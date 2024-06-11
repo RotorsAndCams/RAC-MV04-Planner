@@ -2,3 +2,9 @@
 	path = ExtLibs/mono
 	url = https://github.com/meee1/mono.git
 	shallow = true
+[submodule "Plugins/IFP_UAVControl"]
+	path = Plugins/IFP_UAVControl
+	url = https://github.com/RotorsAndCams/RAC-Propatria-MPPlugin-IFP-UAVControl.git
+[submodule "Plugins/IFP_CameraControl"]
+	path = Plugins/IFP_CameraControl
+	url = https://github.com/RotorsAndCams/RAC-Propatria-MPPlugin-IFP-CameraControl.git
