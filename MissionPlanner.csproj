@@ -613,7 +613,7 @@
       <Version>0.9.7</Version>
     </PackageReference>
     <PackageReference Include="BouncyCastle.Cryptography">
-      <Version>2.0.0</Version>
+      <Version>2.3.1</Version>
     </PackageReference>
     <PackageReference Include="CoordinateSharp">
       <Version>2.22.1.1</Version>
