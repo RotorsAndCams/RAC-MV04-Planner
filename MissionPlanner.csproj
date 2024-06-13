@@ -706,6 +706,12 @@
   <ItemGroup>
     <Compile Include="Antenna\TrackerGeneric.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="Controls\ColorSlider.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ColorSlider.Designer.cs">
+      <DependentUpon>ColorSlider.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\DroneCANSubscriber.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -4830,6 +4836,13 @@
     <Content Include="quaternion.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\icons8-settings-100.png" />
+    <None Include="Resources\icons8-upward-arrow-64.png" />
+    <None Include="Resources\icons8-down-64 %281%29.png" />
+    <None Include="Resources\icons8-reset-50.png" />
+    <None Include="Resources\icons8-crosshair-50.png" />
+    <None Include="Resources\icons8-stop-sign-50.png" />
+    <None Include="Resources\icons8-fullscreen-50.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

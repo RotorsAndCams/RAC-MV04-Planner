@@ -94,7 +94,7 @@ namespace MissionPlanner.GCSViews
         private void DrawUI()
         {
             // Video stream control
-            this.Controls.Add(VideoControl);
+            this.pnl_CameraScreen.Controls.Add(VideoControl);
             VideoControl.Dock = DockStyle.Fill;
 
             // Test functions
@@ -265,22 +265,22 @@ namespace MissionPlanner.GCSViews
                 }},
             };
 
-            ComboBox cb_TestFunctions = new ComboBox();
-            cb_TestFunctions.DropDownStyle = ComboBoxStyle.DropDownList;
-            cb_TestFunctions.Items.AddRange(testFunctions.Keys.ToArray());
-            cb_TestFunctions.SelectedIndex = 0;
-            cb_TestFunctions.Location = new Point(10, (this.Height / 3) + 0);
-            cb_TestFunctions.Width = 100;
-            this.Controls.Add(cb_TestFunctions);
-            cb_TestFunctions.BringToFront();
+            //ComboBox cb_TestFunctions = new ComboBox();
+            //cb_TestFunctions.DropDownStyle = ComboBoxStyle.DropDownList;
+            //cb_TestFunctions.Items.AddRange(testFunctions.Keys.ToArray());
+            //cb_TestFunctions.SelectedIndex = 0;
+            //cb_TestFunctions.Location = new Point(10, (this.Height / 3) + 0);
+            //cb_TestFunctions.Width = 100;
+            //this.Controls.Add(cb_TestFunctions);
+            //cb_TestFunctions.BringToFront();
 
-            Button bt_DoTestFunction = new Button();
-            bt_DoTestFunction.Text = "Test function";
-            bt_DoTestFunction.Location = new Point(10, (this.Height / 3) + 25);
-            bt_DoTestFunction.Width = 100;
-            bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
-            this.Controls.Add(bt_DoTestFunction);
-            bt_DoTestFunction.BringToFront();
+            //Button bt_DoTestFunction = new Button();
+            //bt_DoTestFunction.Text = "Test function";
+            //bt_DoTestFunction.Location = new Point(10, (this.Height / 3) + 25);
+            //bt_DoTestFunction.Width = 100;
+            //bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
+            //this.Controls.Add(bt_DoTestFunction);
+            //bt_DoTestFunction.BringToFront();
             #endregion
         }
 
