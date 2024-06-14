@@ -161,9 +161,8 @@ namespace MissionPlanner.GCSViews
                 }},
                 {"Switch crosshairs", () =>
                 {
-                    HudElements.Crosshairs = HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus;
-                    string crshr = HudElements.Crosshairs == CrosshairsType.Plus ? "plus" : "horizontal";
-                    AddToOSDDebug("Crosshairs set to " + crshr);
+                    SetCrosshairType(HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus);
+                    AddToOSDDebug("Crosshairs set to " + Enum.GetName(typeof(CrosshairsType), HudElements.Crosshairs));
                 }},
                 {"Do photo", () =>
                 {
@@ -640,6 +639,18 @@ namespace MissionPlanner.GCSViews
                 hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 100.0,
                 hasSysRep ? ((MavProto.SysReport)CameraHandler.CameraReports[MavProto.MavReportType.SystemReport]).fov : 60.0,
                 VideoRectangle.Width, HudElements.LineDistance);
+        }
+
+        /// <summary>
+        /// Set the crosshair type on the OSD
+        /// </summary>
+        /// <param name="type">Crosshair type to set</param>
+        private void SetCrosshairType(CrosshairsType type)
+        {
+            if (HudElements.Crosshairs != type)
+            {
+                HudElements.Crosshairs = type;
+            }
         }
 
         /// <summary>
