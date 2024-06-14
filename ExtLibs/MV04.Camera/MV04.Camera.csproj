@@ -75,6 +75,12 @@
     <Compile Include="CameraMoverForm.Designer.cs">
       <DependentUpon>CameraMoverForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="CameraSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CameraSettingsForm.Designer.cs">
+      <DependentUpon>CameraSettingsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HudElements.cs" />
     <Compile Include="MavProto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -91,6 +97,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CameraMoverForm.resx">
       <DependentUpon>CameraMoverForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CameraSettingsForm.resx">
+      <DependentUpon>CameraSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TrackerPosForm.resx">
       <DependentUpon>TrackerPosForm.cs</DependentUpon>
