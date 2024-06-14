@@ -133,10 +133,10 @@
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="btn_FullScreen.Location" type="System.Drawing.Point, System.Drawing">
-    <value>141, 3</value>
+    <value>166, 3</value>
   </data>
   <data name="btn_FullScreen.Size" type="System.Drawing.Size, System.Drawing">
-    <value>132, 78</value>
+    <value>158, 78</value>
   </data>
   <data name="btn_FullScreen.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -163,7 +163,7 @@
     <value>3, 3</value>
   </data>
   <data name="btn_StopTracking.Size" type="System.Drawing.Size, System.Drawing">
-    <value>132, 78</value>
+    <value>157, 78</value>
   </data>
   <data name="btn_StopTracking.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -190,7 +190,7 @@
     <value>1</value>
   </data>
   <data name="tlp_ButtonSection2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>276, 84</value>
+    <value>327, 84</value>
   </data>
   <data name="tlp_ButtonSection2.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -223,10 +223,10 @@
     <value>NoControl</value>
   </data>
   <data name="btn_ChangeCrosshair.Location" type="System.Drawing.Point, System.Drawing">
-    <value>141, 3</value>
+    <value>166, 3</value>
   </data>
   <data name="btn_ChangeCrosshair.Size" type="System.Drawing.Size, System.Drawing">
-    <value>132, 80</value>
+    <value>158, 80</value>
   </data>
   <data name="btn_ChangeCrosshair.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -256,7 +256,7 @@
     <value>3, 3</value>
   </data>
   <data name="btn_ResetZoom.Size" type="System.Drawing.Size, System.Drawing">
-    <value>132, 80</value>
+    <value>157, 80</value>
   </data>
   <data name="btn_ResetZoom.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -286,7 +286,7 @@
     <value>1</value>
   </data>
   <data name="tlp_ButtonSection1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>276, 86</value>
+    <value>327, 86</value>
   </data>
   <data name="tlp_ButtonSection1.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -313,10 +313,10 @@
     <value>Fill</value>
   </data>
   <data name="cs_ColorSliderAltitude.Location" type="System.Drawing.Point, System.Drawing">
-    <value>153, 3</value>
+    <value>166, 3</value>
   </data>
   <data name="cs_ColorSliderAltitude.Size" type="System.Drawing.Size, System.Drawing">
-    <value>120, 395</value>
+    <value>158, 395</value>
   </data>
   <data name="cs_ColorSliderAltitude.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -328,7 +328,7 @@
     <value>cs_ColorSliderAltitude</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.8930.27166, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.8931.17789, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Parent" xml:space="preserve">
     <value>tlp_AGLContainer</value>
@@ -358,7 +358,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="btn_Down.Size" type="System.Drawing.Size, System.Drawing">
-    <value>144, 133</value>
+    <value>157, 133</value>
   </data>
   <data name="btn_Down.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -391,7 +391,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="btn_Up.Size" type="System.Drawing.Size, System.Drawing">
-    <value>144, 131</value>
+    <value>157, 131</value>
   </data>
   <data name="btn_Up.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -424,7 +424,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_AltitudeValue.Location" type="System.Drawing.Point, System.Drawing">
-    <value>20, 62</value>
+    <value>27, 62</value>
   </data>
   <data name="lb_AltitudeValue.Size" type="System.Drawing.Size, System.Drawing">
     <value>97, 37</value>
@@ -460,7 +460,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_Agl.Location" type="System.Drawing.Point, System.Drawing">
-    <value>34, 25</value>
+    <value>41, 25</value>
   </data>
   <data name="lb_Agl.Size" type="System.Drawing.Size, System.Drawing">
     <value>69, 37</value>
@@ -493,7 +493,7 @@
     <value>2</value>
   </data>
   <data name="tlp_AGLData.Size" type="System.Drawing.Size, System.Drawing">
-    <value>138, 125</value>
+    <value>151, 125</value>
   </data>
   <data name="tlp_AGLData.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -523,7 +523,7 @@
     <value>3</value>
   </data>
   <data name="tlp_AGLIncrement.Size" type="System.Drawing.Size, System.Drawing">
-    <value>144, 395</value>
+    <value>157, 395</value>
   </data>
   <data name="tlp_AGLIncrement.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -553,7 +553,7 @@
     <value>1</value>
   </data>
   <data name="tlp_AGLContainer.Size" type="System.Drawing.Size, System.Drawing">
-    <value>276, 401</value>
+    <value>327, 401</value>
   </data>
   <data name="tlp_AGLContainer.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -571,7 +571,7 @@
     <value>2</value>
   </data>
   <data name="tlp_AGLContainer.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="cs_ColorSliderAltitude" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="tlp_AGLIncrement" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,54,71014,Percent,45,28986" /&gt;&lt;Rows Styles="Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="cs_ColorSliderAltitude" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="tlp_AGLIncrement" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,49,8471,Percent,50,1529" /&gt;&lt;Rows Styles="Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="tlp_InfoBase.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
@@ -589,7 +589,7 @@
     <value>0, 0</value>
   </data>
   <data name="btn_Settings.Size" type="System.Drawing.Size, System.Drawing">
-    <value>121, 141</value>
+    <value>160, 141</value>
   </data>
   <data name="btn_Settings.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -613,10 +613,10 @@
     <value>Fill</value>
   </data>
   <data name="pnl_SettingsPanel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>152, 3</value>
+    <value>164, 3</value>
   </data>
   <data name="pnl_SettingsPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>121, 141</value>
+    <value>160, 141</value>
   </data>
   <data name="pnl_SettingsPanel.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -646,7 +646,7 @@
     <value>1</value>
   </data>
   <data name="tlp_SensorLights.Size" type="System.Drawing.Size, System.Drawing">
-    <value>143, 79</value>
+    <value>155, 79</value>
   </data>
   <data name="tlp_SensorLights.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -676,7 +676,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_CameraStatusValue.Location" type="System.Drawing.Point, System.Drawing">
-    <value>81, 31</value>
+    <value>87, 31</value>
   </data>
   <data name="lb_CameraStatusValue.Size" type="System.Drawing.Size, System.Drawing">
     <value>37, 13</value>
@@ -706,7 +706,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_DroneStatusValue.Location" type="System.Drawing.Point, System.Drawing">
-    <value>81, 0</value>
+    <value>87, 0</value>
   </data>
   <data name="lb_DroneStatusValue.Size" type="System.Drawing.Size, System.Drawing">
     <value>49, 13</value>
@@ -805,7 +805,7 @@
     <value>2</value>
   </data>
   <data name="tlp_DeviceStatusInfo.Size" type="System.Drawing.Size, System.Drawing">
-    <value>143, 62</value>
+    <value>155, 62</value>
   </data>
   <data name="tlp_DeviceStatusInfo.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -832,7 +832,7 @@
     <value>3, 3</value>
   </data>
   <data name="pnl_DeviceState.Size" type="System.Drawing.Size, System.Drawing">
-    <value>143, 141</value>
+    <value>155, 141</value>
   </data>
   <data name="pnl_DeviceState.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -859,7 +859,7 @@
     <value>1</value>
   </data>
   <data name="tlp_InfoBase.Size" type="System.Drawing.Size, System.Drawing">
-    <value>276, 147</value>
+    <value>327, 147</value>
   </data>
   <data name="tlp_InfoBase.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -877,7 +877,7 @@
     <value>3</value>
   </data>
   <data name="tlp_InfoBase.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnl_SettingsPanel" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="pnl_DeviceState" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,54,00844,Percent,45,99156" /&gt;&lt;Rows Styles="Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnl_SettingsPanel" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="pnl_DeviceState" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,49,54128,Percent,50,45872" /&gt;&lt;Rows Styles="Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="tlp_ControlsBase.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -889,7 +889,7 @@
     <value>4</value>
   </data>
   <data name="tlp_ControlsBase.Size" type="System.Drawing.Size, System.Drawing">
-    <value>282, 742</value>
+    <value>333, 742</value>
   </data>
   <data name="tlp_ControlsBase.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -913,10 +913,10 @@
     <value>Right</value>
   </data>
   <data name="pnl_Controllers.Location" type="System.Drawing.Point, System.Drawing">
-    <value>853, 0</value>
+    <value>802, 0</value>
   </data>
   <data name="pnl_Controllers.Size" type="System.Drawing.Size, System.Drawing">
-    <value>282, 742</value>
+    <value>333, 742</value>
   </data>
   <data name="pnl_Controllers.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -940,7 +940,7 @@
     <value>0, 0</value>
   </data>
   <data name="pnl_CameraScreen.Size" type="System.Drawing.Size, System.Drawing">
-    <value>853, 742</value>
+    <value>802, 742</value>
   </data>
   <data name="pnl_CameraScreen.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>

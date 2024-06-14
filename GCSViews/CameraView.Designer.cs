@@ -125,6 +125,7 @@
             this.btn_ChangeCrosshair.Image = global::MissionPlanner.Properties.Resources.icons8_crosshair_50;
             this.btn_ChangeCrosshair.Name = "btn_ChangeCrosshair";
             this.btn_ChangeCrosshair.UseVisualStyleBackColor = false;
+            this.btn_ChangeCrosshair.Click += new System.EventHandler(this.btn_ChangeCrosshair_Click);
             // 
             // btn_ResetZoom
             // 
@@ -137,9 +138,11 @@
             // 
             // tlp_AGLContainer
             // 
+            this.tlp_AGLContainer.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.tlp_AGLContainer, "tlp_AGLContainer");
             this.tlp_AGLContainer.Controls.Add(this.cs_ColorSliderAltitude, 1, 0);
             this.tlp_AGLContainer.Controls.Add(this.tlp_AGLIncrement, 0, 0);
+            this.tlp_AGLContainer.ForeColor = System.Drawing.Color.RosyBrown;
             this.tlp_AGLContainer.Name = "tlp_AGLContainer";
             // 
             // cs_ColorSliderAltitude
@@ -150,6 +153,7 @@
             this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
             this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
             resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
+            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
             this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
             this.cs_ColorSliderAltitude.Maximum = 500;
             this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
@@ -223,10 +227,11 @@
             // 
             this.btn_Settings.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_Settings, "btn_Settings");
-            this.btn_Settings.ForeColor = System.Drawing.Color.Transparent;
+            this.btn_Settings.ForeColor = System.Drawing.Color.Black;
             this.btn_Settings.Image = global::MissionPlanner.Properties.Resources.icons8_settings_100;
             this.btn_Settings.Name = "btn_Settings";
             this.btn_Settings.UseVisualStyleBackColor = false;
+            this.btn_Settings.Click += new System.EventHandler(this.btn_Settings_Click);
             // 
             // pnl_DeviceState
             // 
