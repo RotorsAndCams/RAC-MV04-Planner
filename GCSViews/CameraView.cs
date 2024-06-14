@@ -1,5 +1,6 @@
 ﻿using CoordinateSharp;
 using log4net;
+using log4net.Repository.Hierarchy;
 using MissionPlanner.Utilities;
 using MV04.Camera;
 using MV04.Settings;
@@ -84,8 +85,42 @@ namespace MissionPlanner.GCSViews
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
             MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
+
+            
+
             // Draw UI
             DrawUI();
+            //SetColorTheme();
+        }
+
+        private void SetColorTheme()
+        {
+            try
+            {
+                SetControlsChildGUI(this);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+        private void SetControlsChildGUI(Control control)
+        {
+            foreach (Control c in control.Controls)
+            {
+                if(c is Button || c is Panel)
+                {
+                    c.BackColor = Color.Black;
+                    c.BackgroundImage = null;
+                    c.ForeColor = Color.Black;
+                    //ThemeColor.
+                }
+                    
+
+                if(c.Controls.Count > 0)
+                    SetControlsChildGUI(c);
+            }
         }
 
         /// <summary>
@@ -813,6 +848,19 @@ namespace MissionPlanner.GCSViews
         public void Deactivate()
         {
             log.Info("Deactivate");
+        }
+
+        private void btn_Settings_Click(object sender, EventArgs e)
+        {
+            //SettingManager.OpenDialog();
+
+
+
+        }
+
+        private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
+        {
+            SetCrosshairType(HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus);
         }
     }
 }
