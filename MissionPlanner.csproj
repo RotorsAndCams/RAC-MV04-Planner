@@ -4843,6 +4843,10 @@
     <None Include="Resources\icons8-crosshair-50.png" />
     <None Include="Resources\icons8-stop-sign-50.png" />
     <None Include="Resources\icons8-fullscreen-50.png" />
+    <None Include="Resources\headlight-30.png" />
+    <None Include="Resources\motion-sensor-30.png" />
+    <None Include="Resources\drone-takeoff.png" />
+    <None Include="Resources\drone-takeoff_.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

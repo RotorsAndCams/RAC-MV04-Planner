@@ -91,6 +91,24 @@ namespace MissionPlanner.GCSViews
             // Draw UI
             DrawUI();
             //SetColorTheme();
+
+            DisableControls();
+
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.A))
+            {
+                tlp_AGLContainer.Visible = !tlp_AGLContainer.Visible;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void DisableControls()
+        {
+            this.tlp_AGLContainer.Visible = false;
         }
 
         private void SetColorTheme()

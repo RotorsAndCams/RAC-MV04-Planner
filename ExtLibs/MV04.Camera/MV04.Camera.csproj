@@ -120,6 +120,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\day-camera-50.png" />
+    <None Include="Resources\night-camera-50.png" />
+    <None Include="Resources\standing-man-64.png" />
+    <None Include="Resources\standing-man-50.png" />
+    <None Include="Resources\istanding-man-50.png" />
+    <None Include="Resources\istanding-man-501.png" />
+    <None Include="Resources\connect-50.png" />
     <Content Include="SharpGL.ico" />
     <Content Include="SharpGL.png" />
   </ItemGroup>
