@@ -12,6 +12,18 @@ namespace MV04.Camera
 {
     public partial class CameraSettingsForm : Form
     {
+        private static CameraSettingsForm _instance;
+
+        public static CameraSettingsForm Instance
+        {
+            get
+            {
+                if(_instance == null || _instance.IsDisposed)
+                    _instance = new CameraSettingsForm();
+                return _instance;
+            }
+        }
+
         public CameraSettingsForm()
         {
             InitializeComponent();

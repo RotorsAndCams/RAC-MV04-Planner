@@ -180,6 +180,7 @@
             this.btn_Down.Image = global::MissionPlanner.Properties.Resources.icons8_down_64__1_;
             this.btn_Down.Name = "btn_Down";
             this.btn_Down.UseVisualStyleBackColor = false;
+            this.btn_Down.Click += new System.EventHandler(this.btn_Down_Click);
             // 
             // btn_Up
             // 
@@ -189,6 +190,7 @@
             this.btn_Up.Image = global::MissionPlanner.Properties.Resources.icons8_upward_arrow_64;
             this.btn_Up.Name = "btn_Up";
             this.btn_Up.UseVisualStyleBackColor = false;
+            this.btn_Up.Click += new System.EventHandler(this.btn_Up_Click);
             // 
             // tlp_AGLData
             // 

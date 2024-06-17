@@ -854,13 +854,30 @@ namespace MissionPlanner.GCSViews
         {
             //SettingManager.OpenDialog();
 
-
+            CameraSettingsManager.OpenCameraSettingsForm();
 
         }
 
         private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
         {
             SetCrosshairType(HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus);
+        }
+
+        private void btn_Up_Click(object sender, EventArgs e)
+        {
+
+            if(this.cs_ColorSliderAltitude.Value < this.cs_ColorSliderAltitude.Maximum-10)
+                this.cs_ColorSliderAltitude.Value += 10;
+            else
+                this.cs_ColorSliderAltitude.Value = this.cs_ColorSliderAltitude.Maximum;
+        }
+
+        private void btn_Down_Click(object sender, EventArgs e)
+        {
+            if(this.cs_ColorSliderAltitude.Value > 10)
+                this.cs_ColorSliderAltitude.Value -= 10;
+            else
+                this.cs_ColorSliderAltitude.Value = 0;
         }
     }
 }
