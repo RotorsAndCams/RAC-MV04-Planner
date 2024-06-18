@@ -283,22 +283,24 @@ namespace MissionPlanner.GCSViews
                 }},
             };
 
-            //ComboBox cb_TestFunctions = new ComboBox();
-            //cb_TestFunctions.DropDownStyle = ComboBoxStyle.DropDownList;
-            //cb_TestFunctions.Items.AddRange(testFunctions.Keys.ToArray());
-            //cb_TestFunctions.SelectedIndex = 0;
-            //cb_TestFunctions.Location = new Point(10, (this.Height / 3) + 0);
-            //cb_TestFunctions.Width = 100;
-            //this.Controls.Add(cb_TestFunctions);
-            //cb_TestFunctions.BringToFront();
+            //ddd
 
-            //Button bt_DoTestFunction = new Button();
-            //bt_DoTestFunction.Text = "Test function";
-            //bt_DoTestFunction.Location = new Point(10, (this.Height / 3) + 25);
-            //bt_DoTestFunction.Width = 100;
-            //bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
-            //this.Controls.Add(bt_DoTestFunction);
-            //bt_DoTestFunction.BringToFront();
+            ComboBox cb_TestFunctions = new ComboBox();
+            cb_TestFunctions.DropDownStyle = ComboBoxStyle.DropDownList;
+            cb_TestFunctions.Items.AddRange(testFunctions.Keys.ToArray());
+            cb_TestFunctions.SelectedIndex = 0;
+            cb_TestFunctions.Location = new Point(10, (this.Height / 3) + 0);
+            cb_TestFunctions.Width = 100;
+            this.Controls.Add(cb_TestFunctions);
+            cb_TestFunctions.BringToFront();
+
+            Button bt_DoTestFunction = new Button();
+            bt_DoTestFunction.Text = "Test function";
+            bt_DoTestFunction.Location = new Point(10, (this.Height / 3) + 25);
+            bt_DoTestFunction.Width = 100;
+            bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
+            this.Controls.Add(bt_DoTestFunction);
+            bt_DoTestFunction.BringToFront();
             #endregion
         }
 
@@ -897,9 +899,11 @@ namespace MissionPlanner.GCSViews
             
         }
 
-        private async void btn_ResetZoom_Click(object sender, EventArgs e)
+        private void btn_ResetZoom_Click(object sender, EventArgs e)
         {
-            await CameraHandler.ResetZoomAsync();
+            //Task.Run(() => CameraHandler.ResetZoomAsync());
+            CameraHandler.ResetZoom();
+            //CameraHandler.ResetZoomAsync();
         }
     }
 }
