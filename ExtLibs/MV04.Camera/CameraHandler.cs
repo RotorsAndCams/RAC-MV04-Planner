@@ -778,7 +778,7 @@ namespace MV04.Camera
         {
             if (CameraControlConnected)
             {
-                MavProto.MavCmdSetFOV(CameraControl.mav_comm, CameraControl.ackCb, 60);
+                MavProto.MavCmdSetFOV(CameraControl.mav_comm, CameraControl.ackCb, 65);
                 return true;
             }
             
@@ -793,7 +793,7 @@ namespace MV04.Camera
 
                 MavProto.mav_error CmdSent = (MavProto.mav_error)MavProto.MavCmdSetFOV(CameraControl.mav_comm, (command_id, result, unused_arg, handle, buf, buf_len) =>
                 {
-                    //CameraControl.ackCb(command_id, result, unused_arg, handle, buf, buf_len);
+                    CameraControl.ackCb(command_id, result, unused_arg, handle, buf, buf_len);
                     CmdAckReceived.SetResult((MavProto.MAV_RESULT)result);
                 },
                 65);
