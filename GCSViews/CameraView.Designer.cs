@@ -47,6 +47,7 @@
             this.btn_Settings = new System.Windows.Forms.Button();
             this.pnl_DeviceState = new System.Windows.Forms.Panel();
             this.tlp_SensorLights = new System.Windows.Forms.TableLayoutPanel();
+            this.pb_DroneTakeOff = new System.Windows.Forms.PictureBox();
             this.pb_InfraLight = new System.Windows.Forms.PictureBox();
             this.pb_PositionIndicator = new System.Windows.Forms.PictureBox();
             this.tlp_DeviceStatusInfo = new System.Windows.Forms.TableLayoutPanel();
@@ -58,7 +59,6 @@
             this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
             this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.pnl_CameraScreen = new System.Windows.Forms.Panel();
-            this.pb_DroneTakeOff = new System.Windows.Forms.PictureBox();
             this.pnl_Controllers.SuspendLayout();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_AGLContainer.SuspendLayout();
@@ -69,11 +69,11 @@
             this.pnl_SettingsPanel.SuspendLayout();
             this.pnl_DeviceState.SuspendLayout();
             this.tlp_SensorLights.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_DroneTakeOff)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_InfraLight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_PositionIndicator)).BeginInit();
             this.tlp_DeviceStatusInfo.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb_DroneTakeOff)).BeginInit();
             this.SuspendLayout();
             // 
             // pnl_Controllers
@@ -183,6 +183,7 @@
             this.btn_FullScreen.Image = global::MissionPlanner.Properties.Resources.icons8_fullscreen_50;
             this.btn_FullScreen.Name = "btn_FullScreen";
             this.btn_FullScreen.UseVisualStyleBackColor = false;
+            this.btn_FullScreen.Click += new System.EventHandler(this.btn_FullScreen_Click);
             // 
             // btn_StopTracking
             // 
@@ -231,6 +232,13 @@
             this.tlp_SensorLights.Controls.Add(this.pb_InfraLight, 1, 0);
             this.tlp_SensorLights.Controls.Add(this.pb_PositionIndicator, 0, 0);
             this.tlp_SensorLights.Name = "tlp_SensorLights";
+            // 
+            // pb_DroneTakeOff
+            // 
+            resources.ApplyResources(this.pb_DroneTakeOff, "pb_DroneTakeOff");
+            this.pb_DroneTakeOff.Image = global::MissionPlanner.Properties.Resources.drone_takeoff_;
+            this.pb_DroneTakeOff.Name = "pb_DroneTakeOff";
+            this.pb_DroneTakeOff.TabStop = false;
             // 
             // pb_InfraLight
             // 
@@ -305,19 +313,13 @@
             this.btn_ResetZoom.Image = global::MissionPlanner.Properties.Resources.icons8_reset_50;
             this.btn_ResetZoom.Name = "btn_ResetZoom";
             this.btn_ResetZoom.UseVisualStyleBackColor = false;
+            this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
             // 
             // pnl_CameraScreen
             // 
             this.pnl_CameraScreen.BackColor = System.Drawing.Color.DarkGray;
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
-            // 
-            // pb_DroneTakeOff
-            // 
-            resources.ApplyResources(this.pb_DroneTakeOff, "pb_DroneTakeOff");
-            this.pb_DroneTakeOff.Image = global::MissionPlanner.Properties.Resources.drone_takeoff_;
-            this.pb_DroneTakeOff.Name = "pb_DroneTakeOff";
-            this.pb_DroneTakeOff.TabStop = false;
             // 
             // CameraView
             // 
@@ -339,12 +341,12 @@
             this.pnl_SettingsPanel.ResumeLayout(false);
             this.pnl_DeviceState.ResumeLayout(false);
             this.tlp_SensorLights.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pb_DroneTakeOff)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_InfraLight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_PositionIndicator)).EndInit();
             this.tlp_DeviceStatusInfo.ResumeLayout(false);
             this.tlp_DeviceStatusInfo.PerformLayout();
             this.tlp_ButtonSection1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pb_DroneTakeOff)).EndInit();
             this.ResumeLayout(false);
 
         }
