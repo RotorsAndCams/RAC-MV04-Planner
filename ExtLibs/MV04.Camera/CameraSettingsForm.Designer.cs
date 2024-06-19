@@ -152,12 +152,12 @@
             this.BackColor = System.Drawing.Color.Black;
             this.Controls.Add(this.pnl_DisabledControlsByDefault);
             this.Controls.Add(this.tlp_VisibleElements);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.KeyPreview = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "CameraSettingsForm";
             this.ShowIcon = false;
-            this.TopMost = true;
             this.pnl_DisabledControlsByDefault.ResumeLayout(false);
             this.pnl_DisabledControlsByDefault.PerformLayout();
             this.tlp_VisibleElements.ResumeLayout(false);

@@ -28,7 +28,7 @@ namespace MV04.Camera
             }
         }
 
-        public CameraSettingsForm()
+        private CameraSettingsForm()
         {
             InitializeComponent();
 

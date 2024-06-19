@@ -899,7 +899,7 @@ namespace MissionPlanner.GCSViews
         {
             //SettingManager.OpenDialog();
 
-            _cameraSettingsForm = new CameraSettingsForm();
+            _cameraSettingsForm = CameraSettingsForm.Instance;
 
             _cameraSettingsForm.event_ReconnectRequested += Form_event_ReconnectRequested;
 
