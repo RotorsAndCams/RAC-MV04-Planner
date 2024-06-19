@@ -8,11 +8,12 @@ namespace MV04.Camera
 {
     public class CameraSettingsManager
     {
-        public async static void OpenCameraSettingsForm()
+        public static CameraSettingsForm OpenCameraSettingsForm()
         {
             using (var form = new CameraSettingsForm())
             {
                 form.ShowDialog();
+                return form;
             }
         }
 

@@ -806,6 +806,7 @@ namespace MissionPlanner.GCSViews
         /// <param name="line">Text line to add</param>
         private void AddToOSDDebug(string line)
         {
+#if DEBUG
             // Shift everything down
             for (int i = OSDDebugLines.Length - 1; i > 0; i--)
             {
@@ -814,6 +815,7 @@ namespace MissionPlanner.GCSViews
 
             // Add new line
             OSDDebugLines[0] = line;
+#endif
         }
 
         /// <summary>
@@ -846,8 +848,52 @@ namespace MissionPlanner.GCSViews
         {
             //SettingManager.OpenDialog();
 
-            CameraSettingsManager.OpenCameraSettingsForm();
+            _CameraSettingsForm = new CameraSettingsForm();
 
+            _CameraSettingsForm.event_ReconnectRequested += Form_event_ReconnectRequested;
+
+            _CameraSettingsForm.ShowDialog();
+
+        }
+        CameraSettingsForm _CameraSettingsForm;
+        private void Form_event_ReconnectRequested(object sender, EventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => ReconnectCameraStreamAndControl()));
+            }
+            else
+            {
+                ReconnectCameraStreamAndControl();
+            }
+        }
+
+        private void ReconnectCameraStreamAndControl()
+        {
+            // Stream
+            if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
+            {
+                AddToOSDDebug("Video stream started");
+
+                FetchHudData();
+                FetchHudDataTimer.Start();
+            }
+            else
+            {
+                AddToOSDDebug("Failed start video stream");
+            }
+
+            // Control
+            if (CameraHandler.CameraControlConnect(
+                IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
+                int.Parse(SettingManager.Get(Setting.CameraControlPort))))
+            {
+                AddToOSDDebug("Camera control started");
+            }
+            else
+            {
+                AddToOSDDebug("Failed to start camera control");
+            }
         }
 
         private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
@@ -882,14 +928,14 @@ namespace MissionPlanner.GCSViews
             else
             {
                 form = new CameraFullScreenForm();
-                form.VisibleChanged += form_disposed;
+                form.VisibleChanged += FullScreenForm_VisibleChanged;
                 form.ShowDialog();
             }
         }
 
         CameraFullScreenForm form;
 
-        private void form_disposed(object sender, EventArgs e)
+        private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
         {
 
             if (!form.Visible)
@@ -898,11 +944,6 @@ namespace MissionPlanner.GCSViews
                 this.pnl_CameraScreen.Controls.Add(VideoControl);
                 VideoControl.Dock = DockStyle.Fill;
             }
-            else
-            {
-                //
-            }
-            
         }
 
         private void btn_ResetZoom_Click(object sender, EventArgs e)

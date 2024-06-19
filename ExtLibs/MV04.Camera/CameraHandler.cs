@@ -78,7 +78,9 @@ namespace MV04.Camera
             {
                 if (string.IsNullOrWhiteSpace(_MediaSavePath))
                 {
-                    _MediaSavePath = Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
+                    
+                    //Settings.Setting
+                    _MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
                 }
 
                 if (!Directory.Exists(_MediaSavePath))

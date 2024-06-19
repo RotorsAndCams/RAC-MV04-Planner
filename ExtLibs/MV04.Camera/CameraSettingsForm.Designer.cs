@@ -39,11 +39,11 @@
             this.btn_NightCamera = new System.Windows.Forms.Button();
             this.btn_DayCamera = new System.Windows.Forms.Button();
             this.tlp_Base = new System.Windows.Forms.TableLayoutPanel();
-            this.tlp_VisibleElements = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_DisabledControlsByDefault = new System.Windows.Forms.Panel();
+            this.tlp_VisibleElements = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_Base.SuspendLayout();
-            this.tlp_VisibleElements.SuspendLayout();
             this.pnl_DisabledControlsByDefault.SuspendLayout();
+            this.tlp_VisibleElements.SuspendLayout();
             this.SuspendLayout();
             // 
             // btn_Polarity1
@@ -61,6 +61,7 @@
             this.btn_NUC.ForeColor = System.Drawing.Color.White;
             this.btn_NUC.Name = "btn_NUC";
             this.btn_NUC.UseVisualStyleBackColor = false;
+            this.btn_NUC.Click += new System.EventHandler(this.btn_NUC_Click);
             // 
             // btn_BIT
             // 
@@ -86,6 +87,7 @@
             this.btn_Reconnect.Image = global::MV04.Camera.Properties.Resources.connect_50;
             this.btn_Reconnect.Name = "btn_Reconnect";
             this.btn_Reconnect.UseVisualStyleBackColor = false;
+            this.btn_Reconnect.Click += new System.EventHandler(this.btn_Reconnect_Click);
             // 
             // btn_WhiteHot
             // 
@@ -113,6 +115,7 @@
             this.btn_NightCamera.Image = global::MV04.Camera.Properties.Resources.night_camera_50;
             this.btn_NightCamera.Name = "btn_NightCamera";
             this.btn_NightCamera.UseVisualStyleBackColor = false;
+            this.btn_NightCamera.Click += new System.EventHandler(this.btn_NightCamera_Click);
             // 
             // btn_DayCamera
             // 
@@ -122,6 +125,7 @@
             this.btn_DayCamera.Image = global::MV04.Camera.Properties.Resources.day_camera_50;
             this.btn_DayCamera.Name = "btn_DayCamera";
             this.btn_DayCamera.UseVisualStyleBackColor = false;
+            this.btn_DayCamera.Click += new System.EventHandler(this.btn_DayCamera_Click);
             // 
             // tlp_Base
             // 
@@ -129,16 +133,6 @@
             this.tlp_Base.Controls.Add(this.pnl_DisabledControlsByDefault, 0, 1);
             this.tlp_Base.Controls.Add(this.tlp_VisibleElements, 0, 0);
             this.tlp_Base.Name = "tlp_Base";
-            // 
-            // tlp_VisibleElements
-            // 
-            resources.ApplyResources(this.tlp_VisibleElements, "tlp_VisibleElements");
-            this.tlp_VisibleElements.Controls.Add(this.btn_DayCamera, 0, 0);
-            this.tlp_VisibleElements.Controls.Add(this.btn_Reconnect, 1, 1);
-            this.tlp_VisibleElements.Controls.Add(this.btn_NightCamera, 1, 0);
-            this.tlp_VisibleElements.Controls.Add(this.btn_NUC, 0, 1);
-            this.tlp_VisibleElements.ForeColor = System.Drawing.Color.White;
-            this.tlp_VisibleElements.Name = "tlp_VisibleElements";
             // 
             // pnl_DisabledControlsByDefault
             // 
@@ -149,6 +143,16 @@
             this.pnl_DisabledControlsByDefault.Controls.Add(this.btn_BlackHot);
             resources.ApplyResources(this.pnl_DisabledControlsByDefault, "pnl_DisabledControlsByDefault");
             this.pnl_DisabledControlsByDefault.Name = "pnl_DisabledControlsByDefault";
+            // 
+            // tlp_VisibleElements
+            // 
+            resources.ApplyResources(this.tlp_VisibleElements, "tlp_VisibleElements");
+            this.tlp_VisibleElements.Controls.Add(this.btn_DayCamera, 0, 0);
+            this.tlp_VisibleElements.Controls.Add(this.btn_Reconnect, 1, 1);
+            this.tlp_VisibleElements.Controls.Add(this.btn_NightCamera, 1, 0);
+            this.tlp_VisibleElements.Controls.Add(this.btn_NUC, 0, 1);
+            this.tlp_VisibleElements.ForeColor = System.Drawing.Color.White;
+            this.tlp_VisibleElements.Name = "tlp_VisibleElements";
             // 
             // CameraSettingsForm
             // 
@@ -163,10 +167,10 @@
             this.ShowIcon = false;
             this.TopMost = true;
             this.tlp_Base.ResumeLayout(false);
-            this.tlp_VisibleElements.ResumeLayout(false);
-            this.tlp_VisibleElements.PerformLayout();
             this.pnl_DisabledControlsByDefault.ResumeLayout(false);
             this.pnl_DisabledControlsByDefault.PerformLayout();
+            this.tlp_VisibleElements.ResumeLayout(false);
+            this.tlp_VisibleElements.PerformLayout();
             this.ResumeLayout(false);
 
         }
