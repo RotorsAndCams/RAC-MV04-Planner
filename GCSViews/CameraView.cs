@@ -26,6 +26,8 @@ namespace MissionPlanner.GCSViews
 {
     public partial class CameraView : MyUserControl//, IActivate, IDeactivate
     {
+        #region Fields
+
         public static CameraView instance;
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -48,15 +50,19 @@ namespace MissionPlanner.GCSViews
         bool OSDDebug = true;
         string[] OSDDebugLines = new string[10];
 
+        private CameraSettingsForm _cameraSettingsForm;
+        private CameraFullScreenForm _cameraFullScreenForm;
+
+        #endregion
+
         #region Conversion multipliers
         const double Meter_to_Feet = 3.2808399;
         const double Mps_to_Kmph = 3.6;
         const double Mps_to_Knots = 1.94384449;
         #endregion
 
-        /// <summary>
-        /// When the control is created
-        /// </summary>
+        #region Constructor
+
         public CameraView()
         {
             log.Info("Constructor");
@@ -91,6 +97,10 @@ namespace MissionPlanner.GCSViews
 
             DisableControls();
         }
+
+        #endregion
+
+        #region Init
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -167,50 +177,169 @@ namespace MissionPlanner.GCSViews
             #endregion
         }
 
-        /// <summary>
-        /// First time the control is loaded
-        /// </summary>
-        private void CameraView_Load(object sender, EventArgs e)
+        #endregion
+
+        #region CameraFunctions
+
+
+        private void StartCameraStream()
         {
-            // Auto connect if required
-            if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
+            if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
             {
-                // Stream
-                if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
-                {
-                    AddToOSDDebug("Video stream started");
+                AddToOSDDebug("Video stream started");
 
-                    FetchHudData();
-                    FetchHudDataTimer.Start();
-                }
-                else
-                {
-                    AddToOSDDebug("Failed start video stream");
-                }
-
-                // Control
-                if (CameraHandler.CameraControlConnect(
-                    IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
-                    int.Parse(SettingManager.Get(Setting.CameraControlPort))))
-                {
-                    AddToOSDDebug("Camera control started");
-                }
-                else
-                {
-                    AddToOSDDebug("Failed to start camera control");
-                }
+                FetchHudData();
+                FetchHudDataTimer.Start();
             }
+            else
+            {
+                AddToOSDDebug("Failed start video stream");
+            }
+        }
 
-            log.Info("Load");
+        private void StartCameraControl()
+        {
+            if (CameraHandler.CameraControlConnect(
+                IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
+                int.Parse(SettingManager.Get(Setting.CameraControlPort))))
+            {
+                AddToOSDDebug("Camera control started");
+            }
+            else
+            {
+                AddToOSDDebug("Failed to start camera control");
+            }
+        }
+
+        private void ReconnectCameraStreamAndControl()
+        {
+            StartCameraStream();
+            StartCameraControl();
+        }
+
+        #region Crosshair
+
+        private void ChangeCrossHair()
+        {
+            SetCrosshairType(HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus);
+            AddToOSDDebug("Crosshairs set to " + Enum.GetName(typeof(CrosshairsType), HudElements.Crosshairs));
         }
 
         /// <summary>
-        /// Every time the control is displayed
+        /// Set the crosshair type on the OSD
         /// </summary>
-        public void Activate()
+        /// <param name="type">Crosshair type to set</param>
+        private void SetCrosshairType(CrosshairsType type)
         {
-            log.Info("Activate");
+            if (HudElements.Crosshairs != type)
+            {
+                HudElements.Crosshairs = type;
+            }
         }
+
+        #endregion
+
+        private void DoPhoto()
+        {
+            if (CameraHandler.DoPhoto())
+            {
+                AddToOSDDebug("Photo taken");
+            }
+        }
+
+        private void StartRecording()
+        {
+            int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
+            if (CameraHandler.StartRecording(TimeSpan.FromSeconds(sl)))
+            {
+                AddToOSDDebug($"Recording started ({sl}s loop)");
+            }
+            else
+            {
+                AddToOSDDebug("Recording started (infinite)");
+            }
+        }
+
+        private void StartRecordingInfinite()
+        {
+
+            if (CameraHandler.StartRecording(null))
+            {
+                AddToOSDDebug("Recording started (infinite)");
+            }
+            else
+            {
+                AddToOSDDebug("Recording failed to start");
+            }
+        }
+
+        private void StopRecording()
+        {
+            if (CameraHandler.StopRecording())
+            {
+                AddToOSDDebug("Recording stopped");
+            }
+            else
+            {
+                AddToOSDDebug("Recording failed to stopped");
+            }
+        }
+
+        private async Task ResetZoom()
+        {
+            if (await CameraHandler.ResetZoomAsync())
+                AddToOSDDebug("Zoom reset");
+            else
+                AddToOSDDebug("Zoom reset failed");
+        }
+
+        private async Task ToogleDayNightCamera()
+        {
+            if (!CameraHandler.HasCameraReport(MavProto.MavReportType.SystemReport) || ((MavProto.SysReport)CameraHandler.CameraReports[MavProto.MavReportType.SystemReport]).activeSensor == 1) // Unknown / Night Vision
+            {
+                if (await CameraHandler.SetImageSensorAsync(false)) // Set to Day
+                    AddToOSDDebug("Camera sensor set to day");
+                else
+                    AddToOSDDebug("Camera sensor set failed");
+            }
+            else // Day
+            {
+                if (await CameraHandler.SetImageSensorAsync(true)) // Set to Night Vision
+                    AddToOSDDebug("Camera sensor set to night");
+                else
+                    AddToOSDDebug("Camera sensor set failed");
+            }
+        }
+
+        private async Task UpdateIRColor()
+        {
+            if (await CameraHandler.SetNVColorAsync((CameraHandler.NVColor)Enum.Parse(typeof(CameraHandler.NVColor), SettingManager.Get(Setting.IrColorMode), true)))
+                AddToOSDDebug($"Camera NV color mode set to {SettingManager.Get(Setting.IrColorMode)}");
+            else
+                AddToOSDDebug($"Camera NV color mode set failed");
+        }
+
+        private async Task DoBIT()
+        {
+            if (await CameraHandler.DoBITAsync())
+                AddToOSDDebug("Doing built-in test");
+            else
+                AddToOSDDebug("Built-in test failed");
+        }
+
+        private async Task DoNUC()
+        {
+            if (await CameraHandler.DoNUCAsync())
+                AddToOSDDebug("NV calibrated");
+            else
+                AddToOSDDebug("NV calibration failed");
+        }
+
+
+
+        #endregion
+
+        #region Drawing
 
         /// <summary>
         /// Handles every new frame
@@ -355,6 +484,148 @@ namespace MissionPlanner.GCSViews
                 DrawText(text, new Point(VideoRectangle.Width - 3, VideoRectangle.Height / 2), ContentAlignment.TopRight, HorizontalAlignment.Left, new Font(DefaultFont.FontFamily, DefaultFont.Size * 0.75f), Brushes.Lime);
             }
         }
+
+        /// <summary>
+        /// Pixel count for a given horizontal distance (in meters) at the camera target
+        /// </summary>
+        /// <param name="slantRange">Camera target distance in meters</param>
+        /// <param name="fovDegrees">Camera field of view in degrees</param>
+        /// <param name="fovPixels">Camera field of view in pixels (video horizontal resolution)</param>
+        /// <param name="hMeters">Desired horizontal distance for the return value</param>
+        /// <returns>Pixel count for a given horizontal distance (in meters) at the camera target</returns>
+        private int PixelsForMeters(double slantRange, double fovDegrees, int fovPixels, int hMeters = 10)
+        {
+            double fovMeters = 2.0 * slantRange * Math.Tan(MathHelper.Radians(fovDegrees / 2.0));
+            int pixelPerMeter = (int)Math.Round((double)fovPixels / fovMeters); // Use Math.Ceiling() instead?
+            return pixelPerMeter * hMeters;
+        }
+
+        /// <summary>
+        /// Draws a text on the control at a given location
+        /// </summary>
+        private Rectangle DrawText(string text, Point position, ContentAlignment rectangleAlignment = ContentAlignment.TopLeft, HorizontalAlignment textAlignment = HorizontalAlignment.Left, Font textFont = null, Brush textBrush = null, Rectangle? drawArea = null, Graphics drawGraphics = null)
+        {
+            // Null check text
+            text = text ?? "";
+
+            // Set nullables
+            textFont = textFont ?? DefaultFont;
+            textBrush = textBrush ?? DefaultBrush;
+            drawArea = drawArea ?? VideoRectangle;
+            drawGraphics = drawGraphics ?? VideoGraphics;
+
+            // Check position
+            if (position.X >= 0
+                && position.X <= drawArea.Value.Width
+                && position.Y >= 0
+                && position.Y <= drawArea.Value.Height)
+            {
+                // Draw text
+                StringAlignment textHorizontalAlignment = StringAlignment.Near; // Relative to top left corner
+                switch (textAlignment)
+                {
+                    case HorizontalAlignment.Center:
+                        textHorizontalAlignment = StringAlignment.Center;
+                        break;
+                    case HorizontalAlignment.Right:
+                        textHorizontalAlignment = StringAlignment.Far;
+                        break;
+                    default: // HorizontalAlignment.Left
+                        break;
+                }
+                StringFormat textFormat = new StringFormat()
+                {
+                    Alignment = textHorizontalAlignment,
+                    LineAlignment = StringAlignment.Center, // Relative to top left corner
+                    FormatFlags = StringFormatFlags.NoWrap | StringFormatFlags.NoClip
+                };
+
+                Size textSize = TextSize(text, textFont, drawGraphics);
+                switch (rectangleAlignment)
+                {
+                    case ContentAlignment.TopCenter:
+                        position.X -= textSize.Width / 2;
+                        break;
+                    case ContentAlignment.TopRight:
+                        position.X -= textSize.Width + 1;
+                        break;
+                    case ContentAlignment.MiddleLeft:
+                        position.Y -= textSize.Height / 2;
+                        break;
+                    case ContentAlignment.MiddleCenter:
+                        position.X -= textSize.Width / 2;
+                        position.Y -= textSize.Height / 2;
+                        break;
+                    case ContentAlignment.MiddleRight:
+                        position.X -= textSize.Width + 1;
+                        position.Y -= textSize.Height / 2;
+                        break;
+                    case ContentAlignment.BottomLeft:
+                        position.Y -= textSize.Height + 1;
+                        break;
+                    case ContentAlignment.BottomCenter:
+                        position.X -= textSize.Width / 2;
+                        position.Y -= textSize.Height + 1;
+                        break;
+                    case ContentAlignment.BottomRight:
+                        position.X -= textSize.Width + 1;
+                        position.Y -= textSize.Height + 1;
+                        break;
+                    default: // ContentAlignment.TopLeft
+                        break;
+                }
+                Rectangle textRectangle = new Rectangle()
+                {
+                    Size = textSize,
+                    Location = position
+                };
+
+                // Draw text on control
+                drawGraphics.DrawString(text, textFont, textBrush, textRectangle, textFormat);
+
+                // Return rectangle
+                return textRectangle;
+            }
+            else
+            {
+                return new Rectangle();
+            }
+        }
+
+        /// <summary>
+        /// Calculates the bounding rectangle size for a text
+        /// </summary>
+        private Size TextSize(string text, Font font, Graphics graphics)
+        {
+            SizeF size = graphics.MeasureString(text.Split('\n').OrderByDescending(s => s.Length).FirstOrDefault(), font);
+            return new Size()
+            {
+                Width = (int)Math.Ceiling(size.Width) + 4,
+                Height = (int)Math.Ceiling(size.Height * (text.Count(c => c == '\n') + 1))
+            };
+        }
+
+        /// <summary>
+        /// Add a new line to the OSD debug text
+        /// </summary>
+        /// <param name="line">Text line to add</param>
+        private void AddToOSDDebug(string line)
+        {
+#if DEBUG
+            // Shift everything down
+            for (int i = OSDDebugLines.Length - 1; i > 0; i--)
+            {
+                OSDDebugLines[i] = OSDDebugLines[i - 1];
+            }
+
+            // Add new line
+            OSDDebugLines[0] = line;
+#endif
+        }
+
+        #endregion
+
+        #region HUD
 
         /// <summary>
         /// Fetches fresh data for the overlay elements
@@ -525,162 +796,93 @@ namespace MissionPlanner.GCSViews
                 VideoRectangle.Width, HudElements.LineDistance);
         }
 
+        #endregion
+
+        #region EventHandlers
+
         /// <summary>
-        /// Set the crosshair type on the OSD
+        /// First time the control is loaded
         /// </summary>
-        /// <param name="type">Crosshair type to set</param>
-        private void SetCrosshairType(CrosshairsType type)
+        private void CameraView_Load(object sender, EventArgs e)
         {
-            if (HudElements.Crosshairs != type)
+            // Auto connect if required
+            if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
             {
-                HudElements.Crosshairs = type;
+                StartCameraStream();
+                StartCameraControl();
             }
+
+            log.Info("Load");
         }
 
-        /// <summary>
-        /// Pixel count for a given horizontal distance (in meters) at the camera target
-        /// </summary>
-        /// <param name="slantRange">Camera target distance in meters</param>
-        /// <param name="fovDegrees">Camera field of view in degrees</param>
-        /// <param name="fovPixels">Camera field of view in pixels (video horizontal resolution)</param>
-        /// <param name="hMeters">Desired horizontal distance for the return value</param>
-        /// <returns>Pixel count for a given horizontal distance (in meters) at the camera target</returns>
-        private int PixelsForMeters(double slantRange, double fovDegrees, int fovPixels, int hMeters = 10)
+        private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
         {
-            double fovMeters = 2.0 * slantRange * Math.Tan(MathHelper.Radians(fovDegrees / 2.0));
-            int pixelPerMeter = (int)Math.Round((double)fovPixels / fovMeters); // Use Math.Ceiling() instead?
-            return pixelPerMeter * hMeters;
+            ChangeCrossHair();
         }
 
-        /// <summary>
-        /// Draws a text on the control at a given location
-        /// </summary>
-        private Rectangle DrawText(string text, Point position, ContentAlignment rectangleAlignment = ContentAlignment.TopLeft, HorizontalAlignment textAlignment = HorizontalAlignment.Left, Font textFont = null, Brush textBrush = null, Rectangle? drawArea = null, Graphics drawGraphics = null)
+        private void btn_Up_Click(object sender, EventArgs e)
         {
-            // Null check text
-            text = text ?? "";
 
-            // Set nullables
-            textFont = textFont ?? DefaultFont;
-            textBrush = textBrush ?? DefaultBrush;
-            drawArea = drawArea ?? VideoRectangle;
-            drawGraphics = drawGraphics ?? VideoGraphics;
+            if (this.cs_ColorSliderAltitude.Value < this.cs_ColorSliderAltitude.Maximum - 10)
+                this.cs_ColorSliderAltitude.Value += 10;
+            else
+                this.cs_ColorSliderAltitude.Value = this.cs_ColorSliderAltitude.Maximum;
+        }
 
-            // Check position
-            if (position.X >= 0
-                && position.X <= drawArea.Value.Width
-                && position.Y >= 0
-                && position.Y <= drawArea.Value.Height)
+        private void btn_Down_Click(object sender, EventArgs e)
+        {
+            if (this.cs_ColorSliderAltitude.Value > 10)
+                this.cs_ColorSliderAltitude.Value -= 10;
+            else
+                this.cs_ColorSliderAltitude.Value = 0;
+        }
+
+        private void btn_FullScreen_Click(object sender, EventArgs e)
+        {
+            if (_cameraFullScreenForm != null)
             {
-                // Draw text
-                StringAlignment textHorizontalAlignment = StringAlignment.Near; // Relative to top left corner
-                switch (textAlignment)
-                {
-                    case HorizontalAlignment.Center:
-                        textHorizontalAlignment = StringAlignment.Center;
-                        break;
-                    case HorizontalAlignment.Right:
-                        textHorizontalAlignment = StringAlignment.Far;
-                        break;
-                    default: // HorizontalAlignment.Left
-                        break;
-                }
-                StringFormat textFormat = new StringFormat()
-                {
-                    Alignment = textHorizontalAlignment,
-                    LineAlignment = StringAlignment.Center, // Relative to top left corner
-                    FormatFlags = StringFormatFlags.NoWrap | StringFormatFlags.NoClip
-                };
+                _cameraFullScreenForm.Show();
 
-                Size textSize = TextSize(text, textFont, drawGraphics);
-                switch (rectangleAlignment)
-                {
-                    case ContentAlignment.TopCenter:
-                        position.X -= textSize.Width / 2;
-                        break;
-                    case ContentAlignment.TopRight:
-                        position.X -= textSize.Width + 1;
-                        break;
-                    case ContentAlignment.MiddleLeft:
-                        position.Y -= textSize.Height / 2;
-                        break;
-                    case ContentAlignment.MiddleCenter:
-                        position.X -= textSize.Width / 2;
-                        position.Y -= textSize.Height / 2;
-                        break;
-                    case ContentAlignment.MiddleRight:
-                        position.X -= textSize.Width + 1;
-                        position.Y -= textSize.Height / 2;
-                        break;
-                    case ContentAlignment.BottomLeft:
-                        position.Y -= textSize.Height + 1;
-                        break;
-                    case ContentAlignment.BottomCenter:
-                        position.X -= textSize.Width / 2;
-                        position.Y -= textSize.Height + 1;
-                        break;
-                    case ContentAlignment.BottomRight:
-                        position.X -= textSize.Width + 1;
-                        position.Y -= textSize.Height + 1;
-                        break;
-                    default: // ContentAlignment.TopLeft
-                        break;
-                }
-                Rectangle textRectangle = new Rectangle()
-                {
-                    Size = textSize,
-                    Location = position
-                };
-
-                // Draw text on control
-                drawGraphics.DrawString(text, textFont, textBrush, textRectangle, textFormat);
-
-                // Return rectangle
-                return textRectangle;
             }
             else
             {
-                return new Rectangle();
+                _cameraFullScreenForm = new CameraFullScreenForm();
+                _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
+                _cameraFullScreenForm.ShowDialog();
             }
         }
 
-        /// <summary>
-        /// Calculates the bounding rectangle size for a text
-        /// </summary>
-        private Size TextSize(string text, Font font, Graphics graphics)
+        
+
+        private void btn_ResetZoom_Click(object sender, EventArgs e)
         {
-            SizeF size = graphics.MeasureString(text.Split('\n').OrderByDescending(s => s.Length).FirstOrDefault(), font);
-            return new Size()
-            {
-                Width = (int)Math.Ceiling(size.Width) + 4,
-                Height = (int)Math.Ceiling(size.Height * (text.Count(c => c == '\n') + 1))
-            };
+            //Task.Run(() => CameraHandler.ResetZoomAsync());
+            CameraHandler.ResetZoom();
+            //CameraHandler.ResetZoomAsync();
         }
 
-        /// <summary>
-        /// Add a new line to the OSD debug text
-        /// </summary>
-        /// <param name="line">Text line to add</param>
-        private void AddToOSDDebug(string line)
+
+        private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
         {
-#if DEBUG
-            // Shift everything down
-            for (int i = OSDDebugLines.Length - 1; i > 0; i--)
+
+            if (!_cameraFullScreenForm.Visible)
             {
-                OSDDebugLines[i] = OSDDebugLines[i - 1];
+                VideoControl = CameraHandler.VideoControl;
+                this.pnl_CameraScreen.Controls.Add(VideoControl);
+                VideoControl.Dock = DockStyle.Fill;
             }
-
-            // Add new line
-            OSDDebugLines[0] = line;
-#endif
         }
 
-        /// <summary>
-        /// Handles a mouse click on the video area
-        /// </summary>
-        private void OnVideoClick(int x, int y)
+        private void Form_event_ReconnectRequested(object sender, EventArgs e)
         {
-            //AddToOSDDebug($"Clicked at X={x} Y={y}");
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => ReconnectCameraStreamAndControl()));
+            }
+            else
+            {
+                ReconnectCameraStreamAndControl();
+            }
         }
 
         /// <summary>
@@ -697,223 +899,22 @@ namespace MissionPlanner.GCSViews
         {
             //SettingManager.OpenDialog();
 
-            _CameraSettingsForm = new CameraSettingsForm();
+            _cameraSettingsForm = new CameraSettingsForm();
 
-            _CameraSettingsForm.event_ReconnectRequested += Form_event_ReconnectRequested;
+            _cameraSettingsForm.event_ReconnectRequested += Form_event_ReconnectRequested;
 
-            _CameraSettingsForm.ShowDialog();
+            _cameraSettingsForm.ShowDialog();
 
         }
-        CameraSettingsForm _CameraSettingsForm;
-        private void Form_event_ReconnectRequested(object sender, EventArgs e)
+
+        /// <summary>
+        /// Handles a mouse click on the video area
+        /// </summary>
+        private void OnVideoClick(int x, int y)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => ReconnectCameraStreamAndControl()));
-            }
-            else
-            {
-                ReconnectCameraStreamAndControl();
-            }
-        }
-
-        private void ReconnectCameraStreamAndControl()
-        {
-            StartCameraStream();
-            StartCameraControl();
-        }
-
-        #region Methods
-
-
-        private void StartCameraStream()
-        {
-            if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
-            {
-                AddToOSDDebug("Video stream started");
-
-                FetchHudData();
-                FetchHudDataTimer.Start();
-            }
-            else
-            {
-                AddToOSDDebug("Failed start video stream");
-            }
-        }
-
-        private void StartCameraControl()
-        {
-            if (CameraHandler.CameraControlConnect(
-                IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
-                int.Parse(SettingManager.Get(Setting.CameraControlPort))))
-            {
-                AddToOSDDebug("Camera control started");
-            }
-            else
-            {
-                AddToOSDDebug("Failed to start camera control");
-            }
-        }
-
-        private void ChangeCrossHair()
-        {
-            SetCrosshairType(HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus);
-            AddToOSDDebug("Crosshairs set to " + Enum.GetName(typeof(CrosshairsType), HudElements.Crosshairs));
-        }
-
-        private void DoPhoto()
-        {
-            if (CameraHandler.DoPhoto())
-            {
-                AddToOSDDebug("Photo taken");
-            }
-        }
-
-        private void StartRecording()
-        {
-            int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
-            if (CameraHandler.StartRecording(TimeSpan.FromSeconds(sl)))
-            {
-                AddToOSDDebug($"Recording started ({sl}s loop)");
-            }
-            else
-            {
-                AddToOSDDebug("Recording started (infinite)");
-            }
-        }
-
-        private void StartRecordingInfinite()
-        {
-
-            if (CameraHandler.StartRecording(null))
-            {
-                AddToOSDDebug("Recording started (infinite)");
-            }
-            else
-            {
-                AddToOSDDebug("Recording failed to start");
-            }
-        }
-
-        private void StopRecording()
-        {
-            if (CameraHandler.StopRecording())
-            {
-                AddToOSDDebug("Recording stopped");
-            }
-            else
-            {
-                AddToOSDDebug("Recording failed to stopped");
-            }
-        }
-
-        private async Task ResetZoom()
-        {
-            if (await CameraHandler.ResetZoomAsync())
-                AddToOSDDebug("Zoom reset");
-            else
-                AddToOSDDebug("Zoom reset failed");
-        }
-
-        private async Task ToogleDayNightCamera()
-        {
-            if (!CameraHandler.HasCameraReport(MavProto.MavReportType.SystemReport) || ((MavProto.SysReport)CameraHandler.CameraReports[MavProto.MavReportType.SystemReport]).activeSensor == 1) // Unknown / Night Vision
-            {
-                if (await CameraHandler.SetImageSensorAsync(false)) // Set to Day
-                    AddToOSDDebug("Camera sensor set to day");
-                else
-                    AddToOSDDebug("Camera sensor set failed");
-            }
-            else // Day
-            {
-                if (await CameraHandler.SetImageSensorAsync(true)) // Set to Night Vision
-                    AddToOSDDebug("Camera sensor set to night");
-                else
-                    AddToOSDDebug("Camera sensor set failed");
-            }
-        }
-
-        private async Task UpdateIRColor()
-        {
-            if (await CameraHandler.SetNVColorAsync((CameraHandler.NVColor)Enum.Parse(typeof(CameraHandler.NVColor), SettingManager.Get(Setting.IrColorMode), true)))
-                AddToOSDDebug($"Camera NV color mode set to {SettingManager.Get(Setting.IrColorMode)}");
-            else
-                AddToOSDDebug($"Camera NV color mode set failed");
-        }
-
-        private async Task DoBIT()
-        {
-            if (await CameraHandler.DoBITAsync())
-                AddToOSDDebug("Doing built-in test");
-            else
-                AddToOSDDebug("Built-in test failed");
-        }
-
-        private async Task DoNUC()
-        {
-            if (await CameraHandler.DoNUCAsync())
-                AddToOSDDebug("NV calibrated");
-            else
-                AddToOSDDebug("NV calibration failed");
+            //AddToOSDDebug($"Clicked at X={x} Y={y}");
         }
 
         #endregion
-
-        private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
-        {
-            ChangeCrossHair();
-        }
-
-        private void btn_Up_Click(object sender, EventArgs e)
-        {
-
-            if(this.cs_ColorSliderAltitude.Value < this.cs_ColorSliderAltitude.Maximum-10)
-                this.cs_ColorSliderAltitude.Value += 10;
-            else
-                this.cs_ColorSliderAltitude.Value = this.cs_ColorSliderAltitude.Maximum;
-        }
-
-        private void btn_Down_Click(object sender, EventArgs e)
-        {
-            if(this.cs_ColorSliderAltitude.Value > 10)
-                this.cs_ColorSliderAltitude.Value -= 10;
-            else
-                this.cs_ColorSliderAltitude.Value = 0;
-        }
-
-        private void btn_FullScreen_Click(object sender, EventArgs e)
-        {
-            if (form != null)
-            {
-                form.Show();
-                
-            }
-            else
-            {
-                form = new CameraFullScreenForm();
-                form.VisibleChanged += FullScreenForm_VisibleChanged;
-                form.ShowDialog();
-            }
-        }
-
-        CameraFullScreenForm form;
-
-        private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
-        {
-
-            if (!form.Visible)
-            {
-                VideoControl = CameraHandler.VideoControl;
-                this.pnl_CameraScreen.Controls.Add(VideoControl);
-                VideoControl.Dock = DockStyle.Fill;
-            }
-        }
-
-        private void btn_ResetZoom_Click(object sender, EventArgs e)
-        {
-            //Task.Run(() => CameraHandler.ResetZoomAsync());
-            CameraHandler.ResetZoom();
-            //CameraHandler.ResetZoomAsync();
-        }
     }
 }
