@@ -38,10 +38,8 @@
             this.btn_BlackHot = new System.Windows.Forms.Button();
             this.btn_NightCamera = new System.Windows.Forms.Button();
             this.btn_DayCamera = new System.Windows.Forms.Button();
-            this.tlp_Base = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_DisabledControlsByDefault = new System.Windows.Forms.Panel();
             this.tlp_VisibleElements = new System.Windows.Forms.TableLayoutPanel();
-            this.tlp_Base.SuspendLayout();
             this.pnl_DisabledControlsByDefault.SuspendLayout();
             this.tlp_VisibleElements.SuspendLayout();
             this.SuspendLayout();
@@ -127,13 +125,6 @@
             this.btn_DayCamera.UseVisualStyleBackColor = false;
             this.btn_DayCamera.Click += new System.EventHandler(this.btn_DayCamera_Click);
             // 
-            // tlp_Base
-            // 
-            resources.ApplyResources(this.tlp_Base, "tlp_Base");
-            this.tlp_Base.Controls.Add(this.pnl_DisabledControlsByDefault, 0, 1);
-            this.tlp_Base.Controls.Add(this.tlp_VisibleElements, 0, 0);
-            this.tlp_Base.Name = "tlp_Base";
-            // 
             // pnl_DisabledControlsByDefault
             // 
             this.pnl_DisabledControlsByDefault.Controls.Add(this.btn_BIT);
@@ -159,14 +150,14 @@
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.Controls.Add(this.tlp_Base);
+            this.Controls.Add(this.pnl_DisabledControlsByDefault);
+            this.Controls.Add(this.tlp_VisibleElements);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "CameraSettingsForm";
             this.ShowIcon = false;
             this.TopMost = true;
-            this.tlp_Base.ResumeLayout(false);
             this.pnl_DisabledControlsByDefault.ResumeLayout(false);
             this.pnl_DisabledControlsByDefault.PerformLayout();
             this.tlp_VisibleElements.ResumeLayout(false);
@@ -186,7 +177,6 @@
         private System.Windows.Forms.Button btn_NUC;
         private System.Windows.Forms.Button btn_BIT;
         private System.Windows.Forms.Button btn_Reconnect;
-        private System.Windows.Forms.TableLayoutPanel tlp_Base;
         private System.Windows.Forms.TableLayoutPanel tlp_VisibleElements;
         private System.Windows.Forms.Panel pnl_DisabledControlsByDefault;
     }

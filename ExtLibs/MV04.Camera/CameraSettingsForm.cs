@@ -14,7 +14,7 @@ namespace MV04.Camera
 {
     public partial class CameraSettingsForm : Form
     {
-        private const int CHANGEWINDOWHEIGHT = 255;
+        private const int CHANGEWINDOWHEIGHT = 272;
         private static CameraSettingsForm _instance;
         private bool _reducedSize = true;
 

@@ -172,7 +172,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="btn_NUC.Size" type="System.Drawing.Size, System.Drawing">
-    <value>139, 124</value>
+    <value>142, 124</value>
   </data>
   <data name="btn_NUC.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -199,7 +199,7 @@
     <value>NoControl</value>
   </data>
   <data name="btn_BIT.Location" type="System.Drawing.Point, System.Drawing">
-    <value>-3, 0</value>
+    <value>0, 0</value>
   </data>
   <data name="btn_BIT.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -271,13 +271,13 @@
     <value>NoControl</value>
   </data>
   <data name="btn_Reconnect.Location" type="System.Drawing.Point, System.Drawing">
-    <value>139, 124</value>
+    <value>142, 124</value>
   </data>
   <data name="btn_Reconnect.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
   <data name="btn_Reconnect.Size" type="System.Drawing.Size, System.Drawing">
-    <value>139, 124</value>
+    <value>142, 124</value>
   </data>
   <data name="btn_Reconnect.TabIndex" type="System.Int32, mscorlib">
     <value>13</value>
@@ -385,13 +385,13 @@
     <value>NoControl</value>
   </data>
   <data name="btn_NightCamera.Location" type="System.Drawing.Point, System.Drawing">
-    <value>139, 0</value>
+    <value>142, 0</value>
   </data>
   <data name="btn_NightCamera.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
   <data name="btn_NightCamera.Size" type="System.Drawing.Size, System.Drawing">
-    <value>139, 124</value>
+    <value>142, 124</value>
   </data>
   <data name="btn_NightCamera.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -433,7 +433,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="btn_DayCamera.Size" type="System.Drawing.Size, System.Drawing">
-    <value>139, 124</value>
+    <value>142, 124</value>
   </data>
   <data name="btn_DayCamera.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -456,17 +456,14 @@
   <data name="&gt;&gt;btn_DayCamera.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="tlp_Base.ColumnCount" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
   <data name="pnl_DisabledControlsByDefault.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
   <data name="pnl_DisabledControlsByDefault.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 257</value>
+    <value>0, 248</value>
   </data>
   <data name="pnl_DisabledControlsByDefault.Size" type="System.Drawing.Size, System.Drawing">
-    <value>278, 249</value>
+    <value>284, 273</value>
   </data>
   <data name="pnl_DisabledControlsByDefault.TabIndex" type="System.Int32, mscorlib">
     <value>15</value>
@@ -478,7 +475,7 @@
     <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;pnl_DisabledControlsByDefault.Parent" xml:space="preserve">
-    <value>tlp_Base</value>
+    <value>$this</value>
   </data>
   <data name="&gt;&gt;pnl_DisabledControlsByDefault.ZOrder" xml:space="preserve">
     <value>0</value>
@@ -487,16 +484,16 @@
     <value>2</value>
   </data>
   <data name="tlp_VisibleElements.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
+    <value>Top</value>
   </data>
   <data name="tlp_VisibleElements.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 3</value>
+    <value>0, 0</value>
   </data>
   <data name="tlp_VisibleElements.RowCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
   <data name="tlp_VisibleElements.Size" type="System.Drawing.Size, System.Drawing">
-    <value>278, 248</value>
+    <value>284, 248</value>
   </data>
   <data name="tlp_VisibleElements.TabIndex" type="System.Int32, mscorlib">
     <value>15</value>
@@ -508,43 +505,13 @@
     <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;tlp_VisibleElements.Parent" xml:space="preserve">
-    <value>tlp_Base</value>
+    <value>$this</value>
   </data>
   <data name="&gt;&gt;tlp_VisibleElements.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
   <data name="tlp_VisibleElements.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
     <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_DayCamera" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_Reconnect" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_NightCamera" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_NUC" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,50,Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
-  </data>
-  <data name="tlp_Base.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="tlp_Base.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="tlp_Base.RowCount" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="tlp_Base.Size" type="System.Drawing.Size, System.Drawing">
-    <value>284, 509</value>
-  </data>
-  <data name="tlp_Base.TabIndex" type="System.Int32, mscorlib">
-    <value>14</value>
-  </data>
-  <data name="&gt;&gt;tlp_Base.Name" xml:space="preserve">
-    <value>tlp_Base</value>
-  </data>
-  <data name="&gt;&gt;tlp_Base.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;tlp_Base.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;tlp_Base.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="tlp_Base.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="pnl_DisabledControlsByDefault" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="tlp_VisibleElements" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50" /&gt;&lt;Rows Styles="Percent,50,Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -556,7 +523,7 @@
     <value>6, 13</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>284, 511</value>
+    <value>284, 521</value>
   </data>
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterScreen</value>
