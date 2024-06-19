@@ -118,6 +118,7 @@ namespace MissionPlanner.GCSViews
 
             // Test functions
             #region Test functions
+
             Dictionary<string, Action> testFunctions = new Dictionary<string, Action>
             {
                 {"Open settings", () => { SettingManager.OpenDialog(); }},
@@ -172,7 +173,7 @@ namespace MissionPlanner.GCSViews
         private void CameraView_Load(object sender, EventArgs e)
         {
             // Auto connect if required
-            if (false)//bool.Parse(SettingManager.Get(Setting.AutoConnect)))
+            if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
             {
                 // Stream
                 if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
