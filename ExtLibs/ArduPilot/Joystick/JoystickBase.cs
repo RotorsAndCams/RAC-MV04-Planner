@@ -603,52 +603,80 @@ namespace MissionPlanner.Joystick
                     case buttonfunction.MV04_SnapShot:
                         _context.Send(delegate
                         {
-                            CameraHandler.DoPhoto();
+                            try
+                            {
+                                CameraHandler.DoPhoto();
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_SnapShot");
+                            }
                         }, null);
                         break;
                     case buttonfunction.MV04_FlightMode:
                         _context.Send(delegate
                         {
-                            switch ((int)Math.Round(but.p1))
+                            try
                             {
-                                case 0: // Loiter
-                                    // TODO: Switch camera and joysticks to Loiter mode
-                                    break;
-                                case 1: // TapToFly
-                                    // TODO: Switch camera and joysticks to TapToFly mode
-                                    break;
-                                case 2: // Auto
-                                    // TODO: Switch camera and joysticks to Auto mode
-                                    break;
-                                case 3: // Track
-                                    // TODO: Switch camera and joysticks to Track mode
-                                    break;
-                                default: break;
+                                switch ((int)Math.Round(but.p1))
+                                {
+                                    case 0: // Loiter
+                                        // TODO: Switch UAV, camera and joysticks to Loiter mode
+                                        break;
+                                    case 1: // TapToFly
+                                        // TODO: Switch UAV, camera and joysticks to TapToFly mode
+                                        break;
+                                    case 2: // Auto
+                                        // TODO: Switch UAV, camera and joysticks to Auto mode
+                                        break;
+                                    case 3: // Track
+                                        // TODO: Switch UAV, camera and joysticks to Track mode
+                                        break;
+                                    default: break;
+                                }
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_FlightMode");
                             }
                         }, null);
                         break;
                     case buttonfunction.MV04_ImageSensor:
                         _context.Send(delegate
                         {
-                            CameraHandler.SetImageSensorAsync((int)Math.Round(but.p1) == 1);
-                            // p1 = 0 -> Day   -> false
-                            // p1 = 1 -> Night -> true
+                            try
+                            {
+                                CameraHandler.SetImageSensorAsync((int)Math.Round(but.p1) == 1);
+                                // p1 = 0 -> Day   -> false
+                                // p1 = 1 -> Night -> true
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_ImageSensor");
+                            }
                         }, null);
                         break;
                     case buttonfunction.MV04_Arm:
                         _context.Send(delegate
                         {
-                            switch ((int)Math.Round(but.p1))
+                            try
                             {
-                                case 0: // Safe
-                                    Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
-                                    Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 1u, target_system = (byte)Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
-                                    break;
-                                case 1: // Armed
-                                    Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 0u, target_system = (byte)Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
-                                    Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
-                                    break;
-                                default: break;
+                                switch ((int)Math.Round(but.p1))
+                                {
+                                    case 0: // Safe
+                                        Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
+                                        Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 1u, target_system = (byte)Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
+                                        break;
+                                    case 1: // Armed
+                                        Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 0u, target_system = (byte)Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
+                                        Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
+                                        break;
+                                    default: break;
+                                }
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_Arm");
                             }
                         }, null);
                         break;
