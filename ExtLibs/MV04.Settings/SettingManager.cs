@@ -71,7 +71,7 @@ namespace MV04.Settings
                             && value.Split('.').All(s => int.TryParse(s, out int i))
                             && value.Split('.').All(s => int.Parse(s) >= 0 && int.Parse(s) <= 255)
                         ),
-                        new SettingItem(Setting.CameraControlPort, "6969", value =>
+                        new SettingItem(Setting.CameraControlPort, "10024", value =>
                             !string.IsNullOrWhiteSpace(value)
                             && int.TryParse(value, out int port)
                             && port >= 1024 && port <= 65536
