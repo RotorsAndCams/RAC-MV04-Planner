@@ -283,7 +283,11 @@ namespace MissionPlanner.GCSViews
                 }},
             };
 
-            //ddd
+            #endregion
+
+            #region Dev debug tools
+
+#if DEBUG
 
             ComboBox cb_TestFunctions = new ComboBox();
             cb_TestFunctions.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -301,6 +305,8 @@ namespace MissionPlanner.GCSViews
             bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
             this.Controls.Add(bt_DoTestFunction);
             bt_DoTestFunction.BringToFront();
+#endif
+
             #endregion
         }
 
