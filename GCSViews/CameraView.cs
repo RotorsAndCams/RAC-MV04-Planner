@@ -120,167 +120,23 @@ namespace MissionPlanner.GCSViews
             #region Test functions
             Dictionary<string, Action> testFunctions = new Dictionary<string, Action>
             {
-                {"Open settings", () =>
-                {
-                    SettingManager.OpenDialog();
-                }},
-                {"Start stream", () =>
-                {
-                    if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
-                    {
-                        AddToOSDDebug("Video stream started");
-
-                        FetchHudData();
-                        FetchHudDataTimer.Start();
-                    }
-                    else
-                    {
-                        AddToOSDDebug("Failed start video stream");
-                    }
-                }},
-                {"Start control", () =>
-                {
-                    if (CameraHandler.CameraControlConnect(
-                        IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
-                        int.Parse(SettingManager.Get(Setting.CameraControlPort))))
-                    {
-                        AddToOSDDebug("Camera control started");
-                    }
-                    else
-                    {
-                        AddToOSDDebug("Camera control failed to start");
-                    }
-                }},
-                {"Start stream & control", () =>
-                {
-                    // Stream
-                    if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
-                    {
-                        AddToOSDDebug("Video stream started");
-
-                        FetchHudData();
-                        FetchHudDataTimer.Start();
-                    }
-                    else
-                    {
-                        AddToOSDDebug("Failed start video stream");
-                    }
-
-                    // Control
-                    if (CameraHandler.CameraControlConnect(
-                        IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
-                        int.Parse(SettingManager.Get(Setting.CameraControlPort))))
-                    {
-                        AddToOSDDebug("Camera control started");
-                    }
-                    else
-                    {
-                        AddToOSDDebug("Failed to start camera control");
-                    }
-                }},
-                {"Switch crosshairs", () =>
-                {
-                    SetCrosshairType(HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus);
-                    AddToOSDDebug("Crosshairs set to " + Enum.GetName(typeof(CrosshairsType), HudElements.Crosshairs));
-                }},
-                {"Do photo", () =>
-                {
-                    if (CameraHandler.DoPhoto())
-                    {
-                        AddToOSDDebug("Photo taken");
-                    }
-                }},
-                {"Start recording (loop)", () =>
-                {
-                    int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
-                    if (CameraHandler.StartRecording(TimeSpan.FromSeconds(sl)))
-                    {
-                        AddToOSDDebug($"Recording started ({sl}s loop)");
-                    }
-                    else
-                    {
-                        AddToOSDDebug("Recording started (infinite)");
-                    }
-                }},
-                {"Start recording (infinite)", () =>
-                {
-                    if (CameraHandler.StartRecording(null))
-                    {
-                        AddToOSDDebug("Recording started (infinite)");
-                    }
-                    else
-                    {
-                        AddToOSDDebug("Recording failed to start");
-                    }
-                }},
-                {"Stop recording", () =>
-                {
-                    if (CameraHandler.StopRecording())
-                    {
-                        AddToOSDDebug("Recording stopped");
-                    }
-                    else
-                    {
-                        AddToOSDDebug("Recording failed to stopped");
-                    }
-                }},
-                {"Set mode", () =>
-                {
-                    new CameraModeSelectorForm().Show();
-                }},
-                {"Tracker mode", () =>
-                {
-                    new TrackerPosForm().Show();
-                }},
-                {"Camera mover", () =>
-                {
-                    new CameraMoverForm().Show();
-                }},
-                {"Reset zoom", async () =>
-                {
-                    if (await CameraHandler.ResetZoomAsync())
-                        AddToOSDDebug("Zoom reset");
-                    else
-                        AddToOSDDebug("Zoom reset failed");
-                }},
-                {"Toggle Day/Night", async () =>
-                {
-                    if (!CameraHandler.HasCameraReport(MavProto.MavReportType.SystemReport) || ((MavProto.SysReport)CameraHandler.CameraReports[MavProto.MavReportType.SystemReport]).activeSensor == 1) // Unknown / Night Vision
-                    {
-                        if (await CameraHandler.SetImageSensorAsync(false)) // Set to Day
-                            AddToOSDDebug("Camera sensor set to day");
-                        else
-                            AddToOSDDebug("Camera sensor set failed");
-                    }
-                    else // Day
-                    {
-                        if (await CameraHandler.SetImageSensorAsync(true)) // Set to Night Vision
-                            AddToOSDDebug("Camera sensor set to night");
-                        else
-                            AddToOSDDebug("Camera sensor set failed");
-                    }
-                }},
-                {"Update IR color", async () =>
-                {
-                    if (await CameraHandler.SetNVColorAsync((CameraHandler.NVColor)Enum.Parse(typeof(CameraHandler.NVColor), SettingManager.Get(Setting.IrColorMode), true)))
-                        AddToOSDDebug($"Camera NV color mode set to {SettingManager.Get(Setting.IrColorMode)}");
-                    else
-                        AddToOSDDebug($"Camera NV color mode set failed");
-                }},
-                {"Do BIT", async () =>
-                {
-                    if (await CameraHandler.DoBITAsync())
-                        AddToOSDDebug("Doing built-in test");
-                    else
-                        AddToOSDDebug("Built-in test failed");
-                }},
-                {"Do NUC", async () =>
-                {
-                    if (await CameraHandler.DoNUCAsync())
-                        AddToOSDDebug("NV calibrated");
-                    else
-                        AddToOSDDebug("NV calibration failed");
-                }},
+                {"Open settings", () => { SettingManager.OpenDialog(); }},
+                {"Start stream", () => { StartCameraStream(); }},
+                {"Start control", () => { StartCameraControl(); }},
+                {"Start stream & control", () => { StartCameraStream(); StartCameraControl(); }},
+                {"Switch crosshairs", () => { ChangeCrossHair(); }},
+                {"Do photo", () => { DoPhoto(); }},
+                {"Start recording (loop)", () => { StartRecording(); }},
+                {"Start recording (infinite)", () => { StartRecordingInfinite(); }},
+                {"Stop recording", () => { StopRecording(); }},
+                {"Set mode", () => { new CameraModeSelectorForm().Show(); }},
+                {"Tracker mode", () => { new TrackerPosForm().Show(); }},
+                {"Camera mover", () => { new CameraMoverForm().Show(); }},
+                {"Reset zoom", async () => { await ResetZoom(); }},
+                {"Toggle Day/Night", async () => { await ToogleDayNightCamera(); }},
+                {"Update IR color", async () => { await UpdateIRColor(); }},
+                {"Do BIT", async () => { await DoBIT(); }},
+                {"Do NUC", async () => { await DoNUC(); }},
             };
 
             #endregion
@@ -316,7 +172,7 @@ namespace MissionPlanner.GCSViews
         private void CameraView_Load(object sender, EventArgs e)
         {
             // Auto connect if required
-            if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
+            if (false)//bool.Parse(SettingManager.Get(Setting.AutoConnect)))
             {
                 // Stream
                 if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
@@ -836,14 +692,6 @@ namespace MissionPlanner.GCSViews
             AddToOSDDebug($"Double clicked at X={p.X} Y={p.Y}");
         }
 
-        /// <summary>
-        /// Every time the control is closed
-        /// </summary>
-        public void Deactivate()
-        {
-            log.Info("Deactivate");
-        }
-
         private void btn_Settings_Click(object sender, EventArgs e)
         {
             //SettingManager.OpenDialog();
@@ -870,7 +718,15 @@ namespace MissionPlanner.GCSViews
 
         private void ReconnectCameraStreamAndControl()
         {
-            // Stream
+            StartCameraStream();
+            StartCameraControl();
+        }
+
+        #region Methods
+
+
+        private void StartCameraStream()
+        {
             if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
             {
                 AddToOSDDebug("Video stream started");
@@ -882,8 +738,10 @@ namespace MissionPlanner.GCSViews
             {
                 AddToOSDDebug("Failed start video stream");
             }
+        }
 
-            // Control
+        private void StartCameraControl()
+        {
             if (CameraHandler.CameraControlConnect(
                 IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
                 int.Parse(SettingManager.Get(Setting.CameraControlPort))))
@@ -896,9 +754,113 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
+        private void ChangeCrossHair()
         {
             SetCrosshairType(HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus);
+            AddToOSDDebug("Crosshairs set to " + Enum.GetName(typeof(CrosshairsType), HudElements.Crosshairs));
+        }
+
+        private void DoPhoto()
+        {
+            if (CameraHandler.DoPhoto())
+            {
+                AddToOSDDebug("Photo taken");
+            }
+        }
+
+        private void StartRecording()
+        {
+            int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
+            if (CameraHandler.StartRecording(TimeSpan.FromSeconds(sl)))
+            {
+                AddToOSDDebug($"Recording started ({sl}s loop)");
+            }
+            else
+            {
+                AddToOSDDebug("Recording started (infinite)");
+            }
+        }
+
+        private void StartRecordingInfinite()
+        {
+
+            if (CameraHandler.StartRecording(null))
+            {
+                AddToOSDDebug("Recording started (infinite)");
+            }
+            else
+            {
+                AddToOSDDebug("Recording failed to start");
+            }
+        }
+
+        private void StopRecording()
+        {
+            if (CameraHandler.StopRecording())
+            {
+                AddToOSDDebug("Recording stopped");
+            }
+            else
+            {
+                AddToOSDDebug("Recording failed to stopped");
+            }
+        }
+
+        private async Task ResetZoom()
+        {
+            if (await CameraHandler.ResetZoomAsync())
+                AddToOSDDebug("Zoom reset");
+            else
+                AddToOSDDebug("Zoom reset failed");
+        }
+
+        private async Task ToogleDayNightCamera()
+        {
+            if (!CameraHandler.HasCameraReport(MavProto.MavReportType.SystemReport) || ((MavProto.SysReport)CameraHandler.CameraReports[MavProto.MavReportType.SystemReport]).activeSensor == 1) // Unknown / Night Vision
+            {
+                if (await CameraHandler.SetImageSensorAsync(false)) // Set to Day
+                    AddToOSDDebug("Camera sensor set to day");
+                else
+                    AddToOSDDebug("Camera sensor set failed");
+            }
+            else // Day
+            {
+                if (await CameraHandler.SetImageSensorAsync(true)) // Set to Night Vision
+                    AddToOSDDebug("Camera sensor set to night");
+                else
+                    AddToOSDDebug("Camera sensor set failed");
+            }
+        }
+
+        private async Task UpdateIRColor()
+        {
+            if (await CameraHandler.SetNVColorAsync((CameraHandler.NVColor)Enum.Parse(typeof(CameraHandler.NVColor), SettingManager.Get(Setting.IrColorMode), true)))
+                AddToOSDDebug($"Camera NV color mode set to {SettingManager.Get(Setting.IrColorMode)}");
+            else
+                AddToOSDDebug($"Camera NV color mode set failed");
+        }
+
+        private async Task DoBIT()
+        {
+            if (await CameraHandler.DoBITAsync())
+                AddToOSDDebug("Doing built-in test");
+            else
+                AddToOSDDebug("Built-in test failed");
+        }
+
+        private async Task DoNUC()
+        {
+            if (await CameraHandler.DoNUCAsync())
+                AddToOSDDebug("NV calibrated");
+            else
+                AddToOSDDebug("NV calibration failed");
+        }
+
+        #endregion
+
+        private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
+        {
+            ChangeCrossHair();
         }
 
         private void btn_Up_Click(object sender, EventArgs e)
