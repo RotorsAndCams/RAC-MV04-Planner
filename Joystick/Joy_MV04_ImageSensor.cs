@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace MissionPlanner.Joystick
 {
-    public partial class Joy_MV04_CameraMode : Form
+    public partial class Joy_MV04_ImageSensor : Form
     {
-        public Joy_MV04_CameraMode(string tag)
+        public Joy_MV04_ImageSensor(string tag)
         {
             InitializeComponent();
             Utilities.ThemeManager.ApplyThemeTo(this);
@@ -29,7 +29,7 @@ namespace MissionPlanner.Joystick
             int tag = int.Parse(this.Tag.ToString());
 
             JoyButton jb = MainV2.joystick.getButton(tag);
-            jb.function = buttonfunction.MV04_CameraMode;
+            jb.function = buttonfunction.MV04_ImageSensor;
             jb.p1 = comboBox1.SelectedIndex;
 
             MainV2.joystick.setButton(tag, jb);

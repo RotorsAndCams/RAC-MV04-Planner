@@ -476,8 +476,8 @@ namespace MissionPlanner.Joystick
                 case buttonfunction.MV04_Arm:
                     new Joy_MV04_Arm((string)cmb.Tag).ShowDialog();
                     break;
-                case buttonfunction.MV04_CameraMode:
-                    new Joy_MV04_CameraMode((string)cmb.Tag).ShowDialog();
+                case buttonfunction.MV04_ImageSensor:
+                    new Joy_MV04_ImageSensor((string)cmb.Tag).ShowDialog();
                     break;
                 case buttonfunction.MV04_FlightMode:
                     new Joy_MV04_FlightMode((string)cmb.Tag).ShowDialog();

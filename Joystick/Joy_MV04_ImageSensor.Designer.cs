@@ -1,6 +1,6 @@
 ﻿namespace MissionPlanner.Joystick
 {
-    partial class Joy_MV04_CameraMode
+    partial class Joy_MV04_ImageSensor
     {
         /// <summary>
         /// Required designer variable.

@@ -321,8 +321,8 @@
     <EmbeddedResource Include="Joystick\Joy_Mount_Mode.uk.resx">
       <DependentUpon>Joy_Mount_Mode.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Joystick\Joy_MV04_CameraMode.resx">
-      <DependentUpon>Joy_MV04_CameraMode.cs</DependentUpon>
+    <EmbeddedResource Include="Joystick\Joy_MV04_ImageSensor.resx">
+      <DependentUpon>Joy_MV04_ImageSensor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Joystick\Joy_MV04_FlightMode.resx">
       <DependentUpon>Joy_MV04_FlightMode.cs</DependentUpon>
@@ -953,11 +953,11 @@
     <Compile Include="Joystick\Joy_MV04_Arm.Designer.cs">
       <DependentUpon>Joy_MV04_Arm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Joystick\Joy_MV04_CameraMode.cs">
+    <Compile Include="Joystick\Joy_MV04_ImageSensor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Joystick\Joy_MV04_CameraMode.Designer.cs">
-      <DependentUpon>Joy_MV04_CameraMode.cs</DependentUpon>
+    <Compile Include="Joystick\Joy_MV04_ImageSensor.Designer.cs">
+      <DependentUpon>Joy_MV04_ImageSensor.cs</DependentUpon>
     </Compile>
     <Compile Include="Joystick\Joy_MV04_FlightMode.cs">
       <SubType>Form</SubType>

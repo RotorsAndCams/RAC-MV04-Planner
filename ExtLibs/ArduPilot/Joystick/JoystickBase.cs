@@ -627,7 +627,7 @@ namespace MissionPlanner.Joystick
                             }
                         }, null);
                         break;
-                    case buttonfunction.MV04_CameraMode:
+                    case buttonfunction.MV04_ImageSensor:
                         _context.Send(delegate
                         {
                             CameraHandler.SetImageSensorAsync((int)Math.Round(but.p1) == 1);
