@@ -149,6 +149,9 @@
     <EmbeddedResource Include="Controls\Vibration.uk.resx">
       <DependentUpon>Vibration.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\CameraFullScreenForm.resx">
+      <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\CameraView.resx">
       <DependentUpon>CameraView.cs</DependentUpon>
     </EmbeddedResource>
@@ -709,6 +712,12 @@
   <ItemGroup>
     <Compile Include="Antenna\TrackerGeneric.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="Controls\ColorSlider.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ColorSlider.Designer.cs">
+      <DependentUpon>ColorSlider.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\DroneCANSubscriber.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -822,6 +831,12 @@
     </Compile>
     <Compile Include="Controls\FollowMe.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSViews\CameraFullScreenForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSViews\CameraFullScreenForm.Designer.cs">
+      <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\CameraView.cs">
       <SubType>UserControl</SubType>
@@ -4833,6 +4848,18 @@
     <Content Include="quaternion.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\icons8-settings-100.png" />
+    <None Include="Resources\icons8-upward-arrow-64.png" />
+    <None Include="Resources\icons8-down-64 %281%29.png" />
+    <None Include="Resources\icons8-reset-50.png" />
+    <None Include="Resources\icons8-crosshair-50.png" />
+    <None Include="Resources\icons8-stop-sign-50.png" />
+    <None Include="Resources\icons8-fullscreen-50.png" />
+    <None Include="Resources\headlight-30.png" />
+    <None Include="Resources\motion-sensor-30.png" />
+    <None Include="Resources\drone-takeoff.png" />
+    <None Include="Resources\drone-takeoff_.png" />
+    <None Include="Resources\close-50.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

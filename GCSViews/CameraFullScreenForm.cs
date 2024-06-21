@@ -1,13 +1,12 @@
 ﻿using CoordinateSharp;
 using log4net;
-using log4net.Repository.Hierarchy;
 using MissionPlanner.Utilities;
 using MV04.Camera;
 using MV04.Settings;
-using NetTopologySuite.Operation.Valid;
 using NextVisionVideoControlLibrary;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -18,13 +17,13 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.RightsManagement;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MissionPlanner.GCSViews
 {
-    public partial class CameraView : MyUserControl//, IActivate, IDeactivate
+    public partial class CameraFullScreenForm : Form
     {
         #region Fields
 
@@ -47,13 +46,6 @@ namespace MissionPlanner.GCSViews
         (int major, int minor, int build) CameraControlDLLVersion;
 
         Random rnd = new Random();
-        bool OSDDebug = true;
-        string[] OSDDebugLines = new string[10];
-
-        private CameraSettingsForm _cameraSettingsForm;
-        private CameraFullScreenForm _cameraFullScreenForm;
-
-        #endregion
 
         #region Conversion multipliers
         const double Meter_to_Feet = 3.2808399;
@@ -61,14 +53,40 @@ namespace MissionPlanner.GCSViews
         const double Mps_to_Knots = 1.94384449;
         #endregion
 
-        #region Constructor
+        #endregion
 
-        public CameraView()
+
+        public CameraFullScreenForm()
         {
-            log.Info("Constructor");
             InitializeComponent();
-            instance = this;
 
+            InitCameraSettings();
+            StartCameraVideoStream();
+            this.FormClosing += CameraFullScreenForm_FormClosing;
+            this.VisibleChanged += CameraFullScreenForm_VisibleChanged;
+        }
+
+        private void CameraFullScreenForm_VisibleChanged(object sender, EventArgs e)
+        {
+            if (this.Visible)
+            {
+                this.pnl_CameraView.Controls.Add(VideoControl);
+                VideoControl.Dock = DockStyle.Fill;
+            }
+            else
+            {
+                //
+            }
+        }
+
+        private void CameraFullScreenForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            this.Hide();
+        }
+
+        private void InitCameraSettings()
+        {
             // Video control
             VideoControl = CameraHandler.Instance.CameraVideoControl;
             VideoControlDLLVersion = CameraHandler.Instance.StreamDLLVersion;
@@ -91,294 +109,27 @@ namespace MissionPlanner.GCSViews
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
             MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
-            // Draw UI
-            DrawUI();
-
-            DisableControls();
-
-            StartCameraStream();
-            StartCameraControl();
-        }
-
-        #endregion
-
-        #region Init
-
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            if (keyData == (Keys.Control | Keys.A))
-            {
-                tlp_AGLContainer.Visible = !tlp_AGLContainer.Visible;
-            }
-
-            return base.ProcessCmdKey(ref msg, keyData);
-        }
-
-        private void DisableControls()
-        {
-            this.tlp_AGLContainer.Visible = false;
-        }
-
-        /// <summary>
-        /// Draws UI elements
-        /// </summary>
-        private void DrawUI()
-        {
-            // Video stream control
-            this.pnl_CameraScreen.Controls.Add(VideoControl);
+            this.pnl_CameraView.Controls.Add(VideoControl);
             VideoControl.Dock = DockStyle.Fill;
-
-            // Test functions
-            #region Test functions
-
-            Dictionary<string, Action> testFunctions = new Dictionary<string, Action>
-            {
-                {"Open settings", () => { SettingManager.OpenDialog(); }},
-                {"Start stream", () => { StartCameraStream(); }},
-                {"Start control", () => { StartCameraControl(); }},
-                {"Start stream & control", () => { StartCameraStream(); StartCameraControl(); }},
-                {"Switch crosshairs", () => { ChangeCrossHair(); }},
-                {"Do photo", () => { DoPhoto(); }},
-                {"Start recording (loop)", () => { StartRecording(); }},
-                {"Start recording (infinite)", () => { StartRecordingInfinite(); }},
-                {"Stop recording", () => { StopRecording(); }},
-                {"Set mode", () => { new CameraModeSelectorForm().Show(); }},
-                {"Tracker mode", () => { new TrackerPosForm().Show(); }},
-                {"Camera mover", () => { new CameraMoverForm().Show(); }},
-                {"Reset zoom", async () => { await ResetZoom(); }},
-                {"Toggle Day/Night", async () => { await ToogleDayNightCamera(); }},
-                {"Update IR color", async () => { await UpdateIRColor(); }},
-                {"Do BIT", async () => { await DoBIT(); }},
-                {"Do NUC", async () => { await DoNUC(); }},
-            };
-
-            #endregion
-
-            #region Dev debug tools
-
-#if DEBUG
-
-            ComboBox cb_TestFunctions = new ComboBox();
-            cb_TestFunctions.DropDownStyle = ComboBoxStyle.DropDownList;
-            cb_TestFunctions.Items.AddRange(testFunctions.Keys.ToArray());
-            cb_TestFunctions.SelectedIndex = 0;
-            cb_TestFunctions.Location = new Point(10, (this.Height / 3) + 0);
-            cb_TestFunctions.Width = 100;
-            this.Controls.Add(cb_TestFunctions);
-            cb_TestFunctions.BringToFront();
-
-            Button bt_DoTestFunction = new Button();
-            bt_DoTestFunction.Text = "Test function";
-            bt_DoTestFunction.Location = new Point(10, (this.Height / 3) + 25);
-            bt_DoTestFunction.Width = 100;
-            bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
-            this.Controls.Add(bt_DoTestFunction);
-            bt_DoTestFunction.BringToFront();
-#endif
-
-            #endregion
         }
 
-        #endregion
-
-        #region CameraFunctions
-
-        private void StartCameraStream()
+        private void StartCameraVideoStream()
         {
-            bool success = CameraHandler.Instance.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick);
-
-            if (success)
+            if (CameraHandler.Instance.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
             {
+                //AddToOSDDebug("Video stream started");
+
                 FetchHudData();
                 FetchHudDataTimer.Start();
-
-#if DEBUG
-                AddToOSDDebug("Video stream started");
-#endif
-            }
-            else
-            {
-#if DEBUG
-                AddToOSDDebug("Failed start video stream");
-#endif
             }
         }
-
-        private void StartCameraControl()
-        {
-            bool success = CameraHandler.Instance.CameraControlConnect(
-                IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
-                int.Parse(SettingManager.Get(Setting.CameraControlPort)));
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug("Camera control started");
-            else
-                AddToOSDDebug("Failed to start camera control");
-#endif
-        }
-
-        private void ReconnectCameraStreamAndControl()
-        {
-            StartCameraStream();
-            StartCameraControl();
-        }
-
-        #region Crosshair
-
-        private void ChangeCrossHair()
-        {
-            SetCrosshairType(HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus);
-
-#if DEBUG
-            AddToOSDDebug("Crosshairs set to " + Enum.GetName(typeof(CrosshairsType), HudElements.Crosshairs));
-#endif
-        }
-
         /// <summary>
-        /// Set the crosshair type on the OSD
+        /// Handles a mouse click on the video area
         /// </summary>
-        /// <param name="type">Crosshair type to set</param>
-        private void SetCrosshairType(CrosshairsType type)
+        private void OnVideoClick(int x, int y)
         {
-            if (HudElements.Crosshairs != type)
-            {
-                HudElements.Crosshairs = type;
-            }
+            //AddToOSDDebug($"Clicked at X={x} Y={y}");
         }
-
-        #endregion
-
-        private void DoPhoto()
-        {
-            bool success = CameraHandler.Instance.DoPhoto();
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug("Photo taken");
-#endif
-        }
-
-        private void StartRecording()
-        {
-            int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
-
-            bool success = CameraHandler.Instance.StartRecording(TimeSpan.FromSeconds(sl));
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug($"Recording started ({sl}s loop)");
-            else
-                AddToOSDDebug("Recording started (infinite)");
-#endif
-        }
-
-        private void StartRecordingInfinite()
-        {
-            bool success = CameraHandler.Instance.StartRecording(null);
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug("Recording started (infinite)");
-            else
-                AddToOSDDebug("Recording failed to start");
-#endif
-        }
-
-        private void StopRecording()
-        {
-            bool success = CameraHandler.Instance.StopRecording();
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug("Recording stopped");
-            else
-                AddToOSDDebug("Recording failed to stopped");
-#endif
-        }
-
-        private async Task ResetZoom()
-        {
-            bool success = CameraHandler.Instance.ResetZoom();
-
-#if DEBUG
-
-            if (success)
-                AddToOSDDebug("Zoom reset");
-            else
-                AddToOSDDebug("Zoom reset failed");
-#endif
-        }
-
-        private async Task ToogleDayNightCamera()
-        {
-            bool success;
-
-            if (!CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.SystemReport) || ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).activeSensor == 1) // Unknown / Night Vision
-            {
-                success = CameraHandler.Instance.SetImageSensor(false);
-
-#if DEBUG
-                if (success) // Set to Day
-                    AddToOSDDebug("Camera sensor set to day");
-                else
-                    AddToOSDDebug("Camera sensor set failed");
-#endif
-            }
-            else // Day
-            {
-                success = CameraHandler.Instance.SetImageSensor(true);
-
-#if DEBUG
-                if (success) // Set to Night Vision
-                    AddToOSDDebug("Camera sensor set to night");
-                else
-                    AddToOSDDebug("Camera sensor set failed");
-#endif
-            }
-        }
-
-        private async Task UpdateIRColor()
-        {
-            bool success = CameraHandler.Instance.SetNVColor((NVColor)Enum.Parse(typeof(NVColor), SettingManager.Get(Setting.IrColorMode), true));
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug($"Camera NV color mode set to {SettingManager.Get(Setting.IrColorMode)}");
-            else
-                AddToOSDDebug($"Camera NV color mode set failed");
-#endif
-        }
-
-        private async Task DoBIT()
-        {
-            bool success = CameraHandler.Instance.DoBIT();
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug("Doing built-in test");
-            else
-                AddToOSDDebug("Built-in test failed");
-#endif
-        }
-
-        private async Task DoNUC()
-        {
-            bool success = CameraHandler.Instance.DoNUC();
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug("NV calibrated");
-            else
-                AddToOSDDebug("NV calibration failed");
-#endif
-        }
-
-
-
-        #endregion
-
-        #region Drawing
 
         /// <summary>
         /// Handles every new frame
@@ -507,36 +258,6 @@ namespace MissionPlanner.GCSViews
                 }
                 DrawText(message, new Point((VideoRectangle.Width / 2) + rnd.Next(-20, 21), (VideoRectangle.Height / 2) + rnd.Next(-20, 21)), ContentAlignment.MiddleCenter, HorizontalAlignment.Center, new Font(DefaultFont.FontFamily, DefaultFont.Size * 2f, FontStyle.Bold));
             }
-
-            // OSDDebug
-            if (OSDDebug && !string.IsNullOrWhiteSpace(OSDDebugLines[0]))
-            {
-                string text = OSDDebugLines[0];
-                for (int i = 1; i < OSDDebugLines.Length; i++)
-                {
-                    if (!string.IsNullOrWhiteSpace(OSDDebugLines[i]))
-                    {
-                        text += "\n" + OSDDebugLines[i];
-                    }
-                }
-
-                DrawText(text, new Point(VideoRectangle.Width - 3, VideoRectangle.Height / 2), ContentAlignment.TopRight, HorizontalAlignment.Left, new Font(DefaultFont.FontFamily, DefaultFont.Size * 0.75f), Brushes.Lime);
-            }
-        }
-
-        /// <summary>
-        /// Pixel count for a given horizontal distance (in meters) at the camera target
-        /// </summary>
-        /// <param name="slantRange">Camera target distance in meters</param>
-        /// <param name="fovDegrees">Camera field of view in degrees</param>
-        /// <param name="fovPixels">Camera field of view in pixels (video horizontal resolution)</param>
-        /// <param name="hMeters">Desired horizontal distance for the return value</param>
-        /// <returns>Pixel count for a given horizontal distance (in meters) at the camera target</returns>
-        private int PixelsForMeters(double slantRange, double fovDegrees, int fovPixels, int hMeters = 10)
-        {
-            double fovMeters = 2.0 * slantRange * Math.Tan(MathHelper.Radians(fovDegrees / 2.0));
-            int pixelPerMeter = (int)Math.Round((double)fovPixels / fovMeters); // Use Math.Ceiling() instead?
-            return pixelPerMeter * hMeters;
         }
 
         /// <summary>
@@ -643,28 +364,6 @@ namespace MissionPlanner.GCSViews
                 Height = (int)Math.Ceiling(size.Height * (text.Count(c => c == '\n') + 1))
             };
         }
-
-        /// <summary>
-        /// Add a new line to the OSD debug text
-        /// </summary>
-        /// <param name="line">Text line to add</param>
-        private void AddToOSDDebug(string line)
-        {
-#if DEBUG
-            // Shift everything down
-            for (int i = OSDDebugLines.Length - 1; i > 0; i--)
-            {
-                OSDDebugLines[i] = OSDDebugLines[i - 1];
-            }
-
-            // Add new line
-            OSDDebugLines[0] = line;
-#endif
-        }
-
-        #endregion
-
-        #region HUD
 
         /// <summary>
         /// Fetches fresh data for the overlay elements
@@ -835,110 +534,29 @@ namespace MissionPlanner.GCSViews
                 VideoRectangle.Width, HudElements.LineDistance);
         }
 
-        #endregion
-
-        #region EventHandlers
-
-        private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
-        {
-            ChangeCrossHair();
-        }
-
-        private void btn_Up_Click(object sender, EventArgs e)
-        {
-
-            if (this.cs_ColorSliderAltitude.Value < this.cs_ColorSliderAltitude.Maximum - 10)
-                this.cs_ColorSliderAltitude.Value += 10;
-            else
-                this.cs_ColorSliderAltitude.Value = this.cs_ColorSliderAltitude.Maximum;
-        }
-
-        private void btn_Down_Click(object sender, EventArgs e)
-        {
-            if (this.cs_ColorSliderAltitude.Value > 10)
-                this.cs_ColorSliderAltitude.Value -= 10;
-            else
-                this.cs_ColorSliderAltitude.Value = 0;
-        }
-
-        private void btn_FullScreen_Click(object sender, EventArgs e)
-        {
-            if (_cameraFullScreenForm != null)
-            {
-                _cameraFullScreenForm.Show();
-
-            }
-            else
-            {
-                _cameraFullScreenForm = new CameraFullScreenForm();
-                _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
-                _cameraFullScreenForm.ShowDialog();
-            }
-        }
-
-        
-
-        private void btn_ResetZoom_Click(object sender, EventArgs e)
-        {
-            CameraHandler.Instance.ResetZoom();
-        }
-
-
-        private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
-        {
-
-            if (!_cameraFullScreenForm.Visible)
-            {
-                VideoControl = CameraHandler.Instance.CameraVideoControl;
-                this.pnl_CameraScreen.Controls.Add(VideoControl);
-                VideoControl.Dock = DockStyle.Fill;
-            }
-        }
-
-        private void Form_event_ReconnectRequested(object sender, EventArgs e)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => ReconnectCameraStreamAndControl()));
-            }
-            else
-            {
-                ReconnectCameraStreamAndControl();
-            }
-        }
-
         /// <summary>
-        /// Handles a double mouse click on the video area
+        /// Pixel count for a given horizontal distance (in meters) at the camera target
         /// </summary>
-        private void OnVideoDoubleClick(object sender, EventArgs e)
+        /// <param name="slantRange">Camera target distance in meters</param>
+        /// <param name="fovDegrees">Camera field of view in degrees</param>
+        /// <param name="fovPixels">Camera field of view in pixels (video horizontal resolution)</param>
+        /// <param name="hMeters">Desired horizontal distance for the return value</param>
+        /// <returns>Pixel count for a given horizontal distance (in meters) at the camera target</returns>
+        private int PixelsForMeters(double slantRange, double fovDegrees, int fovPixels, int hMeters = 10)
         {
-            Point p = VideoControl.PointToClient(Cursor.Position);
-
-#if DEBUG
-            AddToOSDDebug($"Double clicked at X={p.X} Y={p.Y}");
-#endif
+            double fovMeters = 2.0 * slantRange * Math.Tan(MathHelper.Radians(fovDegrees / 2.0));
+            int pixelPerMeter = (int)Math.Round((double)fovPixels / fovMeters); // Use Math.Ceiling() instead?
+            return pixelPerMeter * hMeters;
         }
 
-        private void btn_Settings_Click(object sender, EventArgs e)
+        private void btn_Close_Click(object sender, EventArgs e)
         {
-            //SettingManager.OpenDialog();
-
-            _cameraSettingsForm = CameraSettingsForm.Instance;
-
-            _cameraSettingsForm.event_ReconnectRequested += Form_event_ReconnectRequested;
-
-            _cameraSettingsForm.ShowDialog();
-
+            this.Hide();
         }
 
-        /// <summary>
-        /// Handles a mouse click on the video area
-        /// </summary>
-        private void OnVideoClick(int x, int y)
+        private void btn_StopTracking_Click(object sender, EventArgs e)
         {
-            //AddToOSDDebug($"Clicked at X={x} Y={y}");
-        }
 
-        #endregion
+        }
     }
 }

@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Xml;
+using MissionPlanner.GCSViews;
 
 namespace MissionPlanner.Utilities
 {
@@ -312,6 +313,9 @@ namespace MissionPlanner.Utilities
                 ((ContainerControl)control).AutoScaleMode = AutoScaleMode.None;
 
             if (control.GetType().IsDefined(typeof(PreventThemingAttribute)))
+                return;
+
+            if (control is CameraView)
                 return;
 
             ApplyTheme(control, 0);
