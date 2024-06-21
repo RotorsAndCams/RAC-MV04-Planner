@@ -65,17 +65,17 @@ namespace MV04.Camera
 
         private void btn_DayCamera_Click(object sender, EventArgs e)
         {
-            CameraHandler.SetImageSensor(false); //Set to Day camera
+            CameraHandler.Instance.SetImageSensor(false); //Set to Day camera
         }
 
         private void btn_NightCamera_Click(object sender, EventArgs e)
         {
-            CameraHandler.SetImageSensor(true); //Set to Night camera
+            CameraHandler.Instance.SetImageSensor(true); //Set to Night camera
         }
 
         private void btn_NUC_Click(object sender, EventArgs e)
         {
-            CameraHandler.DoNUC();
+            CameraHandler.Instance.DoNUC();
         }
 
         private void btn_Reconnect_Click(object sender, EventArgs e)

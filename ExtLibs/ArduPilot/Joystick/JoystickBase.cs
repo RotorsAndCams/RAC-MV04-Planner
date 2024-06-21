@@ -603,7 +603,8 @@ namespace MissionPlanner.Joystick
                     case buttonfunction.MV04_SnapShot:
                         _context.Send(delegate
                         {
-                            CameraHandler.DoPhoto();
+                            
+                            CameraHandler.Instance.DoPhoto();
                         }, null);
                         break;
                     case buttonfunction.MV04_FlightMode:
@@ -630,7 +631,7 @@ namespace MissionPlanner.Joystick
                     case buttonfunction.MV04_CameraMode:
                         _context.Send(delegate
                         {
-                            CameraHandler.SetImageSensorAsync((int)Math.Round(but.p1) == 1);
+                            CameraHandler.Instance.SetImageSensor((int)Math.Round(but.p1) == 1);
                             // p1 = 0 -> Day   -> false
                             // p1 = 1 -> Night -> true
                         }, null);

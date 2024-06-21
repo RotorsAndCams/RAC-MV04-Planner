@@ -328,7 +328,6 @@
             this.Controls.Add(this.pnl_CameraScreen);
             this.Controls.Add(this.pnl_Controllers);
             this.Name = "CameraView";
-            this.Load += new System.EventHandler(this.CameraView_Load);
             this.pnl_Controllers.ResumeLayout(false);
             this.tlp_ControlsBase.ResumeLayout(false);
             this.tlp_AGLContainer.ResumeLayout(false);

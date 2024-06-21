@@ -52,13 +52,13 @@ namespace MV04.Camera
                 case Modes.GRR:
                 case Modes.Nadir:
                 case Modes.UnstabilizedPosition:
-                    CameraHandler.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), comboBox1.SelectedItem.ToString()));
+                    CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), comboBox1.SelectedItem.ToString()));
                     break;
                 case Modes.Tracking:
-                    CameraHandler.StartTracking(null); // null = track to screen center
+                    CameraHandler.Instance.StartTracking(null); // null = track to screen center
                     break;
                 case Modes.Retract:
-                    CameraHandler.Retract();
+                    CameraHandler.Instance.Retract();
                     break;
                 default: break;
             }

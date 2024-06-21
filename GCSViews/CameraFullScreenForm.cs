@@ -88,8 +88,8 @@ namespace MissionPlanner.GCSViews
         private void InitCameraSettings()
         {
             // Video control
-            VideoControl = CameraHandler.VideoControl;
-            VideoControlDLLVersion = CameraHandler.StreamDLLVersion;
+            VideoControl = CameraHandler.Instance.CameraVideoControl;
+            VideoControlDLLVersion = CameraHandler.Instance.StreamDLLVersion;
             CameraStreamIP = SettingManager.Get(Setting.CameraStreamIP);
             CameraStreamPort = int.Parse(SettingManager.Get(Setting.CameraStreamPort));
             FetchHudDataTimer.Interval = 100; // 10Hz
@@ -100,10 +100,10 @@ namespace MissionPlanner.GCSViews
             DefaultBrush = new SolidBrush(Color.Red);
 
             // Camera control
-            CameraControlDLLVersion = CameraHandler.CameraControlDLLVersion;
+            CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
 
             // Snapshot & video save location
-            CameraHandler.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
+            CameraHandler.Instance.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
 
             // SysID for camera functions
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
@@ -115,16 +115,12 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraVideoStream()
         {
-            if (CameraHandler.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
+            if (CameraHandler.Instance.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
             {
                 //AddToOSDDebug("Video stream started");
 
                 FetchHudData();
                 FetchHudDataTimer.Start();
-            }
-            else
-            {
-                //AddToOSDDebug("Failed start video stream");
             }
         }
         /// <summary>
@@ -411,8 +407,8 @@ namespace MissionPlanner.GCSViews
 
             // Target distance (slant range)
             HudElements.TGD = "TGD";
-            bool hasGndCrsRep = CameraHandler.HasCameraReport(MavProto.MavReportType.GndCrsReport);
-            double slantRange = hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 0;
+            bool hasGndCrsRep = CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.GndCrsReport);
+            double slantRange = hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 0;
             switch (SettingManager.Get(Setting.DistFormat))
             {
                 case "km":
@@ -483,12 +479,12 @@ namespace MissionPlanner.GCSViews
             HudElements.ToWaypoint += $"\n{to_wp.Hours.ToString().PadLeft(2, '0')}:{to_wp.Minutes.ToString().PadLeft(2, '0')}:{to_wp.Seconds.ToString().PadLeft(2, '0')}";
 
             // Camera angles
-            bool hasSysRep = CameraHandler.HasCameraReport(MavProto.MavReportType.SystemReport);
+            bool hasSysRep = CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.SystemReport);
             HudElements.Camera = "CAM "
                 + "PITCH"
-                + (hasSysRep ? (int)Math.Round(((MavProto.SysReport)CameraHandler.CameraReports[MavProto.MavReportType.SystemReport]).pitch) : 0).ToString().PadLeft(5) + "°"
+                + (hasSysRep ? (int)Math.Round(((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).pitch) : 0).ToString().PadLeft(5) + "°"
                 + "\nYAW"
-                + (hasSysRep ? (int)Math.Round(((MavProto.SysReport)CameraHandler.CameraReports[MavProto.MavReportType.SystemReport]).roll) : 0).ToString().PadLeft(7) + "°";
+                + (hasSysRep ? (int)Math.Round(((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).roll) : 0).ToString().PadLeft(7) + "°";
 
             // UAV position
             Coordinate droneCoord = new Coordinate(cs.lat, cs.lng, DateTime.Now);
@@ -506,12 +502,12 @@ namespace MissionPlanner.GCSViews
                 + SettingManager.Get(Setting.GPSType).ToUpper().PadLeft(dronePos.Length - 3)
                 + $"\n" + dronePos;
 
-            CameraHandler.DronePos = droneCoord; // Update CameraHandler
+            CameraHandler.Instance.DronePos = droneCoord; // Update CameraHandler
 
             // Camera target position
             Coordinate targetCoord = new Coordinate(
-                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat : 0,
-                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon : 0,
+                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat : 0,
+                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon : 0,
                 DateTime.Now);
             string targetPos;
             switch (SettingManager.Get(Setting.GPSType).ToUpper())
@@ -527,14 +523,14 @@ namespace MissionPlanner.GCSViews
                 + SettingManager.Get(Setting.GPSType).ToUpper().PadLeft(targetPos.Length - 3)
                 + $"\n" + targetPos;
 
-            CameraHandler.TargPos = targetCoord; // Update CameraHandler
+            CameraHandler.Instance.TargPos = targetCoord; // Update CameraHandler
 
             HudElements.LineDistance = 10;
             // TODO: Optimize HudElements.LineDistance on the fly to make it easy to read on the screen
 
             HudElements.LineSpacing = PixelsForMeters(
-                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 100.0,
-                hasSysRep ? ((MavProto.SysReport)CameraHandler.CameraReports[MavProto.MavReportType.SystemReport]).fov : 60.0,
+                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 100.0,
+                hasSysRep ? ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).fov : 60.0,
                 VideoRectangle.Width, HudElements.LineDistance);
         }
 

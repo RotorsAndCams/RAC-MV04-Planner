@@ -58,7 +58,7 @@ namespace MV04.Camera
             // Send if new
             if (NewRates.roll != LastRates.roll || NewRates.pitch != LastRates.pitch || NewRates.zoom != LastRates.zoom)
             {
-                CameraHandler.MoveCamera(NewRates.roll, NewRates.pitch, NewRates.zoom, 0);
+                CameraHandler.Instance.MoveCamera(NewRates.roll, NewRates.pitch, NewRates.zoom, 0);
 
                 label1.Text = $"{Math.Round(NewRates.roll, 2)},{Math.Round(NewRates.pitch, 2)},{NewRates.zoom}";
 
