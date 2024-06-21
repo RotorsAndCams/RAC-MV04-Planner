@@ -45,8 +45,15 @@ namespace MV04.Camera
 
     #endregion
 
+    public class ReportEventArgs : EventArgs
+    {
+        public MavProto.SysReport Report {get;set;}
+    }
+
     public class CameraHandler
     {
+        public event EventHandler<ReportEventArgs> event_ReportArrived;
+
         #region Fields
         private static CameraHandler _Instance;
 
@@ -257,6 +264,10 @@ namespace MV04.Camera
                         var sr = new MavProto.SysReport();
                         MavProto.MavlinkParseSysReport(packet, ref sr);
                         CameraReports[MavProto.MavReportType.SystemReport] = sr;
+
+                        if (event_ReportArrived != null)
+                            event_ReportArrived(null, new ReportEventArgs { Report = sr });
+
                         break;
                     case MavProto.MavReportType.LosReport:
                         var lr = new MavProto.LosReport();

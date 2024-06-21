@@ -98,7 +98,31 @@ namespace MissionPlanner.GCSViews
 
             StartCameraStream();
             StartCameraControl();
+            CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
+            
         }
+
+        private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
+        {
+
+            var status = e.Report.systemMode;
+
+            string st = ((MavProto.NvSystemModes)status).ToString();
+
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetCameraStatusValue(st); }));
+            }
+            else
+                SetCameraStatusValue(st);
+        }
+
+        private void SetCameraStatusValue(string st)
+        {
+            this.lb_CameraStatusValue.Text = st;
+        }
+
 
         #endregion
 
@@ -146,7 +170,7 @@ namespace MissionPlanner.GCSViews
                 {"Tracker mode", () => { new TrackerPosForm().Show(); }},
                 {"Camera mover", () => { new CameraMoverForm().Show(); }},
                 {"Reset zoom", async () => { await ResetZoom(); }},
-                {"Toggle Day/Night", async () => { await ToogleDayNightCamera(); }},
+                {"Toggle Day/Night", async () => { await ToggleDayNightCamera(); }},
                 {"Update IR color", async () => { await UpdateIRColor(); }},
                 {"Do BIT", async () => { await DoBIT(); }},
                 {"Do NUC", async () => { await DoNUC(); }},
@@ -310,7 +334,7 @@ namespace MissionPlanner.GCSViews
 #endif
         }
 
-        private async Task ToogleDayNightCamera()
+        private async Task ToggleDayNightCamera()
         {
             bool success;
 
