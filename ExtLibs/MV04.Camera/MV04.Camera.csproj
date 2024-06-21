@@ -20,7 +20,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -75,9 +75,20 @@
     <Compile Include="CameraMoverForm.Designer.cs">
       <DependentUpon>CameraMoverForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="CameraSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CameraSettingsForm.Designer.cs">
+      <DependentUpon>CameraSettingsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HudElements.cs" />
     <Compile Include="MavProto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="TrackerPosForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -92,6 +103,13 @@
     <EmbeddedResource Include="CameraMoverForm.resx">
       <DependentUpon>CameraMoverForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="CameraSettingsForm.resx">
+      <DependentUpon>CameraSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="TrackerPosForm.resx">
       <DependentUpon>TrackerPosForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -101,10 +119,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\day-camera-50.png" />
+    <None Include="Resources\night-camera-50.png" />
+    <None Include="Resources\standing-man-64.png" />
+    <None Include="Resources\standing-man-50.png" />
+    <None Include="Resources\istanding-man-50.png" />
+    <None Include="Resources\istanding-man-501.png" />
+    <None Include="Resources\connect-50.png" />
     <Content Include="SharpGL.ico" />
     <Content Include="SharpGL.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MV04.Settings\MV04.Settings.csproj">
+      <Project>{2A73FA7A-705C-467E-9C31-F1D0978E366E}</Project>
+      <Name>MV04.Settings</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj">
       <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
       <Name>MissionPlanner.Utilities</Name>
