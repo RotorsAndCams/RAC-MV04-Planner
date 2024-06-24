@@ -146,8 +146,9 @@ namespace MissionPlanner.GCSViews
                 {"Tracker mode", () => { new TrackerPosForm().Show(); }},
                 {"Camera mover", () => { new CameraMoverForm().Show(); }},
                 {"Reset zoom", async () => { await ResetZoom(); }},
-                {"Toggle Day/Night", async () => { await ToogleDayNightCamera(); }},
-                {"Update IR color", async () => { await UpdateIRColor(); }},
+                {"Toggle Day/Night", async () => { await ToggleDayNightCamera(); }},
+                {"Toggle IR Color", async () => { await ToggleIRColor(); }},
+                {"Toggle IR Polarity", async () => { await ToggleIRPolarity(); }},
                 {"Do BIT", async () => { await DoBIT(); }},
                 {"Do NUC", async () => { await DoNUC(); }},
             };
@@ -338,16 +339,58 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private async Task UpdateIRColor()
+        private async Task ToggleIRColor()
         {
-            bool success = CameraHandler.Instance.SetNVColor((NVColor)Enum.Parse(typeof(NVColor), SettingManager.Get(Setting.IrColorMode), true));
+            bool success;
+
+            if (CameraHandler.Instance.CurrentIRColor == IRColor.Grayscale) // Grayscale
+            {
+                success = CameraHandler.Instance.SetIRColor(IRColor.Color); // Set to color
 
 #if DEBUG
-            if (success)
-                AddToOSDDebug($"Camera NV color mode set to {SettingManager.Get(Setting.IrColorMode)}");
-            else
-                AddToOSDDebug($"Camera NV color mode set failed");
+                if (success)
+                    AddToOSDDebug("Camera IR color set to Color");
+                else
+                    AddToOSDDebug("Camera IR color set failed");
 #endif
+            }
+            else // Color
+            {
+                success = CameraHandler.Instance.SetIRColor(IRColor.Grayscale); // Set to grayscale
+
+#if DEBUG
+                if (success)
+                    AddToOSDDebug("Camera IR color set to Grayscale");
+                else
+                    AddToOSDDebug("Camera IR color set failed");
+#endif
+            }
+        }
+
+        private async Task ToggleIRPolarity()
+        {
+            bool success;
+
+            if (!CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.SystemReport) || ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).irSensorPolarity == 1) // Unknown / Inverted
+            {
+                success = CameraHandler.Instance.SetIRPolarity(IRPolarity.Normal);
+#if DEBUG
+                if (success)
+                    AddToOSDDebug("Camera IR polarity set to Normal");
+                else
+                    AddToOSDDebug("Camera IR polarity set failed");
+#endif
+            }
+            else // Normal
+            {
+                success = CameraHandler.Instance.SetIRPolarity(IRPolarity.Inverted);
+#if DEBUG
+                if (success)
+                    AddToOSDDebug("Camera IR polarity set to Inverted");
+                else
+                    AddToOSDDebug("Camera IR polarity set failed");
+#endif
+            }
         }
 
         private async Task DoBIT()

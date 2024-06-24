@@ -19,12 +19,16 @@ namespace MV04.Camera
 {
     #region Enums
 
-    public enum NVColor
-    {               // color,   polarity
-        WhiteHot,   // 0,       0
-        BlackHot,   // 0,       1
-        Color,      // 1,       0
-        ColorInverse// 1,       1
+    public enum IRColor
+    {
+        Grayscale,
+        Color
+    }
+
+    public enum IRPolarity
+    {
+        Normal,
+        Inverted
     }
 
     public enum TrackerMode
@@ -166,6 +170,8 @@ namespace MV04.Camera
         public (double yaw, double pitch, int zoom) LastMovement { get; private set; }
 
         public ZoomState LastZoomState { get; private set; }
+
+        public IRColor CurrentIRColor { get; private set; }
 
         #endregion
 
@@ -483,15 +489,23 @@ namespace MV04.Camera
 
         #region Camera control functions
 
-        public bool SetNVColor(NVColor color)
+        public bool SetIRColor(IRColor color)
+        {
+            if (IsCameraControlConnected
+                &&
+                (mav_error)MavCmdSetIR_Color(CameraControl.mav_comm, CameraControl.ackCb, (int)color) == mav_error.ok)
+            {
+                CurrentIRColor = color;
+                return true;
+            }
+            return false;
+        }
+
+        public bool SetIRPolarity(IRPolarity polarity)
         {
             return IsCameraControlConnected
                 &&
-                (MavProto.mav_error)MavProto.MavCmdSetIR_Color(CameraControl.mav_comm, CameraControl.ackCb, color == NVColor.WhiteHot || color == NVColor.BlackHot ? 0 : 1) == MavProto.mav_error.ok
-                &&
-                (MavProto.mav_error)MavProto.MavCmdSetIRPolarity(CameraControl.mav_comm, CameraControl.ackCb, color == NVColor.WhiteHot || color == NVColor.Color ? 0 : 1) == MavProto.mav_error.ok;
-
-            // The second call will always return MAV_RESULT_FAILED
+                (mav_error)MavCmdSetIRPolarity(CameraControl.mav_comm, CameraControl.ackCb, (int)polarity) == mav_error.ok;
         }
 
         public bool SetImageSensor(bool night)
