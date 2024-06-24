@@ -34,7 +34,6 @@ namespace MissionPlanner.Joystick
         int custom0 = 65535/2;
         int custom1 = 65535/2;
 
-
         //no need for finalizer...
         //~Joystick()
         //{
@@ -601,57 +600,121 @@ namespace MissionPlanner.Joystick
 
                     // MV04 functions
                     case buttonfunction.MV04_SnapShot:
-                        _context.Send(delegate
+                        if (buttondown) // Only execute on button push (not on release)
                         {
-                            
-                            CameraHandler.Instance.DoPhoto();
-                        }, null);
+                            _context.Send(delegate
+                            {
+                                try
+                                {
+                                    CameraHandler.Instance.DoPhoto();
+                                }
+                                catch
+                                {
+                                    CustomMessageBox.Show("Failed to MV04_SnapShot");
+                                }
+                            }, null);
+                        }
                         break;
                     case buttonfunction.MV04_FlightMode:
-                        _context.Send(delegate
+                        if (buttondown) // Only execute on button push (not on release)
                         {
-                            switch ((int)Math.Round(but.p1))
+                            _context.Send(delegate
                             {
-                                case 0: // Loiter
-                                    // TODO: Switch camera and joysticks to Loiter mode
-                                    break;
-                                case 1: // TapToFly
-                                    // TODO: Switch camera and joysticks to TapToFly mode
-                                    break;
-                                case 2: // Auto
-                                    // TODO: Switch camera and joysticks to Auto mode
-                                    break;
-                                case 3: // Track
-                                    // TODO: Switch camera and joysticks to Track mode
-                                    break;
-                                default: break;
-                            }
-                        }, null);
+                                try
+                                {
+                                    switch ((int)Math.Round(but.p1))
+                                    {
+                                        case 0: // Loiter
+                                            Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
+                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                            // TODO: Switch joysticks to Loiter mode
+                                            break;
+                                        case 1: // TapToFly
+                                            Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
+                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                            // TODO: Switch joysticks to TapToFly mode
+                                            break;
+                                        case 2: // Auto
+                                            Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Auto");
+                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                            // TODO: Switch joysticks to Auto mode
+                                            break;
+                                        case 3: // Track
+                                            // TODO: Switch UAV, camera and joysticks to Track mode
+                                            break;
+                                        default: break;
+                                    }
+                                }
+                                catch
+                                {
+                                    CustomMessageBox.Show("Failed to MV04_FlightMode");
+                                }
+                            }, null);
+                        }
                         break;
-                    case buttonfunction.MV04_CameraMode:
-                        _context.Send(delegate
+                    case buttonfunction.MV04_ImageSensor:
+                        if (buttondown) // Only execute on button push (not on release)
                         {
-                            CameraHandler.Instance.SetImageSensor((int)Math.Round(but.p1) == 1);
-                            // p1 = 0 -> Day   -> false
-                            // p1 = 1 -> Night -> true
-                        }, null);
+                            _context.Send(delegate
+                            {
+                                try
+                                {
+                                    CameraHandler.Instance.SetImageSensor((int)Math.Round(but.p1) == 1);
+                                    // p1 = 0 -> Day   -> false
+                                    // p1 = 1 -> Night -> true
+                                }
+                                catch
+                                {
+                                    CustomMessageBox.Show("Failed to MV04_ImageSensor");
+                                }
+                            }, null);
+                        }
                         break;
                     case buttonfunction.MV04_Arm:
-                        _context.Send(delegate
+                        if (buttondown) // Only execute on button push (not on release)
                         {
-                            switch ((int)Math.Round(but.p1))
+                            _context.Send(delegate
                             {
-                                case 0: // Safe
-                                    Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
-                                    Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 1u, target_system = (byte)Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
-                                    break;
-                                case 1: // Armed
-                                    Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 0u, target_system = (byte)Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
-                                    Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
-                                    break;
-                                default: break;
-                            }
-                        }, null);
+                                try
+                                {
+                                    switch ((int)Math.Round(but.p1))
+                                    {
+                                        case 0: // Safe
+                                            Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
+                                            Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 1u, target_system = (byte)   Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
+                                            break;
+                                        case 1: // Armed
+                                            Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 0u, target_system = (byte)   Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
+                                            Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
+                                            break;
+                                        default: break;
+                                    }
+                                }
+                                catch
+                                {
+                                    CustomMessageBox.Show("Failed to MV04_Arm");
+                                }
+                            }, null);
+                        }
+                        break;
+                    case buttonfunction.MV04_Zoom:
+                        if (buttondown) // Only execute on button push (not on release)
+                        {
+                            _context.Send(delegate
+                            {
+                                try
+                                {
+                                    // p1 = 0 -> Zoom stop
+                                    // p1 = 1 -> Zoom in
+                                    // p1 = 2 -> Zoom out
+                                    CameraHandler.Instance.SetZoom((ZoomState)Math.Round(but.p1));
+                                }
+                                catch
+                                {
+                                    CustomMessageBox.Show("Failed to MV04_Zoom");
+                                }
+                            }, null);
+                        }
                         break;
                 }
             }

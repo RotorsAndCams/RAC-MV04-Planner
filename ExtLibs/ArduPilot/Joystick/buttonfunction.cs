@@ -22,7 +22,9 @@
         // MV04 functions
         MV04_SnapShot = 20,
         MV04_FlightMode,
-        MV04_CameraMode,
-        MV04_Arm
+        MV04_ImageSensor,
+        MV04_Arm,
+        MV04_Pitch,
+        MV04_Zoom
     }
 }
