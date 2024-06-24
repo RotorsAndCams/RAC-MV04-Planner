@@ -482,6 +482,12 @@ namespace MissionPlanner.Joystick
                 case buttonfunction.MV04_FlightMode:
                     new Joy_MV04_FlightMode((string)cmb.Tag).ShowDialog();
                     break;
+                case buttonfunction.MV04_Pitch:
+                    new Joy_MV04_Pitch((string)cmb.Tag).ShowDialog();
+                    break;
+                case buttonfunction.MV04_Zoom:
+                    new Joy_MV04_Zoom((string)cmb.Tag).ShowDialog();
+                    break;
 
                 default:
                     CustomMessageBox.Show("No settings to set", "No settings");

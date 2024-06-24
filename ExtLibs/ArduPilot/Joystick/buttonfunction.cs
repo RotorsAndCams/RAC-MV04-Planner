@@ -23,6 +23,8 @@
         MV04_SnapShot = 20,
         MV04_FlightMode,
         MV04_ImageSensor,
-        MV04_Arm
+        MV04_Arm,
+        MV04_Pitch,
+        MV04_Zoom
     }
 }

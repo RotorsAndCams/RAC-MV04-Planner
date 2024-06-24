@@ -330,6 +330,12 @@
     <EmbeddedResource Include="Joystick\Joy_MV04_FlightMode.resx">
       <DependentUpon>Joy_MV04_FlightMode.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Joystick\Joy_MV04_Pitch.resx">
+      <DependentUpon>Joy_MV04_Pitch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Joystick\Joy_MV04_Zoom.resx">
+      <DependentUpon>Joy_MV04_Zoom.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Log\LogBrowse.uk.resx">
       <DependentUpon>LogBrowse.cs</DependentUpon>
     </EmbeddedResource>
@@ -979,6 +985,18 @@
     </Compile>
     <Compile Include="Joystick\Joy_MV04_FlightMode.Designer.cs">
       <DependentUpon>Joy_MV04_FlightMode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Joystick\Joy_MV04_Pitch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Joystick\Joy_MV04_Pitch.Designer.cs">
+      <DependentUpon>Joy_MV04_Pitch.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Joystick\Joy_MV04_Zoom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Joystick\Joy_MV04_Zoom.Designer.cs">
+      <DependentUpon>Joy_MV04_Zoom.cs</DependentUpon>
     </Compile>
     <Compile Include="Log\MavlinkLogBase.cs" />
     <Compile Include="MainV2.cs">
