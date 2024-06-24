@@ -52,19 +52,21 @@ namespace MV04.Camera
     public class CameraHandler
     {
         #region Fields
+
         private static CameraHandler _Instance;
 
         public static CameraHandler Instance
-        { 
-            get 
+        {
+            get
             {
                 if (_Instance == null)
                     _Instance = new CameraHandler();
-                return _Instance; 
-            } 
+                return _Instance;
+            }
         }
 
         private VideoControl _VideoControl = null;
+
         public VideoControl CameraVideoControl
         {
             get
@@ -74,7 +76,9 @@ namespace MV04.Camera
         }
 
         public static int sysID = 1;
+
         public Coordinate DronePos = new Coordinate();
+
         public Coordinate TargPos = new Coordinate();
 
         #region Video Fields
@@ -88,11 +92,17 @@ namespace MV04.Camera
                 return version;
             }
         }
+
         public IPAddress StreamIP { get; set; }
+
         public int StreamPort { get; set; }
+
         public VideoDecoder.RawFrameReadyCB StreamNewFrameCb { private get; set; }
+
         public VideoControl.VideoControlClickDelegate StreamClickCb { private get; set; }
+
         private string _MediaSavePath;
+
         public string MediaSavePath
         {
             get
@@ -127,9 +137,10 @@ namespace MV04.Camera
         #region Camera control Fields
 
         public IPAddress CameraControlIP { get; set; }
+
         public int CameraControlPort { get; set; }
 
-        private MavProto.NvSystemModes PrevCameraMode;
+        private NvSystemModes PrevCameraMode;
 
         private MavProto _mavProto = null;
 
@@ -146,7 +157,7 @@ namespace MV04.Camera
             get
             {
                 (int major, int minor, int build) version = (0, 0, 0);
-                MavProto.GetMavManagerVersion(ref version.major, ref version.minor, ref version.build);
+                GetMavManagerVersion(ref version.major, ref version.minor, ref version.build);
                 return version;
             }
         }
@@ -155,14 +166,14 @@ namespace MV04.Camera
         {
             get
             {
-                return MavProto.IsValid(_mavProto);
+                return IsValid(_mavProto);
             }
         }
 
         /// <summary>
         /// Store Callback reports for state and drawing
         /// </summary>
-        public Dictionary<MavProto.MavReportType, object> CameraReports { get; set; }
+        public Dictionary<MavReportType, object> CameraReports { get; set; }
 
         /// <summary>
         /// Store last movement
@@ -188,7 +199,7 @@ namespace MV04.Camera
 
             StartCommunicationWithdevice();
 
-            if (!MavProto.IsValid(_mavProto))
+            if (!IsValid(_mavProto))
             {
                 MessageBox.Show("Invalid MavProto - CameraHandler - ctor");
             }
@@ -225,7 +236,7 @@ namespace MV04.Camera
             CameraControlIP = ip;
             CameraControlPort = port;
 
-            return MavProto.IsValid(_mavProto);
+            return IsValid(_mavProto);
         }
 
         public bool StartStream(IPAddress ip, int port, VideoDecoder.RawFrameReadyCB onNewFrame, VideoControl.VideoControlClickDelegate onClick)
@@ -237,13 +248,14 @@ namespace MV04.Camera
 
             return _VideoControl.VideoControlStartStream(StreamIP.ToString(), StreamPort, StreamNewFrameCb, StreamClickCb, false) == 0;
         }
+
         #endregion
 
         #region Methods
 
-        public bool HasCameraReport(MavProto.MavReportType report_type)
+        public bool HasCameraReport(MavReportType report_type)
         {
-            if (CameraReports == null) CameraReports = new Dictionary<MavProto.MavReportType, object>();
+            if (CameraReports == null) CameraReports = new Dictionary<MavReportType, object>();
             return CameraReports.ContainsKey(report_type) && CameraReports[report_type] != null;
         }
 
@@ -254,112 +266,114 @@ namespace MV04.Camera
                 byte[] packet = new byte[buf_len];
                 Marshal.Copy(buf, packet, 0, packet.Length);
 
-                if (!HasCameraReport((MavProto.MavReportType)report_type))
-                    CameraReports.Add((MavProto.MavReportType)report_type, null);
+                string hexMsg = BitConverter.ToString(packet);
 
-                switch ((MavProto.MavReportType)report_type)
+                if (!HasCameraReport((MavReportType)report_type))
+                    CameraReports.Add((MavReportType)report_type, null);
+
+                switch ((MavReportType)report_type)
                 {
-                    case MavProto.MavReportType.SystemReport:
-                        var sr = new MavProto.SysReport();
-                        MavProto.MavlinkParseSysReport(packet, ref sr);
-                        CameraReports[MavProto.MavReportType.SystemReport] = sr;
+                    case MavReportType.SystemReport:
+                        var sr = new SysReport();
+                        MavlinkParseSysReport(packet, ref sr);
+                        CameraReports[MavReportType.SystemReport] = sr;
                         break;
-                    case MavProto.MavReportType.LosReport:
-                        var lr = new MavProto.LosReport();
-                        MavProto.MavlinkParseLosReport(packet, ref lr);
-                        CameraReports[MavProto.MavReportType.LosReport] = lr;
+                    case MavReportType.LosReport:
+                        var lr = new LosReport();
+                        MavlinkParseLosReport(packet, ref lr);
+                        CameraReports[MavReportType.LosReport] = lr;
                         break;
-                    case MavProto.MavReportType.GndCrsReport:
-                        var gcr = new MavProto.GndCrsReport();
-                        MavProto.MavlinkParseGndCrsReport(packet, ref gcr);
-                        CameraReports[MavProto.MavReportType.GndCrsReport] = gcr;
+                    case MavReportType.GndCrsReport:
+                        var gcr = new GndCrsReport();
+                        MavlinkParseGndCrsReport(packet, ref gcr);
+                        CameraReports[MavReportType.GndCrsReport] = gcr;
                         break;
-                    case MavProto.MavReportType.SnapshotReport:
-                        var ssr = new MavProto.SnapshotReport();
-                        MavProto.MavlinkParseSnapshotReport(packet, ref ssr);
-                        CameraReports[MavProto.MavReportType.SnapshotReport] = ssr;
+                    case MavReportType.SnapshotReport:
+                        var ssr = new SnapshotReport();
+                        MavlinkParseSnapshotReport(packet, ref ssr);
+                        CameraReports[MavReportType.SnapshotReport] = ssr;
                         break;
-                    case MavProto.MavReportType.SDCardReport:
-                        var sdcr = new MavProto.SDCardReport();
-                        MavProto.MavlinkParseSDCardReport(packet, ref sdcr);
-                        CameraReports[MavProto.MavReportType.SDCardReport] = sdcr;
+                    case MavReportType.SDCardReport:
+                        var sdcr = new SDCardReport();
+                        MavlinkParseSDCardReport(packet, ref sdcr);
+                        CameraReports[MavReportType.SDCardReport] = sdcr;
                         break;
-                    case MavProto.MavReportType.VideoReport:
-                        var vr = new MavProto.VideoReport();
-                        MavProto.MavlinkParseVideoReport(packet, ref vr);
-                        CameraReports[MavProto.MavReportType.VideoReport] = vr;
+                    case MavReportType.VideoReport:
+                        var vr = new VideoReport();
+                        MavlinkParseVideoReport(packet, ref vr);
+                        CameraReports[MavReportType.VideoReport] = vr;
                         break;
-                    case MavProto.MavReportType.LosRateReport:
-                        var lrr = new MavProto.LosRateReport();
-                        MavProto.MavlinkParseLosRateReport(packet, ref lrr);
-                        CameraReports[MavProto.MavReportType.LosRateReport] = lrr;
+                    case MavReportType.LosRateReport:
+                        var lrr = new LosRateReport();
+                        MavlinkParseLosRateReport(packet, ref lrr);
+                        CameraReports[MavReportType.LosRateReport] = lrr;
                         break;
-                    case MavProto.MavReportType.ObjectDetectionReport:
-                        var odr = new MavProto.ObjectDetectionReport();
-                        MavProto.MavlinkParseObjectDetectionReport(packet, ref odr);
-                        CameraReports[MavProto.MavReportType.ObjectDetectionReport] = odr;
+                    case MavReportType.ObjectDetectionReport:
+                        var odr = new ObjectDetectionReport();
+                        MavlinkParseObjectDetectionReport(packet, ref odr);
+                        CameraReports[MavReportType.ObjectDetectionReport] = odr;
                         break;
-                    case MavProto.MavReportType.IMUReport:
-                        var ir = new MavProto.IMUReport();
-                        MavProto.MavlinkParseIMUReport(packet, ref ir);
-                        CameraReports[MavProto.MavReportType.IMUReport] = ir;
+                    case MavReportType.IMUReport:
+                        var ir = new IMUReport();
+                        MavlinkParseIMUReport(packet, ref ir);
+                        CameraReports[MavReportType.IMUReport] = ir;
                         break;
-                    case MavProto.MavReportType.FireDetectionReport:
-                        var fdr = new MavProto.FireDetectionReport();
-                        MavProto.MavlinkParseFireDetectionReport(packet, ref fdr);
-                        CameraReports[MavProto.MavReportType.FireDetectionReport] = fdr;
+                    case MavReportType.FireDetectionReport:
+                        var fdr = new FireDetectionReport();
+                        MavlinkParseFireDetectionReport(packet, ref fdr);
+                        CameraReports[MavReportType.FireDetectionReport] = fdr;
                         break;
-                    case MavProto.MavReportType.TrackingReport:
-                        var tr = new MavProto.TrackingReport();
-                        MavProto.MavlinkParseTrackingReport(packet, ref tr);
-                        CameraReports[MavProto.MavReportType.TrackingReport] = tr;
+                    case MavReportType.TrackingReport:
+                        var tr = new TrackingReport();
+                        MavlinkParseTrackingReport(packet, ref tr);
+                        CameraReports[MavReportType.TrackingReport] = tr;
                         break;
-                    case MavProto.MavReportType.LPRReport:
-                        var lprr = new MavProto.LPRReport();
-                        MavProto.MavlinkParseLPRReport(packet, ref lprr);
-                        CameraReports[MavProto.MavReportType.LPRReport] = lprr;
+                    case MavReportType.LPRReport:
+                        var lprr = new LPRReport();
+                        MavlinkParseLPRReport(packet, ref lprr);
+                        CameraReports[MavReportType.LPRReport] = lprr;
                         break;
-                    case MavProto.MavReportType.ARMarkerReport:
-                        var armr = new MavProto.ARMarkerReport();
-                        MavProto.MavlinkParseARMarkerReport(packet, ref armr);
-                        CameraReports[MavProto.MavReportType.ARMarkerReport] = armr;
+                    case MavReportType.ARMarkerReport:
+                        var armr = new ARMarkerReport();
+                        MavlinkParseARMarkerReport(packet, ref armr);
+                        CameraReports[MavReportType.ARMarkerReport] = armr;
                         break;
-                    case MavProto.MavReportType.ParameterReport:
-                        var pr = new MavProto.ParameterReport();
-                        MavProto.MavlinkParseParameterReport(packet, ref pr);
-                        CameraReports[MavProto.MavReportType.ParameterReport] = pr;
+                    case MavReportType.ParameterReport:
+                        var pr = new ParameterReport();
+                        MavlinkParseParameterReport(packet, ref pr);
+                        CameraReports[MavReportType.ParameterReport] = pr;
                         break;
-                    case MavProto.MavReportType.CarCountReport:
-                        var ccr = new MavProto.CarCountReport();
-                        MavProto.MavlinkParseCarCountReport(packet, ref ccr);
-                        CameraReports[MavProto.MavReportType.CarCountReport] = ccr;
+                    case MavReportType.CarCountReport:
+                        var ccr = new CarCountReport();
+                        MavlinkParseCarCountReport(packet, ref ccr);
+                        CameraReports[MavReportType.CarCountReport] = ccr;
                         break;
-                    case MavProto.MavReportType.OGLRReport:
-                        var oglr = new MavProto.OGLRReport();
-                        MavProto.MavlinkParseOGLRReport(packet, ref oglr);
-                        CameraReports[MavProto.MavReportType.OGLRReport] = oglr;
+                    case MavReportType.OGLRReport:
+                        var oglr = new OGLRReport();
+                        MavlinkParseOGLRReport(packet, ref oglr);
+                        CameraReports[MavReportType.OGLRReport] = oglr;
                         break;
-                    case MavProto.MavReportType.VMDReport:
-                        var vmdr = new MavProto.VMDReport();
-                        MavProto.MavlinkParseVMDReport(packet, ref vmdr);
-                        CameraReports[MavProto.MavReportType.VMDReport] = vmdr;
+                    case MavReportType.VMDReport:
+                        var vmdr = new VMDReport();
+                        MavlinkParseVMDReport(packet, ref vmdr);
+                        CameraReports[MavReportType.VMDReport] = vmdr;
                         break;
-                    case MavProto.MavReportType.PLR_Report:
-                        var plrr = new MavProto.PLR_Report();
-                        MavProto.MavlinkParsePLRReport(packet, ref plrr);
-                        CameraReports[MavProto.MavReportType.PLR_Report] = plrr;
+                    case MavReportType.PLR_Report:
+                        var plrr = new PLR_Report();
+                        MavlinkParsePLRReport(packet, ref plrr);
+                        CameraReports[MavReportType.PLR_Report] = plrr;
                         break;
-                    case MavProto.MavReportType.RangeFinderReport:
-                        var rfr = new MavProto.RangeFinderReport();
-                        MavProto.MavlinkParseRangeFinderReport(packet, ref rfr);
-                        CameraReports[MavProto.MavReportType.RangeFinderReport] = rfr;
+                    case MavReportType.RangeFinderReport:
+                        var rfr = new RangeFinderReport();
+                        MavlinkParseRangeFinderReport(packet, ref rfr);
+                        CameraReports[MavReportType.RangeFinderReport] = rfr;
                         break;
-                    case MavProto.MavReportType.AuxCameraControlReport:
-                        var accr = new MavProto.ObjectAuxCameraDetectionReport();
-                        MavProto.MavlinkParseAuxCameraControlReport(packet, ref accr);
-                        CameraReports[MavProto.MavReportType.AuxCameraControlReport] = accr;
+                    case MavReportType.AuxCameraControlReport:
+                        var accr = new ObjectAuxCameraDetectionReport();
+                        MavlinkParseAuxCameraControlReport(packet, ref accr);
+                        CameraReports[MavReportType.AuxCameraControlReport] = accr;
                         break;
-                    case MavProto.MavReportType.Reserved:
+                    case MavReportType.Reserved:
                     default: break;
                 }
             }
@@ -371,17 +385,16 @@ namespace MV04.Camera
             // result = MAV_RESULT code
             // buf = The whole MavLink packet
 
-            return;
-
             if (buf_len > 0)
             {
                 byte[] packet = new byte[buf_len];
                 Marshal.Copy(buf, packet, 0, packet.Length);
 
                 string hexMsg = BitConverter.ToString(packet);
-                MavProto.MAV_RESULT mavResult = (MavProto.MAV_RESULT)result;
-                MavProto.MavCommands mavCommand = (MavProto.MavCommands)command_id;
+                MAV_RESULT mavResult = (MAV_RESULT)result;
             }
+
+            return;
         }
 
         #region Video Methods
@@ -487,7 +500,7 @@ namespace MV04.Camera
 
         #endregion
 
-        #region Camera control functions
+        #region Camera control Methods
 
         public bool SetIRColor(IRColor color)
         {
@@ -512,14 +525,26 @@ namespace MV04.Camera
         {
             return IsCameraControlConnected
                 &&
-                (MavProto.mav_error)MavProto.MavCmdSetDisplayedSensor(CameraControl.mav_comm, CameraControl.ackCb, night ? 1 : 0) == MavProto.mav_error.ok;
+                (mav_error)MavCmdSetDisplayedSensor(CameraControl.mav_comm, CameraControl.ackCb, night ? 1 : 0) == mav_error.ok;
         }
 
-        public bool SetMode(MavProto.NvSystemModes mode)
+        public bool SetMode(NvSystemModes mode)
         {
             return IsCameraControlConnected
                 &&
-                (MavProto.mav_error)MavProto.MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == MavProto.mav_error.ok;
+                (mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok;
+        }
+
+        public Point FullSizeToTrackingSize(Point fullSizePoint, Size fullSizeResolution)
+        {
+            return new Point(
+                (int)Math.Round(fullSizePoint.X * (1280.0 / fullSizeResolution.Width)),
+                (int)Math.Round(fullSizePoint.Y * (720.0 / fullSizeResolution.Height)));
+        }
+
+        public Point FullSizeToTrackingSize(Point fullSizePoint)
+        {
+            return FullSizeToTrackingSize(fullSizePoint, new Size(1920, 1080));
         }
 
         private double Constrain(double number, double minValue, double maxValue)
@@ -559,10 +584,10 @@ namespace MV04.Camera
             if (IsCameraControlConnected)
             {
                 // Save current camera mode
-                if (HasCameraReport(MavProto.MavReportType.SystemReport))
-                    PrevCameraMode = (MavProto.NvSystemModes)((MavProto.SysReport)CameraReports[MavProto.MavReportType.SystemReport]).systemMode;
+                if (HasCameraReport(MavReportType.SystemReport))
+                    PrevCameraMode = (NvSystemModes)((SysReport)CameraReports[MavReportType.SystemReport]).systemMode;
                 else
-                    PrevCameraMode = MavProto.NvSystemModes.GRR;
+                    PrevCameraMode = NvSystemModes.GRR;
 
                 // Handle default tracking pos (center)
                 Point _trackPos = trackPos ?? new Point(640, 360);
@@ -572,36 +597,36 @@ namespace MV04.Camera
                 _trackPos.Y = Constrain(_trackPos.Y, 0, 720);
 
                 // Start tracking
-                return (MavProto.mav_error)MavProto.MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.Track, 0) == MavProto.mav_error.ok;
+                return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.Track, 0) == mav_error.ok;
             }
 
-                return false;
+            return false;
         }
 
         public bool StopTracking(bool resetToPrevMode = false)
         {
             if (IsCameraControlConnected
                 &&
-                (MavProto.mav_error)MavProto.MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, 0, 0, (int)TrackerMode.Disable, 0) == MavProto.mav_error.ok)
+                (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, 0, 0, (int)TrackerMode.Disable, 0) == mav_error.ok)
             {
                 if (resetToPrevMode) SetMode(PrevCameraMode);
                 return true;
             }
-            
-                return false;
-            }
-        
+
+            return false;
+        }
+
         public bool Retract()
         {
             return IsCameraControlConnected
-                && (MavProto.mav_error)MavProto.MavCmdDoMountControl(CameraControl.mav_comm, CameraControl.ackCb, (int)MavProto.MavMountMode.Retract) == MavProto.mav_error.ok;
+                && (mav_error)MavCmdDoMountControl(CameraControl.mav_comm, CameraControl.ackCb, (int)MavMountMode.Retract) == mav_error.ok;
         }
 
         public bool SetZoom(ZoomState zoomState)
         {
             if (IsCameraControlConnected && zoomState != LastZoomState
                 &&
-                (MavProto.mav_error)MavProto.MavCmdSetCameraZoom(CameraControl.mav_comm, CameraControl.ackCb, (int)zoomState) == MavProto.mav_error.ok)
+                (mav_error)MavCmdSetCameraZoom(CameraControl.mav_comm, CameraControl.ackCb, (int)zoomState) == mav_error.ok)
             {
                 LastZoomState = zoomState;
                 return true;
@@ -622,37 +647,37 @@ namespace MV04.Camera
                 // Only send if new
                 if ((yaw != LastMovement.yaw || pitch != LastMovement.pitch || zoom != LastMovement.zoom)
                     &&
-                    (MavProto.mav_error)MavProto.MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, (float)yaw, (float)pitch, zoom, (float)groundAlt) == MavProto.mav_error.ok)
+                    (mav_error)MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, (float)yaw, (float)pitch, zoom, (float)groundAlt) == mav_error.ok)
                 {
-                LastMovement = (yaw, pitch, zoom);
+                    LastMovement = (yaw, pitch, zoom);
                     return true;
-            }
+                }
             }
 
-                return false;
+            return false;
         }
 
         public bool ResetZoom()
         {
             if (IsCameraControlConnected)
             {
-                MavProto.MavCmdSetFOV(CameraControl.mav_comm, CameraControl.ackCb, 65);
+                MavCmdSetFOV(CameraControl.mav_comm, CameraControl.ackCb, 65);
                 return true;
             }
-            
-                return false;
-            }
+
+            return false;
+        }
 
         public bool DoBIT()
         {
             return IsCameraControlConnected
-                && (MavProto.mav_error)MavProto.MavCmdDoBIT_Test(CameraControl.mav_comm, CameraControl.ackCb) == MavProto.mav_error.ok;
-            }
+                && (mav_error)MavCmdDoBIT_Test(CameraControl.mav_comm, CameraControl.ackCb) == mav_error.ok;
+        }
 
         public bool DoNUC()
         {
             return IsCameraControlConnected
-                && (MavProto.mav_error)MavProto.MavCmdDoNUC(CameraControl.mav_comm, CameraControl.ackCb) == MavProto.mav_error.ok;
+                && (mav_error)MavCmdDoNUC(CameraControl.mav_comm, CameraControl.ackCb) == mav_error.ok;
         }
 
         #endregion

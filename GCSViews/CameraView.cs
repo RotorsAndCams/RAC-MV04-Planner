@@ -311,16 +311,16 @@ namespace MissionPlanner.GCSViews
 #endif
         }
 
-        private async Task ToogleDayNightCamera()
+        private async Task ToggleDayNightCamera()
         {
             bool success;
 
             if (!CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.SystemReport) || ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).activeSensor == 1) // Unknown / Night Vision
             {
-                success = CameraHandler.Instance.SetImageSensor(false);
+                success = CameraHandler.Instance.SetImageSensor(false); // Set to Day
 
 #if DEBUG
-                if (success) // Set to Day
+                if (success)
                     AddToOSDDebug("Camera sensor set to day");
                 else
                     AddToOSDDebug("Camera sensor set failed");
@@ -328,10 +328,10 @@ namespace MissionPlanner.GCSViews
             }
             else // Day
             {
-                success = CameraHandler.Instance.SetImageSensor(true);
+                success = CameraHandler.Instance.SetImageSensor(true); // Set to Night Vision
 
 #if DEBUG
-                if (success) // Set to Night Vision
+                if (success)
                     AddToOSDDebug("Camera sensor set to night");
                 else
                     AddToOSDDebug("Camera sensor set failed");
@@ -919,7 +919,7 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        
+
 
         private void btn_ResetZoom_Click(object sender, EventArgs e)
         {
@@ -971,7 +971,6 @@ namespace MissionPlanner.GCSViews
             _cameraSettingsForm.event_ReconnectRequested += Form_event_ReconnectRequested;
 
             _cameraSettingsForm.ShowDialog();
-
         }
 
         /// <summary>
@@ -979,7 +978,9 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void OnVideoClick(int x, int y)
         {
-            //AddToOSDDebug($"Clicked at X={x} Y={y}");
+#if DEBUG
+            AddToOSDDebug($"Clicked at X={x} Y={y}");
+#endif
         }
 
         #endregion
