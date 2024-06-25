@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.RightsManagement;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -49,7 +50,8 @@ namespace MissionPlanner.GCSViews
         bool OSDDebug = true;
         string[] OSDDebugLines = new string[10];
 
-        private CameraSettingsForm _cameraSettingsForm;
+        private enum_MV04_CameraModes previousCameraMode;
+
         private CameraFullScreenForm _cameraFullScreenForm;
 
         #endregion
@@ -97,9 +99,31 @@ namespace MissionPlanner.GCSViews
 
             StartCameraStream();
             StartCameraControl();
-
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
+
         }
+
+        private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
+        {
+
+            var status = e.Report.systemMode;
+
+            string st = ((MavProto.NvSystemModes)status).ToString();
+
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetCameraStatusValue(st); }));
+            }
+            else
+                SetCameraStatusValue(st);
+        }
+
+        private void SetCameraStatusValue(string st)
+        {
+            this.lb_CameraStatusValue.Text = st;
+        }
+
 
         #endregion
 
@@ -147,7 +171,7 @@ namespace MissionPlanner.GCSViews
                 {"Tracker mode", () => { new TrackerPosForm().Show(); }},
                 {"Camera mover", () => { new CameraMoverForm().Show(); }},
                 {"Reset zoom", async () => { await ResetZoom(); }},
-                {"Toggle Day/Night", async () => { await ToogleDayNightCamera(); }},
+                {"Toggle Day/Night", async () => { await ToggleDayNightCamera(); }},
                 {"Update IR color", async () => { await UpdateIRColor(); }},
                 {"Do BIT", async () => { await DoBIT(); }},
                 {"Do NUC", async () => { await DoNUC(); }},
@@ -311,7 +335,7 @@ namespace MissionPlanner.GCSViews
 #endif
         }
 
-        private async Task ToogleDayNightCamera()
+        private async Task ToggleDayNightCamera()
         {
             bool success;
 
@@ -877,10 +901,13 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+
+
         private void btn_ResetZoom_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.ResetZoom();
         }
+
 
         private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
         {
@@ -920,12 +947,9 @@ namespace MissionPlanner.GCSViews
         private void btn_Settings_Click(object sender, EventArgs e)
         {
             //SettingManager.OpenDialog();
+            CameraSettingsForm.Instance.ShowDialog();
+            CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
 
-            _cameraSettingsForm = CameraSettingsForm.Instance;
-
-            _cameraSettingsForm.event_ReconnectRequested += Form_event_ReconnectRequested;
-
-            _cameraSettingsForm.ShowDialog();
 
         }
 
@@ -937,27 +961,27 @@ namespace MissionPlanner.GCSViews
             //AddToOSDDebug($"Clicked at X={x} Y={y}");
         }
 
-        private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
-        {
-
-            var status = e.Report.systemMode;
-
-            string st = ((MavProto.NvSystemModes)status).ToString();
-
-
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => { SetCameraStatusValue(st); }));
-            }
-            else
-                SetCameraStatusValue(st);
-        }
-
         #endregion
 
-        private void SetCameraStatusValue(string st)
+        private bool _isFPVModeActive = false;
+
+        private void btn_FPVCameraMode_Click(object sender, EventArgs e)
         {
-            this.lb_CameraStatusValue.Text = st;
+            if (_isFPVModeActive)
+            {
+                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), previousCameraMode.ToString()));
+
+                _isFPVModeActive = false;
+                btn_FPVCameraMode.BackColor = Color.Black;
+            }
+            else
+            {
+                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), enum_MV04_CameraModes.Stow.ToString()));
+
+                _isFPVModeActive = true;
+                btn_FPVCameraMode.BackColor = Color.DarkGreen;
+
+            }
         }
     }
 }

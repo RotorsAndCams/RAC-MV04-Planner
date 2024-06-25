@@ -39,9 +39,6 @@
             this.tlp_AGLData = new System.Windows.Forms.TableLayoutPanel();
             this.lb_AltitudeValue = new System.Windows.Forms.Label();
             this.lb_Agl = new System.Windows.Forms.Label();
-            this.tlp_ButtonSection2 = new System.Windows.Forms.TableLayoutPanel();
-            this.btn_FullScreen = new System.Windows.Forms.Button();
-            this.btn_StopTracking = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
             this.btn_Settings = new System.Windows.Forms.Button();
@@ -57,14 +54,16 @@
             this.lb_Drone = new System.Windows.Forms.Label();
             this.tlp_ButtonSection1 = new System.Windows.Forms.TableLayoutPanel();
             this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
+            this.btn_FullScreen = new System.Windows.Forms.Button();
             this.btn_ResetZoom = new System.Windows.Forms.Button();
+            this.btn_FPVCameraMode = new System.Windows.Forms.Button();
+            this.btn_StopTracking = new System.Windows.Forms.Button();
             this.pnl_CameraScreen = new System.Windows.Forms.Panel();
             this.pnl_Controllers.SuspendLayout();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_AGLContainer.SuspendLayout();
             this.tlp_AGLIncrement.SuspendLayout();
             this.tlp_AGLData.SuspendLayout();
-            this.tlp_ButtonSection2.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
             this.pnl_SettingsPanel.SuspendLayout();
             this.pnl_DeviceState.SuspendLayout();
@@ -86,8 +85,7 @@
             // tlp_ControlsBase
             // 
             resources.ApplyResources(this.tlp_ControlsBase, "tlp_ControlsBase");
-            this.tlp_ControlsBase.Controls.Add(this.tlp_AGLContainer, 0, 3);
-            this.tlp_ControlsBase.Controls.Add(this.tlp_ButtonSection2, 0, 2);
+            this.tlp_ControlsBase.Controls.Add(this.tlp_AGLContainer, 0, 2);
             this.tlp_ControlsBase.Controls.Add(this.tlp_InfoBase, 0, 0);
             this.tlp_ControlsBase.Controls.Add(this.tlp_ButtonSection1, 0, 1);
             this.tlp_ControlsBase.Name = "tlp_ControlsBase";
@@ -167,32 +165,6 @@
             resources.ApplyResources(this.lb_Agl, "lb_Agl");
             this.lb_Agl.ForeColor = System.Drawing.Color.White;
             this.lb_Agl.Name = "lb_Agl";
-            // 
-            // tlp_ButtonSection2
-            // 
-            resources.ApplyResources(this.tlp_ButtonSection2, "tlp_ButtonSection2");
-            this.tlp_ButtonSection2.Controls.Add(this.btn_FullScreen, 1, 0);
-            this.tlp_ButtonSection2.Controls.Add(this.btn_StopTracking, 0, 0);
-            this.tlp_ButtonSection2.Name = "tlp_ButtonSection2";
-            // 
-            // btn_FullScreen
-            // 
-            this.btn_FullScreen.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_FullScreen, "btn_FullScreen");
-            this.btn_FullScreen.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_FullScreen.Image = global::MissionPlanner.Properties.Resources.icons8_fullscreen_50;
-            this.btn_FullScreen.Name = "btn_FullScreen";
-            this.btn_FullScreen.UseVisualStyleBackColor = false;
-            this.btn_FullScreen.Click += new System.EventHandler(this.btn_FullScreen_Click);
-            // 
-            // btn_StopTracking
-            // 
-            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
-            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
-            this.btn_StopTracking.Name = "btn_StopTracking";
-            this.btn_StopTracking.UseVisualStyleBackColor = false;
             // 
             // tlp_InfoBase
             // 
@@ -292,7 +264,10 @@
             // 
             resources.ApplyResources(this.tlp_ButtonSection1, "tlp_ButtonSection1");
             this.tlp_ButtonSection1.Controls.Add(this.btn_ChangeCrosshair, 1, 0);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_FullScreen, 1, 1);
             this.tlp_ButtonSection1.Controls.Add(this.btn_ResetZoom, 0, 0);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_FPVCameraMode, 0, 1);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_StopTracking, 1, 2);
             this.tlp_ButtonSection1.Name = "tlp_ButtonSection1";
             // 
             // btn_ChangeCrosshair
@@ -305,6 +280,16 @@
             this.btn_ChangeCrosshair.UseVisualStyleBackColor = false;
             this.btn_ChangeCrosshair.Click += new System.EventHandler(this.btn_ChangeCrosshair_Click);
             // 
+            // btn_FullScreen
+            // 
+            this.btn_FullScreen.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_FullScreen, "btn_FullScreen");
+            this.btn_FullScreen.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_FullScreen.Image = global::MissionPlanner.Properties.Resources.icons8_fullscreen_50;
+            this.btn_FullScreen.Name = "btn_FullScreen";
+            this.btn_FullScreen.UseVisualStyleBackColor = false;
+            this.btn_FullScreen.Click += new System.EventHandler(this.btn_FullScreen_Click);
+            // 
             // btn_ResetZoom
             // 
             this.btn_ResetZoom.BackColor = System.Drawing.Color.Black;
@@ -314,6 +299,24 @@
             this.btn_ResetZoom.Name = "btn_ResetZoom";
             this.btn_ResetZoom.UseVisualStyleBackColor = false;
             this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
+            // 
+            // btn_FPVCameraMode
+            // 
+            this.btn_FPVCameraMode.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_FPVCameraMode, "btn_FPVCameraMode");
+            this.btn_FPVCameraMode.ForeColor = System.Drawing.Color.White;
+            this.btn_FPVCameraMode.Name = "btn_FPVCameraMode";
+            this.btn_FPVCameraMode.UseVisualStyleBackColor = false;
+            this.btn_FPVCameraMode.Click += new System.EventHandler(this.btn_FPVCameraMode_Click);
+            // 
+            // btn_StopTracking
+            // 
+            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
+            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
+            this.btn_StopTracking.Name = "btn_StopTracking";
+            this.btn_StopTracking.UseVisualStyleBackColor = false;
             // 
             // pnl_CameraScreen
             // 
@@ -335,7 +338,6 @@
             this.tlp_AGLIncrement.PerformLayout();
             this.tlp_AGLData.ResumeLayout(false);
             this.tlp_AGLData.PerformLayout();
-            this.tlp_ButtonSection2.ResumeLayout(false);
             this.tlp_InfoBase.ResumeLayout(false);
             this.pnl_SettingsPanel.ResumeLayout(false);
             this.pnl_DeviceState.ResumeLayout(false);
@@ -370,7 +372,6 @@
         private System.Windows.Forms.Label lb_DroneStatusValue;
         private System.Windows.Forms.Label lb_Camera;
         private System.Windows.Forms.Label lb_Drone;
-        private System.Windows.Forms.TableLayoutPanel tlp_ButtonSection2;
         private System.Windows.Forms.TableLayoutPanel tlp_ButtonSection1;
         private System.Windows.Forms.Button btn_ResetZoom;
         private System.Windows.Forms.Button btn_Settings;
@@ -381,5 +382,6 @@
         private System.Windows.Forms.PictureBox pb_PositionIndicator;
         private System.Windows.Forms.PictureBox pb_InfraLight;
         private System.Windows.Forms.PictureBox pb_DroneTakeOff;
+        private System.Windows.Forms.Button btn_FPVCameraMode;
     }
 }
