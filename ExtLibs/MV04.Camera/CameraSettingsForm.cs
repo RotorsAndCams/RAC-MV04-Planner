@@ -20,7 +20,17 @@ namespace MV04.Camera
         private bool _isFunctionsDisabled = true;
         private bool _isSettingsVisible = false;
 
-        public CameraSettingsForm()
+        public static CameraSettingsForm Instance
+        {
+            get 
+            {
+                if(_instance == null)
+                    _instance = new CameraSettingsForm();
+                return _instance;
+            }
+        }
+
+        private CameraSettingsForm()
         {
             InitializeComponent();
 

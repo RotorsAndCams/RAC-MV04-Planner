@@ -32,14 +32,12 @@
             this.pnl_Controllers = new System.Windows.Forms.Panel();
             this.tlp_ControlsBase = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_AGLContainer = new System.Windows.Forms.TableLayoutPanel();
-            this.cs_ColorSliderAltitude = new MissionPlanner.Controls.ColorSlider();
             this.tlp_AGLIncrement = new System.Windows.Forms.TableLayoutPanel();
             this.btn_Down = new System.Windows.Forms.Button();
             this.btn_Up = new System.Windows.Forms.Button();
             this.tlp_AGLData = new System.Windows.Forms.TableLayoutPanel();
             this.lb_AltitudeValue = new System.Windows.Forms.Label();
             this.lb_Agl = new System.Windows.Forms.Label();
-            this.tlp_ButtonSection2 = new System.Windows.Forms.TableLayoutPanel();
             this.btn_FullScreen = new System.Windows.Forms.Button();
             this.btn_StopTracking = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
@@ -59,12 +57,13 @@
             this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
             this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.pnl_CameraScreen = new System.Windows.Forms.Panel();
+            this.cs_ColorSliderAltitude = new MissionPlanner.Controls.ColorSlider();
+            this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.pnl_Controllers.SuspendLayout();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_AGLContainer.SuspendLayout();
             this.tlp_AGLIncrement.SuspendLayout();
             this.tlp_AGLData.SuspendLayout();
-            this.tlp_ButtonSection2.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
             this.pnl_SettingsPanel.SuspendLayout();
             this.pnl_DeviceState.SuspendLayout();
@@ -86,8 +85,7 @@
             // tlp_ControlsBase
             // 
             resources.ApplyResources(this.tlp_ControlsBase, "tlp_ControlsBase");
-            this.tlp_ControlsBase.Controls.Add(this.tlp_AGLContainer, 0, 3);
-            this.tlp_ControlsBase.Controls.Add(this.tlp_ButtonSection2, 0, 2);
+            this.tlp_ControlsBase.Controls.Add(this.tlp_AGLContainer, 0, 2);
             this.tlp_ControlsBase.Controls.Add(this.tlp_InfoBase, 0, 0);
             this.tlp_ControlsBase.Controls.Add(this.tlp_ButtonSection1, 0, 1);
             this.tlp_ControlsBase.Name = "tlp_ControlsBase";
@@ -100,25 +98,6 @@
             this.tlp_AGLContainer.Controls.Add(this.tlp_AGLIncrement, 0, 0);
             this.tlp_AGLContainer.ForeColor = System.Drawing.Color.RosyBrown;
             this.tlp_AGLContainer.Name = "tlp_AGLContainer";
-            // 
-            // cs_ColorSliderAltitude
-            // 
-            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
-            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
-            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
-            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
-            resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
-            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
-            this.cs_ColorSliderAltitude.Maximum = 500;
-            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
-            this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
-            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
-            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
-            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
-            this.cs_ColorSliderAltitude.ThumbSize = 40;
             // 
             // tlp_AGLIncrement
             // 
@@ -167,13 +146,6 @@
             resources.ApplyResources(this.lb_Agl, "lb_Agl");
             this.lb_Agl.ForeColor = System.Drawing.Color.White;
             this.lb_Agl.Name = "lb_Agl";
-            // 
-            // tlp_ButtonSection2
-            // 
-            resources.ApplyResources(this.tlp_ButtonSection2, "tlp_ButtonSection2");
-            this.tlp_ButtonSection2.Controls.Add(this.btn_FullScreen, 1, 0);
-            this.tlp_ButtonSection2.Controls.Add(this.btn_StopTracking, 0, 0);
-            this.tlp_ButtonSection2.Name = "tlp_ButtonSection2";
             // 
             // btn_FullScreen
             // 
@@ -292,7 +264,10 @@
             // 
             resources.ApplyResources(this.tlp_ButtonSection1, "tlp_ButtonSection1");
             this.tlp_ButtonSection1.Controls.Add(this.btn_ChangeCrosshair, 1, 0);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_FullScreen, 1, 1);
             this.tlp_ButtonSection1.Controls.Add(this.btn_ResetZoom, 0, 0);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_FPVCameraMode, 0, 1);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_StopTracking, 1, 2);
             this.tlp_ButtonSection1.Name = "tlp_ButtonSection1";
             // 
             // btn_ChangeCrosshair
@@ -321,6 +296,34 @@
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
             // 
+            // cs_ColorSliderAltitude
+            // 
+            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
+            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
+            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
+            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
+            resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
+            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
+            this.cs_ColorSliderAltitude.Maximum = 500;
+            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
+            this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
+            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
+            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
+            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
+            this.cs_ColorSliderAltitude.ThumbSize = 40;
+            // 
+            // btn_FPVCameraMode
+            // 
+            this.btn_FPVCameraMode.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_FPVCameraMode, "btn_FPVCameraMode");
+            this.btn_FPVCameraMode.ForeColor = System.Drawing.Color.White;
+            this.btn_FPVCameraMode.Name = "btn_FPVCameraMode";
+            this.btn_FPVCameraMode.UseVisualStyleBackColor = false;
+            this.btn_FPVCameraMode.Click += new System.EventHandler(this.btn_FPVCameraMode_Click);
+            // 
             // CameraView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -335,7 +338,6 @@
             this.tlp_AGLIncrement.PerformLayout();
             this.tlp_AGLData.ResumeLayout(false);
             this.tlp_AGLData.PerformLayout();
-            this.tlp_ButtonSection2.ResumeLayout(false);
             this.tlp_InfoBase.ResumeLayout(false);
             this.pnl_SettingsPanel.ResumeLayout(false);
             this.pnl_DeviceState.ResumeLayout(false);
@@ -370,7 +372,6 @@
         private System.Windows.Forms.Label lb_DroneStatusValue;
         private System.Windows.Forms.Label lb_Camera;
         private System.Windows.Forms.Label lb_Drone;
-        private System.Windows.Forms.TableLayoutPanel tlp_ButtonSection2;
         private System.Windows.Forms.TableLayoutPanel tlp_ButtonSection1;
         private System.Windows.Forms.Button btn_ResetZoom;
         private System.Windows.Forms.Button btn_Settings;
@@ -381,5 +382,6 @@
         private System.Windows.Forms.PictureBox pb_PositionIndicator;
         private System.Windows.Forms.PictureBox pb_InfraLight;
         private System.Windows.Forms.PictureBox pb_DroneTakeOff;
+        private System.Windows.Forms.Button btn_FPVCameraMode;
     }
 }

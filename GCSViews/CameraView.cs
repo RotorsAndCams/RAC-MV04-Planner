@@ -50,7 +50,8 @@ namespace MissionPlanner.GCSViews
         bool OSDDebug = true;
         string[] OSDDebugLines = new string[10];
 
-        private CameraSettingsForm _cameraSettingsForm;
+        private enum_MV04_CameraModes previousCameraMode;
+
         private CameraFullScreenForm _cameraFullScreenForm;
 
         #endregion
@@ -946,12 +947,10 @@ namespace MissionPlanner.GCSViews
         private void btn_Settings_Click(object sender, EventArgs e)
         {
             //SettingManager.OpenDialog();
+            CameraSettingsForm.Instance.ShowDialog();
+            CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
 
-            _cameraSettingsForm = new CameraSettingsForm();
-
-            _cameraSettingsForm.event_ReconnectRequested += Form_event_ReconnectRequested;
-
-            _cameraSettingsForm.ShowDialog();
+            
         }
 
         /// <summary>
@@ -963,5 +962,26 @@ namespace MissionPlanner.GCSViews
         }
 
         #endregion
+
+        private bool _isFPVModeActive = false;
+
+        private void btn_FPVCameraMode_Click(object sender, EventArgs e)
+        {
+            if (_isFPVModeActive)
+            {
+                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), previousCameraMode.ToString()));
+
+                _isFPVModeActive = false;
+                btn_FPVCameraMode.BackColor = Color.Black;
+            }
+            else
+            {
+                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), enum_MV04_CameraModes.Stow.ToString()));
+
+                _isFPVModeActive = true;
+                btn_FPVCameraMode.BackColor = Color.DarkGreen;
+
+            }
+        }
     }
 }
