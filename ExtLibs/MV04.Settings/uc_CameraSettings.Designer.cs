@@ -375,6 +375,7 @@
             this.button_Cancel.TabIndex = 1;
             this.button_Cancel.Text = "Reset";
             this.button_Cancel.UseVisualStyleBackColor = false;
+            this.button_Cancel.Click += new System.EventHandler(this.button_Cancel_Click);
             // 
             // tableLayoutPanel2
             // 

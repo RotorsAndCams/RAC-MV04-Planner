@@ -12,35 +12,33 @@ namespace MV04.Settings
 {
     public partial class uc_CameraSettings : UserControl
     {
-        internal HashSet<SettingItem> returnData;
-
-
+        private HashSet<SettingItem> returnData;
 
         public uc_CameraSettings()
         {
             InitializeComponent();
 
-            returnData = new HashSet<SettingItem>();
+            SetSavedSettingsValues();
         }
 
-        public void InjectData(HashSet<SettingItem> formData)
+        private void SetSavedSettingsValues()
         {
-            // Set UI from formData
-            textBox_cameraStreamIp.Text = GetValue(formData, Setting.CameraStreamIP);
-            textBox_cameraStreamPort.Text = GetValue(formData, Setting.CameraStreamPort);
-            textBox_cameraControlIp.Text = GetValue(formData, Setting.CameraControlIP);
-            textBox_cameraControlPort.Text = GetValue(formData, Setting.CameraControlPort);
-            radioButton_AutoConnect_Yes.Checked = bool.Parse(GetValue(formData, Setting.AutoConnect));
-            radioButton_AutoConnect_No.Checked = !radioButton_AutoConnect_Yes.Checked;
-            numericUpDown_VideoSegmentLength.Value = int.Parse(GetValue(formData, Setting.VideoSegmentLength));
-            comboBox_IrColorMode.SelectedItem = GetValue(formData, Setting.IrColorMode);
-            comboBox_coordFormat.SelectedItem = GetValue(formData, Setting.GPSType);
-            comboBox_altFormat.SelectedItem = GetValue(formData, Setting.AltFormat);
-            comboBox_distFormat.SelectedItem = GetValue(formData, Setting.DistFormat);
-            comboBox_speedFormat.SelectedItem = GetValue(formData, Setting.SpeedFormat);
+            returnData = SettingManager.GetSettings();
 
-            returnData = formData;
+            textBox_cameraStreamIp.Text = GetValue(returnData, Setting.CameraStreamIP);
+            textBox_cameraStreamPort.Text = GetValue(returnData, Setting.CameraStreamPort);
+            textBox_cameraControlIp.Text = GetValue(returnData, Setting.CameraControlIP);
+            textBox_cameraControlPort.Text = GetValue(returnData, Setting.CameraControlPort);
+            radioButton_AutoConnect_Yes.Checked = bool.Parse(GetValue(returnData, Setting.AutoConnect));
+            radioButton_AutoConnect_No.Checked = !radioButton_AutoConnect_Yes.Checked;
+            numericUpDown_VideoSegmentLength.Value = int.Parse(GetValue(returnData, Setting.VideoSegmentLength));
+            comboBox_IrColorMode.SelectedItem = GetValue(returnData, Setting.IrColorMode);
+            comboBox_coordFormat.SelectedItem = GetValue(returnData, Setting.GPSType);
+            comboBox_altFormat.SelectedItem = GetValue(returnData, Setting.AltFormat);
+            comboBox_distFormat.SelectedItem = GetValue(returnData, Setting.DistFormat);
+            comboBox_speedFormat.SelectedItem = GetValue(returnData, Setting.SpeedFormat);
         }
+
 
         private string GetValue(HashSet<SettingItem> collection, Setting setting)
         {
@@ -62,7 +60,6 @@ namespace MV04.Settings
 
         private void button_Save_Click(object sender, EventArgs e)
         {
-            // Validate & save contents
             SetIfValid(returnData, Setting.CameraStreamIP, textBox_cameraStreamIp.Text);
             SetIfValid(returnData, Setting.CameraStreamPort, textBox_cameraStreamPort.Text);
             SetIfValid(returnData, Setting.CameraControlIP, textBox_cameraControlIp.Text);
@@ -75,7 +72,13 @@ namespace MV04.Settings
             SetIfValid(returnData, Setting.DistFormat, comboBox_distFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.SpeedFormat, comboBox_speedFormat.SelectedItem.ToString());
 
+            SettingManager.Save(returnData);
+
         }
 
+        private void button_Cancel_Click(object sender, EventArgs e)
+        {
+            SetSavedSettingsValues();
+        }
     }
 }

@@ -28,7 +28,6 @@ namespace MV04.Camera
             HideSettings();
             this.KeyPreview = true;
 
-            this.uc_CameraSettings.InjectData();
         }
 
         private void HideSettings()
