@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Xml;
 using MissionPlanner.GCSViews;
+using MV04.Camera;
 
 namespace MissionPlanner.Utilities
 {
@@ -315,7 +316,7 @@ namespace MissionPlanner.Utilities
             if (control.GetType().IsDefined(typeof(PreventThemingAttribute)))
                 return;
 
-            if (control is CameraView)
+            if (control is CameraView || control is CameraSettingsForm)
                 return;
 
             ApplyTheme(control, 0);
