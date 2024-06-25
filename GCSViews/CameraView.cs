@@ -53,6 +53,9 @@ namespace MissionPlanner.GCSViews
         private enum_MV04_CameraModes previousCameraMode;
 
         private CameraFullScreenForm _cameraFullScreenForm;
+        private bool _isFPVModeActive = false;
+        private Point GCSDisplaySize = new Point(1920, 1200);
+
 
         #endregion
 
@@ -961,10 +964,6 @@ namespace MissionPlanner.GCSViews
             //AddToOSDDebug($"Clicked at X={x} Y={y}");
         }
 
-        #endregion
-
-        private bool _isFPVModeActive = false;
-
         private void btn_FPVCameraMode_Click(object sender, EventArgs e)
         {
             if (_isFPVModeActive)
@@ -983,5 +982,13 @@ namespace MissionPlanner.GCSViews
 
             }
         }
+
+        #endregion
+
+        private static Point Translate(Point point, Size from, Size to)
+        {
+            return new Point((point.X * to.Width) / from.Width, (point.Y * to.Height) / from.Height);
+        }
+
     }
 }
