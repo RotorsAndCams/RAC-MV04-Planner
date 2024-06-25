@@ -18,7 +18,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.RightsManagement;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -98,6 +97,8 @@ namespace MissionPlanner.GCSViews
 
             StartCameraStream();
             StartCameraControl();
+
+            CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
         }
 
         #endregion
@@ -876,13 +877,10 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        
-
         private void btn_ResetZoom_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.ResetZoom();
         }
-
 
         private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
         {
@@ -939,6 +937,27 @@ namespace MissionPlanner.GCSViews
             //AddToOSDDebug($"Clicked at X={x} Y={y}");
         }
 
+        private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
+        {
+
+            var status = e.Report.systemMode;
+
+            string st = ((MavProto.NvSystemModes)status).ToString();
+
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetCameraStatusValue(st); }));
+            }
+            else
+                SetCameraStatusValue(st);
+        }
+
         #endregion
+
+        private void SetCameraStatusValue(string st)
+        {
+            this.lb_CameraStatusValue.Text = st;
+        }
     }
 }
