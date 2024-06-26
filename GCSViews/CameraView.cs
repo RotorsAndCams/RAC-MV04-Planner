@@ -54,8 +54,8 @@ namespace MissionPlanner.GCSViews
 
         private CameraFullScreenForm _cameraFullScreenForm;
         private bool _isFPVModeActive = false;
-        private Point GCSDisplaySize = new Point(1920, 1200);
-
+        private Size Trip5Size = new Size(1920, 1200);
+        public static bool IsCameraTrackingModeActive { get; set; } = false;
 
         #endregion
 
@@ -103,6 +103,8 @@ namespace MissionPlanner.GCSViews
             StartCameraStream();
             StartCameraControl();
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
+
+            SetStopButtonVisibility();
 
         }
 
@@ -983,11 +985,39 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+        private void pnl_CameraScreen_DoubleClick(object sender, EventArgs e)
+        {
+            IsCameraTrackingModeActive = true;
+
+            var X = MousePosition.X;
+            var Y = MousePosition.Y;
+
+            var translatedPoint = Translate(new Point(X, Y), this.pnl_CameraScreen.Size, Trip5Size);
+
+            CameraHandler.Instance.StartTracking(translatedPoint);
+
+            SetStopButtonVisibility();
+        }
+
+        private void btn_StopTracking_Click(object sender, EventArgs e)
+        {
+            CameraHandler.Instance.StopTracking(true);
+            IsCameraTrackingModeActive = false;
+            SetStopButtonVisibility();
+        }
+
         #endregion
 
         private static Point Translate(Point point, Size from, Size to)
         {
             return new Point((point.X * to.Width) / from.Width, (point.Y * to.Height) / from.Height);
+        }
+
+        private void SetStopButtonVisibility()
+        {
+            if (IsCameraTrackingModeActive)
+                btn_StopTracking.Visible = true;
+            else btn_StopTracking.Visible = false;
         }
 
     }

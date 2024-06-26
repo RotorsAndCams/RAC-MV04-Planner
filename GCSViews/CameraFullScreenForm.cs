@@ -556,7 +556,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_StopTracking_Click(object sender, EventArgs e)
         {
-
+            CameraHandler.Instance.StopTracking(true);
         }
     }
 }
