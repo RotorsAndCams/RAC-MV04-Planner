@@ -54,7 +54,7 @@ namespace MissionPlanner.GCSViews
 
         private CameraFullScreenForm _cameraFullScreenForm;
         private bool _isFPVModeActive = false;
-        private Size Trip5Size = new Size(1920, 1200);
+        public static Size Trip5Size = new Size(1920, 1200);
         public static bool IsCameraTrackingModeActive { get; set; } = false;
 
         #endregion
@@ -863,6 +863,8 @@ namespace MissionPlanner.GCSViews
                 hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 100.0,
                 hasSysRep ? ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).fov : 60.0,
                 VideoRectangle.Width, HudElements.LineDistance);
+
+            SetStopButtonVisibility();
         }
 
         #endregion
@@ -923,6 +925,7 @@ namespace MissionPlanner.GCSViews
                 this.pnl_CameraScreen.Controls.Add(VideoControl);
                 VideoControl.Dock = DockStyle.Fill;
             }
+            ReconnectCameraStreamAndControl();
         }
 
         private void Form_event_ReconnectRequested(object sender, EventArgs e)
@@ -963,7 +966,16 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void OnVideoClick(int x, int y)
         {
-            //AddToOSDDebug($"Clicked at X={x} Y={y}");
+            IsCameraTrackingModeActive = true;
+
+            var X = MousePosition.X;
+            var Y = MousePosition.Y;
+
+            var translatedPoint = Translate(new Point(X, Y), this.pnl_CameraScreen.Size, Trip5Size);
+
+            CameraHandler.Instance.StartTracking(translatedPoint);
+
+            SetStopButtonVisibility();
         }
 
         private void btn_FPVCameraMode_Click(object sender, EventArgs e)
@@ -985,20 +997,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private void pnl_CameraScreen_DoubleClick(object sender, EventArgs e)
-        {
-            IsCameraTrackingModeActive = true;
-
-            var X = MousePosition.X;
-            var Y = MousePosition.Y;
-
-            var translatedPoint = Translate(new Point(X, Y), this.pnl_CameraScreen.Size, Trip5Size);
-
-            CameraHandler.Instance.StartTracking(translatedPoint);
-
-            SetStopButtonVisibility();
-        }
-
         private void btn_StopTracking_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.StopTracking(true);
@@ -1008,7 +1006,7 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-        private static Point Translate(Point point, Size from, Size to)
+        public static Point Translate(Point point, Size from, Size to)
         {
             return new Point((point.X * to.Width) / from.Width, (point.Y * to.Height) / from.Height);
         }
@@ -1017,7 +1015,8 @@ namespace MissionPlanner.GCSViews
         {
             if (IsCameraTrackingModeActive)
                 btn_StopTracking.Visible = true;
-            else btn_StopTracking.Visible = false;
+            else
+                btn_StopTracking.Visible = false;
         }
 
     }

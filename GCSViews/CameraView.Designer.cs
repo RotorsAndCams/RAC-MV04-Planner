@@ -324,7 +324,6 @@
             this.pnl_CameraScreen.BackColor = System.Drawing.Color.DarkGray;
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
-            this.pnl_CameraScreen.DoubleClick += new System.EventHandler(this.pnl_CameraScreen_DoubleClick);
             // 
             // CameraView
             // 
