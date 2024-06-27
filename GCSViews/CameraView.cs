@@ -1023,14 +1023,14 @@ namespace MissionPlanner.GCSViews
         {
             if (_isFPVModeActive)
             {
-                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), previousCameraMode.ToString()));
+                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)previousCameraMode);
 
                 _isFPVModeActive = false;
                 btn_FPVCameraMode.BackColor = Color.Black;
             }
             else
             {
-                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), enum_MV04_CameraModes.Stow.ToString()));
+                CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Stow);
 
                 _isFPVModeActive = true;
                 btn_FPVCameraMode.BackColor = Color.DarkGreen;
