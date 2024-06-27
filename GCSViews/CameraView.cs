@@ -1000,8 +1000,6 @@ namespace MissionPlanner.GCSViews
             //SettingManager.OpenDialog();
             CameraSettingsForm.Instance.ShowDialog();
             CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
-
-            _cameraSettingsForm.ShowDialog();
         }
 
         /// <summary>
