@@ -27,7 +27,6 @@ namespace MissionPlanner.GCSViews
     {
         #region Fields
 
-        public static CameraView instance;
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         VideoControl VideoControl;
@@ -47,6 +46,9 @@ namespace MissionPlanner.GCSViews
 
         Random rnd = new Random();
 
+        private int X;
+        private int Y;
+
         #region Conversion multipliers
         const double Meter_to_Feet = 3.2808399;
         const double Mps_to_Kmph = 3.6;
@@ -64,14 +66,44 @@ namespace MissionPlanner.GCSViews
             StartCameraVideoStream();
             this.FormClosing += CameraFullScreenForm_FormClosing;
             this.VisibleChanged += CameraFullScreenForm_VisibleChanged;
+
+            SetStopButtonVisible();
+
+#if DEBUG
+
+            this.VideoControl.Paint += CameraFullScreenForm_Paint;
+
+
+#endif
+
+        }
+
+        private void CameraFullScreenForm_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            Pen myp = new Pen(System.Drawing.Color.Red, 4);
+            Font fy = new Font("Helvetica", 10, FontStyle.Bold);
+            Brush br = new SolidBrush(System.Drawing.Color.Red);
+            //g.DrawString(X.ToString() + ", " + Y.ToString(), fy, br, X, Y);
+            g.FillEllipse(br, X, Y, 10, 10);
+
+            Point res = CameraView.Translate(new Point(X, Y), this.pnl_CameraView.Size, new Size(1920, 1200));
+
+            Brush br2 = new SolidBrush(Color.Yellow);
+            g.FillEllipse(br2, res.X, res.Y, 10, 10);
         }
 
         private void CameraFullScreenForm_VisibleChanged(object sender, EventArgs e)
         {
             if (this.Visible)
             {
-                this.pnl_CameraView.Controls.Add(VideoControl);
-                VideoControl.Dock = DockStyle.Fill;
+                
+                //StartCameraVideoStream();
+                //this.pnl_CameraView.Controls.Add(VideoControl);
+                //VideoControl.Dock = DockStyle.Fill;
+                //CameraHandler.Instance.CameraControlConnect(
+                //IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
+                //int.Parse(SettingManager.Get(Setting.CameraControlPort)));
             }
             else
             {
@@ -115,20 +147,33 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraVideoStream()
         {
-            if (CameraHandler.Instance.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick))
+            if (CameraHandler.Instance.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClickFullScreen))
             {
                 //AddToOSDDebug("Video stream started");
 
                 FetchHudData();
                 FetchHudDataTimer.Start();
             }
+            CameraHandler.Instance.CameraControlConnect(
+                IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
+                int.Parse(SettingManager.Get(Setting.CameraControlPort)));
         }
         /// <summary>
-        /// Handles a mouse click on the video area
+        /// Handles a mouse click on the video area 
+        /// the CameraView event will be triggered
         /// </summary>
-        private void OnVideoClick(int x, int y)
+        private void OnVideoClickFullScreen(int x, int y)
         {
-            //AddToOSDDebug($"Clicked at X={x} Y={y}");
+            //X = MousePosition.X;
+            //Y = MousePosition.Y;
+
+            //var translatedPoint = CameraView.Translate(new Point(X, Y), this.pnl_CameraView.Size, CameraView.Trip5Size);
+
+            //CameraHandler.Instance.StartTracking(translatedPoint);
+
+            //CameraView.IsCameraTrackingModeActive = true;
+
+            //SetStopButtonVisible();
         }
 
         /// <summary>
@@ -532,6 +577,8 @@ namespace MissionPlanner.GCSViews
                 hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 100.0,
                 hasSysRep ? ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).fov : 60.0,
                 VideoRectangle.Width, HudElements.LineDistance);
+
+            SetStopButtonVisible();
         }
 
         /// <summary>
@@ -556,7 +603,18 @@ namespace MissionPlanner.GCSViews
 
         private void btn_StopTracking_Click(object sender, EventArgs e)
         {
+            CameraHandler.Instance.StopTracking(true);
+            CameraView.IsCameraTrackingModeActive = false;
 
+            SetStopButtonVisible();
+        }
+
+        private void SetStopButtonVisible()
+        {
+            if (CameraView.IsCameraTrackingModeActive)
+                this.btn_StopTracking.Visible = true;
+            else
+                this.btn_StopTracking.Visible = false;
         }
     }
 }

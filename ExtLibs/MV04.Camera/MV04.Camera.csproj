@@ -126,6 +126,7 @@
     <None Include="Resources\istanding-man-50.png" />
     <None Include="Resources\istanding-man-501.png" />
     <None Include="Resources\connect-50.png" />
+    <None Include="Resources\more-50.png" />
     <Content Include="SharpGL.ico" />
     <Content Include="SharpGL.png" />
   </ItemGroup>
