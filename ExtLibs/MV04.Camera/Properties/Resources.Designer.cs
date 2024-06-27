@@ -103,6 +103,16 @@ namespace MV04.Camera.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap more_50 {
+            get {
+                object obj = ResourceManager.GetObject("more_50", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap night_camera_50 {
             get {
                 object obj = ResourceManager.GetObject("night-camera-50", resourceCulture);

@@ -50,8 +50,12 @@ namespace MissionPlanner.GCSViews
         bool OSDDebug = true;
         string[] OSDDebugLines = new string[10];
 
-        private CameraSettingsForm _cameraSettingsForm;
+        private enum_MV04_CameraModes previousCameraMode;
+
         private CameraFullScreenForm _cameraFullScreenForm;
+        private bool _isFPVModeActive = false;
+        public static Size Trip5Size = new Size(1920, 1200);
+        public static bool IsCameraTrackingModeActive { get; set; } = false;
 
         #endregion
 
@@ -98,7 +102,33 @@ namespace MissionPlanner.GCSViews
 
             StartCameraStream();
             StartCameraControl();
+            CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
+
+            SetStopButtonVisibility();
+
         }
+
+        private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
+        {
+
+            var status = e.Report.systemMode;
+
+            string st = ((MavProto.NvSystemModes)status).ToString();
+
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetCameraStatusValue(st); }));
+            }
+            else
+                SetCameraStatusValue(st);
+        }
+
+        private void SetCameraStatusValue(string st)
+        {
+            this.lb_CameraStatusValue.Text = st;
+        }
+
 
         #endregion
 
@@ -876,6 +906,8 @@ namespace MissionPlanner.GCSViews
                 hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 100.0,
                 hasSysRep ? ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).fov : 60.0,
                 VideoRectangle.Width, HudElements.LineDistance);
+
+            SetStopButtonVisibility();
         }
 
         #endregion
@@ -936,6 +968,7 @@ namespace MissionPlanner.GCSViews
                 this.pnl_CameraScreen.Controls.Add(VideoControl);
                 VideoControl.Dock = DockStyle.Fill;
             }
+            ReconnectCameraStreamAndControl();
         }
 
         private void Form_event_ReconnectRequested(object sender, EventArgs e)
@@ -965,10 +998,8 @@ namespace MissionPlanner.GCSViews
         private void btn_Settings_Click(object sender, EventArgs e)
         {
             //SettingManager.OpenDialog();
-
-            _cameraSettingsForm = CameraSettingsForm.Instance;
-
-            _cameraSettingsForm.event_ReconnectRequested += Form_event_ReconnectRequested;
+            CameraSettingsForm.Instance.ShowDialog();
+            CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
 
             _cameraSettingsForm.ShowDialog();
         }
@@ -978,11 +1009,58 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void OnVideoClick(int x, int y)
         {
-#if DEBUG
-            AddToOSDDebug($"Clicked at X={x} Y={y}");
-#endif
+            IsCameraTrackingModeActive = true;
+
+            var X = MousePosition.X;
+            var Y = MousePosition.Y;
+
+            var translatedPoint = Translate(new Point(X, Y), this.pnl_CameraScreen.Size, Trip5Size);
+
+            CameraHandler.Instance.StartTracking(translatedPoint);
+
+            SetStopButtonVisibility();
+        }
+
+        private void btn_FPVCameraMode_Click(object sender, EventArgs e)
+        {
+            if (_isFPVModeActive)
+            {
+                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), previousCameraMode.ToString()));
+
+                _isFPVModeActive = false;
+                btn_FPVCameraMode.BackColor = Color.Black;
+            }
+            else
+            {
+                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), enum_MV04_CameraModes.Stow.ToString()));
+
+                _isFPVModeActive = true;
+                btn_FPVCameraMode.BackColor = Color.DarkGreen;
+
+            }
+        }
+
+        private void btn_StopTracking_Click(object sender, EventArgs e)
+        {
+            CameraHandler.Instance.StopTracking(true);
+            IsCameraTrackingModeActive = false;
+            SetStopButtonVisibility();
         }
 
         #endregion
+
+        public static Point Translate(Point point, Size from, Size to)
+        {
+            return new Point((point.X * to.Width) / from.Width, (point.Y * to.Height) / from.Height);
+        }
+
+        private void SetStopButtonVisibility()
+        {
+            if (IsCameraTrackingModeActive)
+                btn_StopTracking.Visible = true;
+            else
+                btn_StopTracking.Visible = false;
+        }
+
     }
 }
