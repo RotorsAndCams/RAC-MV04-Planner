@@ -524,6 +524,10 @@
       <Project>{e12dbd68-f282-491a-be11-5e6ff21932c1}</Project>
       <Name>MV04.Camera</Name>
     </ProjectReference>
+    <ProjectReference Include="ExtLibs\MV04.GCS\MV04.GCS.csproj">
+      <Project>{40A838B6-38CC-47DF-9179-3E6445D3313F}</Project>
+      <Name>MV04.GCS</Name>
+    </ProjectReference>
     <ProjectReference Include="ExtLibs\MV04.Settings\MV04.Settings.csproj">
       <Project>{2a73fa7a-705c-467e-9c31-f1d0978e366e}</Project>
       <Name>MV04.Settings</Name>

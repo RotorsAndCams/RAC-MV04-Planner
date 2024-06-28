@@ -6,18 +6,49 @@ using System.Threading.Tasks;
 
 namespace MV04.GCS
 {
-    public static class GCSHandler
+    public enum buttonfunction_mv04
     {
-        //public enum buttonfunction_mv04
-        //{
-        //    MV04_SnapShot = 20,
-        //    MV04_FlightMode,
-        //    MV04_CameraMode,
-        //    MV04_Arm
-        //}
-
-        //public enum FlightModeOption { Loiter, TapToFly, Auto, Track }
-        //public enum CameraModeOption { Day, Night }
-        //public enum ArmOption { Safe, Armed }
+        MV04_SnapShot = 20,
+        MV04_FlightMode,
+        MV04_ImageSensor,
+        MV04_Arm,
+        MV04_Pitch,
+        MV04_Zoom
     }
+
+    public enum buttonfunction_mv04_FlightMode_option
+    {
+        Manual,
+        TapToFly,
+        Auto,
+        Follow
+    }
+
+    public enum buttonfunction_mv04_ImageSensor_option
+    {
+        Day,
+        Night
+    }
+
+    public enum buttonfunction_mv04_Arm_option
+    {
+        Safe,
+        Armed
+    }
+
+    public enum buttonfunction_mv04_Pitch_option
+    {
+        Stop,
+        Up,
+        Down
+    }
+
+    public enum buttonfunction_mv04_Zoom_option
+    {
+        Stop,
+        In,
+        Out
+    }
+
+    public static class GCSHandler { }
 }
