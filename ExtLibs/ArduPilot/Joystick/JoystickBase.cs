@@ -625,22 +625,26 @@ namespace MissionPlanner.Joystick
                                     switch ((int)Math.Round(but.p1))
                                     {
                                         case 0: // Loiter
+                                            StateHandler.CurrentSate = MV04_State.Manual;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to Loiter mode
                                             break;
                                         case 1: // TapToFly
+                                            StateHandler.CurrentSate = MV04_State.TapToFly;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to TapToFly mode
                                             break;
                                         case 2: // Auto
+                                            StateHandler.CurrentSate = MV04_State.Auto;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Auto");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to Auto mode
                                             break;
                                         case 3: // Track
-                                            // TODO: Switch UAV, camera and joysticks to Track mode
+                                            StateHandler.CurrentSate = MV04_State.Follow;
+                                            // TODO: Switch UAV, camera and joysticks to Follow mode
                                             break;
                                         default: break;
                                     }
