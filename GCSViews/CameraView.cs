@@ -1012,7 +1012,7 @@ namespace MissionPlanner.GCSViews
             var X = MousePosition.X;
             var Y = MousePosition.Y;
 
-            var translatedPoint = Translate(new Point(X, Y), this.pnl_CameraScreen.Size, Trip5Size);
+            var translatedPoint = CameraHandler.FullSizeToTrackingSize(new Point(X,Y));//Translate(new Point(X, Y), this.pnl_CameraScreen.Size, Trip5Size);
 
             CameraHandler.Instance.StartTracking(translatedPoint);
 

@@ -59,6 +59,7 @@
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.btn_StopTracking = new System.Windows.Forms.Button();
             this.pnl_CameraScreen = new System.Windows.Forms.Panel();
+            this.tlp_Buttonsection2 = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_Controllers.SuspendLayout();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_AGLContainer.SuspendLayout();
@@ -73,6 +74,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb_PositionIndicator)).BeginInit();
             this.tlp_DeviceStatusInfo.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
+            this.tlp_Buttonsection2.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnl_Controllers
@@ -85,9 +87,10 @@
             // tlp_ControlsBase
             // 
             resources.ApplyResources(this.tlp_ControlsBase, "tlp_ControlsBase");
-            this.tlp_ControlsBase.Controls.Add(this.tlp_AGLContainer, 0, 2);
-            this.tlp_ControlsBase.Controls.Add(this.tlp_InfoBase, 0, 0);
+            this.tlp_ControlsBase.Controls.Add(this.tlp_Buttonsection2, 0, 2);
             this.tlp_ControlsBase.Controls.Add(this.tlp_ButtonSection1, 0, 1);
+            this.tlp_ControlsBase.Controls.Add(this.tlp_InfoBase, 0, 0);
+            this.tlp_ControlsBase.Controls.Add(this.tlp_AGLContainer, 0, 3);
             this.tlp_ControlsBase.Name = "tlp_ControlsBase";
             // 
             // tlp_AGLContainer
@@ -267,7 +270,6 @@
             this.tlp_ButtonSection1.Controls.Add(this.btn_FullScreen, 1, 1);
             this.tlp_ButtonSection1.Controls.Add(this.btn_ResetZoom, 0, 0);
             this.tlp_ButtonSection1.Controls.Add(this.btn_FPVCameraMode, 0, 1);
-            this.tlp_ButtonSection1.Controls.Add(this.btn_StopTracking, 1, 2);
             this.tlp_ButtonSection1.Name = "tlp_ButtonSection1";
             // 
             // btn_ChangeCrosshair
@@ -325,6 +327,12 @@
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
             // 
+            // tlp_Buttonsection2
+            // 
+            resources.ApplyResources(this.tlp_Buttonsection2, "tlp_Buttonsection2");
+            this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 1, 0);
+            this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
+            // 
             // CameraView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -349,6 +357,7 @@
             this.tlp_DeviceStatusInfo.ResumeLayout(false);
             this.tlp_DeviceStatusInfo.PerformLayout();
             this.tlp_ButtonSection1.ResumeLayout(false);
+            this.tlp_Buttonsection2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -384,5 +393,6 @@
         private System.Windows.Forms.PictureBox pb_InfraLight;
         private System.Windows.Forms.PictureBox pb_DroneTakeOff;
         private System.Windows.Forms.Button btn_FPVCameraMode;
+        private System.Windows.Forms.TableLayoutPanel tlp_Buttonsection2;
     }
 }

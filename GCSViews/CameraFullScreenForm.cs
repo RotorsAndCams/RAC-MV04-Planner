@@ -80,6 +80,8 @@ namespace MissionPlanner.GCSViews
 
         private void CameraFullScreenForm_Paint(object sender, PaintEventArgs e)
         {
+#if DEBUG
+
             var g = e.Graphics;
             Pen myp = new Pen(System.Drawing.Color.Red, 4);
             Font fy = new Font("Helvetica", 10, FontStyle.Bold);
@@ -91,6 +93,8 @@ namespace MissionPlanner.GCSViews
 
             Brush br2 = new SolidBrush(Color.Yellow);
             g.FillEllipse(br2, res.X, res.Y, 10, 10);
+
+#endif
         }
 
         private void CameraFullScreenForm_VisibleChanged(object sender, EventArgs e)

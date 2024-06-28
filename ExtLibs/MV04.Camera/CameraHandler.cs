@@ -546,14 +546,14 @@ namespace MV04.Camera
                 (mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok;
         }
 
-        public Point FullSizeToTrackingSize(Point fullSizePoint, Size fullSizeResolution)
+        public static Point FullSizeToTrackingSize(Point fullSizePoint, Size fullSizeResolution)
         {
             return new Point(
                 (int)Math.Round(fullSizePoint.X * (1280.0 / fullSizeResolution.Width)),
                 (int)Math.Round(fullSizePoint.Y * (720.0 / fullSizeResolution.Height)));
         }
 
-        public Point FullSizeToTrackingSize(Point fullSizePoint)
+        public static Point FullSizeToTrackingSize(Point fullSizePoint)
         {
             return FullSizeToTrackingSize(fullSizePoint, new Size(1920, 1080));
         }
