@@ -81,6 +81,7 @@
     <Compile Include="CameraSettingsForm.Designer.cs">
       <DependentUpon>CameraSettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GimbalHandler.cs" />
     <Compile Include="HudElements.cs" />
     <Compile Include="MavProto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
