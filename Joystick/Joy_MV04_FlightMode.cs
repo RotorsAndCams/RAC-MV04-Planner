@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MV04.GCS;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,7 +20,7 @@ namespace MissionPlanner.Joystick
             this.BringToFront();
 
             this.Tag = tag;
-            comboBox1.Items.AddRange(new string[] { "Loiter", "TapToFly", "Auto", "Track" });
+            comboBox1.Items.AddRange(Enum.GetNames(typeof(buttonfunction_mv04_FlightMode_option)));
             JoyButton jb = MainV2.joystick.getButton(int.Parse(tag));
             comboBox1.SelectedIndex = (int)Math.Round(jb.p1);
         }

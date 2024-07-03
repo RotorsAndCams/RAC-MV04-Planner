@@ -2,9 +2,12 @@
 using MissionPlanner.ArduPilot;
 using MissionPlanner.Utilities;
 using MV04.Camera;
+using MV04.GCS;
+using MV04.State;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -377,7 +380,23 @@ namespace MissionPlanner.Joystick
                             {
                                 try
                                 {
-                                    Interface.setMode((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,mode);
+                                    // Trigger MV04 state change event
+                                    switch (mode.ToLower())
+                                    {
+                                        case "rtl":
+                                        case "smart_rtl":
+                                        case "auto rtl":
+                                            StateHandler.CurrentSate = MV04_State.RTL;
+                                            break;
+                                        case "land":
+                                            StateHandler.CurrentSate = MV04_State.Land;
+                                            break;
+                                        default:
+                                            StateHandler.CurrentSate = MV04_State.Unknown;
+                                            break;
+                                    }
+
+                                    Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, mode);
                                 }
                                 catch
                                 {
@@ -419,15 +438,16 @@ namespace MissionPlanner.Joystick
                         {
                             try
                             {
+                                // Get takeoff altitude parameter (or set default value)
+                                float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
+                                Settings.Instance["takeoff_alt"] = takeoffAlt.ToString();
+
+                                // Do takeoff procedure
                                 Interface.setMode("Guided");
-                                if (Interface.MAV.cs.firmware == Firmwares.ArduCopter2)
-                                {
-                                    Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 2);
-                                }
-                                else
-                                {
-                                    Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 20);
-                                }
+                                Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
+
+                                // Trigger MV04 state change event
+                                StateHandler.CurrentSate = MV04_State.Takeoff;
                             }
                             catch
                             {
@@ -622,25 +642,29 @@ namespace MissionPlanner.Joystick
                             {
                                 try
                                 {
-                                    switch ((int)Math.Round(but.p1))
+                                    switch ((buttonfunction_mv04_FlightMode_option)(int)Math.Round(but.p1))
                                     {
-                                        case 0: // Loiter
+                                        case buttonfunction_mv04_FlightMode_option.Manual:
+                                            StateHandler.CurrentSate = MV04_State.Manual;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
-                                            // TODO: Switch joysticks to Loiter mode
+                                            // TODO: Switch joysticks to Manual mode
                                             break;
-                                        case 1: // TapToFly
+                                        case buttonfunction_mv04_FlightMode_option.TapToFly:
+                                            StateHandler.CurrentSate = MV04_State.TapToFly;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to TapToFly mode
                                             break;
-                                        case 2: // Auto
+                                        case buttonfunction_mv04_FlightMode_option.Auto:
+                                            StateHandler.CurrentSate = MV04_State.Auto;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Auto");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to Auto mode
                                             break;
-                                        case 3: // Track
-                                            // TODO: Switch UAV, camera and joysticks to Track mode
+                                        case buttonfunction_mv04_FlightMode_option.Follow:
+                                            StateHandler.CurrentSate = MV04_State.Follow;
+                                            // TODO: Switch UAV, camera and joysticks to Follow mode
                                             break;
                                         default: break;
                                     }
@@ -677,13 +701,13 @@ namespace MissionPlanner.Joystick
                             {
                                 try
                                 {
-                                    switch ((int)Math.Round(but.p1))
+                                    switch ((buttonfunction_mv04_Arm_option)(int)Math.Round(but.p1))
                                     {
-                                        case 0: // Safe
+                                        case buttonfunction_mv04_Arm_option.Safe:
                                             Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
                                             Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 1u, target_system = (byte)   Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
                                             break;
-                                        case 1: // Armed
+                                        case buttonfunction_mv04_Arm_option.Armed:
                                             Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 0u, target_system = (byte)   Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
                                             Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
                                             break;
@@ -693,6 +717,32 @@ namespace MissionPlanner.Joystick
                                 catch
                                 {
                                     CustomMessageBox.Show("Failed to MV04_Arm");
+                                }
+                            }, null);
+                        }
+                        break;
+                    case buttonfunction.MV04_Pitch:
+                        if (buttondown)
+                        {
+                            _context.Send(delegate
+                            {
+                                try
+                                {
+                                    // TODO: Set active Pitch value for some GimbalTimer
+                                    switch ((buttonfunction_mv04_Pitch_option)(int)Math.Round(but.p1))
+                                    {
+                                        case buttonfunction_mv04_Pitch_option.Stop:
+                                            break;
+                                        case buttonfunction_mv04_Pitch_option.Up:
+                                            break;
+                                        case buttonfunction_mv04_Pitch_option.Down:
+                                            break;
+                                        default: break;
+                                    }
+                                }
+                                catch
+                                {
+                                    CustomMessageBox.Show("Failed to MV04_Pitch");
                                 }
                             }, null);
                         }
