@@ -405,10 +405,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MV04.State\MV04.State.csproj">
-      <Project>{78FD6E54-F55E-46B8-89F9-2A655C031D5A}</Project>
-      <Name>MV04.State</Name>
-    </ProjectReference>
     <ProjectReference Include="ExtLibs\7zip\7zip.csproj">
       <Project>{1117efd6-3a46-47f7-9beb-02792d213b8d}</Project>
       <Name>7zip</Name>
@@ -535,6 +531,10 @@
     <ProjectReference Include="ExtLibs\MV04.Settings\MV04.Settings.csproj">
       <Project>{2a73fa7a-705c-467e-9c31-f1d0978e366e}</Project>
       <Name>MV04.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="ExtLibs\MV04.State\MV04.State.csproj">
+      <Project>{78FD6E54-F55E-46B8-89F9-2A655C031D5A}</Project>
+      <Name>MV04.State</Name>
     </ProjectReference>
     <ProjectReference Include="ExtLibs\netDxf\netDxf.csproj">
       <Project>{785380e0-ceb9-4c34-82e5-60d0e33e848e}</Project>
