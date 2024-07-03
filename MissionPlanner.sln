@@ -207,7 +207,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MV04.Settings", "ExtLibs\MV
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MV04.Camera", "ExtLibs\MV04.Camera\MV04.Camera.csproj", "{E12DBD68-F282-491A-BE11-5E6FF21932C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MV04.State", "..\MV04.State\MV04.State.csproj", "{78FD6E54-F55E-46B8-89F9-2A655C031D5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MV04.State", "ExtLibs\MV04.State\MV04.State.csproj", "{78FD6E54-F55E-46B8-89F9-2A655C031D5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
