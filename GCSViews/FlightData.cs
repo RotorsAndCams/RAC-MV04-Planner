@@ -32,6 +32,7 @@ using ZedGraph;
 using LogAnalyzer = MissionPlanner.Utilities.LogAnalyzer;
 using TableLayoutPanelCellPosition = System.Windows.Forms.TableLayoutPanelCellPosition;
 using UnauthorizedAccessException = System.UnauthorizedAccessException;
+using MV04.State;
 
 // written by michael oborne
 
@@ -5089,6 +5090,9 @@ namespace MissionPlanner.GCSViews
                 {
                     MainV2.comPort.doCommand((byte) MainV2.comPort.sysidcurrent, (byte) MainV2.comPort.compidcurrent,
                         MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, altf);
+
+                    // Trigger MV04 state change event
+                    StateHandler.CurrentSate = MV04_State.Takeoff;
                 }
                 catch
                 {
