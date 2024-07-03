@@ -20,7 +20,11 @@ namespace MissionPlanner.Joystick
             this.BringToFront();
 
             this.Tag = tag;
+<<<<<<<< HEAD:Joystick/Joy_MV04_Zoom.cs
             comboBox1.Items.AddRange(Enum.GetNames(typeof(buttonfunction_mv04_Zoom_option)));
+========
+            comboBox1.Items.AddRange(Enum.GetNames(typeof(buttonfunction_mv04_ImageSensor_option)));
+>>>>>>>> main:Joystick/Joy_MV04_CameraMode.cs
             JoyButton jb = MainV2.joystick.getButton(int.Parse(tag));
             comboBox1.SelectedIndex = (int)Math.Round(jb.p1);
         }
@@ -30,7 +34,11 @@ namespace MissionPlanner.Joystick
             int tag = int.Parse(this.Tag.ToString());
             JoyButton jb = MainV2.joystick.getButton(tag);
 
+<<<<<<<< HEAD:Joystick/Joy_MV04_Zoom.cs
             jb.function = buttonfunction.MV04_Zoom;
+========
+            jb.function = buttonfunction.MV04_ImageSensor;
+>>>>>>>> main:Joystick/Joy_MV04_CameraMode.cs
             jb.p1 = comboBox1.SelectedIndex;
 
             MainV2.joystick.setButton(tag, jb);

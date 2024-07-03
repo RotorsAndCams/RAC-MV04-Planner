@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.pnl_CameraView = new System.Windows.Forms.Panel();
-            this.btn_Close = new System.Windows.Forms.Button();
             this.btn_StopTracking = new System.Windows.Forms.Button();
+            this.btn_Close = new System.Windows.Forms.Button();
             this.pnl_CameraView.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,18 +45,6 @@
             this.pnl_CameraView.Size = new System.Drawing.Size(1904, 1061);
             this.pnl_CameraView.TabIndex = 0;
             // 
-            // btn_Close
-            // 
-            this.btn_Close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_Close.BackColor = System.Drawing.Color.Black;
-            this.btn_Close.Image = global::MissionPlanner.Properties.Resources.close_50;
-            this.btn_Close.Location = new System.Drawing.Point(1844, 0);
-            this.btn_Close.Name = "btn_Close";
-            this.btn_Close.Size = new System.Drawing.Size(60, 61);
-            this.btn_Close.TabIndex = 0;
-            this.btn_Close.UseVisualStyleBackColor = false;
-            this.btn_Close.Click += new System.EventHandler(this.btn_Close_Click);
-            // 
             // btn_StopTracking
             // 
             this.btn_StopTracking.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -68,6 +56,18 @@
             this.btn_StopTracking.TabIndex = 1;
             this.btn_StopTracking.UseVisualStyleBackColor = false;
             this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
+            // 
+            // btn_Close
+            // 
+            this.btn_Close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_Close.BackColor = System.Drawing.Color.Black;
+            this.btn_Close.Image = global::MissionPlanner.Properties.Resources.close_50;
+            this.btn_Close.Location = new System.Drawing.Point(1844, 0);
+            this.btn_Close.Name = "btn_Close";
+            this.btn_Close.Size = new System.Drawing.Size(60, 61);
+            this.btn_Close.TabIndex = 0;
+            this.btn_Close.UseVisualStyleBackColor = false;
+            this.btn_Close.Click += new System.EventHandler(this.btn_Close_Click);
             // 
             // CameraFullScreenForm
             // 

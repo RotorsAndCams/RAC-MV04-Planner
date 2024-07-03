@@ -1,6 +1,7 @@
 ﻿using MissionPlanner.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -182,6 +183,15 @@ namespace MV04.Settings
             File.WriteAllText(FileName, toSave.ToJSON()); // create or owerwrite
         }
 
+        public static void Save(HashSet<SettingItem> settings)
+        {
+            if (settings == null) return;
+
+            if (settings.Count == 0) return;
+
+            File.WriteAllText(FileName, settings.ToJSON());
+        }
+
         /// <summary>
         /// Loads the repviously saved settings from a JSON file
         /// </summary>
@@ -248,6 +258,11 @@ namespace MV04.Settings
                     Save();
                 }
             }
+        }
+
+        public static HashSet<SettingItem> GetSettings()
+        {
+            return SettingCollection;
         }
 
     }

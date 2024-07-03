@@ -49,8 +49,15 @@ namespace MV04.Camera
 
     #endregion
 
+    public class ReportEventArgs : EventArgs
+    {
+        public MavProto.SysReport Report { get; set; }
+    }
+
     public class CameraHandler
     {
+        public event EventHandler<ReportEventArgs> event_ReportArrived;
+
         #region Fields
 
         private static CameraHandler _Instance;
@@ -273,10 +280,14 @@ namespace MV04.Camera
 
                 switch ((MavReportType)report_type)
                 {
-                    case MavReportType.SystemReport:
-                        var sr = new SysReport();
-                        MavlinkParseSysReport(packet, ref sr);
-                        CameraReports[MavReportType.SystemReport] = sr;
+                    case MavProto.MavReportType.SystemReport:
+                        var sr = new MavProto.SysReport();
+                        MavProto.MavlinkParseSysReport(packet, ref sr);
+                        CameraReports[MavProto.MavReportType.SystemReport] = sr;
+
+                        if (event_ReportArrived != null)
+                            event_ReportArrived(null, new ReportEventArgs { Report = sr });
+
                         break;
                     case MavReportType.LosReport:
                         var lr = new LosReport();
@@ -535,14 +546,14 @@ namespace MV04.Camera
                 (mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok;
         }
 
-        public Point FullSizeToTrackingSize(Point fullSizePoint, Size fullSizeResolution)
+        public static Point FullSizeToTrackingSize(Point fullSizePoint, Size fullSizeResolution)
         {
             return new Point(
                 (int)Math.Round(fullSizePoint.X * (1280.0 / fullSizeResolution.Width)),
                 (int)Math.Round(fullSizePoint.Y * (720.0 / fullSizeResolution.Height)));
         }
 
-        public Point FullSizeToTrackingSize(Point fullSizePoint)
+        public static Point FullSizeToTrackingSize(Point fullSizePoint)
         {
             return FullSizeToTrackingSize(fullSizePoint, new Size(1920, 1080));
         }
