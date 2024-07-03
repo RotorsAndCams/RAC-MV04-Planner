@@ -7,6 +7,7 @@ using MV04.State;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -379,7 +380,23 @@ namespace MissionPlanner.Joystick
                             {
                                 try
                                 {
-                                    Interface.setMode((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,mode);
+                                    // Trigger MV04 state change event
+                                    switch (mode.ToLower())
+                                    {
+                                        case "rtl":
+                                        case "smart_rtl":
+                                        case "auto rtl":
+                                            StateHandler.CurrentSate = MV04_State.RTL;
+                                            break;
+                                        case "land":
+                                            StateHandler.CurrentSate = MV04_State.Land;
+                                            break;
+                                        default:
+                                            StateHandler.CurrentSate = MV04_State.Unknown;
+                                            break;
+                                    }
+
+                                    Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, mode);
                                 }
                                 catch
                                 {
@@ -421,15 +438,16 @@ namespace MissionPlanner.Joystick
                         {
                             try
                             {
+                                // Get takeoff altitude parameter (or set default value)
+                                float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
+                                Settings.Instance["takeoff_alt"] = takeoffAlt.ToString();
+
+                                // Do takeoff procedure
                                 Interface.setMode("Guided");
-                                if (Interface.MAV.cs.firmware == Firmwares.ArduCopter2)
-                                {
-                                    Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 2);
-                                }
-                                else
-                                {
-                                    Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 20);
-                                }
+                                Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
+
+                                // Trigger MV04 state change event
+                                StateHandler.CurrentSate = MV04_State.Takeoff;
                             }
                             catch
                             {
