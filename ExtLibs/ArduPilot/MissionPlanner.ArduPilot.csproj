@@ -34,6 +34,8 @@
     <ProjectReference Include="..\GMap.NET.Core\GMap.NET.Core.csproj" />
     <ProjectReference Include="..\Mavlink\MAVLink.csproj" />
     <ProjectReference Include="..\MV04.Camera\MV04.Camera.csproj" />
+    <ProjectReference Include="..\MV04.GCS\MV04.GCS.csproj" />
+    <ProjectReference Include="..\MV04.State\MV04.State.csproj" />
     <ProjectReference Include="..\Strings\MissionPlanner.Strings.csproj" />
     <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj" />
   </ItemGroup>
