@@ -106,6 +106,9 @@ namespace MissionPlanner.GCSViews
 
             SetStopButtonVisibility();
 
+            //States
+            SetDroneStatusValue();
+            //CameraHandler.Instance.
         }
 
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
@@ -122,6 +125,23 @@ namespace MissionPlanner.GCSViews
             }
             else
                 SetCameraStatusValue(st);
+
+
+            //Test: Set Drone Status
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetDroneStatusValue(); }));
+            }
+            else
+                SetDroneStatusValue();
+
+
+        }
+
+        private void SetDroneStatusValue()
+        {
+            string mode = MainV2.comPort.MAV.cs.mode;
+            this.lb_DroneStatusValue.Text = mode;
         }
 
         private void SetCameraStatusValue(string st)
@@ -1014,6 +1034,11 @@ namespace MissionPlanner.GCSViews
 
             var translatedPoint = CameraHandler.FullSizeToTrackingSize(new Point(X,Y));//Translate(new Point(X, Y), this.pnl_CameraScreen.Size, Trip5Size);
 
+            string output = "";
+
+            if (DialogResult.OK != MissionPlanner.Controls.InputBox.Show("Start Camera Tracking", "", ref output))
+                return;
+
             CameraHandler.Instance.StartTracking(translatedPoint);
 
             SetStopButtonVisibility();
@@ -1047,10 +1072,6 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-        public static Point Translate(Point point, Size from, Size to)
-        {
-            return new Point((point.X * to.Width) / from.Width, (point.Y * to.Height) / from.Height);
-        }
 
         private void SetStopButtonVisibility()
         {
