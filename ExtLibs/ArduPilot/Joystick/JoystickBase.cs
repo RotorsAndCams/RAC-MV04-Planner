@@ -645,26 +645,26 @@ namespace MissionPlanner.Joystick
                                     switch ((buttonfunction_mv04_FlightMode_option)(int)Math.Round(but.p1))
                                     {
                                         case buttonfunction_mv04_FlightMode_option.Manual:
-                                            StateHandler.CurrentSate = MV04_State.Manual;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to Manual mode
+                                            StateHandler.CurrentSate = MV04_State.Manual;
                                             break;
                                         case buttonfunction_mv04_FlightMode_option.TapToFly:
-                                            StateHandler.CurrentSate = MV04_State.TapToFly;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to TapToFly mode
+                                            StateHandler.CurrentSate = MV04_State.TapToFly;
                                             break;
                                         case buttonfunction_mv04_FlightMode_option.Auto:
-                                            StateHandler.CurrentSate = MV04_State.Auto;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Auto");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to Auto mode
+                                            StateHandler.CurrentSate = MV04_State.Auto;
                                             break;
                                         case buttonfunction_mv04_FlightMode_option.Follow:
-                                            StateHandler.CurrentSate = MV04_State.Follow;
                                             // TODO: Switch UAV, camera and joysticks to Follow mode
+                                            StateHandler.CurrentSate = MV04_State.Follow;
                                             break;
                                         default: break;
                                     }
@@ -683,9 +683,9 @@ namespace MissionPlanner.Joystick
                             {
                                 try
                                 {
-                                    CameraHandler.Instance.SetImageSensor((int)Math.Round(but.p1) == 1);
                                     // p1 = 0 -> Day   -> false
                                     // p1 = 1 -> Night -> true
+                                    CameraHandler.Instance.SetImageSensor((int)Math.Round(but.p1) == 1);
                                 }
                                 catch
                                 {
@@ -704,10 +704,12 @@ namespace MissionPlanner.Joystick
                                     switch ((buttonfunction_mv04_Arm_option)(int)Math.Round(but.p1))
                                     {
                                         case buttonfunction_mv04_Arm_option.Safe:
+                                            // Disarm, safety on
                                             Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
                                             Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 1u, target_system = (byte)   Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
                                             break;
                                         case buttonfunction_mv04_Arm_option.Armed:
+                                            // Safety off, arm
                                             Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 0u, target_system = (byte)   Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
                                             Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
                                             break;
