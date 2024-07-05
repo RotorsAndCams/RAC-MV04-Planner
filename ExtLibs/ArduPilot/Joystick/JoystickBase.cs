@@ -380,6 +380,8 @@ namespace MissionPlanner.Joystick
                             {
                                 try
                                 {
+                                    Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, mode);
+
                                     // Trigger MV04 state change event
                                     switch (mode.ToLower())
                                     {
@@ -395,8 +397,6 @@ namespace MissionPlanner.Joystick
                                             StateHandler.CurrentSate = MV04_State.Unknown;
                                             break;
                                     }
-
-                                    Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, mode);
                                 }
                                 catch
                                 {
@@ -722,23 +722,16 @@ namespace MissionPlanner.Joystick
                         }
                         break;
                     case buttonfunction.MV04_Pitch:
-                        if (buttondown)
+                        if (buttondown) // Only execute on button push (not on release)
                         {
                             _context.Send(delegate
                             {
                                 try
                                 {
-                                    // TODO: Set active Pitch value for some GimbalTimer
-                                    switch ((buttonfunction_mv04_Pitch_option)(int)Math.Round(but.p1))
-                                    {
-                                        case buttonfunction_mv04_Pitch_option.Stop:
-                                            break;
-                                        case buttonfunction_mv04_Pitch_option.Up:
-                                            break;
-                                        case buttonfunction_mv04_Pitch_option.Down:
-                                            break;
-                                        default: break;
-                                    }
+                                    // p1 = 0 -> Pitch stop
+                                    // p1 = 1 -> Pitch up
+                                    // p1 = 2 -> Pitch down
+                                    CameraHandler.Instance.SetCameraPitch((PitchDirection)(int)Math.Round(but.p1));
                                 }
                                 catch
                                 {
