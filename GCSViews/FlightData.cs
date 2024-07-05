@@ -411,6 +411,23 @@ namespace MissionPlanner.GCSViews
 
             tabControlactions.Multiline = Settings.Instance.GetBoolean("tabControlactions_Multiline", false);
 
+            this.cs_ColorSliderAltitude.Scroll += Cs_ColorSliderAltitude_ValueChanged;
+
+            this.cs_ColorSliderAltitude.Minimum = 0;
+            this.cs_ColorSliderAltitude.Maximum = 1000;
+
+
+            this.lb_AltitudeValue.Text = ((int)hud1.groundalt).ToString();
+            this.cs_ColorSliderAltitude.Value = (int)hud1.groundalt;
+
+        }
+
+        private int _sliderAltitude;
+
+        private void Cs_ColorSliderAltitude_ValueChanged(object sender, EventArgs e)
+        {
+            _sliderAltitude = (int)cs_ColorSliderAltitude.Value;
+            this.lb_AltitudeValue.Text = _sliderAltitude.ToString() + " m";
         }
 
         public void Activate()
@@ -705,7 +722,7 @@ namespace MissionPlanner.GCSViews
                     a++;
                 }
             }
-
+            tabControlactions.TabPages.Add(tabAGL);
             ThemeManager.ApplyThemeTo(tabControlactions);
         }
 
@@ -4181,6 +4198,11 @@ namespace MissionPlanner.GCSViews
             coords1.AltUnit = CurrentState.AltUnit;
         }
 
+        /// <summary>
+        /// set altitude 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void modifyandSetAlt_Click(object sender, EventArgs e)
         {
             int newalt = (int) modifyandSetAlt.Value;
@@ -5259,6 +5281,11 @@ namespace MissionPlanner.GCSViews
                             bindingSourceStatusTab.UpdateDataSource(MainV2.comPort.MAV.cs));
                         this.tabStatus.Invalidate();
                     }
+                    else if(tabControlactions.SelectedTab == tabAGL)
+                    {
+                        MainV2.comPort.MAV.cs.UpdateCurrentSettings(
+                            bindingSourceAGLTab.UpdateDataSource(MainV2.comPort.MAV.cs));
+                    }
                     else if (tabControlactions.SelectedTab == tabQuick)
                     {
                         MainV2.comPort.MAV.cs.UpdateCurrentSettings(
@@ -6262,6 +6289,41 @@ namespace MissionPlanner.GCSViews
             catch (Exception ex)
             {
                 CustomMessageBox.Show(Strings.CommandFailed + ex.ToString(), Strings.ERROR);
+            }
+        }
+
+        private void btn_Up_Click(object sender, EventArgs e)
+        {
+            _sliderAltitude = (int)cs_ColorSliderAltitude.Value + 10;
+
+            if(_sliderAltitude > 1000)
+                _sliderAltitude = 1000;
+
+            cs_ColorSliderAltitude.Value = _sliderAltitude;
+
+            this.lb_AltitudeValue.Text = _sliderAltitude.ToString() + " m";
+        }
+
+        private void btn_Down_Click(object sender, EventArgs e)
+        {
+            _sliderAltitude = (int)cs_ColorSliderAltitude.Value - 10;
+            if(_sliderAltitude <0)
+                _sliderAltitude = 0;
+
+            cs_ColorSliderAltitude.Value = _sliderAltitude;
+
+            this.lb_AltitudeValue.Text = _sliderAltitude.ToString() + " m";
+        }
+
+        private void btn_SetAltitudeSendCommand_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                MainV2.comPort.setNewWPAlt(new Locationwp { alt = _sliderAltitude / CurrentState.multiplieralt });
+            }
+            catch
+            {
+                CustomMessageBox.Show(Strings.ErrorCommunicating, Strings.ERROR);
             }
         }
     }
