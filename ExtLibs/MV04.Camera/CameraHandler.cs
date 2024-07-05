@@ -47,6 +47,20 @@ namespace MV04.Camera
         Out
     }
 
+    public enum PitchDirection
+    {
+        Stop,
+        Up,
+        Down
+    }
+
+    public enum YawDirection
+    {
+        Stop,
+        Left,
+        Right
+    }
+
     #endregion
 
     public class ReportEventArgs : EventArgs
@@ -183,12 +197,28 @@ namespace MV04.Camera
         public Dictionary<MavReportType, object> CameraReports { get; set; }
 
         /// <summary>
-        /// Store last movement
+        /// Timer loop for gimbal movement commands
         /// </summary>
-        public (double yaw, double pitch, int zoom) LastMovement { get; private set; }
+        private System.Windows.Forms.Timer GimbalTimer;
 
+        /// <summary>
+        /// Store the next gimbal movement
+        /// </summary>
+        public (double yaw, double pitch) NextMovement { get; private set; }
+
+        /// <summary>
+        /// Store the last gimbal movement
+        /// </summary>
+        public (double yaw, double pitch) LastMovement { get; private set; }
+
+        /// <summary>
+        /// Store the last zoom command
+        /// </summary>
         public ZoomState LastZoomState { get; private set; }
 
+        /// <summary>
+        /// Stire the currently selected IR color mode
+        /// </summary>
         public IRColor CurrentIRColor { get; private set; }
 
         #endregion
@@ -242,6 +272,10 @@ namespace MV04.Camera
         {
             CameraControlIP = ip;
             CameraControlPort = port;
+
+            GimbalTimer = new System.Windows.Forms.Timer();
+            GimbalTimer.Enabled = false;
+            GimbalTimer.Tick += GimbalTimer_Tick;
 
             return IsValid(_mavProto);
         }
@@ -541,9 +575,30 @@ namespace MV04.Camera
 
         public bool SetMode(NvSystemModes mode)
         {
-            return IsCameraControlConnected
+            if (IsCameraControlConnected
                 &&
-                (mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok;
+                (mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok)
+            {
+                switch (mode)
+                {
+                    // Start gimbal moving timer in modes that support it
+                    case NvSystemModes.HoldCoordinate:
+                    case NvSystemModes.Observation:
+                    case NvSystemModes.LocalPosition:
+                    case NvSystemModes.GlobalPosition:
+                    case NvSystemModes.GRR:
+                    case NvSystemModes.PTC:
+                    case NvSystemModes.UnstabilizedPosition:
+                        StartGimbal();
+                        break;
+                    // Stop gimbal moving timer in modes that don't support it
+                    default:
+                        StopGimbal();
+                        break;
+                }
+                return true;
+            }
+            return false;
         }
 
         public static Point FullSizeToTrackingSize(Point fullSizePoint, Size fullSizeResolution)
@@ -646,28 +701,6 @@ namespace MV04.Camera
             return false;
         }
 
-        public bool MoveCamera(double yaw, double pitch, int zoom, double groundAlt = 0)
-        {
-            if (IsCameraControlConnected)
-            {
-                // Constrain inputs
-                yaw = Constrain(yaw, -1, 1);
-                pitch = Constrain(pitch, -1, 1);
-                zoom = Constrain(zoom, 0, 2);
-
-                // Only send if new
-                if ((yaw != LastMovement.yaw || pitch != LastMovement.pitch || zoom != LastMovement.zoom)
-                    &&
-                    (mav_error)MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, (float)yaw, (float)pitch, zoom, (float)groundAlt) == mav_error.ok)
-                {
-                    LastMovement = (yaw, pitch, zoom);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public bool ResetZoom()
         {
             if (IsCameraControlConnected)
@@ -677,6 +710,82 @@ namespace MV04.Camera
             }
 
             return false;
+        }
+
+        private bool MoveCamera(double yaw, double pitch, double groundAlt = 0)
+        {
+            if (IsCameraControlConnected)
+            {
+                // Constrain inputs
+                yaw = Constrain(yaw, -1, 1);
+                pitch = Constrain(pitch, -1, 1);
+
+                // Only send if new
+                if ((yaw != LastMovement.yaw || pitch != LastMovement.pitch)
+                    &&
+                    (mav_error)MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, (float)yaw, (float)pitch, (int)LastZoomState, (float)groundAlt) == mav_error.ok)
+                {
+                    LastMovement = (yaw, pitch);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void StartGimbal(TimeSpan? timerInterval = null)
+        {
+            if (GimbalTimer.Enabled) GimbalTimer.Stop();
+
+            if (timerInterval == null) timerInterval = TimeSpan.FromMilliseconds(100); // Default gimbal update frequency is 10Hz
+            GimbalTimer.Interval = (int)Math.Round(timerInterval.Value.TotalMilliseconds);
+            GimbalTimer.Start();
+        }
+
+        private void GimbalTimer_Tick(object sender, EventArgs e)
+        {
+            MoveCamera(NextMovement.yaw, NextMovement.pitch);
+        }
+
+        public void StopGimbal()
+        {
+            GimbalTimer.Stop();
+        }
+
+        public void SetCameraPitch(PitchDirection direction, double speed = 1)
+        {
+            double pitchValue;
+            switch (direction)
+            {
+                case PitchDirection.Up:
+                    pitchValue = Constrain(speed, 0, 1);        // Positive is up
+                    break;
+                case PitchDirection.Down:
+                    pitchValue = Constrain(speed, 0, 1) * -1;   // Negative is down
+                    break;
+                default:
+                    pitchValue = 0;
+                    break;
+            }
+            NextMovement = (NextMovement.yaw, pitchValue);
+        }
+
+        public void SetCameraYaw(YawDirection direction, double speed = 1)
+        {
+            double yawValue;
+            switch (direction)
+            {
+                case YawDirection.Left:
+                    yawValue = Constrain(speed, 0, 1);      // Positive is left
+                    break;
+                case YawDirection.Right:
+                    yawValue = Constrain(speed, 0, 1) * -1; // Negative is right
+                    break;
+                default:
+                    yawValue = 0;
+                    break;
+            }
+            NextMovement = (yawValue, NextMovement.pitch);
         }
 
         public bool DoBIT()
