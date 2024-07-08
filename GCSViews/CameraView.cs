@@ -22,6 +22,7 @@ using System.Security.RightsManagement;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static IronPython.Modules._ast;
+using static MV04.Camera.MavProto;
 
 namespace MissionPlanner.GCSViews
 {
@@ -113,10 +114,6 @@ namespace MissionPlanner.GCSViews
             this.Resize += CameraView_Resize;
         }
         
-
-        
-
-
         #endregion
 
         #region Init
@@ -1064,6 +1061,14 @@ namespace MissionPlanner.GCSViews
         {
 
             var status = e.Report.systemMode;
+
+            #region test
+
+            var test = e.Report.status_flags;
+
+            var stg = (NvSystemModes)((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]).systemMode;
+
+            #endregion
 
             string st = ((MavProto.NvSystemModes)status).ToString();
 
