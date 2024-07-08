@@ -21,6 +21,7 @@ using System.Runtime.InteropServices;
 using System.Security.RightsManagement;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static IronPython.Modules._ast;
 
 namespace MissionPlanner.GCSViews
 {
@@ -109,45 +110,11 @@ namespace MissionPlanner.GCSViews
             //States
             SetDroneStatusValue();
             //CameraHandler.Instance.
+            this.Resize += CameraView_Resize;
         }
+        
 
-        private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
-        {
-
-            var status = e.Report.systemMode;
-
-            string st = ((MavProto.NvSystemModes)status).ToString();
-
-
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => { SetCameraStatusValue(st); }));
-            }
-            else
-                SetCameraStatusValue(st);
-
-
-            //Test: Set Drone Status
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => { SetDroneStatusValue(); }));
-            }
-            else
-                SetDroneStatusValue();
-
-
-        }
-
-        private void SetDroneStatusValue()
-        {
-            string mode = MainV2.comPort.MAV.cs.mode;
-            this.lb_DroneStatusValue.Text = mode;
-        }
-
-        private void SetCameraStatusValue(string st)
-        {
-            this.lb_CameraStatusValue.Text = st;
-        }
+        
 
 
         #endregion
@@ -177,6 +144,7 @@ namespace MissionPlanner.GCSViews
             // Video stream control
             this.pnl_CameraScreen.Controls.Add(VideoControl);
             VideoControl.Dock = DockStyle.Fill;
+
 
             // Test functions
             #region Test functions
@@ -1070,8 +1038,58 @@ namespace MissionPlanner.GCSViews
             SetStopButtonVisibility();
         }
 
+        private void CameraView_Resize(object sender, EventArgs e)
+        {
+            if (this.Size.Width < 1270)
+            {
+                this.pnl_CameraScreen.Padding = new Padding(0, 60, 0, 60);
+                this.pnl_CameraScreen.MinimumSize = new Size(620, 360);
+                this.pnl_CameraScreen.Size = new Size(620, 360);
+            }
+            else if (this.Size.Width < 1590)
+            {
+                this.pnl_CameraScreen.Padding = new Padding(0, 30, 0, 30);
+                this.pnl_CameraScreen.MinimumSize = new Size(960, 540);
+                this.pnl_CameraScreen.Size = new Size(960, 540);
+            }
+            else
+            {
+                this.pnl_CameraScreen.Padding = new Padding(0, 0, 0, 0);
+                this.pnl_CameraScreen.MinimumSize = new Size(1280, 720);
+                this.pnl_CameraScreen.Size = new Size(1280, 720);
+            }
+        }
+
+        private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
+        {
+
+            var status = e.Report.systemMode;
+
+            string st = ((MavProto.NvSystemModes)status).ToString();
+
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetCameraStatusValue(st); }));
+            }
+            else
+                SetCameraStatusValue(st);
+
+
+            //Test: Set Drone Status
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetDroneStatusValue(); }));
+            }
+            else
+                SetDroneStatusValue();
+
+
+        }
+
         #endregion
 
+        #region Methods
 
         private void SetStopButtonVisibility()
         {
@@ -1081,5 +1099,17 @@ namespace MissionPlanner.GCSViews
                 btn_StopTracking.Visible = false;
         }
 
+        private void SetDroneStatusValue()
+        {
+            string mode = MainV2.comPort.MAV.cs.mode;
+            this.lb_DroneStatusValue.Text = mode;
+        }
+
+        private void SetCameraStatusValue(string st)
+        {
+            this.lb_CameraStatusValue.Text = st;
+        }
+
+        #endregion
     }
 }
