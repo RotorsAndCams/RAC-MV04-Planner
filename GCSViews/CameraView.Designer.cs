@@ -61,6 +61,9 @@
             this.tlp_StatusUpper = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_CameraScreen = new System.Windows.Forms.Panel();
+            this.lb_GCSSelectedState = new System.Windows.Forms.Label();
+            this.lb_GCSSelectedStateValue = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
@@ -215,10 +218,12 @@
             // 
             this.tlp_DeviceStatusInfo.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.tlp_DeviceStatusInfo, "tlp_DeviceStatusInfo");
+            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_GCSSelectedState, 0, 2);
             this.tlp_DeviceStatusInfo.Controls.Add(this.lb_CameraStatusValue, 1, 1);
             this.tlp_DeviceStatusInfo.Controls.Add(this.lb_DroneStatusValue, 1, 0);
             this.tlp_DeviceStatusInfo.Controls.Add(this.lb_Camera, 0, 1);
             this.tlp_DeviceStatusInfo.Controls.Add(this.lb_Drone, 0, 0);
+            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_GCSSelectedStateValue, 1, 2);
             this.tlp_DeviceStatusInfo.Name = "tlp_DeviceStatusInfo";
             // 
             // lb_CameraStatusValue
@@ -260,6 +265,7 @@
             this.tlp_AGLIncrement.Controls.Add(this.btn_Down, 0, 2);
             this.tlp_AGLIncrement.Controls.Add(this.btn_Up, 0, 0);
             this.tlp_AGLIncrement.Controls.Add(this.tlp_AGLData, 0, 1);
+            this.tlp_AGLIncrement.Controls.Add(this.button1, 0, 3);
             this.tlp_AGLIncrement.Name = "tlp_AGLIncrement";
             // 
             // btn_Down
@@ -341,6 +347,24 @@
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
             // 
+            // lb_GCSSelectedState
+            // 
+            resources.ApplyResources(this.lb_GCSSelectedState, "lb_GCSSelectedState");
+            this.lb_GCSSelectedState.ForeColor = System.Drawing.Color.White;
+            this.lb_GCSSelectedState.Name = "lb_GCSSelectedState";
+            // 
+            // lb_GCSSelectedStateValue
+            // 
+            resources.ApplyResources(this.lb_GCSSelectedStateValue, "lb_GCSSelectedStateValue");
+            this.lb_GCSSelectedStateValue.ForeColor = System.Drawing.Color.White;
+            this.lb_GCSSelectedStateValue.Name = "lb_GCSSelectedStateValue";
+            // 
+            // button1
+            // 
+            resources.ApplyResources(this.button1, "button1");
+            this.button1.Name = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // CameraView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -404,5 +428,8 @@
         private System.Windows.Forms.TableLayoutPanel tlp_StatusUpper;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Panel pnl_CameraScreen;
+        private System.Windows.Forms.Label lb_GCSSelectedState;
+        private System.Windows.Forms.Label lb_GCSSelectedStateValue;
+        private System.Windows.Forms.Button button1;
     }
 }

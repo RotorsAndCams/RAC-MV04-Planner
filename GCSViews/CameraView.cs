@@ -4,8 +4,10 @@ using log4net.Repository.Hierarchy;
 using MissionPlanner.Utilities;
 using MV04.Camera;
 using MV04.Settings;
+using MV04.State;
 using NetTopologySuite.Operation.Valid;
 using NextVisionVideoControlLibrary;
+using OpenTK.Graphics.ES11;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -112,8 +114,11 @@ namespace MissionPlanner.GCSViews
             SetDroneStatusValue();
             //CameraHandler.Instance.
             this.Resize += CameraView_Resize;
+
+            StateHandler.MV04StateChange += StateHandler_MV04StateChange;
         }
-        
+
+
         #endregion
 
         #region Init
@@ -1072,7 +1077,7 @@ namespace MissionPlanner.GCSViews
 
             string st = ((MavProto.NvSystemModes)status).ToString();
 
-
+            //Test: Set Camera Status
             if (InvokeRequired)
             {
                 Invoke(new Action(() => { SetCameraStatusValue(st); }));
@@ -1089,7 +1094,25 @@ namespace MissionPlanner.GCSViews
             else
                 SetDroneStatusValue();
 
+            ////Test: Set GCS Status
+            //if (InvokeRequired)
+            //{
+            //    Invoke(new Action(() => SetGCSStatus()));
+            //}
+            //else
+            //    SetGCSStatus();
+        }
 
+
+        private void StateHandler_MV04StateChange(object sender, MV04StateChangeEventArgs e)
+        {
+            //Test: Set GCS Status
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => SetGCSStatus()));
+            }
+            else
+                SetGCSStatus();
         }
 
         #endregion
@@ -1113,6 +1136,21 @@ namespace MissionPlanner.GCSViews
         private void SetCameraStatusValue(string st)
         {
             this.lb_CameraStatusValue.Text = st;
+        }
+
+        private void SetGCSStatus()
+        {
+            this.lb_GCSSelectedStateValue.Text = StateHandler.CurrentSate.ToString();
+
+            CheckStatus();
+        }
+
+        /// <summary>
+        /// Do blinking and error provider (MSGBox) if states are inconsistent
+        /// </summary>
+        private void CheckStatus()
+        {
+
         }
 
         #endregion
