@@ -135,6 +135,10 @@
       <Project>{2A73FA7A-705C-467E-9C31-F1D0978E366E}</Project>
       <Name>MV04.Settings</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MV04.State\MV04.State.csproj">
+      <Project>{78FD6E54-F55E-46B8-89F9-2A655C031D5A}</Project>
+      <Name>MV04.State</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj">
       <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
       <Name>MissionPlanner.Utilities</Name>
