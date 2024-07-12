@@ -418,7 +418,7 @@ namespace MissionPlanner.GCSViews
 
 
             this.lb_AltitudeValue.Text = ((int)hud1.groundalt).ToString();
-            this.cs_ColorSliderAltitude.Value = (int)hud1.groundalt;
+            this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
 
         }
 

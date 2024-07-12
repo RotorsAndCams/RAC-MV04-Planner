@@ -125,7 +125,7 @@ namespace MissionPlanner.GCSViews
             _droneStatustimer.Interval = 3000;
             _droneStatustimer.Enabled = true;
 
-
+            this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
         }
 
         Point _videoControlClick;
@@ -1196,7 +1196,6 @@ namespace MissionPlanner.GCSViews
             {
                 Task.Run(() => ProvideCameraError());
                 MessageBox.Show("Camera no communication");
-
                 return;
             }
 
@@ -1207,32 +1206,52 @@ namespace MissionPlanner.GCSViews
                 case MV04_State.Manual:
                     if (cameraMode != NvSystemModes.GRR)
                     {
-                        Task.Run(() => Blink());
+                        Task.Run(() => ProvideCameraError());
+                    }
+                    if(  MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
+                    {
+                        Task.Run(() => ProvideDroneError());
                     }
                     break;
                 case MV04_State.TapToFly:
                     if (cameraMode != NvSystemModes.GRR)
                     {
-                        Task.Run(() => Blink());
+                        Task.Run(() => ProvideCameraError());
+                    }
+                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "AUTO")
+                    {
+                        Task.Run(() => ProvideDroneError());
                     }
                     break;
                 case MV04_State.Auto:
                     if (cameraMode != NvSystemModes.GRR)
                     {
-                        Task.Run(() => Blink());
+                        Task.Run(() => ProvideCameraError());
+                    }
+                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "AUTO")
+                    {
+                        Task.Run(() => ProvideDroneError());
                     }
                     break;
                 case MV04_State.Follow:
                     if (cameraMode != NvSystemModes.Tracking)
                     {
-                        Task.Run(() => Blink());
+                        Task.Run(() => ProvideCameraError());
+                    }
+                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "FOLLOW")
+                    {
+                        Task.Run(() => ProvideDroneError());
                     }
                     break;
                 case MV04_State.FPV:
                     if (cameraMode != NvSystemModes.Stow)
                     {
-                        Task.Run(() => Blink());
+                        Task.Run(() => ProvideCameraError());
                     }
+                    //if (MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
+                    //{
+                    //    Task.Run(() => ProvideDroneError());
+                    //}
                     break;
                 case MV04_State.Takeoff:
                     break;
@@ -1246,6 +1265,7 @@ namespace MissionPlanner.GCSViews
                     break;
 
             }
+
 
 
         }
