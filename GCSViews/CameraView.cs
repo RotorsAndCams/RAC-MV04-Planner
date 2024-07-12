@@ -1104,6 +1104,8 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+        NvSystemModes _cameraState;
+
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
         {
 
@@ -1114,6 +1116,8 @@ namespace MissionPlanner.GCSViews
             var test = e.Report.status_flags;
 
             var stg = (NvSystemModes)((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]).systemMode;
+
+            _cameraState = stg;
 
             #endregion
 
@@ -1155,6 +1159,30 @@ namespace MissionPlanner.GCSViews
             }
             else
                 SetGCSStatus();
+
+            if (e.NewState == MV04_State.Follow)
+            {
+                if(_cameraState != NvSystemModes.Tracking)
+                {
+                    MessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
+                    Task.Run(() => ProvideGCSError());
+                }
+                //check van e tracking
+            }
+
+            if (e.NewState == MV04_State.Auto)
+            {
+                
+                if (MainV2.comPort.MAV.wps.Values.Count <= 0)
+                {
+                    MessageBox.Show("No uploaded plan");
+                    Task.Run(() => Blink());
+                }
+                
+                
+            }
+
+
         }
 
         #endregion
