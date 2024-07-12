@@ -645,20 +645,27 @@ namespace MissionPlanner.Joystick
                                     switch ((buttonfunction_mv04_FlightMode_option)(int)Math.Round(but.p1))
                                     {
                                         case buttonfunction_mv04_FlightMode_option.Manual:
+
+                                            //notify components about state change
                                             StateHandler.CurrentSate = MV04_State.Manual;
+                                            //set drone mode
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
+                                            //Interface.setMode("LOITER");
+                                            //set camera mode
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to Manual mode
                                             break;
                                         case buttonfunction_mv04_FlightMode_option.TapToFly:
                                             StateHandler.CurrentSate = MV04_State.TapToFly;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
+                                            //Interface.setMode("GUIDED");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to TapToFly mode
                                             break;
                                         case buttonfunction_mv04_FlightMode_option.Auto:
                                             StateHandler.CurrentSate = MV04_State.Auto;
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Auto");
+                                            //Interface.setMode("AUTO");
                                             CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             // TODO: Switch joysticks to Auto mode
                                             break;

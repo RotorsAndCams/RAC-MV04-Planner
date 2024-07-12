@@ -41,15 +41,21 @@
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
             this.btn_Settings = new System.Windows.Forms.Button();
             this.pnl_DeviceState = new System.Windows.Forms.Panel();
+            this.tlp_StatusUpper = new System.Windows.Forms.TableLayoutPanel();
+            this.tlp_DeviceStatusInfo = new System.Windows.Forms.TableLayoutPanel();
+            this.lb_DroneStatusValue = new System.Windows.Forms.Label();
+            this.lb_GCSSelectedStateValue = new System.Windows.Forms.Label();
+            this.pnl_GCS = new System.Windows.Forms.Panel();
+            this.lb_GCSSelectedState = new System.Windows.Forms.Label();
+            this.pnl_Drone = new System.Windows.Forms.Panel();
+            this.lb_Drone = new System.Windows.Forms.Label();
+            this.pnl_Camera = new System.Windows.Forms.Panel();
+            this.lb_Camera = new System.Windows.Forms.Label();
+            this.lb_CameraStatusValue = new System.Windows.Forms.Label();
             this.tlp_SensorLights = new System.Windows.Forms.TableLayoutPanel();
             this.pb_DroneTakeOff = new System.Windows.Forms.PictureBox();
             this.pb_InfraLight = new System.Windows.Forms.PictureBox();
             this.pb_PositionIndicator = new System.Windows.Forms.PictureBox();
-            this.tlp_DeviceStatusInfo = new System.Windows.Forms.TableLayoutPanel();
-            this.lb_CameraStatusValue = new System.Windows.Forms.Label();
-            this.lb_DroneStatusValue = new System.Windows.Forms.Label();
-            this.lb_Camera = new System.Windows.Forms.Label();
-            this.lb_Drone = new System.Windows.Forms.Label();
             this.tlp_AGLContainer = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_AGLIncrement = new System.Windows.Forms.TableLayoutPanel();
             this.btn_Down = new System.Windows.Forms.Button();
@@ -57,28 +63,28 @@
             this.tlp_AGLData = new System.Windows.Forms.TableLayoutPanel();
             this.lb_AltitudeValue = new System.Windows.Forms.Label();
             this.lb_Agl = new System.Windows.Forms.Label();
-            this.cs_ColorSliderAltitude = new MissionPlanner.Controls.ColorSlider();
-            this.tlp_StatusUpper = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_CameraScreen = new System.Windows.Forms.Panel();
-            this.lb_GCSSelectedState = new System.Windows.Forms.Label();
-            this.lb_GCSSelectedStateValue = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btn_SetAlt = new System.Windows.Forms.Button();
+            this.cs_ColorSliderAltitude = new MissionPlanner.Controls.ColorSlider();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
             this.pnl_SettingsPanel.SuspendLayout();
             this.pnl_DeviceState.SuspendLayout();
+            this.tlp_StatusUpper.SuspendLayout();
+            this.tlp_DeviceStatusInfo.SuspendLayout();
+            this.pnl_GCS.SuspendLayout();
+            this.pnl_Drone.SuspendLayout();
+            this.pnl_Camera.SuspendLayout();
             this.tlp_SensorLights.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_DroneTakeOff)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_InfraLight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_PositionIndicator)).BeginInit();
-            this.tlp_DeviceStatusInfo.SuspendLayout();
             this.tlp_AGLContainer.SuspendLayout();
             this.tlp_AGLIncrement.SuspendLayout();
             this.tlp_AGLData.SuspendLayout();
-            this.tlp_StatusUpper.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -184,6 +190,79 @@
             resources.ApplyResources(this.pnl_DeviceState, "pnl_DeviceState");
             this.pnl_DeviceState.Name = "pnl_DeviceState";
             // 
+            // tlp_StatusUpper
+            // 
+            resources.ApplyResources(this.tlp_StatusUpper, "tlp_StatusUpper");
+            this.tlp_StatusUpper.Controls.Add(this.tlp_DeviceStatusInfo, 0, 0);
+            this.tlp_StatusUpper.Controls.Add(this.tlp_SensorLights, 0, 1);
+            this.tlp_StatusUpper.Name = "tlp_StatusUpper";
+            // 
+            // tlp_DeviceStatusInfo
+            // 
+            this.tlp_DeviceStatusInfo.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.tlp_DeviceStatusInfo, "tlp_DeviceStatusInfo");
+            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_DroneStatusValue, 1, 0);
+            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_GCSSelectedStateValue, 1, 2);
+            this.tlp_DeviceStatusInfo.Controls.Add(this.pnl_GCS, 0, 2);
+            this.tlp_DeviceStatusInfo.Controls.Add(this.pnl_Drone, 0, 0);
+            this.tlp_DeviceStatusInfo.Controls.Add(this.pnl_Camera, 0, 1);
+            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_CameraStatusValue, 1, 1);
+            this.tlp_DeviceStatusInfo.Name = "tlp_DeviceStatusInfo";
+            // 
+            // lb_DroneStatusValue
+            // 
+            resources.ApplyResources(this.lb_DroneStatusValue, "lb_DroneStatusValue");
+            this.lb_DroneStatusValue.ForeColor = System.Drawing.Color.White;
+            this.lb_DroneStatusValue.Name = "lb_DroneStatusValue";
+            // 
+            // lb_GCSSelectedStateValue
+            // 
+            resources.ApplyResources(this.lb_GCSSelectedStateValue, "lb_GCSSelectedStateValue");
+            this.lb_GCSSelectedStateValue.ForeColor = System.Drawing.Color.White;
+            this.lb_GCSSelectedStateValue.Name = "lb_GCSSelectedStateValue";
+            // 
+            // pnl_GCS
+            // 
+            this.pnl_GCS.Controls.Add(this.lb_GCSSelectedState);
+            resources.ApplyResources(this.pnl_GCS, "pnl_GCS");
+            this.pnl_GCS.Name = "pnl_GCS";
+            // 
+            // lb_GCSSelectedState
+            // 
+            resources.ApplyResources(this.lb_GCSSelectedState, "lb_GCSSelectedState");
+            this.lb_GCSSelectedState.ForeColor = System.Drawing.Color.White;
+            this.lb_GCSSelectedState.Name = "lb_GCSSelectedState";
+            // 
+            // pnl_Drone
+            // 
+            this.pnl_Drone.Controls.Add(this.lb_Drone);
+            resources.ApplyResources(this.pnl_Drone, "pnl_Drone");
+            this.pnl_Drone.Name = "pnl_Drone";
+            // 
+            // lb_Drone
+            // 
+            resources.ApplyResources(this.lb_Drone, "lb_Drone");
+            this.lb_Drone.ForeColor = System.Drawing.Color.White;
+            this.lb_Drone.Name = "lb_Drone";
+            // 
+            // pnl_Camera
+            // 
+            this.pnl_Camera.Controls.Add(this.lb_Camera);
+            resources.ApplyResources(this.pnl_Camera, "pnl_Camera");
+            this.pnl_Camera.Name = "pnl_Camera";
+            // 
+            // lb_Camera
+            // 
+            resources.ApplyResources(this.lb_Camera, "lb_Camera");
+            this.lb_Camera.ForeColor = System.Drawing.Color.White;
+            this.lb_Camera.Name = "lb_Camera";
+            // 
+            // lb_CameraStatusValue
+            // 
+            resources.ApplyResources(this.lb_CameraStatusValue, "lb_CameraStatusValue");
+            this.lb_CameraStatusValue.ForeColor = System.Drawing.Color.White;
+            this.lb_CameraStatusValue.Name = "lb_CameraStatusValue";
+            // 
             // tlp_SensorLights
             // 
             this.tlp_SensorLights.BackColor = System.Drawing.Color.Black;
@@ -214,42 +293,6 @@
             this.pb_PositionIndicator.Name = "pb_PositionIndicator";
             this.pb_PositionIndicator.TabStop = false;
             // 
-            // tlp_DeviceStatusInfo
-            // 
-            this.tlp_DeviceStatusInfo.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.tlp_DeviceStatusInfo, "tlp_DeviceStatusInfo");
-            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_GCSSelectedState, 0, 2);
-            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_CameraStatusValue, 1, 1);
-            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_DroneStatusValue, 1, 0);
-            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_Camera, 0, 1);
-            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_Drone, 0, 0);
-            this.tlp_DeviceStatusInfo.Controls.Add(this.lb_GCSSelectedStateValue, 1, 2);
-            this.tlp_DeviceStatusInfo.Name = "tlp_DeviceStatusInfo";
-            // 
-            // lb_CameraStatusValue
-            // 
-            resources.ApplyResources(this.lb_CameraStatusValue, "lb_CameraStatusValue");
-            this.lb_CameraStatusValue.ForeColor = System.Drawing.Color.White;
-            this.lb_CameraStatusValue.Name = "lb_CameraStatusValue";
-            // 
-            // lb_DroneStatusValue
-            // 
-            resources.ApplyResources(this.lb_DroneStatusValue, "lb_DroneStatusValue");
-            this.lb_DroneStatusValue.ForeColor = System.Drawing.Color.White;
-            this.lb_DroneStatusValue.Name = "lb_DroneStatusValue";
-            // 
-            // lb_Camera
-            // 
-            resources.ApplyResources(this.lb_Camera, "lb_Camera");
-            this.lb_Camera.ForeColor = System.Drawing.Color.White;
-            this.lb_Camera.Name = "lb_Camera";
-            // 
-            // lb_Drone
-            // 
-            resources.ApplyResources(this.lb_Drone, "lb_Drone");
-            this.lb_Drone.ForeColor = System.Drawing.Color.White;
-            this.lb_Drone.Name = "lb_Drone";
-            // 
             // tlp_AGLContainer
             // 
             this.tlp_AGLContainer.BackColor = System.Drawing.Color.Black;
@@ -262,10 +305,10 @@
             // tlp_AGLIncrement
             // 
             resources.ApplyResources(this.tlp_AGLIncrement, "tlp_AGLIncrement");
+            this.tlp_AGLIncrement.Controls.Add(this.btn_SetAlt, 0, 3);
             this.tlp_AGLIncrement.Controls.Add(this.btn_Down, 0, 2);
             this.tlp_AGLIncrement.Controls.Add(this.btn_Up, 0, 0);
             this.tlp_AGLIncrement.Controls.Add(this.tlp_AGLData, 0, 1);
-            this.tlp_AGLIncrement.Controls.Add(this.button1, 0, 3);
             this.tlp_AGLIncrement.Name = "tlp_AGLIncrement";
             // 
             // btn_Down
@@ -308,32 +351,6 @@
             this.lb_Agl.ForeColor = System.Drawing.Color.White;
             this.lb_Agl.Name = "lb_Agl";
             // 
-            // cs_ColorSliderAltitude
-            // 
-            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
-            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
-            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
-            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
-            resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
-            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
-            this.cs_ColorSliderAltitude.Maximum = 500;
-            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
-            this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
-            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
-            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
-            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
-            this.cs_ColorSliderAltitude.ThumbSize = 40;
-            // 
-            // tlp_StatusUpper
-            // 
-            resources.ApplyResources(this.tlp_StatusUpper, "tlp_StatusUpper");
-            this.tlp_StatusUpper.Controls.Add(this.tlp_DeviceStatusInfo, 0, 0);
-            this.tlp_StatusUpper.Controls.Add(this.tlp_SensorLights, 0, 1);
-            this.tlp_StatusUpper.Name = "tlp_StatusUpper";
-            // 
             // tableLayoutPanel2
             // 
             resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
@@ -347,23 +364,35 @@
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
             // 
-            // lb_GCSSelectedState
+            // btn_SetAlt
             // 
-            resources.ApplyResources(this.lb_GCSSelectedState, "lb_GCSSelectedState");
-            this.lb_GCSSelectedState.ForeColor = System.Drawing.Color.White;
-            this.lb_GCSSelectedState.Name = "lb_GCSSelectedState";
+            resources.ApplyResources(this.btn_SetAlt, "btn_SetAlt");
+            this.btn_SetAlt.BackColor = System.Drawing.Color.Black;
+            this.btn_SetAlt.ForeColor = System.Drawing.Color.Black;
+            this.btn_SetAlt.Image = global::MissionPlanner.Properties.Resources.confirm_64;
+            this.btn_SetAlt.Name = "btn_SetAlt";
+            this.btn_SetAlt.UseVisualStyleBackColor = false;
+            this.btn_SetAlt.Click += new System.EventHandler(this.btn_SetAlt_Click);
             // 
-            // lb_GCSSelectedStateValue
+            // cs_ColorSliderAltitude
             // 
-            resources.ApplyResources(this.lb_GCSSelectedStateValue, "lb_GCSSelectedStateValue");
-            this.lb_GCSSelectedStateValue.ForeColor = System.Drawing.Color.White;
-            this.lb_GCSSelectedStateValue.Name = "lb_GCSSelectedStateValue";
-            // 
-            // button1
-            // 
-            resources.ApplyResources(this.button1, "button1");
-            this.button1.Name = "button1";
-            this.button1.UseVisualStyleBackColor = true;
+            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
+            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
+            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
+            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
+            resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
+            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
+            this.cs_ColorSliderAltitude.Maximum = 1000;
+            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
+            this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
+            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
+            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
+            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
+            this.cs_ColorSliderAltitude.ThumbSize = 40;
+            this.cs_ColorSliderAltitude.ValueChanged += new System.EventHandler(this.cs_ColorSliderAltitude_ValueChanged);
             // 
             // CameraView
             // 
@@ -378,18 +407,24 @@
             this.tlp_InfoBase.ResumeLayout(false);
             this.pnl_SettingsPanel.ResumeLayout(false);
             this.pnl_DeviceState.ResumeLayout(false);
+            this.tlp_StatusUpper.ResumeLayout(false);
+            this.tlp_DeviceStatusInfo.ResumeLayout(false);
+            this.tlp_DeviceStatusInfo.PerformLayout();
+            this.pnl_GCS.ResumeLayout(false);
+            this.pnl_GCS.PerformLayout();
+            this.pnl_Drone.ResumeLayout(false);
+            this.pnl_Drone.PerformLayout();
+            this.pnl_Camera.ResumeLayout(false);
+            this.pnl_Camera.PerformLayout();
             this.tlp_SensorLights.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pb_DroneTakeOff)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_InfraLight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_PositionIndicator)).EndInit();
-            this.tlp_DeviceStatusInfo.ResumeLayout(false);
-            this.tlp_DeviceStatusInfo.PerformLayout();
             this.tlp_AGLContainer.ResumeLayout(false);
             this.tlp_AGLIncrement.ResumeLayout(false);
             this.tlp_AGLIncrement.PerformLayout();
             this.tlp_AGLData.ResumeLayout(false);
             this.tlp_AGLData.PerformLayout();
-            this.tlp_StatusUpper.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -430,6 +465,9 @@
         private System.Windows.Forms.Panel pnl_CameraScreen;
         private System.Windows.Forms.Label lb_GCSSelectedState;
         private System.Windows.Forms.Label lb_GCSSelectedStateValue;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Panel pnl_Drone;
+        private System.Windows.Forms.Panel pnl_GCS;
+        private System.Windows.Forms.Panel pnl_Camera;
+        private System.Windows.Forms.Button btn_SetAlt;
     }
 }

@@ -6317,13 +6317,37 @@ namespace MissionPlanner.GCSViews
 
         private void btn_SetAltitudeSendCommand_Click(object sender, EventArgs e)
         {
+            //try
+            //{
+            //    //MainV2.comPort.setNewWPAlt((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp { lat= MainV2.comPort.MAV.cs.lat, lng = MainV2.comPort.MAV.cs.lng, alt = _sliderAltitude / CurrentState.multiplieralt });
+            //    //MainV2.comPort.setNewWPAlt(new Locationwp { alt = _sliderAltitude / CurrentState.multiplieralt });
+
+            //    MainV2.comPort.setMode("GUIDED");
+
+            //    MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent,
+            //        MAVLink.MAV_CMD.OVERRIDE_GOTO, 0, 0, 0, 0, 0, 0, _sliderAltitude / CurrentState.multiplieralt);
+            //}
+            //catch
+            //{
+            //    CustomMessageBox.Show(Strings.ErrorCommunicating, Strings.ERROR);
+            //}
+
+            var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, _sliderAltitude);
+
+            Locationwp gotohere = new Locationwp();
+
+            gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+            gotohere.alt = (float)plla.Alt / CurrentState.multiplieralt; // back to m
+            gotohere.lat = (plla.Lat);
+            gotohere.lng = (plla.Lng);
+
             try
             {
-                MainV2.comPort.setNewWPAlt(new Locationwp { alt = _sliderAltitude / CurrentState.multiplieralt });
+                MainV2.comPort.setGuidedModeWP(gotohere);
             }
-            catch
+            catch (Exception ex)
             {
-                CustomMessageBox.Show(Strings.ErrorCommunicating, Strings.ERROR);
+                CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
             }
         }
     }

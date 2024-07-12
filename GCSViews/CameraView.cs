@@ -116,8 +116,36 @@ namespace MissionPlanner.GCSViews
             this.Resize += CameraView_Resize;
 
             StateHandler.MV04StateChange += StateHandler_MV04StateChange;
+
+            if (!CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport))
+                this.lb_CameraStatusValue.Text = "NoCom";
+
+            _droneStatustimer = new System.Timers.Timer();
+            _droneStatustimer.Elapsed += _droneStatustimer_Elapsed;
+            _droneStatustimer.Interval = 3000;
+            _droneStatustimer.Enabled = true;
+
+
         }
 
+        Point _videoControlClick;
+
+        private void VideoControl_MouseClick(object sender, MouseEventArgs e)
+        {
+            _videoControlClick = new Point(e.X, e.Y);
+        }
+
+        private void _droneStatustimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetDroneStatusValue(); }));
+            }
+            else
+                SetDroneStatusValue();
+        }
+
+        System.Timers.Timer _droneStatustimer;
 
         #endregion
 
@@ -147,6 +175,7 @@ namespace MissionPlanner.GCSViews
             this.pnl_CameraScreen.Controls.Add(VideoControl);
             VideoControl.Dock = DockStyle.Fill;
 
+            VideoControl.MouseClick += VideoControl_MouseClick;
 
             // Test functions
             #region Test functions
@@ -171,6 +200,7 @@ namespace MissionPlanner.GCSViews
                 {"Toggle IR Polarity", async () => { await ToggleIRPolarity(); }},
                 {"Do BIT", async () => { await DoBIT(); }},
                 {"Do NUC", async () => { await DoNUC(); }},
+                {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
             };
 
             #endregion
@@ -916,6 +946,8 @@ namespace MissionPlanner.GCSViews
                 this.cs_ColorSliderAltitude.Value += 10;
             else
                 this.cs_ColorSliderAltitude.Value = this.cs_ColorSliderAltitude.Maximum;
+
+            this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
         }
 
         private void btn_Down_Click(object sender, EventArgs e)
@@ -924,6 +956,8 @@ namespace MissionPlanner.GCSViews
                 this.cs_ColorSliderAltitude.Value -= 10;
             else
                 this.cs_ColorSliderAltitude.Value = 0;
+
+            this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
         }
 
         private void btn_FullScreen_Click(object sender, EventArgs e)
@@ -997,19 +1031,27 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void OnVideoClick(int x, int y)
         {
-            IsCameraTrackingModeActive = true;
-
-            var X = MousePosition.X;
-            var Y = MousePosition.Y;
-
-            var translatedPoint = CameraHandler.FullSizeToTrackingSize(new Point(X,Y));//Translate(new Point(X, Y), this.pnl_CameraScreen.Size, Trip5Size);
-
-            string output = "";
-
-            if (DialogResult.OK != MissionPlanner.Controls.InputBox.Show("Start Camera Tracking", "", ref output))
+            if (x <= 0 || y <= 0)
                 return;
 
-            CameraHandler.Instance.StartTracking(translatedPoint);
+            IsCameraTrackingModeActive = true;
+
+            //if (DialogResult.OK != MissionPlanner.Controls.InputBox.Show("Start Camera Tracking", "", ref output))
+            //    return;
+
+            CameraHandler.Instance.StartTracking(new Point(x, y));
+
+            Point _trackPos = new Point(x, y);
+
+            // Constrain tracking pos
+            _trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
+            _trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
+
+#if DEBUG
+            AddToOSDDebug($"calculated clicked at X={_trackPos.X} Y={_trackPos.Y}");
+            AddToOSDDebug($"built in clicked at X={x} Y={y}");
+            
+#endif
 
             SetStopButtonVisibility();
         }
@@ -1146,13 +1188,137 @@ namespace MissionPlanner.GCSViews
         }
 
         /// <summary>
-        /// Do blinking and error provider (MSGBox) if states are inconsistent
+        /// Do blinking and error (provider or MSGBox) if states are inconsistent
         /// </summary>
         private void CheckStatus()
         {
+            if (!CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport) /* || MainV2.comPort.MAV.cs.mode ==  ||*/)
+            {
+                Task.Run(() => ProvideCameraError());
+                MessageBox.Show("Camera no communication");
+
+                return;
+            }
+
+            var cameraMode = (NvSystemModes)((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]).systemMode;
+
+            switch (StateHandler.CurrentSate)
+            {
+                case MV04_State.Manual:
+                    if (cameraMode != NvSystemModes.GRR)
+                    {
+                        Task.Run(() => Blink());
+                    }
+                    break;
+                case MV04_State.TapToFly:
+                    if (cameraMode != NvSystemModes.GRR)
+                    {
+                        Task.Run(() => Blink());
+                    }
+                    break;
+                case MV04_State.Auto:
+                    if (cameraMode != NvSystemModes.GRR)
+                    {
+                        Task.Run(() => Blink());
+                    }
+                    break;
+                case MV04_State.Follow:
+                    if (cameraMode != NvSystemModes.Tracking)
+                    {
+                        Task.Run(() => Blink());
+                    }
+                    break;
+                case MV04_State.FPV:
+                    if (cameraMode != NvSystemModes.Stow)
+                    {
+                        Task.Run(() => Blink());
+                    }
+                    break;
+                case MV04_State.Takeoff:
+                    break;
+                case MV04_State.RTL:
+                    break;
+                case MV04_State.Land:
+                    break;
+                case MV04_State.Unknown:
+                    break;
+                default: 
+                    break;
+
+            }
+
 
         }
 
+        private const int MAXBLINK = 14;
+
+        private async void Blink()
+        {
+            int _blinkCounter = 0;
+            while (_blinkCounter != MAXBLINK)
+            {
+                await Task.Delay(500);
+                tlp_DeviceStatusInfo.BackColor = tlp_DeviceStatusInfo.BackColor == Color.Red ? Color.Black : Color.Red;
+                ++_blinkCounter;
+            }
+        }
+
+        private async void BlinkControl(Control control)
+        {
+            if (control == null)
+                return;
+
+            int _blinkCounter = 0;
+            while (_blinkCounter != MAXBLINK)
+            {
+                await Task.Delay(500);
+                tlp_DeviceStatusInfo.BackColor = control.BackColor == Color.Red ? Color.Black : Color.Red;
+                ++_blinkCounter;
+            }
+        }
+
+        private void ProvideCameraError()
+        {
+            BlinkControl(this.pnl_Camera);
+        }
+
+        private void ProvideDroneError()
+        {
+            BlinkControl(this.pnl_Drone);
+        }
+
+        private void ProvideGCSError()
+        {
+            BlinkControl(this.pnl_GCS);
+        }
+
         #endregion
+
+        private void btn_SetAlt_Click(object sender, EventArgs e)
+        {
+            var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, cs_ColorSliderAltitude.Value);
+
+            Locationwp gotohere = new Locationwp();
+
+            gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+            gotohere.alt = (float)plla.Alt / CurrentState.multiplieralt; // back to m
+            gotohere.lat = (plla.Lat);
+            gotohere.lng = (plla.Lng);
+
+            try
+            {
+                MainV2.comPort.setGuidedModeWP(gotohere);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+            }
+        }
+
+        private void cs_ColorSliderAltitude_ValueChanged(object sender, EventArgs e)
+        {
+            this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
+        }
+
     }
 }

@@ -237,56 +237,9 @@ namespace MV04.Camera
 
             StartCommunicationWithdevice();
 
-
-            //
-            StateHandler.MV04StateChange += StateHandler_MV04StateChange;
-
-
             if (!IsValid(_mavProto))
             {
                 MessageBox.Show("Invalid MavProto - CameraHandler - ctor");
-            }
-        }
-
-        /// <summary>
-        /// Set Camera to proper mode depending on GCS state changed
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void StateHandler_MV04StateChange(object sender, MV04StateChangeEventArgs e)
-        {
-            switch (e.NewState)
-            {
-                case MV04_State.Manual:
-                    // Stabilizált módban legyen a kamera GRR?
-                    break;
-                case MV04_State.TapToFly:
-                    // Joystick-al kamerázik
-                    break;
-                case MV04_State.Takeoff:
-                    // kamera lefele néz
-                    break;
-                case MV04_State.Land:
-                    // kamera lefele néz? vagy kikapcsol?
-                    break;
-                case MV04_State.Auto:
-                    // Kamerát vezérel
-                    break;
-                case MV04_State.Follow:
-                    //Camera Tracking-be kell legyen
-                    break;
-                case MV04_State.FPV:
-                    // Nadir kamera mód
-                    break;
-                case MV04_State.RTL:
-                    // Kamera vezérlés
-                    break;
-                case MV04_State.Unknown:
-                    // legyen kamerakép?
-                    break;
-                default:
-                    break;
-
             }
         }
 
@@ -677,7 +630,7 @@ namespace MV04.Camera
             }
         }
 
-        private int Constrain(int number, int minValue, int maxValue)
+        public int Constrain(int number, int minValue, int maxValue)
         {
             if (number < minValue)
             {

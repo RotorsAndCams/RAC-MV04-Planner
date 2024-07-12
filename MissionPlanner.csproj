@@ -4887,6 +4887,7 @@
     <None Include="Resources\drone-takeoff_.png" />
     <None Include="Resources\close-50.png" />
     <None Include="Resources\camera-64.png" />
+    <None Include="Resources\confirm-64.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

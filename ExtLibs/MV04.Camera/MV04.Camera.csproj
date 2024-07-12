@@ -81,6 +81,12 @@
     <Compile Include="CameraSettingsForm.Designer.cs">
       <DependentUpon>CameraSettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GCSModeTesterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSModeTesterForm.Designer.cs">
+      <DependentUpon>GCSModeTesterForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HudElements.cs" />
     <Compile Include="MavProto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -105,6 +111,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CameraSettingsForm.resx">
       <DependentUpon>CameraSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GCSModeTesterForm.resx">
+      <DependentUpon>GCSModeTesterForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
