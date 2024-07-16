@@ -112,8 +112,9 @@ namespace MissionPlanner.GCSViews
 
             //States
             SetDroneStatusValue();
-            //CameraHandler.Instance.
             this.Resize += CameraView_Resize;
+            SetDroneLEDStates(enum_LandingLEDState.Off, enum_PositionLEDState.Off);
+            LEDStateHandler.LedStateChanged += LEDStateHandler_LedStateChanged;
 
             StateHandler.MV04StateChange += StateHandler_MV04StateChange;
 
@@ -126,6 +127,47 @@ namespace MissionPlanner.GCSViews
             _droneStatustimer.Enabled = true;
 
             this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
+        }
+
+        private void LEDStateHandler_LedStateChanged(object sender, LEDStateChangedEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState); }));
+            }
+            else
+                SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState);
+        }
+
+        private void SetDroneLEDStates(enum_LandingLEDState landing, enum_PositionLEDState position)
+        {
+            if (landing == enum_LandingLEDState.On)
+            {
+                this.pb_DroneTakeOff.Visible = true;
+            }
+            else
+            {
+                this.pb_DroneTakeOff.Visible = false;
+            }
+
+            switch (position)
+            {
+                case enum_PositionLEDState.Off:
+                    this.pb_InfraLight.Visible = false;
+                    this.pb_PositionIndicator.Visible = false;
+                    break;
+                case enum_PositionLEDState.IR:
+                    this.pb_PositionIndicator.Visible = false;
+                    this.pb_InfraLight.Visible = true;
+                    break;
+                case enum_PositionLEDState.RedGreen:
+                    this.pb_InfraLight.Visible = false;
+                    this.pb_PositionIndicator.Visible = true;
+                    break;
+                default:
+                    break;
+            }
+
         }
 
         Point _videoControlClick;

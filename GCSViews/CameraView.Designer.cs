@@ -57,7 +57,9 @@
             this.pb_InfraLight = new System.Windows.Forms.PictureBox();
             this.pb_PositionIndicator = new System.Windows.Forms.PictureBox();
             this.tlp_AGLContainer = new System.Windows.Forms.TableLayoutPanel();
+            this.cs_ColorSliderAltitude = new MissionPlanner.Controls.ColorSlider();
             this.tlp_AGLIncrement = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_SetAlt = new System.Windows.Forms.Button();
             this.btn_Down = new System.Windows.Forms.Button();
             this.btn_Up = new System.Windows.Forms.Button();
             this.tlp_AGLData = new System.Windows.Forms.TableLayoutPanel();
@@ -65,8 +67,6 @@
             this.lb_Agl = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_CameraScreen = new System.Windows.Forms.Panel();
-            this.btn_SetAlt = new System.Windows.Forms.Button();
-            this.cs_ColorSliderAltitude = new MissionPlanner.Controls.ColorSlider();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
@@ -302,6 +302,26 @@
             this.tlp_AGLContainer.ForeColor = System.Drawing.Color.RosyBrown;
             this.tlp_AGLContainer.Name = "tlp_AGLContainer";
             // 
+            // cs_ColorSliderAltitude
+            // 
+            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
+            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
+            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
+            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
+            resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
+            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
+            this.cs_ColorSliderAltitude.Maximum = 1000;
+            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
+            this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
+            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
+            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
+            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
+            this.cs_ColorSliderAltitude.ThumbSize = 40;
+            this.cs_ColorSliderAltitude.ValueChanged += new System.EventHandler(this.cs_ColorSliderAltitude_ValueChanged);
+            // 
             // tlp_AGLIncrement
             // 
             resources.ApplyResources(this.tlp_AGLIncrement, "tlp_AGLIncrement");
@@ -310,6 +330,16 @@
             this.tlp_AGLIncrement.Controls.Add(this.btn_Up, 0, 0);
             this.tlp_AGLIncrement.Controls.Add(this.tlp_AGLData, 0, 1);
             this.tlp_AGLIncrement.Name = "tlp_AGLIncrement";
+            // 
+            // btn_SetAlt
+            // 
+            resources.ApplyResources(this.btn_SetAlt, "btn_SetAlt");
+            this.btn_SetAlt.BackColor = System.Drawing.Color.Black;
+            this.btn_SetAlt.ForeColor = System.Drawing.Color.Black;
+            this.btn_SetAlt.Image = global::MissionPlanner.Properties.Resources.confirm_64;
+            this.btn_SetAlt.Name = "btn_SetAlt";
+            this.btn_SetAlt.UseVisualStyleBackColor = false;
+            this.btn_SetAlt.Click += new System.EventHandler(this.btn_SetAlt_Click);
             // 
             // btn_Down
             // 
@@ -363,36 +393,6 @@
             this.pnl_CameraScreen.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
-            // 
-            // btn_SetAlt
-            // 
-            resources.ApplyResources(this.btn_SetAlt, "btn_SetAlt");
-            this.btn_SetAlt.BackColor = System.Drawing.Color.Black;
-            this.btn_SetAlt.ForeColor = System.Drawing.Color.Black;
-            this.btn_SetAlt.Image = global::MissionPlanner.Properties.Resources.confirm_64;
-            this.btn_SetAlt.Name = "btn_SetAlt";
-            this.btn_SetAlt.UseVisualStyleBackColor = false;
-            this.btn_SetAlt.Click += new System.EventHandler(this.btn_SetAlt_Click);
-            // 
-            // cs_ColorSliderAltitude
-            // 
-            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
-            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
-            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
-            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
-            resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
-            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
-            this.cs_ColorSliderAltitude.Maximum = 1000;
-            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
-            this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
-            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
-            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
-            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
-            this.cs_ColorSliderAltitude.ThumbSize = 40;
-            this.cs_ColorSliderAltitude.ValueChanged += new System.EventHandler(this.cs_ColorSliderAltitude_ValueChanged);
             // 
             // CameraView
             // 

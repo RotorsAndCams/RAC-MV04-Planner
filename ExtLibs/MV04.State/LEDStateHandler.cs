@@ -21,8 +21,8 @@ namespace MV04.State
 
     public class LEDStateChangedEventArgs: EventArgs
     {
-        public static enum_LandingLEDState LandingLEDState { get; set; }
-        public static enum_PositionLEDState PositionLEDState { get; set; }
+        public enum_LandingLEDState LandingLEDState { get; set; }
+        public enum_PositionLEDState PositionLEDState { get; set; }
 
         public LEDStateChangedEventArgs(enum_LandingLEDState landing, enum_PositionLEDState position)
         {
