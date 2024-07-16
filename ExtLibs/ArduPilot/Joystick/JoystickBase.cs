@@ -473,9 +473,42 @@ namespace MissionPlanner.Joystick
                         {
                             try
                             {
-                                int number = (int) but.p1;
+                                int buttonNumber = (int) but.buttonno;
+                                int relayChannelNumber = (int) but.p1;
                                 int state = buttondown == true ? 1 : 0;
-                                Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,MAVLink.MAV_CMD.DO_SET_RELAY, number, state, 0, 0, 0, 0, 0);
+
+
+                                //landing led on: 19 , off: 17
+
+                                //tekerő off: 29, IR: 30 , Pos: 31 vagy az egyik vagy a másik látható fény
+
+                                if (buttondown)
+                                {
+                                    //felkapcsolás
+                                    // p1 = 0 -> ir
+                                    // p1 = 1 -> landing
+                                    // p1 = 2 -> posIndicator
+                                    switch (buttonNumber)
+                                    {
+                                        case 17:    //Landing LED off
+                                            LEDStateHandler.LandingLEDState = enum_LandingLEDState.Off;
+                                            break;
+                                        case 19:    //Landing LED on
+                                            LEDStateHandler.LandingLEDState = enum_LandingLEDState.On;
+                                            break;
+                                        case 29:    //Visibility lights off
+                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.Off;
+                                            break;
+                                        case 30:    //Visibility IR light 
+                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.IR;
+                                            break;
+                                        case 31:    //Visibility Pos light
+                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.RedGreen;
+                                            break;  
+                                    }
+                                }
+
+                                Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,MAVLink.MAV_CMD.DO_SET_RELAY, relayChannelNumber, state, 0, 0, 0, 0, 0);
                             }
                             catch
                             {
