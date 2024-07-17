@@ -129,63 +129,12 @@ namespace MissionPlanner.GCSViews
             this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
         }
 
-        private void LEDStateHandler_LedStateChanged(object sender, LEDStateChangedEventArgs e)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => { SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState); }));
-            }
-            else
-                SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState);
-        }
+        
 
-        private void SetDroneLEDStates(enum_LandingLEDState landing, enum_PositionLEDState position)
-        {
-            if (landing == enum_LandingLEDState.On)
-            {
-                this.pb_DroneTakeOff.Visible = true;
-            }
-            else
-            {
-                this.pb_DroneTakeOff.Visible = false;
-            }
+        
 
-            switch (position)
-            {
-                case enum_PositionLEDState.Off:
-                    this.pb_InfraLight.Visible = false;
-                    this.pb_PositionIndicator.Visible = false;
-                    break;
-                case enum_PositionLEDState.IR:
-                    this.pb_PositionIndicator.Visible = false;
-                    this.pb_InfraLight.Visible = true;
-                    break;
-                case enum_PositionLEDState.RedGreen:
-                    this.pb_InfraLight.Visible = false;
-                    this.pb_PositionIndicator.Visible = true;
-                    break;
-                default:
-                    break;
-            }
 
-        }
-
-        Point _videoControlClick;
-
-        private void VideoControl_MouseClick(object sender, MouseEventArgs e)
-        {
-            _videoControlClick = new Point(e.X, e.Y);
-        }
-
-        private void _droneStatustimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => { SetDroneStatusValue(); }));
-            }
-            else
-                SetDroneStatusValue();
-        }
+        
 
         System.Timers.Timer _droneStatustimer;
 
@@ -216,8 +165,6 @@ namespace MissionPlanner.GCSViews
             // Video stream control
             this.pnl_CameraScreen.Controls.Add(VideoControl);
             VideoControl.Dock = DockStyle.Fill;
-
-            VideoControl.MouseClick += VideoControl_MouseClick;
 
             // Test functions
             #region Test functions
@@ -1017,13 +964,10 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-
-
         private void btn_ResetZoom_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.ResetZoom();
         }
-
 
         private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
         {
@@ -1073,13 +1017,10 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void OnVideoClick(int x, int y)
         {
-            if (x <= 0 || y <= 0)
+            if (x <= 0 || y <= 0 || IsCameraTrackingModeActive)
                 return;
 
             IsCameraTrackingModeActive = true;
-
-            //if (DialogResult.OK != MissionPlanner.Controls.InputBox.Show("Start Camera Tracking", "", ref output))
-            //    return;
 
             CameraHandler.Instance.StartTracking(new Point(x, y));
 
@@ -1223,8 +1164,52 @@ namespace MissionPlanner.GCSViews
                 
                 
             }
+        }
 
+        private void _droneStatustimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetDroneStatusValue(); }));
+            }
+            else
+                SetDroneStatusValue();
+        }
 
+        private void LEDStateHandler_LedStateChanged(object sender, LEDStateChangedEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState); }));
+            }
+            else
+                SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState);
+        }
+
+        private void btn_SetAlt_Click(object sender, EventArgs e)
+        {
+            var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, cs_ColorSliderAltitude.Value);
+
+            Locationwp gotohere = new Locationwp();
+
+            gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+            gotohere.alt = (float)plla.Alt / CurrentState.multiplieralt; // back to m
+            gotohere.lat = (plla.Lat);
+            gotohere.lng = (plla.Lng);
+
+            try
+            {
+                MainV2.comPort.setGuidedModeWP(gotohere);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+            }
+        }
+
+        private void cs_ColorSliderAltitude_ValueChanged(object sender, EventArgs e)
+        {
+            this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
         }
 
         #endregion
@@ -1382,33 +1367,40 @@ namespace MissionPlanner.GCSViews
             BlinkControl(this.pnl_GCS);
         }
 
+        private void SetDroneLEDStates(enum_LandingLEDState landing, enum_PositionLEDState position)
+        {
+            if (landing == enum_LandingLEDState.On)
+            {
+                this.pb_DroneTakeOff.Visible = true;
+            }
+            else
+            {
+                this.pb_DroneTakeOff.Visible = false;
+            }
+
+            switch (position)
+            {
+                case enum_PositionLEDState.Off:
+                    this.pb_InfraLight.Visible = false;
+                    this.pb_PositionIndicator.Visible = false;
+                    break;
+                case enum_PositionLEDState.IR:
+                    this.pb_PositionIndicator.Visible = false;
+                    this.pb_InfraLight.Visible = true;
+                    break;
+                case enum_PositionLEDState.RedGreen:
+                    this.pb_InfraLight.Visible = false;
+                    this.pb_PositionIndicator.Visible = true;
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
         #endregion
 
-        private void btn_SetAlt_Click(object sender, EventArgs e)
-        {
-            var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, cs_ColorSliderAltitude.Value);
-
-            Locationwp gotohere = new Locationwp();
-
-            gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
-            gotohere.alt = (float)plla.Alt / CurrentState.multiplieralt; // back to m
-            gotohere.lat = (plla.Lat);
-            gotohere.lng = (plla.Lng);
-
-            try
-            {
-                MainV2.comPort.setGuidedModeWP(gotohere);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
-            }
-        }
-
-        private void cs_ColorSliderAltitude_ValueChanged(object sender, EventArgs e)
-        {
-            this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
-        }
+        
 
     }
 }
