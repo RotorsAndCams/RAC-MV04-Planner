@@ -453,64 +453,6 @@
   <data name="MenuFlightPlanner.ToolTipText" xml:space="preserve">
     <value>Flight Planner</value>
   </data>
-  <data name="MenuCamera.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        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
-</value>
-  </data>
   <data name="MenuCamera.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
   </data>
@@ -1056,7 +998,7 @@
     <value>status1</value>
   </data>
   <data name="&gt;&gt;status1.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.Status, MissionPlanner, Version=1.3.8844.29222, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.Status, MissionPlanner, Version=1.3.8949.25969, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;status1.Parent" xml:space="preserve">
     <value>panel1</value>
@@ -2847,7 +2789,7 @@
     <value>toolStripConnectionControl</value>
   </data>
   <data name="&gt;&gt;toolStripConnectionControl.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ToolStripConnectionControl, MissionPlanner, Version=1.3.8844.29222, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ToolStripConnectionControl, MissionPlanner, Version=1.3.8949.25969, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;MenuArduPilot.Name" xml:space="preserve">
     <value>MenuArduPilot</value>

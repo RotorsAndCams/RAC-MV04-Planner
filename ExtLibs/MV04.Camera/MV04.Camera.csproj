@@ -81,6 +81,12 @@
     <Compile Include="CameraSettingsForm.Designer.cs">
       <DependentUpon>CameraSettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GCSModeTesterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSModeTesterForm.Designer.cs">
+      <DependentUpon>GCSModeTesterForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HudElements.cs" />
     <Compile Include="MavProto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -105,6 +111,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CameraSettingsForm.resx">
       <DependentUpon>CameraSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GCSModeTesterForm.resx">
+      <DependentUpon>GCSModeTesterForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -134,6 +143,10 @@
     <ProjectReference Include="..\MV04.Settings\MV04.Settings.csproj">
       <Project>{2A73FA7A-705C-467E-9C31-F1D0978E366E}</Project>
       <Name>MV04.Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MV04.State\MV04.State.csproj">
+      <Project>{78FD6E54-F55E-46B8-89F9-2A655C031D5A}</Project>
+      <Name>MV04.State</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj">
       <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>

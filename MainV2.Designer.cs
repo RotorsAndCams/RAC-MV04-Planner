@@ -146,6 +146,7 @@ namespace MissionPlanner
             // MenuCamera
             // 
             this.MenuCamera.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.MenuCamera.Image = global::MissionPlanner.Properties.Resources.camera_64;
             resources.ApplyResources(this.MenuCamera, "MenuCamera");
             this.MenuCamera.Margin = new System.Windows.Forms.Padding(0);
             this.MenuCamera.Name = "MenuCamera";

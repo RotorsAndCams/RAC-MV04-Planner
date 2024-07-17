@@ -52,6 +52,7 @@ namespace MissionPlanner.Utilities
         public Boolean displayAdvActionsTab { get; set; }
         public Boolean displaySimpleActionsTab { get; set; }
         public Boolean displayGaugesTab { get; set; }
+        public Boolean showAGLTab { get; set; }
         public Boolean displayStatusTab { get; set; }
         public Boolean displayServoTab { get; set; }
         public Boolean displayScriptsTab { get; set; }
@@ -143,6 +144,7 @@ namespace MissionPlanner.Utilities
             displayAdvActionsTab = false;
             displaySimpleActionsTab = true;
             displayGaugesTab = true;
+            showAGLTab = true;
             displayStatusTab = false;
             displayServoTab = false;
             displayScriptsTab = false;
@@ -271,6 +273,7 @@ namespace MissionPlanner.Utilities
                 displayAdvActionsTab = false,
                 displaySimpleActionsTab = true,
                 displayGaugesTab = true,
+                showAGLTab = true,
                 displayStatusTab = false,
                 displayServoTab = false,
                 displayScriptsTab = false,
@@ -353,6 +356,7 @@ namespace MissionPlanner.Utilities
                 displayAdvActionsTab = true,
                 displaySimpleActionsTab = false,
                 displayGaugesTab = true,
+                showAGLTab = true,
                 displayStatusTab = true,
                 displayServoTab = true,
                 displayScriptsTab = true,
