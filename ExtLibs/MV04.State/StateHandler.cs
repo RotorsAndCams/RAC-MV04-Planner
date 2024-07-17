@@ -56,7 +56,8 @@ namespace MV04.State
             {
                 PrevioustSate = _currentSate;
                 _currentSate = value;
-                MV04StateChange(null, new MV04StateChangeEventArgs(PrevioustSate, _currentSate));
+                if (MV04StateChange != null)
+                    MV04StateChange(null, new MV04StateChangeEventArgs(PrevioustSate, _currentSate));
             }
         }
 

@@ -193,6 +193,9 @@
   <data name="PlusFramesGreen_02" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\PlusFramesGreen_02.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="calibration06" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\calibration06.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="FW icons 2013+logos-011" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\FW icons 2013+logos-011.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -201,6 +204,9 @@
   </data>
   <data name="apmp5" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\apmp5.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="close-50" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\close-50.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="dark_flightplan_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\dark_flightplan_icon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -211,8 +217,8 @@
   <data name="_01_03" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\01_03.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="calibration06" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\calibration06.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="redsinglecopter2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\redsinglecopter2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="APM_airframes_001" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\APM_airframes_001.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -258,6 +264,9 @@
   </data>
   <data name="maggps" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\maggps.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="camera-64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\camera-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="motion-sensor-30" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\motion-sensor-30.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -381,9 +390,6 @@
   </data>
   <data name="mpdesktop" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\mpdesktop.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="drone-takeoff_" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\drone-takeoff_.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="light_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\light_01.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -551,8 +557,8 @@ Control-S - save grid file\par
   <data name="marker_05" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\marker_05.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="FW icons 2013+logos-11" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\FW icons 2013+logos-11.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="drone-takeoff_" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\drone-takeoff_.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="FW icons 2013+logos-15" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\FW icons 2013+logos-15.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -572,8 +578,8 @@ Control-S - save grid file\par
   <data name="MinimOSD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MinimOSD.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="redsinglecopter2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\redsinglecopter2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="FW icons 2013+logos-11" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FW icons 2013+logos-11.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="marker_02" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\marker_02.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -710,7 +716,7 @@ Control-S - save grid file\par
   <data name="pixhawk2cube" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\pixhawk2cube.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="close-50" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\close-50.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="confirm-64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\confirm-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

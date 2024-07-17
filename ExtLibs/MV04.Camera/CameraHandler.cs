@@ -1,6 +1,7 @@
 ﻿using CoordinateSharp;
 using MissionPlanner.Utilities;
 using MV04.Settings;
+using MV04.State;
 using NextVisionVideoControlLibrary;
 using SharpGL;
 using System;
@@ -629,7 +630,7 @@ namespace MV04.Camera
             }
         }
 
-        private int Constrain(int number, int minValue, int maxValue)
+        public int Constrain(int number, int minValue, int maxValue)
         {
             if (number < minValue)
             {

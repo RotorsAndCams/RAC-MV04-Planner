@@ -82,17 +82,17 @@ namespace MissionPlanner.GCSViews
         {
 #if DEBUG
 
-            var g = e.Graphics;
-            Pen myp = new Pen(System.Drawing.Color.Red, 4);
-            Font fy = new Font("Helvetica", 10, FontStyle.Bold);
-            Brush br = new SolidBrush(System.Drawing.Color.Red);
-            //g.DrawString(X.ToString() + ", " + Y.ToString(), fy, br, X, Y);
-            g.FillEllipse(br, X, Y, 10, 10);
+            //var g = e.Graphics;
+            //Pen myp = new Pen(System.Drawing.Color.Red, 4);
+            //Font fy = new Font("Helvetica", 10, FontStyle.Bold);
+            //Brush br = new SolidBrush(System.Drawing.Color.Red);
+            ////g.DrawString(X.ToString() + ", " + Y.ToString(), fy, br, X, Y);
+            //g.FillEllipse(br, X, Y, 10, 10);
 
-            Point res = CameraView.Translate(new Point(X, Y), this.pnl_CameraView.Size, new Size(1920, 1200));
+            //Point res = CameraView.Translate(new Point(X, Y), this.pnl_CameraView.Size, new Size(1920, 1200));
 
-            Brush br2 = new SolidBrush(Color.Yellow);
-            g.FillEllipse(br2, res.X, res.Y, 10, 10);
+            //Brush br2 = new SolidBrush(Color.Yellow);
+            //g.FillEllipse(br2, res.X, res.Y, 10, 10);
 
 #endif
         }

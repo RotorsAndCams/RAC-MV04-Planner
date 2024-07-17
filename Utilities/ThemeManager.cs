@@ -316,7 +316,7 @@ namespace MissionPlanner.Utilities
             if (control.GetType().IsDefined(typeof(PreventThemingAttribute)))
                 return;
 
-            if (control is CameraView || control is CameraSettingsForm)
+            if (control is CameraView || control is CameraSettingsForm || control is CameraFullScreenForm)
                 return;
 
             ApplyTheme(control, 0);

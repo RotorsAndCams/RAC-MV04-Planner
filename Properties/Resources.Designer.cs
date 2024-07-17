@@ -403,6 +403,16 @@ namespace MissionPlanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap camera_64 {
+            get {
+                object obj = ResourceManager.GetObject("camera-64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap camera_icon {
             get {
                 object obj = ResourceManager.GetObject("camera_icon", resourceCulture);
@@ -466,6 +476,16 @@ namespace MissionPlanner.Properties {
         public static System.Drawing.Bitmap compass {
             get {
                 object obj = ResourceManager.GetObject("compass", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap confirm_64 {
+            get {
+                object obj = ResourceManager.GetObject("confirm-64", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

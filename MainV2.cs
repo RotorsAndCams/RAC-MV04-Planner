@@ -594,6 +594,11 @@ namespace MissionPlanner
                     t.TabPages.Remove(FlightData.tabQuick);
                 }
 
+                if (!t.TabPages.Contains(FlightData.tabAGL))
+                {
+                    t.TabPages.Add(FlightData.tabAGL);
+                }
+
                 if (DisplayConfiguration.displayPreFlightTab && !t.TabPages.Contains(FlightData.tabPagePreFlight))
                 {
                     t.TabPages.Add(FlightData.tabPagePreFlight);
