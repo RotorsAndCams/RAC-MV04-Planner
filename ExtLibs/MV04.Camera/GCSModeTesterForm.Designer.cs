@@ -39,7 +39,6 @@
             this.cb_SelectMode.Name = "cb_SelectMode";
             this.cb_SelectMode.Size = new System.Drawing.Size(222, 21);
             this.cb_SelectMode.TabIndex = 0;
-            this.cb_SelectMode.SelectedIndexChanged += new System.EventHandler(this.cb_SelectMode_SelectedIndexChanged);
             // 
             // btn_SetMode
             // 

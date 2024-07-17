@@ -484,10 +484,6 @@ namespace MissionPlanner.Joystick
 
                                 if (buttondown)
                                 {
-                                    //felkapcsolás
-                                    // p1 = 0 -> ir
-                                    // p1 = 1 -> landing
-                                    // p1 = 2 -> posIndicator
                                     switch (buttonNumber)
                                     {
                                         case 17:    //Landing LED off
@@ -503,7 +499,7 @@ namespace MissionPlanner.Joystick
                                             LEDStateHandler.PositionLEDState = enum_PositionLEDState.IR;
                                             break;
                                         case 31:    //Visibility Pos light
-                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.RedGreen;
+                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.RedLight;
                                             break;  
                                     }
                                 }

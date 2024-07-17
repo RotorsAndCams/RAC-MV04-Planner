@@ -1388,7 +1388,7 @@ namespace MissionPlanner.GCSViews
                     this.pb_PositionIndicator.Visible = false;
                     this.pb_InfraLight.Visible = true;
                     break;
-                case enum_PositionLEDState.RedGreen:
+                case enum_PositionLEDState.RedLight:
                     this.pb_InfraLight.Visible = false;
                     this.pb_PositionIndicator.Visible = true;
                     break;

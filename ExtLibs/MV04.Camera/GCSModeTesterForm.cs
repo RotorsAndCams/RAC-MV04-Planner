@@ -22,11 +22,6 @@ namespace MV04.Camera
 
         }
 
-        private void cb_SelectMode_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //
-        }
-
         private void btn_SetMode_Click(object sender, EventArgs e)
         {
             StateHandler.CurrentSate = (MV04_State)Enum.Parse(typeof(MV04_State), cb_SelectMode.SelectedItem.ToString());

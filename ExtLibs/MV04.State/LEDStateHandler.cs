@@ -16,7 +16,7 @@ namespace MV04.State
     {
         Off,
         IR,
-        RedGreen
+        RedLight
     }
 
     public class LEDStateChangedEventArgs: EventArgs
