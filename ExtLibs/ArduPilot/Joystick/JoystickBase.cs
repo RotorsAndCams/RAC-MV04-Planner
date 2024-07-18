@@ -876,6 +876,8 @@ namespace MissionPlanner.Joystick
 
         public abstract int getNumButtons();
 
+        public abstract int getNumAxes();
+
         public joystickaxis getJoystickAxis(int channel)
         {
             try

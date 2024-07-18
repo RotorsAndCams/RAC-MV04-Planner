@@ -311,6 +311,25 @@ namespace MissionPlanner.Joystick
             return number_of_buttons;
         }
 
+        public override int getNumAxes()
+        {
+            byte number_of_axes = 10;
+            
+            log.Info("getNumAxes");
+            
+            try
+            {
+                Native.ioctl(fs.SafeFileHandle.DangerousGetHandle(), (int)JSIOCGAXES, ref number_of_axes);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+
+            log.Info("getNumAxes " + number_of_axes);
+            return number_of_axes;
+        }
+
         /*
          * 
  * IOCTL commands for joystick driver

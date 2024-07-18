@@ -202,6 +202,9 @@ namespace MissionPlanner.Joystick
                     if (joy == null)
                     {
                         joy = JoystickBase.Create(() => MainV2.comPort);
+
+                        maxaxis = joy.getNumAxes();
+
                         for (int a = 1; a <= maxaxis; a++)
                         {
                             var config = joy.getChannel(a);
@@ -217,7 +220,7 @@ namespace MissionPlanner.Joystick
 
                         noButtons = joy.getNumButtons();
 
-                        noButtons = Math.Min(16, noButtons);
+                        //noButtons = Math.Min(16, noButtons);
 
                         SuspendLayout();
 

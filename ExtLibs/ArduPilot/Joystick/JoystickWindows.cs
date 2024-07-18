@@ -94,6 +94,13 @@ namespace MissionPlanner.Joystick
             return joystick.Capabilities.ButtonCount;
         }
 
+        public override int getNumAxes()
+        {
+            if (joystick == null)
+                return 0;
+            return joystick.Capabilities.AxeCount;
+        }
+
         internal new static IList<DeviceInstance> getDevices()
         {
             return new DirectInput().GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AttachedOnly);
