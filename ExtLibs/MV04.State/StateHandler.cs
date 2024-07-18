@@ -29,16 +29,6 @@ namespace MV04.State
         public MV04_State NewState { get; set; }
 
         #endregion
-
-        #region Methods
-
-        public MV04StateChangeEventArgs(MV04_State previousState, MV04_State newState)
-        {
-            PreviousState = previousState;
-            NewState = newState;
-        }
-
-        #endregion
     }
 
     public static class StateHandler
@@ -56,8 +46,15 @@ namespace MV04.State
             {
                 PrevioustSate = _currentSate;
                 _currentSate = value;
+
                 if (MV04StateChange != null)
-                    MV04StateChange(null, new MV04StateChangeEventArgs(PrevioustSate, _currentSate));
+                {
+                    MV04StateChange(null, new MV04StateChangeEventArgs()
+                    {
+                        PreviousState = PrevioustSate,
+                        NewState = _currentSate
+                    });
+                }
             }
         }
 
