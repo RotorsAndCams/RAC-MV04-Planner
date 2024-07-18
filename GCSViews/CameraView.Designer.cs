@@ -67,6 +67,7 @@
             this.lb_Agl = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_CameraScreen = new System.Windows.Forms.Panel();
+            this.btn_TripSwitchOnOff = new System.Windows.Forms.Button();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
@@ -101,6 +102,7 @@
             // 
             resources.ApplyResources(this.tlp_Buttonsection2, "tlp_Buttonsection2");
             this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 1, 0);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 0);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
             // 
             // btn_StopTracking
@@ -116,9 +118,9 @@
             // tlp_ButtonSection1
             // 
             resources.ApplyResources(this.tlp_ButtonSection1, "tlp_ButtonSection1");
+            this.tlp_ButtonSection1.Controls.Add(this.btn_TripSwitchOnOff, 0, 0);
             this.tlp_ButtonSection1.Controls.Add(this.btn_ChangeCrosshair, 1, 0);
             this.tlp_ButtonSection1.Controls.Add(this.btn_FullScreen, 1, 1);
-            this.tlp_ButtonSection1.Controls.Add(this.btn_ResetZoom, 0, 0);
             this.tlp_ButtonSection1.Controls.Add(this.btn_FPVCameraMode, 0, 1);
             this.tlp_ButtonSection1.Name = "tlp_ButtonSection1";
             // 
@@ -394,6 +396,15 @@
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
             // 
+            // btn_TripSwitchOnOff
+            // 
+            this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
+            this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
+            this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
+            this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
+            this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
+            // 
             // CameraView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -469,5 +480,6 @@
         private System.Windows.Forms.Panel pnl_GCS;
         private System.Windows.Forms.Panel pnl_Camera;
         private System.Windows.Forms.Button btn_SetAlt;
+        private System.Windows.Forms.Button btn_TripSwitchOnOff;
     }
 }

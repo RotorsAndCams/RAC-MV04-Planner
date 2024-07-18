@@ -153,6 +153,39 @@
   <data name="&gt;&gt;btn_StopTracking.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="btn_ResetZoom.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="btn_ResetZoom.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9pt, style=Bold</value>
+  </data>
+  <data name="btn_ResetZoom.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btn_ResetZoom.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 3</value>
+  </data>
+  <data name="btn_ResetZoom.Size" type="System.Drawing.Size, System.Drawing">
+    <value>145, 75</value>
+  </data>
+  <data name="btn_ResetZoom.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="btn_ResetZoom.Text" xml:space="preserve">
+    <value>Zoom</value>
+  </data>
+  <data name="&gt;&gt;btn_ResetZoom.Name" xml:space="preserve">
+    <value>btn_ResetZoom</value>
+  </data>
+  <data name="&gt;&gt;btn_ResetZoom.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btn_ResetZoom.Parent" xml:space="preserve">
+    <value>tlp_Buttonsection2</value>
+  </data>
+  <data name="&gt;&gt;btn_ResetZoom.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
   <data name="tlp_Buttonsection2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
@@ -184,10 +217,43 @@
     <value>0</value>
   </data>
   <data name="tlp_Buttonsection2.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_StopTracking" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_StopTracking" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_ResetZoom" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="tlp_ButtonSection1.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
+  </data>
+  <data name="btn_TripSwitchOnOff.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="btn_TripSwitchOnOff.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Stencil, 20.25pt</value>
+  </data>
+  <data name="btn_TripSwitchOnOff.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btn_TripSwitchOnOff.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 3</value>
+  </data>
+  <data name="btn_TripSwitchOnOff.Size" type="System.Drawing.Size, System.Drawing">
+    <value>145, 81</value>
+  </data>
+  <data name="btn_TripSwitchOnOff.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="btn_TripSwitchOnOff.Text" xml:space="preserve">
+    <value>Switch On</value>
+  </data>
+  <data name="&gt;&gt;btn_TripSwitchOnOff.Name" xml:space="preserve">
+    <value>btn_TripSwitchOnOff</value>
+  </data>
+  <data name="&gt;&gt;btn_TripSwitchOnOff.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btn_TripSwitchOnOff.Parent" xml:space="preserve">
+    <value>tlp_ButtonSection1</value>
+  </data>
+  <data name="&gt;&gt;btn_TripSwitchOnOff.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <data name="btn_ChangeCrosshair.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -217,7 +283,7 @@
     <value>tlp_ButtonSection1</value>
   </data>
   <data name="&gt;&gt;btn_ChangeCrosshair.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="btn_FullScreen.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -244,39 +310,6 @@
     <value>tlp_ButtonSection1</value>
   </data>
   <data name="&gt;&gt;btn_FullScreen.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="btn_ResetZoom.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="btn_ResetZoom.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Segoe UI, 9pt, style=Bold</value>
-  </data>
-  <data name="btn_ResetZoom.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="btn_ResetZoom.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 3</value>
-  </data>
-  <data name="btn_ResetZoom.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 81</value>
-  </data>
-  <data name="btn_ResetZoom.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="btn_ResetZoom.Text" xml:space="preserve">
-    <value>Zoom</value>
-  </data>
-  <data name="&gt;&gt;btn_ResetZoom.Name" xml:space="preserve">
-    <value>btn_ResetZoom</value>
-  </data>
-  <data name="&gt;&gt;btn_ResetZoom.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btn_ResetZoom.Parent" xml:space="preserve">
-    <value>tlp_ButtonSection1</value>
-  </data>
-  <data name="&gt;&gt;btn_ResetZoom.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
   <data name="btn_FPVCameraMode.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
@@ -343,7 +376,7 @@
     <value>1</value>
   </data>
   <data name="tlp_ButtonSection1.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_ChangeCrosshair" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_FullScreen" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_ResetZoom" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_FPVCameraMode" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,33,33333,Percent,33,33333,Percent,33,33333" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_TripSwitchOnOff" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_ChangeCrosshair" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_FullScreen" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_FPVCameraMode" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,33,33333,Percent,33,33333,Percent,33,33333" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="tlp_InfoBase.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
@@ -937,7 +970,7 @@
     <value>cs_ColorSliderAltitude</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.8963.22487, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.8964.29144, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Parent" xml:space="preserve">
     <value>tlp_AGLContainer</value>

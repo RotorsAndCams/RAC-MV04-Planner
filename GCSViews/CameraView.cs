@@ -1,4 +1,5 @@
 ﻿using CoordinateSharp;
+using GMap.NET;
 using log4net;
 using log4net.Repository.Hierarchy;
 using MissionPlanner.Utilities;
@@ -61,6 +62,10 @@ namespace MissionPlanner.GCSViews
         public static Size Trip5Size = new Size(1920, 1200);
         public static bool IsCameraTrackingModeActive { get; set; } = false;
 
+        System.Timers.Timer _droneStatusTimer;
+        System.Timers.Timer _cameraSwitchOffTimer;
+
+
         #endregion
 
         #region Conversion multipliers
@@ -73,6 +78,8 @@ namespace MissionPlanner.GCSViews
 
         public CameraView()
         {
+            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
+
             log.Info("Constructor");
             InitializeComponent();
             instance = this;
@@ -121,22 +128,44 @@ namespace MissionPlanner.GCSViews
             if (!CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport))
                 this.lb_CameraStatusValue.Text = "NoCom";
 
-            _droneStatustimer = new System.Timers.Timer();
-            _droneStatustimer.Elapsed += _droneStatustimer_Elapsed;
-            _droneStatustimer.Interval = 3000;
-            _droneStatustimer.Enabled = true;
+            _droneStatusTimer = new System.Timers.Timer();
+            _droneStatusTimer.Elapsed += _droneStatustimer_Elapsed;
+            _droneStatusTimer.Interval = 3000;
+            _droneStatusTimer.Enabled = true;
 
             this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
+
+
+            //timer for camera switchoff
+            _cameraSwitchOffTimer = new System.Timers.Timer();
+            _cameraSwitchOffTimer.Elapsed += _cameraSwitchOffTimer_Elapsed;
+            _cameraSwitchOffTimer.Interval = 30000;
+            _cameraSwitchOffTimer.Enabled = true;
+
+            
         }
+        private bool _tripSwitchedOff = false;
+        private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            string mode = MainV2.comPort.MAV.cs.mode;
+            int agl = (int)MainV2.comPort.MAV.cs.alt;
 
-        
+            bool droneFlightMode = mode.ToUpper() == "GUIDED" || mode.ToUpper() == "AUTO" || mode.ToUpper() == "LOITER";
+            bool droneAGLMoreThanZero = agl > 0;
+            bool currentStateFlight = StateHandler.CurrentSate == MV04_State.Takeoff || StateHandler.CurrentSate == MV04_State.Follow || StateHandler.CurrentSate == MV04_State.Auto || StateHandler.CurrentSate == MV04_State.Manual;
 
-        
+            int state = 0;
 
+            if (/*droneFlightMode || */ droneAGLMoreThanZero || currentStateFlight)
+            {
+                return;
+            }
+            //else
+            //    state = 1;
 
-        
-
-        System.Timers.Timer _droneStatustimer;
+            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, state, 0, 0, 0, 0, 0);
+            _tripSwitchedOff = true;
+        }
 
         #endregion
 
@@ -1212,6 +1241,18 @@ namespace MissionPlanner.GCSViews
             this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
         }
 
+        private void btn_TripSwitchOnOff_Click(object sender, EventArgs e)
+        {
+            if (_tripSwitchedOff)
+            {
+                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
+                _tripSwitchedOff = false;
+
+                ReconnectCameraStreamAndControl();
+            }
+
+        }
+
         #endregion
 
         #region Methods
@@ -1397,6 +1438,8 @@ namespace MissionPlanner.GCSViews
             }
 
         }
+
+
 
         #endregion
 
