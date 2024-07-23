@@ -65,6 +65,8 @@ namespace MissionPlanner.GCSViews
         System.Timers.Timer _droneStatusTimer;
         System.Timers.Timer _cameraSwitchOffTimer;
 
+        public const int _maxAllowedAltitudeValue = 500;
+        public const int _minAllowedAltitudeValue = 50;
 
         #endregion
 
@@ -133,7 +135,12 @@ namespace MissionPlanner.GCSViews
             _droneStatusTimer.Interval = 3000;
             _droneStatusTimer.Enabled = true;
 
-            this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
+            if((int)MainV2.comPort.MAV.cs.alt < _minAllowedAltitudeValue)
+                this.cs_ColorSliderAltitude.Value = _minAllowedAltitudeValue;
+            else if((int)MainV2.comPort.MAV.cs.alt > _maxAllowedAltitudeValue)
+                this.cs_ColorSliderAltitude.Value -= _maxAllowedAltitudeValue;
+            else
+                this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
 
 
             //timer for camera switchoff
@@ -962,20 +969,20 @@ namespace MissionPlanner.GCSViews
         private void btn_Up_Click(object sender, EventArgs e)
         {
 
-            if (this.cs_ColorSliderAltitude.Value < this.cs_ColorSliderAltitude.Maximum - 10)
+            if (this.cs_ColorSliderAltitude.Value < _maxAllowedAltitudeValue - 10)
                 this.cs_ColorSliderAltitude.Value += 10;
             else
-                this.cs_ColorSliderAltitude.Value = this.cs_ColorSliderAltitude.Maximum;
+                this.cs_ColorSliderAltitude.Value = _maxAllowedAltitudeValue;
 
             this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
         }
 
         private void btn_Down_Click(object sender, EventArgs e)
         {
-            if (this.cs_ColorSliderAltitude.Value > 10)
+            if (this.cs_ColorSliderAltitude.Value > _minAllowedAltitudeValue + 10)
                 this.cs_ColorSliderAltitude.Value -= 10;
             else
-                this.cs_ColorSliderAltitude.Value = 0;
+                this.cs_ColorSliderAltitude.Value = _minAllowedAltitudeValue;
 
             this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
         }

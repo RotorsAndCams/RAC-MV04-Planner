@@ -323,7 +323,8 @@
             resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
             this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
             this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
-            this.cs_ColorSliderAltitude.Maximum = 1000;
+            this.cs_ColorSliderAltitude.Maximum = 500;
+            this.cs_ColorSliderAltitude.Minimum = 50;
             this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
             this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
             this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
