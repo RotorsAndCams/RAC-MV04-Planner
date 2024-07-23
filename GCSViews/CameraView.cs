@@ -156,6 +156,7 @@ namespace MissionPlanner.GCSViews
 
             int state = 0;
 
+            //test
             if (/*droneFlightMode || */ droneAGLMoreThanZero || currentStateFlight)
             {
                 return;
@@ -165,6 +166,7 @@ namespace MissionPlanner.GCSViews
 
             MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, state, 0, 0, 0, 0, 0);
             _tripSwitchedOff = true;
+            btn_TripSwitchOnOff.BackColor = Color.Black;
         }
 
         #endregion
@@ -1249,7 +1251,15 @@ namespace MissionPlanner.GCSViews
                 _tripSwitchedOff = false;
 
                 ReconnectCameraStreamAndControl();
+                btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
             }
+            //else
+            //{
+            //    MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 0, 0, 0, 0, 0, 0);
+            //    _tripSwitchedOff = true;
+            //    //red
+            //}
+
 
         }
 
@@ -1269,6 +1279,9 @@ namespace MissionPlanner.GCSViews
         {
             string mode = MainV2.comPort.MAV.cs.mode;
             this.lb_DroneStatusValue.Text = mode;
+
+            int agl = (int)MainV2.comPort.MAV.cs.alt;
+            this.lb_AltitudeValue.Text = agl.ToString() + "m";
         }
 
         private void SetCameraStatusValue(string st)

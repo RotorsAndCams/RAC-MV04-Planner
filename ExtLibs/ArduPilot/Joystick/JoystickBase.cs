@@ -486,21 +486,28 @@ namespace MissionPlanner.Joystick
                                 {
                                     switch (buttonNumber)
                                     {
-                                        case 17:    //Landing LED off
-                                            LEDStateHandler.LandingLEDState = enum_LandingLEDState.Off;
-                                            break;
-                                        case 19:    //Landing LED on
+                                        case 18:    //Landing LED on
                                             LEDStateHandler.LandingLEDState = enum_LandingLEDState.On;
                                             break;
-                                        case 29:    //Visibility lights off
-                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.Off;
-                                            break;
-                                        case 30:    //Visibility IR light 
+                                        case 29:    //Visibility IR light 
                                             LEDStateHandler.PositionLEDState = enum_PositionLEDState.IR;
                                             break;
-                                        case 31:    //Visibility Pos light
+                                        case 30:    //Visibility Pos light
                                             LEDStateHandler.PositionLEDState = enum_PositionLEDState.RedLight;
-                                            break;  
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    switch (buttonNumber)
+                                    {
+                                        case 18:    //Landing LED off
+                                            LEDStateHandler.LandingLEDState = enum_LandingLEDState.Off;
+                                            break;
+                                        case 29:
+                                        case 30:    //Visibility Pos light off
+                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.Off;
+                                            break;
                                     }
                                 }
 

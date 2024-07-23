@@ -32,10 +32,11 @@
             this.tlp_ControlsBase = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_Buttonsection2 = new System.Windows.Forms.TableLayoutPanel();
             this.btn_StopTracking = new System.Windows.Forms.Button();
+            this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.tlp_ButtonSection1 = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_TripSwitchOnOff = new System.Windows.Forms.Button();
             this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
             this.btn_FullScreen = new System.Windows.Forms.Button();
-            this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
@@ -67,7 +68,6 @@
             this.lb_Agl = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_CameraScreen = new System.Windows.Forms.Panel();
-            this.btn_TripSwitchOnOff = new System.Windows.Forms.Button();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
@@ -115,6 +115,16 @@
             this.btn_StopTracking.UseVisualStyleBackColor = false;
             this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
             // 
+            // btn_ResetZoom
+            // 
+            this.btn_ResetZoom.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_ResetZoom, "btn_ResetZoom");
+            this.btn_ResetZoom.ForeColor = System.Drawing.Color.White;
+            this.btn_ResetZoom.Image = global::MissionPlanner.Properties.Resources.icons8_reset_50;
+            this.btn_ResetZoom.Name = "btn_ResetZoom";
+            this.btn_ResetZoom.UseVisualStyleBackColor = false;
+            this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
+            // 
             // tlp_ButtonSection1
             // 
             resources.ApplyResources(this.tlp_ButtonSection1, "tlp_ButtonSection1");
@@ -123,6 +133,15 @@
             this.tlp_ButtonSection1.Controls.Add(this.btn_FullScreen, 1, 1);
             this.tlp_ButtonSection1.Controls.Add(this.btn_FPVCameraMode, 0, 1);
             this.tlp_ButtonSection1.Name = "tlp_ButtonSection1";
+            // 
+            // btn_TripSwitchOnOff
+            // 
+            this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
+            this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
+            this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
+            this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
+            this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
             // 
             // btn_ChangeCrosshair
             // 
@@ -143,16 +162,6 @@
             this.btn_FullScreen.Name = "btn_FullScreen";
             this.btn_FullScreen.UseVisualStyleBackColor = false;
             this.btn_FullScreen.Click += new System.EventHandler(this.btn_FullScreen_Click);
-            // 
-            // btn_ResetZoom
-            // 
-            this.btn_ResetZoom.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_ResetZoom, "btn_ResetZoom");
-            this.btn_ResetZoom.ForeColor = System.Drawing.Color.White;
-            this.btn_ResetZoom.Image = global::MissionPlanner.Properties.Resources.icons8_reset_50;
-            this.btn_ResetZoom.Name = "btn_ResetZoom";
-            this.btn_ResetZoom.UseVisualStyleBackColor = false;
-            this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
             // 
             // btn_FPVCameraMode
             // 
@@ -395,15 +404,6 @@
             this.pnl_CameraScreen.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
-            // 
-            // btn_TripSwitchOnOff
-            // 
-            this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
-            this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
-            this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
-            this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
-            this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
             // 
             // CameraView
             // 
