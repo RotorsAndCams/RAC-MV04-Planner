@@ -724,11 +724,11 @@ namespace MissionPlanner.Joystick
                                     case buttonfunction_mv04_Arm_option.Safe:
                                         // Disarm, safety on
                                         Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
-                                        Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 1u, target_system = (byte)  Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
+                                        Interface.doSafety((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
                                         break;
                                     case buttonfunction_mv04_Arm_option.Armed:
                                         // Safety off, arm
-                                        Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 0u, target_system = (byte)  Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
+                                        Interface.doSafety((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
                                         Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
                                         break;
                                     default: break;

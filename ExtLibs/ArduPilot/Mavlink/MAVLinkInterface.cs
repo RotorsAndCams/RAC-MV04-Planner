@@ -2506,6 +2506,11 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             return true;
         }
 
+        public void doSafety(byte sysid, byte compid, bool safeIt)
+        {
+            setMode(sysid, compid, new MAVLink.mavlink_set_mode_t() { custom_mode = safeIt ? 1u : 0u, target_system = sysid }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
+        }
+
         [Obsolete]
         public bool doARM(bool armit, bool force = false)
         {
