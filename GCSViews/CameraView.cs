@@ -9,6 +9,7 @@ using MV04.State;
 using NetTopologySuite.Operation.Valid;
 using NextVisionVideoControlLibrary;
 using OpenTK.Graphics.ES11;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -149,9 +150,13 @@ namespace MissionPlanner.GCSViews
             _cameraSwitchOffTimer.Interval = 30000;
             _cameraSwitchOffTimer.Enabled = true;
 
-            
         }
+
+
+
+        PictureBox pictureBox;
         private bool _tripSwitchedOff = false;
+
         private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             string mode = MainV2.comPort.MAV.cs.mode;
@@ -227,6 +232,7 @@ namespace MissionPlanner.GCSViews
                 {"Toggle IR Polarity", async () => { await ToggleIRPolarity(); }},
                 {"Do BIT", async () => { await DoBIT(); }},
                 {"Do NUC", async () => { await DoNUC(); }},
+                {"Test Gstreamer", async () => { new GstreamerTestForm().Show(); }},
                 {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
             };
 
