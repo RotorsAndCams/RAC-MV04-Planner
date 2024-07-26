@@ -121,6 +121,9 @@
   <data name="planebackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\planebackground.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="planeicon4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\planetracker4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="marker_07" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\marker_07.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -175,14 +178,14 @@
   <data name="up" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\up.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="quadhover_12" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\quadhover_12.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="dark_flightdata_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\dark_flightdata_icon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="calibration04" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\calibration04.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="down" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\down.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="quadframesnormal_12" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\quadframesnormal_12.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -265,14 +268,8 @@
   <data name="maggps" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\maggps.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="camera-64" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\camera-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="motion-sensor-30" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\motion-sensor-30.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="quadframesnormal_05" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\quadframesnormal_05.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="heli" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\heli.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -301,11 +298,17 @@
   <data name="light_06" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\light_06.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="calibration01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\calibration01.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="calibration07" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\calibration07.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="apmp2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\apmp2.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FW icons 2013+logos-16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FW icons 2013+logos-16.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="missionplannerlogodark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\missionplannerlogodark.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -313,11 +316,8 @@
   <data name="hil" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\new frames-10.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="quadhover_12" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\quadhover_12.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="planeicon1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\planetracker1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="px4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\px4.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="apmp4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\apmp4.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -379,8 +379,8 @@
   <data name="PlusFramesGreen_06" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\PlusFramesGreen_06.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="planeicon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\planetracker.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="camera-64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\camera-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="dark_connect_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\dark_connect_icon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -548,9 +548,6 @@ Control-S - save grid file\par
   <data name="compass" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BR-HMC5883-01-2.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="px4" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\px4.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="quadhover_05" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\quadhover_05.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -568,9 +565,6 @@ Control-S - save grid file\par
   </data>
   <data name="y6b" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\FW icons Y6.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="hilheli" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\new frames-13.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="tri" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\frames-05.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -602,8 +596,8 @@ Control-S - save grid file\par
   <data name="quadframesnormal_03" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\quadframesnormal_03.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="planeicon4" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\planetracker4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="planeicon1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\planetracker1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="cameraGimalYaw" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cameraGimalYaw.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -650,6 +644,12 @@ Control-S - save grid file\par
   <data name="quadframesnormal_11" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\quadframesnormal_11.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="FW icons 2013+logos-07" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FW icons 2013+logos-07.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="confirm-64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\confirm-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="marker_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\marker_01.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -664,6 +664,9 @@ Control-S - save grid file\par
   </data>
   <data name="bgdark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\bgdark.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="planeicon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\planetracker.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Hframelight" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Hframelight.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -686,8 +689,8 @@ Control-S - save grid file\par
   <data name="Gaugebg" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Gaugebg.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="FW icons 2013+logos-07" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\FW icons 2013+logos-07.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="quadframesnormal_05" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\quadframesnormal_05.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="opticalflow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BR-0016-01-3T.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -695,8 +698,8 @@ Control-S - save grid file\par
   <data name="wizardicon1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\wizardicon1.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="calibration01" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\calibration01.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="down" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\down.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="wizardicon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\wizardicon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -710,13 +713,13 @@ Control-S - save grid file\par
   <data name="x8" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\x8.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="FW icons 2013+logos-16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\FW icons 2013+logos-16.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="hilheli" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\new frames-13.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="pixhawk2cube" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\pixhawk2cube.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="confirm-64" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\confirm-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="power-64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\power-64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

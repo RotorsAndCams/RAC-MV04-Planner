@@ -139,6 +139,7 @@
             this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
             this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
+            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.power_64;
             this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
             this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
             this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
@@ -405,7 +406,7 @@
             this.pnl_CameraScreen.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
             this.pnl_CameraScreen.Name = "pnl_CameraScreen";
-            // 
+            //
             // CameraView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
