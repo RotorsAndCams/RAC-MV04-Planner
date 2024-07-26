@@ -473,38 +473,28 @@ namespace MissionPlanner.Joystick
                         {
                             try
                             {
-                                int buttonNumber = (int) but.buttonno;
-                                int relayChannelNumber = (int) but.p1;
-                                int state = buttondown == true ? 1 : 0;
+                                /*
+                                Command         | Input channel
+                                ----------------+--------------
+                                PowerLED        | 19
+                                IR indicator    | 30
+                                Red indcator    | 31
+                                */
 
-
-                                //landing led on: 19 , off: 17
-
-                                //tekerő off: 29, IR: 30 , Pos: 31 vagy az egyik vagy a másik látható fény
-
-                                if (buttondown)
+                                switch (but.buttonno)
                                 {
-                                    switch (buttonNumber)
-                                    {
-                                        case 17:    //Landing LED off
-                                            LEDStateHandler.LandingLEDState = enum_LandingLEDState.Off;
-                                            break;
-                                        case 19:    //Landing LED on
-                                            LEDStateHandler.LandingLEDState = enum_LandingLEDState.On;
-                                            break;
-                                        case 29:    //Visibility lights off
-                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.Off;
-                                            break;
-                                        case 30:    //Visibility IR light 
-                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.IR;
-                                            break;
-                                        case 31:    //Visibility Pos light
-                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.RedLight;
-                                            break;  
-                                    }
+                                    case 19:    // Power LED
+                                        LEDStateHandler.LandingLEDState = buttondown ? enum_LandingLEDState.On : enum_LandingLEDState.Off;
+                                        break;
+                                    case 30:    // Visibility IR light 
+                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.IR : enum_PositionLEDState.Off;
+                                        break;
+                                    case 31:    // Visibility Pos light
+                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.RedLight : enum_PositionLEDState.Off;
+                                        break;  
                                 }
 
-                                Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,MAVLink.MAV_CMD.DO_SET_RELAY, relayChannelNumber, state, 0, 0, 0, 0, 0);
+                                Interface.doCommand((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, but.p1, buttondown ? 1 : 0, 0, 0, 0, 0, 0);
                             }
                             catch
                             {
