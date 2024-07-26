@@ -1,4 +1,6 @@
 ﻿using log4net;
+using MissionPlanner.Utilities;
+using System.Globalization;
 using System.Reflection;
 
 namespace MissionPlanner.Swarm
@@ -48,6 +50,9 @@ namespace MissionPlanner.Swarm
 
         public void Takeoff()
         {
+            float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
+            Settings.Instance["takeoff_alt"] = takeoffAlt.ToString(CultureInfo.InvariantCulture);
+
             foreach (var port in MainV2.Comports)
             {
                 foreach (var mav in port.MAVlist)
@@ -57,7 +62,7 @@ namespace MissionPlanner.Swarm
 
                     port.setMode(mav.sysid, mav.compid, "GUIDED");
 
-                    port.doCommand(mav.sysid, mav.compid, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 5);
+                    port.doCommand(mav.sysid, mav.compid, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
                 }
             }
         }

@@ -440,7 +440,7 @@ namespace MissionPlanner.Joystick
                             {
                                 // Get takeoff altitude parameter (or set default value)
                                 float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
-                                Settings.Instance["takeoff_alt"] = takeoffAlt.ToString();
+                                Settings.Instance["takeoff_alt"] = takeoffAlt.ToString(CultureInfo.InvariantCulture);
 
                                 // Do takeoff procedure
                                 Interface.setMode("Guided");

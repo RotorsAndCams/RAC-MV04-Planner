@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MissionPlanner.Utilities;
+using System;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace MissionPlanner.Swarm.FollowLeader
@@ -41,13 +43,16 @@ namespace MissionPlanner.Swarm.FollowLeader
 
         private void but_takeoff_Click(object sender, EventArgs e)
         {
+            float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
+            Settings.Instance["takeoff_alt"] = takeoffAlt.ToString(CultureInfo.InvariantCulture);
+
             foreach (var port in MainV2.Comports)
             {
                 foreach (var MAV in port.MAVlist)
                 {
                     MAV.parent.setMode(MAV.sysid, MAV.compid, "GUIDED");
 
-                    MAV.parent.doCommand(MAV.sysid, MAV.compid, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 5);
+                    MAV.parent.doCommand(MAV.sysid, MAV.compid, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
                 }
             }
         }
