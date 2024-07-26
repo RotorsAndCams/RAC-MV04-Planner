@@ -443,7 +443,7 @@ namespace MissionPlanner.Joystick
                                 Settings.Instance["takeoff_alt"] = takeoffAlt.ToString(CultureInfo.InvariantCulture);
 
                                 // Do takeoff procedure
-                                Interface.setMode("Guided");
+                                //Interface.setMode("Guided");
                                 Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
 
                                 // Trigger MV04 state change event

@@ -5109,7 +5109,7 @@ namespace MissionPlanner.GCSViews
                 }
                 takeoffAlt = float.Parse(Settings.Instance["takeoff_alt"], CultureInfo.InvariantCulture);
 
-                MainV2.comPort.setMode("GUIDED");
+                //MainV2.comPort.setMode("GUIDED");
 
                 try
                 {
