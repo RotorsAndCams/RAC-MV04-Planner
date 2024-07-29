@@ -87,7 +87,7 @@ namespace MV04.Camera
             }
         }
 
-        public static readonly int TripChannelNumber = 4;
+        public static readonly int TripChannelNumber = 0;
 
         private VideoControl _VideoControl = null;
 

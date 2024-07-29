@@ -1266,12 +1266,12 @@ namespace MissionPlanner.GCSViews
                 ReconnectCameraStreamAndControl();
                 btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
             }
-            //else
-            //{
-            //    MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 0, 0, 0, 0, 0, 0);
-            //    _tripSwitchedOff = true;
-            //    //red
-            //}
+            else
+            {
+                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 0, 0, 0, 0, 0, 0);
+                _tripSwitchedOff = true;
+                btn_TripSwitchOnOff.BackColor = Color.Black;
+            }
 
 
         }
