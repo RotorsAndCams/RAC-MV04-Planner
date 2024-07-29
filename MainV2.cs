@@ -3418,19 +3418,23 @@ namespace MissionPlanner
             {
                 try
                 {
-                    if (image == null)
+                    if (false)
                     {
-                        GCSViews.FlightData.myhud.bgimage = null;
-                        return;
-                    }
+                        if (image == null)
+                        {
+                            GCSViews.FlightData.myhud.bgimage = null;
+                            return;
+                        }
 
-                    var old = GCSViews.FlightData.myhud.bgimage;
-                    GCSViews.FlightData.myhud.bgimage = new Bitmap(image.Width, image.Height, 4 * image.Width,
-                        PixelFormat.Format32bppPArgb,
-                        image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
-                            .Scan0);
-                    if (old != null)
-                        old.Dispose();
+                        var old = GCSViews.FlightData.myhud.bgimage;
+                        GCSViews.FlightData.myhud.bgimage = new Bitmap(image.Width, image.Height, 4 * image.Width,
+                            PixelFormat.Format32bppPArgb,
+                            image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
+                                .Scan0);
+                        if (old != null)
+                            old.Dispose();
+                    }
+                    
                 }
                 catch
                 {

@@ -413,12 +413,18 @@ namespace MissionPlanner.GCSViews
 
             this.cs_ColorSliderAltitude.Scroll += Cs_ColorSliderAltitude_ValueChanged;
 
-            this.cs_ColorSliderAltitude.Minimum = 0;
-            this.cs_ColorSliderAltitude.Maximum = 1000;
+            this.cs_ColorSliderAltitude.Minimum = 50;
+            this.cs_ColorSliderAltitude.Maximum = 500;
 
 
             this.lb_AltitudeValue.Text = ((int)hud1.groundalt).ToString();
-            this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
+
+            if ((int)MainV2.comPort.MAV.cs.alt > cs_ColorSliderAltitude.Maximum)
+                this.cs_ColorSliderAltitude.Value = cs_ColorSliderAltitude.Maximum;
+            else if ((int)MainV2.comPort.MAV.cs.alt < cs_ColorSliderAltitude.Minimum)
+                this.cs_ColorSliderAltitude.Value = cs_ColorSliderAltitude.Minimum;
+            else
+                this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
 
         }
 
@@ -6296,8 +6302,8 @@ namespace MissionPlanner.GCSViews
         {
             _sliderAltitude = (int)cs_ColorSliderAltitude.Value + 10;
 
-            if(_sliderAltitude > 1000)
-                _sliderAltitude = 1000;
+            if(_sliderAltitude > cs_ColorSliderAltitude.Maximum)
+                _sliderAltitude = cs_ColorSliderAltitude.Maximum;
 
             cs_ColorSliderAltitude.Value = _sliderAltitude;
 
@@ -6307,8 +6313,8 @@ namespace MissionPlanner.GCSViews
         private void btn_Down_Click(object sender, EventArgs e)
         {
             _sliderAltitude = (int)cs_ColorSliderAltitude.Value - 10;
-            if(_sliderAltitude <0)
-                _sliderAltitude = 0;
+            if(_sliderAltitude < cs_ColorSliderAltitude.Minimum)
+                _sliderAltitude = cs_ColorSliderAltitude.Minimum;
 
             cs_ColorSliderAltitude.Value = _sliderAltitude;
 
@@ -6317,21 +6323,6 @@ namespace MissionPlanner.GCSViews
 
         private void btn_SetAltitudeSendCommand_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    //MainV2.comPort.setNewWPAlt((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp { lat= MainV2.comPort.MAV.cs.lat, lng = MainV2.comPort.MAV.cs.lng, alt = _sliderAltitude / CurrentState.multiplieralt });
-            //    //MainV2.comPort.setNewWPAlt(new Locationwp { alt = _sliderAltitude / CurrentState.multiplieralt });
-
-            //    MainV2.comPort.setMode("GUIDED");
-
-            //    MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent,
-            //        MAVLink.MAV_CMD.OVERRIDE_GOTO, 0, 0, 0, 0, 0, 0, _sliderAltitude / CurrentState.multiplieralt);
-            //}
-            //catch
-            //{
-            //    CustomMessageBox.Show(Strings.ErrorCommunicating, Strings.ERROR);
-            //}
-
             var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, _sliderAltitude);
 
             Locationwp gotohere = new Locationwp();

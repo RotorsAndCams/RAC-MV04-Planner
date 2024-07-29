@@ -32,10 +32,11 @@
             this.tlp_ControlsBase = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_Buttonsection2 = new System.Windows.Forms.TableLayoutPanel();
             this.btn_StopTracking = new System.Windows.Forms.Button();
+            this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.tlp_ButtonSection1 = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_TripSwitchOnOff = new System.Windows.Forms.Button();
             this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
             this.btn_FullScreen = new System.Windows.Forms.Button();
-            this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
@@ -101,6 +102,7 @@
             // 
             resources.ApplyResources(this.tlp_Buttonsection2, "tlp_Buttonsection2");
             this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 1, 0);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 0);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
             // 
             // btn_StopTracking
@@ -113,14 +115,34 @@
             this.btn_StopTracking.UseVisualStyleBackColor = false;
             this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
             // 
+            // btn_ResetZoom
+            // 
+            this.btn_ResetZoom.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_ResetZoom, "btn_ResetZoom");
+            this.btn_ResetZoom.ForeColor = System.Drawing.Color.White;
+            this.btn_ResetZoom.Image = global::MissionPlanner.Properties.Resources.icons8_reset_50;
+            this.btn_ResetZoom.Name = "btn_ResetZoom";
+            this.btn_ResetZoom.UseVisualStyleBackColor = false;
+            this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
+            // 
             // tlp_ButtonSection1
             // 
             resources.ApplyResources(this.tlp_ButtonSection1, "tlp_ButtonSection1");
+            this.tlp_ButtonSection1.Controls.Add(this.btn_TripSwitchOnOff, 0, 0);
             this.tlp_ButtonSection1.Controls.Add(this.btn_ChangeCrosshair, 1, 0);
             this.tlp_ButtonSection1.Controls.Add(this.btn_FullScreen, 1, 1);
-            this.tlp_ButtonSection1.Controls.Add(this.btn_ResetZoom, 0, 0);
             this.tlp_ButtonSection1.Controls.Add(this.btn_FPVCameraMode, 0, 1);
             this.tlp_ButtonSection1.Name = "tlp_ButtonSection1";
+            // 
+            // btn_TripSwitchOnOff
+            // 
+            this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
+            this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
+            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.power_64;
+            this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
+            this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
+            this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
             // 
             // btn_ChangeCrosshair
             // 
@@ -141,16 +163,6 @@
             this.btn_FullScreen.Name = "btn_FullScreen";
             this.btn_FullScreen.UseVisualStyleBackColor = false;
             this.btn_FullScreen.Click += new System.EventHandler(this.btn_FullScreen_Click);
-            // 
-            // btn_ResetZoom
-            // 
-            this.btn_ResetZoom.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_ResetZoom, "btn_ResetZoom");
-            this.btn_ResetZoom.ForeColor = System.Drawing.Color.White;
-            this.btn_ResetZoom.Image = global::MissionPlanner.Properties.Resources.icons8_reset_50;
-            this.btn_ResetZoom.Name = "btn_ResetZoom";
-            this.btn_ResetZoom.UseVisualStyleBackColor = false;
-            this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
             // 
             // btn_FPVCameraMode
             // 
@@ -312,7 +324,8 @@
             resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
             this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
             this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
-            this.cs_ColorSliderAltitude.Maximum = 1000;
+            this.cs_ColorSliderAltitude.Maximum = 500;
+            this.cs_ColorSliderAltitude.Minimum = 50;
             this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
             this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
             this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
@@ -469,5 +482,6 @@
         private System.Windows.Forms.Panel pnl_GCS;
         private System.Windows.Forms.Panel pnl_Camera;
         private System.Windows.Forms.Button btn_SetAlt;
+        private System.Windows.Forms.Button btn_TripSwitchOnOff;
     }
 }
