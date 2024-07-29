@@ -15,21 +15,11 @@ namespace MissionPlanner.GCSViews
 {
     public partial class GstreamerTestForm : Form
     {
-        //public HUD testHud = new MissionPlanner.Controls.HUD();
-
         public GstreamerTestForm()
         {
-
-
             InitializeComponent();
 
-
-            //this.Controls.Add(testHud);
-            //testHud.Dock = DockStyle.Fill;
-
             TestGstreamer();
-
-
         }
 
         private readonly object _bgimagelock = new object();
@@ -50,41 +40,25 @@ namespace MissionPlanner.GCSViews
 
             GStreamer.onNewImage += (sender, image) =>
             {
-                //lock (this._bgimagelock)
-                //{
-                //    try
-                //    {
-                //        if (image == null)
-                //        {
-                //            testHud.bgimage = null;
-                //            return;
-                //        }
-
-
-                //        var old = testHud.bgimage;
-                //        testHud.bgimage = (Image)new Bitmap(image.Width, image.Height, 4 * image.Width,
-                //                System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
-                //                image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
-                //                    .Scan0);
-
-                //        if (old != null)
-                //            old.Dispose();
-                //    }
-                //    catch
-                //    {
-                //    }
-
-                //}
-
-                var img = (Image)new Bitmap(image.Width, image.Height, 4 * image.Width,
+                
+                try
+                {
+                    lock (this._bgimagelock)
+                    {
+                        var img = (Image)new Bitmap(image.Width, image.Height, 4 * image.Width,
                                 System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
                                 image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
                                     .Scan0);
 
-                var gr = pictureBox1.CreateGraphics();
-                gr.DrawImage(img, 0,0, pictureBox1.Width, pictureBox1.Height);
+                        var gr = pictureBox1.CreateGraphics();
+                        gr.DrawImage(img, 0, 0, pictureBox1.Width, pictureBox1.Height);
+                    }
+                    
+                }
+                catch(Exception ex)
+                {
 
-                
+                }
             };
         }
 
