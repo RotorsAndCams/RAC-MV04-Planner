@@ -37,7 +37,7 @@ namespace MissionPlanner.GCSViews
         public static CameraView instance;
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        VideoControl VideoControl;
+        //VideoControl VideoControl;
         (int major, int minor, int build) VideoControlDLLVersion;
         string CameraStreamIP;
         int CameraStreamPort;
@@ -69,6 +69,8 @@ namespace MissionPlanner.GCSViews
         public const int _maxAllowedAltitudeValue = 500;
         public const int _minAllowedAltitudeValue = 50;
 
+        private bool _tripSwitchedOff = false;
+
         #endregion
 
         #region Conversion multipliers
@@ -88,7 +90,7 @@ namespace MissionPlanner.GCSViews
             instance = this;
 
             // Video control
-            VideoControl = CameraHandler.Instance.CameraVideoControl;
+            //VideoControl = CameraHandler.Instance.CameraVideoControl;
             VideoControlDLLVersion = CameraHandler.Instance.StreamDLLVersion;
             CameraStreamIP = SettingManager.Get(Setting.CameraStreamIP);
             CameraStreamPort = int.Parse(SettingManager.Get(Setting.CameraStreamPort));
@@ -149,13 +151,60 @@ namespace MissionPlanner.GCSViews
             _cameraSwitchOffTimer.Elapsed += _cameraSwitchOffTimer_Elapsed;
             _cameraSwitchOffTimer.Interval = 30000;
             _cameraSwitchOffTimer.Enabled = true;
+            _gr = pb_CameraGstream.CreateGraphics();
+
+            pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
+
+            GStreamer.onNewImage += (sender, image) =>
+            {
+                try
+                {
+                    if (image == null) return;
+
+                    img = (Image)new Bitmap(image.Width, image.Height, 4 * image.Width,
+                                System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
+                                image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
+                                    .Scan0);
+                    if (InvokeRequired)
+                        Invoke(new Action(() => pb_CameraGstream.Refresh()));
+                    else
+                        pb_CameraGstream.Refresh();
+
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show("Gst error" + ex.Message);
+                }
+                
+                
+            };
 
         }
 
 
+        System.Drawing.Image img;
 
-        PictureBox pictureBox;
-        private bool _tripSwitchedOff = false;
+        private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
+        {
+            
+            try
+            {
+                if (img != null) 
+                {
+                    lock (this._bgimagelock)
+                    {
+                        _gr.DrawImage(img, 0, 0, img.Width, img.Height);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        private readonly object _bgimagelock = new object();
+        private Graphics _gr;
 
         private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -168,13 +217,10 @@ namespace MissionPlanner.GCSViews
 
             int state = 0;
 
-            //test
-            if (/*droneFlightMode || */ droneAGLMoreThanZero || currentStateFlight)
+            if (droneAGLMoreThanZero || currentStateFlight)
             {
                 return;
             }
-            //else
-            //    state = 1;
 
             MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, state, 0, 0, 0, 0, 0);
             _tripSwitchedOff = true;
@@ -206,8 +252,8 @@ namespace MissionPlanner.GCSViews
         private void DrawUI()
         {
             // Video stream control
-            this.pnl_CameraScreen.Controls.Add(VideoControl);
-            VideoControl.Dock = DockStyle.Fill;
+            //this.pnl_CameraScreen.Controls.Add(VideoControl);
+            //VideoControl.Dock = DockStyle.Fill;
 
             // Test functions
             #region Test functions
@@ -269,7 +315,9 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraStream()
         {
-            bool success = CameraHandler.Instance.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick);
+            //bool success = CameraHandler.Instance.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick);
+
+            bool success = StartGstreamerCameraStream(CameraHandler.url);
 
             if (success)
             {
@@ -498,6 +546,27 @@ namespace MissionPlanner.GCSViews
             else
                 AddToOSDDebug("NV calibration failed");
 #endif
+        }
+
+
+        private bool StartGstreamerCameraStream(string p_url)
+        {
+            try
+            {
+                CameraHandler.Instance.StartGstreamer(p_url);
+                //GStreamer.StartA(p_url);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                CustomMessageBox.Show(ex.ToString(), Strings.ERROR);
+                return false;
+            }
+        }
+
+        private void StopGstreamerCameraStream()
+        {
+            GStreamer.StopAll();
         }
 
 
@@ -1016,12 +1085,12 @@ namespace MissionPlanner.GCSViews
         private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
         {
 
-            if (!_cameraFullScreenForm.Visible)
-            {
-                VideoControl = CameraHandler.Instance.CameraVideoControl;
-                this.pnl_CameraScreen.Controls.Add(VideoControl);
-                VideoControl.Dock = DockStyle.Fill;
-            }
+            //if (!_cameraFullScreenForm.Visible)
+            //{
+            //    VideoControl = CameraHandler.Instance.CameraVideoControl;
+            //    //this.pnl_CameraScreen.Controls.Add(VideoControl);
+            //    VideoControl.Dock = DockStyle.Fill;
+            //}
             ReconnectCameraStreamAndControl();
         }
 
@@ -1042,11 +1111,11 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void OnVideoDoubleClick(object sender, EventArgs e)
         {
-            Point p = VideoControl.PointToClient(Cursor.Position);
+            //Point p = VideoControl.PointToClient(Cursor.Position);
 
-#if DEBUG
-            AddToOSDDebug($"Double clicked at X={p.X} Y={p.Y}");
-#endif
+//#if DEBUG
+//            AddToOSDDebug($"Double clicked at X={p.X} Y={p.Y}");
+//#endif
         }
 
         private void btn_Settings_Click(object sender, EventArgs e)
@@ -1111,24 +1180,24 @@ namespace MissionPlanner.GCSViews
 
         private void CameraView_Resize(object sender, EventArgs e)
         {
-            if (this.Size.Width < 1270)
-            {
-                this.pnl_CameraScreen.Padding = new Padding(0, 60, 0, 60);
-                this.pnl_CameraScreen.MinimumSize = new Size(620, 360);
-                this.pnl_CameraScreen.Size = new Size(620, 360);
-            }
-            else if (this.Size.Width < 1590)
-            {
-                this.pnl_CameraScreen.Padding = new Padding(0, 30, 0, 30);
-                this.pnl_CameraScreen.MinimumSize = new Size(960, 540);
-                this.pnl_CameraScreen.Size = new Size(960, 540);
-            }
-            else
-            {
-                this.pnl_CameraScreen.Padding = new Padding(0, 0, 0, 0);
-                this.pnl_CameraScreen.MinimumSize = new Size(1280, 720);
-                this.pnl_CameraScreen.Size = new Size(1280, 720);
-            }
+            //if (this.Size.Width < 1270)
+            //{
+            //    this.pnl_CameraScreen.Padding = new Padding(0, 60, 0, 60);
+            //    this.pnl_CameraScreen.MinimumSize = new Size(620, 360);
+            //    this.pnl_CameraScreen.Size = new Size(620, 360);
+            //}
+            //else if (this.Size.Width < 1590)
+            //{
+            //    this.pnl_CameraScreen.Padding = new Padding(0, 30, 0, 30);
+            //    this.pnl_CameraScreen.MinimumSize = new Size(960, 540);
+            //    this.pnl_CameraScreen.Size = new Size(960, 540);
+            //}
+            //else
+            //{
+            //    this.pnl_CameraScreen.Padding = new Padding(0, 0, 0, 0);
+            //    this.pnl_CameraScreen.MinimumSize = new Size(1280, 720);
+            //    this.pnl_CameraScreen.Size = new Size(1280, 720);
+            //}
         }
 
         NvSystemModes _cameraState;

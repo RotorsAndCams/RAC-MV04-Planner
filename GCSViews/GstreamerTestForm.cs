@@ -60,6 +60,7 @@ namespace MissionPlanner.GCSViews
 
                 }
             };
+
         }
 
         private void pb_Gstreamer_MouseClick(object sender, MouseEventArgs e)

@@ -112,7 +112,7 @@ namespace MV04.Camera
             get
             {
                 (int major, int minor, int build) version = (0, 0, 0);
-                _VideoControl.VideoControlGetVersion(ref version.major, ref version.minor, ref version.build);
+                //_VideoControl.VideoControlGetVersion(ref version.major, ref version.minor, ref version.build);
                 return version;
             }
         }
@@ -155,6 +155,9 @@ namespace MV04.Camera
         }
 
         private Timer RecordingTimer;
+
+        public static readonly string url = @"videotestsrc pattern=pinwheel ! video/x-raw, width=1280, height=720, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+        public static readonly string urlNight = @"videotestsrc ! video/x-raw, width=1280, height=720, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 
         #endregion
 
@@ -235,7 +238,7 @@ namespace MV04.Camera
             GetIPAndPortFromSettings();
 
             _mavProto = new MavProto(2, CameraControlIP, CameraControlPort, OnReport, OnAck);
-            _VideoControl = new VideoControl();
+            //_VideoControl = new VideoControl();
 
             StartCommunicationWithdevice();
 
@@ -294,6 +297,20 @@ namespace MV04.Camera
         }
 
         #endregion
+
+        System.Threading.Thread currentGS;
+        public void StartGstreamer(string u)
+        {
+             currentGS = GStreamer.StartA(u);
+        }
+
+        public void StopGstreamer()
+        {
+            currentGS.Abort();
+            currentGS = null;
+        }
+
+
 
         #region Methods
 

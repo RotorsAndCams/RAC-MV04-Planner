@@ -67,7 +67,7 @@
             this.lb_AltitudeValue = new System.Windows.Forms.Label();
             this.lb_Agl = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.pnl_CameraScreen = new System.Windows.Forms.Panel();
+            this.pb_CameraGstream = new System.Windows.Forms.Panel();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
@@ -397,15 +397,14 @@
             // tableLayoutPanel2
             // 
             resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
-            this.tableLayoutPanel2.Controls.Add(this.pnl_CameraScreen, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.tlp_ControlsBase, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.pb_CameraGstream, 0, 0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             // 
-            // pnl_CameraScreen
+            // pb_CameraGstream
             // 
-            this.pnl_CameraScreen.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
-            this.pnl_CameraScreen.Name = "pnl_CameraScreen";
+            resources.ApplyResources(this.pb_CameraGstream, "pb_CameraGstream");
+            this.pb_CameraGstream.Name = "pb_CameraGstream";
             // 
             // CameraView
             // 
@@ -475,7 +474,6 @@
         private System.Windows.Forms.TableLayoutPanel tlp_Buttonsection2;
         private System.Windows.Forms.TableLayoutPanel tlp_StatusUpper;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Panel pnl_CameraScreen;
         private System.Windows.Forms.Label lb_GCSSelectedState;
         private System.Windows.Forms.Label lb_GCSSelectedStateValue;
         private System.Windows.Forms.Panel pnl_Drone;
@@ -483,5 +481,6 @@
         private System.Windows.Forms.Panel pnl_Camera;
         private System.Windows.Forms.Button btn_SetAlt;
         private System.Windows.Forms.Button btn_TripSwitchOnOff;
+        private System.Windows.Forms.Panel pb_CameraGstream;
     }
 }
