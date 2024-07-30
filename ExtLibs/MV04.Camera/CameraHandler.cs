@@ -299,7 +299,7 @@ namespace MV04.Camera
         #endregion
 
 
-        string currentStream = url;
+        string currentStream = "";
         System.Threading.Thread currentGS;
         public void StartGstreamer(string u)
         {
@@ -311,9 +311,13 @@ namespace MV04.Camera
 
         public void StopGstreamer()
         {
-            currentGS.Abort();
-            System.Threading.Thread.Sleep(100);
-            currentGS = null;
+            if(currentGS != null)
+            {
+                currentGS.Abort();
+                System.Threading.Thread.Sleep(100);
+                currentGS = null;
+            }
+            
         }
 
 

@@ -1545,13 +1545,26 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-        private void tableLayoutPanel2_Paint(object sender, PaintEventArgs e)
-        {
 
-        }
-
-        private void pb_CameraGstream_DoubleClick(object sender, EventArgs e)
+        private void pb_CameraGstream_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+            if (e.X <= 0 || e.Y <= 0)
+                return;
+
+            //if (IsCameraTrackingModeActive)
+            //    return;
+
+            IsCameraTrackingModeActive = true;
+
+            //CameraHandler.Instance.StartTracking(new Point(e.X, e.Y));
+
+            Point _trackPos = new Point(e.X, e.Y);
+
+            // Constrain tracking pos
+            _trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
+            _trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
+
+            MessageBox.Show("(X: " + e.X + " ," + "Y: " + e.Y + ")\n" + "(CX: " + _trackPos.X + ", " + _trackPos.Y + ")");
 
         }
     }

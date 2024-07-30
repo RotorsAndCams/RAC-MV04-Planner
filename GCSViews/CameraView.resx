@@ -136,7 +136,7 @@
     <value>154, 3</value>
   </data>
   <data name="btn_StopTracking.Size" type="System.Drawing.Size, System.Drawing">
-    <value>146, 73</value>
+    <value>146, 75</value>
   </data>
   <data name="btn_StopTracking.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -166,7 +166,7 @@
     <value>3, 3</value>
   </data>
   <data name="btn_ResetZoom.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 73</value>
+    <value>145, 75</value>
   </data>
   <data name="btn_ResetZoom.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -190,7 +190,7 @@
     <value>Fill</value>
   </data>
   <data name="tlp_Buttonsection2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 344</value>
+    <value>3, 354</value>
   </data>
   <data name="tlp_Buttonsection2.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>3, 0, 3, 3</value>
@@ -199,7 +199,7 @@
     <value>1</value>
   </data>
   <data name="tlp_Buttonsection2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>303, 79</value>
+    <value>303, 81</value>
   </data>
   <data name="tlp_Buttonsection2.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -235,7 +235,7 @@
     <value>3, 3</value>
   </data>
   <data name="btn_TripSwitchOnOff.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 78</value>
+    <value>145, 81</value>
   </data>
   <data name="btn_TripSwitchOnOff.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -265,7 +265,7 @@
     <value>154, 3</value>
   </data>
   <data name="btn_ChangeCrosshair.Size" type="System.Drawing.Size, System.Drawing">
-    <value>146, 78</value>
+    <value>146, 81</value>
   </data>
   <data name="btn_ChangeCrosshair.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -289,10 +289,10 @@
     <value>NoControl</value>
   </data>
   <data name="btn_FullScreen.Location" type="System.Drawing.Point, System.Drawing">
-    <value>154, 87</value>
+    <value>154, 90</value>
   </data>
   <data name="btn_FullScreen.Size" type="System.Drawing.Size, System.Drawing">
-    <value>146, 79</value>
+    <value>146, 81</value>
   </data>
   <data name="btn_FullScreen.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -319,10 +319,10 @@
     <value>NoControl</value>
   </data>
   <data name="btn_FPVCameraMode.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 87</value>
+    <value>3, 90</value>
   </data>
   <data name="btn_FPVCameraMode.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 79</value>
+    <value>145, 81</value>
   </data>
   <data name="btn_FPVCameraMode.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -346,7 +346,7 @@
     <value>Fill</value>
   </data>
   <data name="tlp_ButtonSection1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 175</value>
+    <value>3, 180</value>
   </data>
   <data name="tlp_ButtonSection1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>3, 3, 3, 0</value>
@@ -355,7 +355,7 @@
     <value>1</value>
   </data>
   <data name="tlp_ButtonSection1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>303, 169</value>
+    <value>303, 174</value>
   </data>
   <data name="tlp_ButtonSection1.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -391,7 +391,7 @@
     <value>0, 0</value>
   </data>
   <data name="btn_Settings.Size" type="System.Drawing.Size, System.Drawing">
-    <value>146, 160</value>
+    <value>146, 165</value>
   </data>
   <data name="btn_Settings.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -418,7 +418,7 @@
     <value>154, 3</value>
   </data>
   <data name="pnl_SettingsPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>146, 160</value>
+    <value>146, 165</value>
   </data>
   <data name="pnl_SettingsPanel.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -478,7 +478,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_GCSSelectedStateValue.Location" type="System.Drawing.Point, System.Drawing">
-    <value>63, 66</value>
+    <value>63, 70</value>
   </data>
   <data name="lb_GCSSelectedStateValue.Size" type="System.Drawing.Size, System.Drawing">
     <value>53, 13</value>
@@ -541,10 +541,10 @@
     <value>Fill</value>
   </data>
   <data name="pnl_GCS.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 69</value>
+    <value>3, 73</value>
   </data>
   <data name="pnl_GCS.Size" type="System.Drawing.Size, System.Drawing">
-    <value>54, 25</value>
+    <value>54, 24</value>
   </data>
   <data name="pnl_GCS.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -604,7 +604,7 @@
     <value>3, 3</value>
   </data>
   <data name="pnl_Drone.Size" type="System.Drawing.Size, System.Drawing">
-    <value>54, 27</value>
+    <value>54, 29</value>
   </data>
   <data name="pnl_Drone.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
@@ -661,10 +661,10 @@
     <value>Fill</value>
   </data>
   <data name="pnl_Camera.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 36</value>
+    <value>3, 38</value>
   </data>
   <data name="pnl_Camera.Size" type="System.Drawing.Size, System.Drawing">
-    <value>54, 27</value>
+    <value>54, 29</value>
   </data>
   <data name="pnl_Camera.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -688,7 +688,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_CameraStatusValue.Location" type="System.Drawing.Point, System.Drawing">
-    <value>63, 33</value>
+    <value>63, 35</value>
   </data>
   <data name="lb_CameraStatusValue.Size" type="System.Drawing.Size, System.Drawing">
     <value>49, 13</value>
@@ -721,7 +721,7 @@
     <value>3</value>
   </data>
   <data name="tlp_DeviceStatusInfo.Size" type="System.Drawing.Size, System.Drawing">
-    <value>139, 97</value>
+    <value>139, 100</value>
   </data>
   <data name="tlp_DeviceStatusInfo.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -754,7 +754,7 @@
     <value>99, 3</value>
   </data>
   <data name="pb_DroneTakeOff.Size" type="System.Drawing.Size, System.Drawing">
-    <value>43, 51</value>
+    <value>43, 53</value>
   </data>
   <data name="pb_DroneTakeOff.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -781,7 +781,7 @@
     <value>51, 3</value>
   </data>
   <data name="pb_InfraLight.Size" type="System.Drawing.Size, System.Drawing">
-    <value>42, 51</value>
+    <value>42, 53</value>
   </data>
   <data name="pb_InfraLight.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -808,7 +808,7 @@
     <value>3, 3</value>
   </data>
   <data name="pb_PositionIndicator.Size" type="System.Drawing.Size, System.Drawing">
-    <value>42, 51</value>
+    <value>42, 53</value>
   </data>
   <data name="pb_PositionIndicator.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -829,7 +829,7 @@
     <value>Fill</value>
   </data>
   <data name="tlp_SensorLights.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 103</value>
+    <value>0, 106</value>
   </data>
   <data name="tlp_SensorLights.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -838,7 +838,7 @@
     <value>1</value>
   </data>
   <data name="tlp_SensorLights.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 57</value>
+    <value>145, 59</value>
   </data>
   <data name="tlp_SensorLights.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -871,7 +871,7 @@
     <value>2</value>
   </data>
   <data name="tlp_StatusUpper.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 160</value>
+    <value>145, 165</value>
   </data>
   <data name="tlp_StatusUpper.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -898,7 +898,7 @@
     <value>3, 3</value>
   </data>
   <data name="pnl_DeviceState.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 160</value>
+    <value>145, 165</value>
   </data>
   <data name="pnl_DeviceState.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -925,7 +925,7 @@
     <value>1</value>
   </data>
   <data name="tlp_InfoBase.Size" type="System.Drawing.Size, System.Drawing">
-    <value>303, 166</value>
+    <value>303, 171</value>
   </data>
   <data name="tlp_InfoBase.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -955,7 +955,7 @@
     <value>154, 3</value>
   </data>
   <data name="cs_ColorSliderAltitude.Size" type="System.Drawing.Size, System.Drawing">
-    <value>146, 321</value>
+    <value>146, 329</value>
   </data>
   <data name="cs_ColorSliderAltitude.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -967,7 +967,7 @@
     <value>cs_ColorSliderAltitude</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.8977.18217, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.8977.21145, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Parent" xml:space="preserve">
     <value>tlp_AGLContainer</value>
@@ -988,13 +988,13 @@
     <value>NoControl</value>
   </data>
   <data name="btn_SetAlt.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 219</value>
+    <value>0, 228</value>
   </data>
   <data name="btn_SetAlt.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
   <data name="btn_SetAlt.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 102</value>
+    <value>145, 101</value>
   </data>
   <data name="btn_SetAlt.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -1024,13 +1024,13 @@
     <value>NoControl</value>
   </data>
   <data name="btn_Down.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 146</value>
+    <value>0, 152</value>
   </data>
   <data name="btn_Down.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
   <data name="btn_Down.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 73</value>
+    <value>145, 76</value>
   </data>
   <data name="btn_Down.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -1063,7 +1063,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="btn_Up.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 73</value>
+    <value>145, 76</value>
   </data>
   <data name="btn_Up.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -1096,7 +1096,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_AltitudeValue.Location" type="System.Drawing.Point, System.Drawing">
-    <value>24, 33</value>
+    <value>24, 35</value>
   </data>
   <data name="lb_AltitudeValue.Size" type="System.Drawing.Size, System.Drawing">
     <value>90, 32</value>
@@ -1132,7 +1132,7 @@
     <value>NoControl</value>
   </data>
   <data name="lb_Agl.Location" type="System.Drawing.Point, System.Drawing">
-    <value>38, 1</value>
+    <value>38, 3</value>
   </data>
   <data name="lb_Agl.Size" type="System.Drawing.Size, System.Drawing">
     <value>62, 32</value>
@@ -1159,13 +1159,13 @@
     <value>Fill</value>
   </data>
   <data name="tlp_AGLData.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 76</value>
+    <value>3, 79</value>
   </data>
   <data name="tlp_AGLData.RowCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
   <data name="tlp_AGLData.Size" type="System.Drawing.Size, System.Drawing">
-    <value>139, 67</value>
+    <value>139, 70</value>
   </data>
   <data name="tlp_AGLData.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -1195,7 +1195,7 @@
     <value>4</value>
   </data>
   <data name="tlp_AGLIncrement.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 321</value>
+    <value>145, 329</value>
   </data>
   <data name="tlp_AGLIncrement.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -1219,13 +1219,13 @@
     <value>Fill</value>
   </data>
   <data name="tlp_AGLContainer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 429</value>
+    <value>3, 441</value>
   </data>
   <data name="tlp_AGLContainer.RowCount" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
   <data name="tlp_AGLContainer.Size" type="System.Drawing.Size, System.Drawing">
-    <value>303, 327</value>
+    <value>303, 335</value>
   </data>
   <data name="tlp_AGLContainer.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -1255,7 +1255,7 @@
     <value>4</value>
   </data>
   <data name="tlp_ControlsBase.Size" type="System.Drawing.Size, System.Drawing">
-    <value>309, 759</value>
+    <value>309, 779</value>
   </data>
   <data name="tlp_ControlsBase.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -1267,7 +1267,7 @@
     <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;tlp_ControlsBase.Parent" xml:space="preserve">
-    <value>tableLayoutPanel2</value>
+    <value>tlp_CVBase</value>
   </data>
   <data name="&gt;&gt;tlp_ControlsBase.ZOrder" xml:space="preserve">
     <value>0</value>
@@ -1275,11 +1275,11 @@
   <data name="tlp_ControlsBase.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
     <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="tlp_Buttonsection2" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="tlp_ButtonSection1" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="tlp_InfoBase" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="tlp_AGLContainer" Row="3" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100" /&gt;&lt;Rows Styles="Percent,22,72727,Percent,22,72727,Percent,10,90909,Percent,43,63636" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
-  <data name="tableLayoutPanel2.ColumnCount" type="System.Int32, mscorlib">
+  <data name="tlp_CVBase.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
   <data name="pb_CameraGstream.BackgroundImageLayout" type="System.Windows.Forms.ImageLayout, System.Windows.Forms">
-    <value>None</value>
+    <value>Stretch</value>
   </data>
   <data name="pb_CameraGstream.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -1288,10 +1288,16 @@
     <value>NoControl</value>
   </data>
   <data name="pb_CameraGstream.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 3</value>
+    <value>0, 0</value>
+  </data>
+  <data name="pb_CameraGstream.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 0</value>
   </data>
   <data name="pb_CameraGstream.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1585, 759</value>
+    <value>1591, 785</value>
+  </data>
+  <data name="pb_CameraGstream.SizeMode" type="System.Windows.Forms.PictureBoxSizeMode, System.Windows.Forms">
+    <value>CenterImage</value>
   </data>
   <data name="pb_CameraGstream.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -1303,61 +1309,40 @@
     <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;pb_CameraGstream.Parent" xml:space="preserve">
-    <value>tableLayoutPanel2</value>
+    <value>tlp_CVBase</value>
   </data>
   <data name="&gt;&gt;pb_CameraGstream.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="panel1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 768</value>
-  </data>
-  <data name="panel1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 14</value>
-  </data>
-  <data name="panel1.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;panel1.Name" xml:space="preserve">
-    <value>panel1</value>
-  </data>
-  <data name="&gt;&gt;panel1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;panel1.Parent" xml:space="preserve">
-    <value>tableLayoutPanel2</value>
-  </data>
-  <data name="&gt;&gt;panel1.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="tableLayoutPanel2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+  <data name="tlp_CVBase.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
-  <data name="tableLayoutPanel2.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="tlp_CVBase.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
-  <data name="tableLayoutPanel2.RowCount" type="System.Int32, mscorlib">
-    <value>2</value>
+  <data name="tlp_CVBase.RowCount" type="System.Int32, mscorlib">
+    <value>1</value>
   </data>
-  <data name="tableLayoutPanel2.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="tlp_CVBase.Size" type="System.Drawing.Size, System.Drawing">
     <value>1906, 785</value>
   </data>
-  <data name="tableLayoutPanel2.TabIndex" type="System.Int32, mscorlib">
+  <data name="tlp_CVBase.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
   </data>
-  <data name="&gt;&gt;tableLayoutPanel2.Name" xml:space="preserve">
-    <value>tableLayoutPanel2</value>
+  <data name="&gt;&gt;tlp_CVBase.Name" xml:space="preserve">
+    <value>tlp_CVBase</value>
   </data>
-  <data name="&gt;&gt;tableLayoutPanel2.Type" xml:space="preserve">
+  <data name="&gt;&gt;tlp_CVBase.Type" xml:space="preserve">
     <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tableLayoutPanel2.Parent" xml:space="preserve">
+  <data name="&gt;&gt;tlp_CVBase.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;tableLayoutPanel2.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;tlp_CVBase.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="tableLayoutPanel2.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="tlp_ControlsBase" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="pb_CameraGstream" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="panel1" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100,Absolute,315" /&gt;&lt;Rows Styles="Percent,100,Absolute,20" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  <data name="tlp_CVBase.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="tlp_ControlsBase" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="pb_CameraGstream" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100,Absolute,315" /&gt;&lt;Rows Styles="Percent,100,Absolute,20" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
