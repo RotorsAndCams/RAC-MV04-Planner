@@ -23,6 +23,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.RightsManagement;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static IronPython.Modules._ast;
@@ -48,7 +49,7 @@ namespace MissionPlanner.GCSViews
         Graphics VideoGraphics;
         HudElements HudElements = new HudElements();
 
-        Timer FetchHudDataTimer = new Timer();
+        System.Windows.Forms.Timer FetchHudDataTimer = new System.Windows.Forms.Timer();
 
         (int major, int minor, int build) CameraControlDLLVersion;
 
@@ -145,13 +146,18 @@ namespace MissionPlanner.GCSViews
             else
                 this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
 
-
             //timer for camera switchoff
             _cameraSwitchOffTimer = new System.Timers.Timer();
             _cameraSwitchOffTimer.Elapsed += _cameraSwitchOffTimer_Elapsed;
             _cameraSwitchOffTimer.Interval = 30000;
             _cameraSwitchOffTimer.Enabled = true;
-            _gr = pb_CameraGstream.CreateGraphics();
+
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.UserPaint |
+                ControlStyles.OptimizedDoubleBuffer,
+                true);
+
+            this.DoubleBuffered = true;
 
             pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
 
@@ -161,50 +167,49 @@ namespace MissionPlanner.GCSViews
                 {
                     if (image == null) return;
 
-                    img = (Image)new Bitmap(image.Width, image.Height, 4 * image.Width,
+                    img = new Bitmap(image.Width, image.Height, 4 * image.Width,
                                 System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
                                 image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
                                     .Scan0);
+
+                    if (img == null) return;
+
                     if (InvokeRequired)
-                        Invoke(new Action(() => pb_CameraGstream.Refresh()));
+                        Invoke(new Action(() => pb_CameraGstream.Invalidate()));
                     else
-                        pb_CameraGstream.Refresh();
+                        pb_CameraGstream.Invalidate();
 
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show("Gst error" + ex.Message);
                 }
-                
-                
             };
 
         }
 
-
-        System.Drawing.Image img;
+        Image img;
+        private readonly object _bgimagelock = new object();
 
         private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
         {
-            
             try
             {
-                if (img != null) 
+                if (img != null)
                 {
                     lock (this._bgimagelock)
                     {
-                        _gr.DrawImage(img, 0, 0, img.Width, img.Height);
+                        e.Graphics.DrawImage(img, 0, 0, img.Width, img.Height);
                     }
                 }
             }
             catch (Exception ex)
             {
-
+                MessageBox.Show($"{ex.Message}");
+                img.Dispose();
+                img = null;
             }
         }
-
-        private readonly object _bgimagelock = new object();
-        private Graphics _gr;
 
         private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -1536,9 +1541,18 @@ namespace MissionPlanner.GCSViews
 
 
 
+
+
         #endregion
 
-        
+        private void tableLayoutPanel2_Paint(object sender, PaintEventArgs e)
+        {
 
+        }
+
+        private void pb_CameraGstream_DoubleClick(object sender, EventArgs e)
+        {
+
+        }
     }
 }

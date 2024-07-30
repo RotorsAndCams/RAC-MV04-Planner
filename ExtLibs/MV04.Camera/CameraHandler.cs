@@ -298,15 +298,21 @@ namespace MV04.Camera
 
         #endregion
 
+
+        string currentStream = url;
         System.Threading.Thread currentGS;
         public void StartGstreamer(string u)
         {
-             currentGS = GStreamer.StartA(u);
+            if (u == currentStream)
+                return;
+            currentStream = u;
+            currentGS = GStreamer.StartA(u);
         }
 
         public void StopGstreamer()
         {
             currentGS.Abort();
+            System.Threading.Thread.Sleep(100);
             currentGS = null;
         }
 
