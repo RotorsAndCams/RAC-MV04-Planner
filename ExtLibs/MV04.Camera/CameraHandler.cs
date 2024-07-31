@@ -156,8 +156,8 @@ namespace MV04.Camera
 
         private Timer RecordingTimer;
 
-        public static readonly string url = @"videotestsrc pattern=pinwheel ! video/x-raw, width=1280, height=720, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
-        public static readonly string urlNight = @"videotestsrc ! video/x-raw, width=1280, height=720, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+        public static readonly string url = @"videotestsrc pattern=pinwheel ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+        public static readonly string urlNight = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 
         #endregion
 

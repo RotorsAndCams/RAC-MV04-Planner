@@ -441,6 +441,7 @@
             this.tlp_AGLData.ResumeLayout(false);
             this.tlp_AGLData.PerformLayout();
             this.tlp_CVBase.ResumeLayout(false);
+            this.tlp_CVBase.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_CameraGstream)).EndInit();
             this.ResumeLayout(false);
 

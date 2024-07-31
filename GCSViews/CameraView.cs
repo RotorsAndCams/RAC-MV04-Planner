@@ -46,7 +46,7 @@ namespace MissionPlanner.GCSViews
         new Font DefaultFont;
         Brush DefaultBrush;
         Rectangle VideoRectangle;
-        Graphics VideoGraphics;
+        Graphics gr;
         HudElements HudElements = new HudElements();
 
         System.Windows.Forms.Timer FetchHudDataTimer = new System.Windows.Forms.Timer();
@@ -190,7 +190,7 @@ namespace MissionPlanner.GCSViews
 
         Image img;
         private readonly object _bgimagelock = new object();
-
+        Graphics _gr;
         private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
         {
             try
@@ -199,8 +199,13 @@ namespace MissionPlanner.GCSViews
                 {
                     lock (this._bgimagelock)
                     {
-                        e.Graphics.DrawImage(img, 0, 0, img.Width, img.Height);
+                        e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
                     }
+
+                    if(_gr != e.Graphics)
+                        _gr = e.Graphics;
+
+                    OnNewFrame(img.Width, img.Height);
                 }
             }
             catch (Exception ex)
@@ -580,6 +585,123 @@ namespace MissionPlanner.GCSViews
 
         #region Drawing
 
+        private void OnNewFrame(int width, int height)
+        {
+            // frame_buf is 1920 x 1080 x 3 long
+            // real frame is width x height
+
+            // Create drawing objects
+            
+            _gr.InterpolationMode = InterpolationMode.High;
+            _gr.SmoothingMode = SmoothingMode.HighQuality;
+            _gr.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+            _gr.CompositingQuality = CompositingQuality.HighQuality;
+            VideoRectangle = new Rectangle()
+            {
+                X = (int)Math.Round(_gr.VisibleClipBounds.X),
+                Y = (int)Math.Round(_gr.VisibleClipBounds.Y),
+                Width = (int)Math.Round(_gr.VisibleClipBounds.Width),
+                Height = (int)Math.Round(_gr.VisibleClipBounds.Height)
+            };
+
+            // Datetime
+            Rectangle Datetime = DrawText(HudElements.Time, new Point(3, 3), ContentAlignment.TopLeft, HorizontalAlignment.Left);
+
+            // Battery
+            Rectangle Battery = DrawText(HudElements.Battery, new Point(VideoRectangle.Width - 3, 3), ContentAlignment.TopRight, HorizontalAlignment.Right);
+
+            int topLeft = Datetime.Right;
+            int topStep = ((Battery.Left - topLeft) / 4) / 2;
+
+            // AGL
+            DrawText(HudElements.AGL, new Point(topLeft + topStep, 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
+
+            // Velocity
+            DrawText(HudElements.Velocity, new Point(topLeft + (3 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
+
+            // TGD
+            DrawText(HudElements.TGD, new Point(topLeft + (5 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
+
+            // Signal strengths
+            DrawText(HudElements.SignalStrengths, new Point(topLeft + (7 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Right);
+
+            // Camera info
+            DrawText(HudElements.Camera, new Point(3, Datetime.Bottom + 20), ContentAlignment.TopLeft, HorizontalAlignment.Right);
+
+            // Next waypoint
+            Rectangle nextWP = DrawText(HudElements.ToWaypoint, new Point(VideoRectangle.Width - 3, Battery.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right);
+
+            // Operator distance
+            DrawText(HudElements.FromOperator, new Point(VideoRectangle.Width - 3, nextWP.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right);
+
+            // Coords
+            DrawText(HudElements.DroneGps, new Point(0, VideoRectangle.Height - 3), ContentAlignment.BottomLeft, HorizontalAlignment.Left);
+            DrawText(HudElements.TargetGps, new Point(VideoRectangle.Width - 3, VideoRectangle.Height - 3), ContentAlignment.BottomRight, HorizontalAlignment.Right);
+
+            #region Crosshairs
+            int lineHeight = (int)Math.Round(VideoRectangle.Height * 0.1);
+            Pen linePen = new Pen(Color.Red, 1);
+
+            if (HudElements.Crosshairs == CrosshairsType.Plus) // Plus
+            {
+                _gr.DrawLine(linePen,
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    (VideoRectangle.Width / 2) + lineHeight, VideoRectangle.Height / 2);
+                _gr.DrawLine(linePen,
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    VideoRectangle.Width / 2, (VideoRectangle.Height / 2) + lineHeight);
+                _gr.DrawLine(linePen,
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    (VideoRectangle.Width / 2) - lineHeight, VideoRectangle.Height / 2);
+                _gr.DrawLine(linePen,
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    VideoRectangle.Width / 2, (VideoRectangle.Height / 2) - lineHeight);
+            }
+            else // Horizontal
+            {
+                // Draw center ^ character
+                _gr.DrawLine(new Pen(Color.Red, 3),
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    (VideoRectangle.Width / 2) - Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
+                _gr.DrawLine(new Pen(Color.Red, 3),
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    (VideoRectangle.Width / 2) + Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
+
+                for (int i = 1; i <= 3; i++)
+                {
+                    // Draw lines to the right
+                    _gr.DrawLine(linePen,
+                        (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
+                        (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
+
+                    // Draw lines to the left
+                    _gr.DrawLine(linePen,
+                        (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
+                        (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
+                }
+
+                // Draw number under first right line
+                DrawText(HudElements.LineDistance.ToString(), new Point((VideoRectangle.Width / 2) + HudElements.LineSpacing, (VideoRectangle.Height / 2) + lineHeight + 3), ContentAlignment.TopCenter, HorizontalAlignment.Center, new Font(DefaultFont.FontFamily, this.Font.SizeInPoints, FontStyle.Regular));
+            }
+            #endregion
+
+            // OSDDebug
+            if (OSDDebug && !string.IsNullOrWhiteSpace(OSDDebugLines[0]))
+            {
+                string text = OSDDebugLines[0];
+                for (int i = 1; i < OSDDebugLines.Length; i++)
+                {
+                    if (!string.IsNullOrWhiteSpace(OSDDebugLines[i]))
+                    {
+                        text += "\n" + OSDDebugLines[i];
+                    }
+                }
+
+                DrawText(text, new Point(VideoRectangle.Width - 3, VideoRectangle.Height / 2), ContentAlignment.TopRight, HorizontalAlignment.Left, new Font(DefaultFont.FontFamily, DefaultFont.Size * 0.75f), Brushes.Lime);
+            }
+        }
+
+
         /// <summary>
         /// Handles every new frame
         /// </summary>
@@ -589,17 +711,17 @@ namespace MissionPlanner.GCSViews
             // real frame is width x height
 
             // Create drawing objects
-            VideoGraphics = Graphics.FromImage(new Bitmap(width, height, 3 * width, System.Drawing.Imaging.PixelFormat.Format24bppRgb, Marshal.UnsafeAddrOfPinnedArrayElement(frame_buf, 0)));
-            VideoGraphics.InterpolationMode = InterpolationMode.High;
-            VideoGraphics.SmoothingMode = SmoothingMode.HighQuality;
-            VideoGraphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-            VideoGraphics.CompositingQuality = CompositingQuality.HighQuality;
+            gr = Graphics.FromImage(new Bitmap(width, height, 3 * width, System.Drawing.Imaging.PixelFormat.Format24bppRgb, Marshal.UnsafeAddrOfPinnedArrayElement(frame_buf, 0)));
+            gr.InterpolationMode = InterpolationMode.High;
+            gr.SmoothingMode = SmoothingMode.HighQuality;
+            gr.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+            gr.CompositingQuality = CompositingQuality.HighQuality;
             VideoRectangle = new Rectangle()
             {
-                X = (int)Math.Round(VideoGraphics.VisibleClipBounds.X),
-                Y = (int)Math.Round(VideoGraphics.VisibleClipBounds.Y),
-                Width = (int)Math.Round(VideoGraphics.VisibleClipBounds.Width),
-                Height = (int)Math.Round(VideoGraphics.VisibleClipBounds.Height)
+                X = (int)Math.Round(gr.VisibleClipBounds.X),
+                Y = (int)Math.Round(gr.VisibleClipBounds.Y),
+                Width = (int)Math.Round(gr.VisibleClipBounds.Width),
+                Height = (int)Math.Round(gr.VisibleClipBounds.Height)
             };
 
             if (status == stream_status.StreamDetectionOk)
@@ -644,38 +766,38 @@ namespace MissionPlanner.GCSViews
 
                 if (HudElements.Crosshairs == CrosshairsType.Plus) // Plus
                 {
-                    VideoGraphics.DrawLine(linePen,
+                    gr.DrawLine(linePen,
                         VideoRectangle.Width / 2, VideoRectangle.Height / 2,
                         (VideoRectangle.Width / 2) + lineHeight, VideoRectangle.Height / 2);
-                    VideoGraphics.DrawLine(linePen,
+                    gr.DrawLine(linePen,
                         VideoRectangle.Width / 2, VideoRectangle.Height / 2,
                         VideoRectangle.Width / 2, (VideoRectangle.Height / 2) + lineHeight);
-                    VideoGraphics.DrawLine(linePen,
+                    gr.DrawLine(linePen,
                         VideoRectangle.Width / 2, VideoRectangle.Height / 2,
                         (VideoRectangle.Width / 2) - lineHeight, VideoRectangle.Height / 2);
-                    VideoGraphics.DrawLine(linePen,
+                    gr.DrawLine(linePen,
                         VideoRectangle.Width / 2, VideoRectangle.Height / 2,
                         VideoRectangle.Width / 2, (VideoRectangle.Height / 2) - lineHeight);
                 }
                 else // Horizontal
                 {
                     // Draw center ^ character
-                    VideoGraphics.DrawLine(new Pen(Color.Red, 3),
+                    gr.DrawLine(new Pen(Color.Red, 3),
                         VideoRectangle.Width / 2, VideoRectangle.Height / 2,
                         (VideoRectangle.Width / 2) - Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-                    VideoGraphics.DrawLine(new Pen(Color.Red, 3),
+                    gr.DrawLine(new Pen(Color.Red, 3),
                         VideoRectangle.Width / 2, VideoRectangle.Height / 2,
                         (VideoRectangle.Width / 2) + Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
 
                     for (int i = 1; i <= 3; i++)
                     {
                         // Draw lines to the right
-                        VideoGraphics.DrawLine(linePen,
+                        gr.DrawLine(linePen,
                             (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
                             (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
 
                         // Draw lines to the left
-                        VideoGraphics.DrawLine(linePen,
+                        gr.DrawLine(linePen,
                             (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
                             (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
                     }
@@ -688,7 +810,7 @@ namespace MissionPlanner.GCSViews
             else // Stream is not OK, Stream needs therapy
             {
                 // Clean screen
-                VideoGraphics.Clear(Color.FromArgb(0, 128, 0));
+                gr.Clear(Color.FromArgb(0, 128, 0));
 
                 // Print status message
                 string message = "";
@@ -751,7 +873,7 @@ namespace MissionPlanner.GCSViews
             textFont = textFont ?? DefaultFont;
             textBrush = textBrush ?? DefaultBrush;
             drawArea = drawArea ?? VideoRectangle;
-            drawGraphics = drawGraphics ?? VideoGraphics;
+            drawGraphics = _gr;
 
             // Check position
             if (position.X >= 0
