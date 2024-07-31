@@ -186,6 +186,7 @@ namespace MissionPlanner.GCSViews
                 }
             };
 
+
         }
 
         Image img;
@@ -1661,10 +1662,6 @@ namespace MissionPlanner.GCSViews
 
         }
 
-
-
-
-
         #endregion
 
 
@@ -1673,20 +1670,20 @@ namespace MissionPlanner.GCSViews
             if (e.X <= 0 || e.Y <= 0)
                 return;
 
-            //if (IsCameraTrackingModeActive)
-            //    return;
+            if (IsCameraTrackingModeActive)
+                return;
 
             IsCameraTrackingModeActive = true;
 
-            //CameraHandler.Instance.StartTracking(new Point(e.X, e.Y));
+            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y));
 
-            Point _trackPos = new Point(e.X, e.Y);
+            //Point _trackPos = new Point(e.X, e.Y);
 
-            // Constrain tracking pos
-            _trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
-            _trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
+            //// Constrain tracking pos
+            //_trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
+            //_trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
 
-            MessageBox.Show("(X: " + e.X + " ," + "Y: " + e.Y + ")\n" + "(CX: " + _trackPos.X + ", " + _trackPos.Y + ")");
+            //MessageBox.Show("(X: " + e.X + " ," + "Y: " + e.Y + ")\n" + "(CX: " + _trackPos.X + ", " + _trackPos.Y + ")");
 
         }
     }

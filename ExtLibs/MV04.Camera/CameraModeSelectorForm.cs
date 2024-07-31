@@ -42,32 +42,36 @@ namespace MV04.Camera
             InitializeComponent();
             BringToFront();
 
-            comboBox1.Items.AddRange(Enum.GetNames(typeof(enum_MV04_CameraModes)));
+            comboBox1.Items.AddRange(Enum.GetNames(typeof(MavProto.NvSystemModes)));
             comboBox1.SelectedIndex = 0;
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch ((enum_MV04_CameraModes)Enum.Parse(typeof(enum_MV04_CameraModes), comboBox1.SelectedItem.ToString()))
-            {
-                case enum_MV04_CameraModes.Stow:
-                case enum_MV04_CameraModes.Pilot:
-                case enum_MV04_CameraModes.HoldCoordinate:
-                case enum_MV04_CameraModes.Observation:
-                case enum_MV04_CameraModes.GRR:
-                case enum_MV04_CameraModes.Nadir:
-                case enum_MV04_CameraModes.UnstabilizedPosition:
-                    CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), comboBox1.SelectedItem.ToString()));
-                    break;
-                case enum_MV04_CameraModes.Tracking:
-                    CameraHandler.Instance.StartTracking(null); // null = track to screen center
-                    break;
-                case enum_MV04_CameraModes.Retract:
-                    CameraHandler.Instance.Retract();
-                    break;
-                default: break;
-            }
+            //switch ((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), comboBox1.SelectedItem.ToString()))
+            //{
+            //    case MavProto.NvSystemModes.Stow:
+            //    case MavProto.NvSystemModes.Pilot:
+            //    case MavProto.NvSystemModes.HoldCoordinate:
+            //    case MavProto.NvSystemModes.Observation:
+            //    case MavProto.NvSystemModes.GRR:
+            //    case MavProto.NvSystemModes.Nadir:
+            //    case MavProto.NvSystemModes.UnstabilizedPosition:
+            //        CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), comboBox1.SelectedItem.ToString()));
+            //        break;
+            //    case MavProto.NvSystemModes.Tracking:
+            //        CameraHandler.Instance.StartTracking(null); // null = track to screen center
+            //        break;
+            //    //case MavProto.NvSystemModes.:
+            //    //    CameraHandler.Instance.Retract();
+            //        break;
+            //    default: break;
+            //}
+            CameraHandler.Instance.SetMode((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), comboBox1.SelectedItem.ToString()));
+
+            if(((MavProto.NvSystemModes)Enum.Parse(typeof(MavProto.NvSystemModes), comboBox1.SelectedItem.ToString()) == MavProto.NvSystemModes.Tracking))
+                CameraHandler.Instance.StartTracking(null);
         }
     }
 }

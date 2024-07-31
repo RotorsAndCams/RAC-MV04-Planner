@@ -78,19 +78,11 @@ namespace MV04.Camera
         private void btn_DayCamera_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.SetImageSensor(false); //Set to Day camera
-
-            CameraHandler.Instance.StopGstreamer();
-            System.Threading.Thread.Sleep(100);
-            CameraHandler.Instance.StartGstreamer(CameraHandler.url);
         }
 
         private void btn_NightCamera_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.SetImageSensor(true); //Set to Night camera
-
-            CameraHandler.Instance.StopGstreamer();
-            System.Threading.Thread.Sleep(100);
-            CameraHandler.Instance.StartGstreamer(CameraHandler.urlNight);
         }
 
         private void btn_NUC_Click(object sender, EventArgs e)
