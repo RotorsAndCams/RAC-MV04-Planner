@@ -186,7 +186,29 @@ namespace MissionPlanner.GCSViews
                 }
             };
 
+            this.FormClosing += CameraView_FormClosing;
+        }
 
+        private void CameraView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
+                _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
+                pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
+                LEDStateHandler.LedStateChanged -= LEDStateHandler_LedStateChanged;
+                StateHandler.MV04StateChange -= StateHandler_MV04StateChange;
+
+                GStreamer.StopAll();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            
+
+
+            
         }
 
         Image img;
@@ -1332,45 +1354,46 @@ namespace MissionPlanner.GCSViews
 
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
         {
-
-            var status = e.Report.systemMode;
-
-            #region test
-
-            var test = e.Report.status_flags;
-
-            var stg = (NvSystemModes)((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]).systemMode;
-
-            _cameraState = stg;
-
-            #endregion
-
-            string st = ((MavProto.NvSystemModes)status).ToString();
-
-            //Test: Set Camera Status
-            if (InvokeRequired)
+            try
             {
-                Invoke(new Action(() => { SetCameraStatusValue(st); }));
+                var status = e.Report.systemMode;
+
+                #region test
+
+                var test = e.Report.status_flags;
+
+                var stg = (NvSystemModes)((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]).systemMode;
+
+                _cameraState = stg;
+
+                #endregion
+
+                string st = ((MavProto.NvSystemModes)status).ToString();
+
+
+                //Test: Set Camera Status
+                if (InvokeRequired)
+                {
+                    Invoke(new Action(() => { SetCameraStatusValue(st); }));
+                }
+                else
+                    SetCameraStatusValue(st);
+
+
+                //Test: Set Drone Status
+                if (InvokeRequired)
+                {
+                    Invoke(new Action(() => { SetDroneStatusValue(); }));
+                }
+                else
+                    SetDroneStatusValue();
             }
-            else
-                SetCameraStatusValue(st);
-
-
-            //Test: Set Drone Status
-            if (InvokeRequired)
+            catch(Exception ex)
             {
-                Invoke(new Action(() => { SetDroneStatusValue(); }));
+                Console.WriteLine(ex.ToString());
             }
-            else
-                SetDroneStatusValue();
+            
 
-            ////Test: Set GCS Status
-            //if (InvokeRequired)
-            //{
-            //    Invoke(new Action(() => SetGCSStatus()));
-            //}
-            //else
-            //    SetGCSStatus();
         }
 
 

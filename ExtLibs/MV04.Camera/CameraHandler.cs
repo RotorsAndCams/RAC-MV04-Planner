@@ -693,7 +693,7 @@ namespace MV04.Camera
                 &&
                 (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, 0, 0, (int)TrackerMode.Disable, 0) == mav_error.ok)
             {
-                if (resetToPrevMode) SetMode(PrevCameraMode);
+                SetMode(NvSystemModes.GRR);
                 return true;
             }
 
@@ -817,6 +817,7 @@ namespace MV04.Camera
             return IsCameraControlConnected
                 && (mav_error)MavCmdDoNUC(CameraControl.mav_comm, CameraControl.ackCb) == mav_error.ok;
         }
+
 
         #endregion
 
