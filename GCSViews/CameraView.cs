@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.Globalization;
 using System.IO;
@@ -28,6 +29,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static IronPython.Modules._ast;
 using static MV04.Camera.MavProto;
+using Accord.Video.FFMPEG;
 
 namespace MissionPlanner.GCSViews
 {
@@ -187,7 +189,16 @@ namespace MissionPlanner.GCSViews
             };
 
             this.FormClosing += CameraView_FormClosing;
+            
+            _videoRecordTimer.Interval = 500;
+            _videoRecordTimer.Tick += _videoRecordTimer_Tick;
+            _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
+
+            _videoSaveSegmentTimer.Interval = _segmentLength*1000;
+            _videoSaveSegmentTimer.Tick += _videoSaveSegmentTimer_Tick;
         }
+
+        
 
         private void CameraView_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -229,6 +240,7 @@ namespace MissionPlanner.GCSViews
                         _gr = e.Graphics;
 
                     OnNewFrame(img.Width, img.Height);
+
                 }
             }
             catch (Exception ex)
@@ -238,6 +250,9 @@ namespace MissionPlanner.GCSViews
                 img = null;
             }
         }
+
+        Bitmap _actualCameraImage;
+        Bitmap _actualCameraVideoImage;
 
         private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -348,8 +363,6 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraStream()
         {
-            //bool success = CameraHandler.Instance.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick);
-
             bool success = StartGstreamerCameraStream(CameraHandler.url);
 
             if (success)
@@ -416,26 +429,85 @@ namespace MissionPlanner.GCSViews
 
         private void DoPhoto()
         {
-            bool success = CameraHandler.Instance.DoPhoto();
+            //bool success = CameraHandler.Instance.DoPhoto();
+
+            _actualCameraImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
+            pb_CameraGstream.DrawToBitmap(_actualCameraImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height));
+
+            if (_actualCameraImage != null)
+                _actualCameraImage.Save("test" + DateTime.Now.Millisecond + ".jpg", ImageFormat.Jpeg);  //TODO megfelelő helyre névvel létrehozni
 
 #if DEBUG
-            if (success)
-                AddToOSDDebug("Photo taken");
+            AddToOSDDebug("Photo taken");
 #endif
         }
 
+        List<Bitmap> _bitmapsForVideo = new List<Bitmap>();
+        System.Windows.Forms.Timer _videoRecordTimer = new System.Windows.Forms.Timer();
+        System.Windows.Forms.Timer _videoSaveSegmentTimer = new System.Windows.Forms.Timer();
+
+        /// <summary>
+        /// Add bitmap to the list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _videoRecordTimer_Tick(object sender, EventArgs e)
+        {
+            if (_recordingInProgress)
+            {
+                lock (_bitmapsForVideo)
+                {
+                    _actualCameraVideoImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
+                    pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height));
+
+                    if (_actualCameraVideoImage != null)
+                        _bitmapsForVideo.Add(_actualCameraVideoImage);
+                }
+            }
+        }
+
+        /// <summary>
+        /// write the list to a file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void _videoSaveSegmentTimer_Tick(object sender, EventArgs e)
+        {
+            if (_recordingInProgress)
+            {
+                lock (_bitmapsForVideo)
+                {
+                    using(VideoFileWriter writer = new VideoFileWriter())
+                    {
+
+                        writer.Open("testrecord" + DateTime.Now.Millisecond, 1024, 768, _frameRate, VideoCodec.MPEG4);
+
+                        foreach(Bitmap bm in _bitmapsForVideo)
+                        {
+                            Bitmap bm_formatted = new Bitmap(bm,1024, 768);
+                            writer.WriteVideoFrame(bm_formatted);
+                        }
+                        writer.Close();
+                    }
+
+                    _bitmapsForVideo.Clear();
+                }
+            }
+        }
+        int _frameRate = 10;
+        bool _recordingInProgress = false;
+        int _segmentLength;
         private void StartRecording()
         {
             int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
 
-            bool success = CameraHandler.Instance.StartRecording(TimeSpan.FromSeconds(sl));
+            _videoRecordTimer?.Start();
+            _videoSaveSegmentTimer?.Start();
 
-#if DEBUG
-            if (success)
-                AddToOSDDebug($"Recording started ({sl}s loop)");
-            else
-                AddToOSDDebug("Recording started (infinite)");
-#endif
+            _recordingInProgress = true;
+
+
         }
 
         private void StartRecordingInfinite()
@@ -452,14 +524,18 @@ namespace MissionPlanner.GCSViews
 
         private void StopRecording()
         {
-            bool success = CameraHandler.Instance.StopRecording();
+            //bool success = CameraHandler.Instance.StopRecording();
+            _recordingInProgress = false;
+            _videoRecordTimer?.Stop();
+            _videoSaveSegmentTimer?.Stop();
+            _bitmapsForVideo.Clear();
 
-#if DEBUG
-            if (success)
-                AddToOSDDebug("Recording stopped");
-            else
-                AddToOSDDebug("Recording failed to stopped");
-#endif
+            //#if DEBUG
+            //            if (success)
+            //                AddToOSDDebug("Recording stopped");
+            //            else
+            //                AddToOSDDebug("Recording failed to stopped");
+            //#endif
         }
 
         private async Task ResetZoom()
