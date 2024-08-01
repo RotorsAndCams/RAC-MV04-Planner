@@ -68,17 +68,9 @@ namespace MissionPlanner.Joystick
             if (currentInterface() == null)
                 return;
 
-            if (Interface.MAV.cs.firmware == Firmwares.ArduPlane)
-            {
-                loadconfig("joystickbuttons" + Interface.MAV.cs.firmware + ".xml",
-                    "joystickaxis" + Interface.MAV.cs.firmware + ".xml");
-            }
-            else if (Interface.MAV.cs.firmware == Firmwares.ArduCopter2)
-            {
-                loadconfig("joystickbuttons" + Interface.MAV.cs.firmware + ".xml",
-                    "joystickaxis" + Interface.MAV.cs.firmware + ".xml");
-            }
-            else if (Interface.MAV.cs.firmware == Firmwares.ArduRover)
+            if (Interface.MAV.cs.firmware == Firmwares.ArduPlane
+                || Interface.MAV.cs.firmware == Firmwares.ArduCopter2
+                || Interface.MAV.cs.firmware == Firmwares.ArduRover)
             {
                 loadconfig("joystickbuttons" + Interface.MAV.cs.firmware + ".xml",
                     "joystickaxis" + Interface.MAV.cs.firmware + ".xml");
@@ -1239,37 +1231,32 @@ namespace MissionPlanner.Joystick
                                 JoyChannels[2].reverse, JoyChannels[2].expo);
                         //(ushort)(((int)state.Y / 65.535) + 1000);
                     }
-                    if (getJoystickAxis(3) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech3 = pickchannel(3, JoyChannels[3].axis, JoyChannels[3].reverse,
-                            JoyChannels[3].expo); //(ushort)(1000 - ((int)slider[0] / 65.535) + 1000);
-                    if (getJoystickAxis(4) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech4 = pickchannel(4, JoyChannels[4].axis, JoyChannels[4].reverse,
-                            JoyChannels[4].expo); //(ushort)(((int)state.X / 65.535) + 1000);
 
-                    if (getJoystickAxis(5) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech5 = pickchannel(5, JoyChannels[5].axis, JoyChannels[5].reverse,
-                            JoyChannels[5].expo);
-                    if (getJoystickAxis(6) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech6 = pickchannel(6, JoyChannels[6].axis, JoyChannels[6].reverse,
-                            JoyChannels[6].expo);
-                    if (getJoystickAxis(7) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech7 = pickchannel(7, JoyChannels[7].axis, JoyChannels[7].reverse,
-                            JoyChannels[7].expo);
-                    if (getJoystickAxis(8) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech8 = pickchannel(8, JoyChannels[8].axis, JoyChannels[8].reverse,
-                            JoyChannels[8].expo);
-
-                    if (getJoystickAxis(9) != joystickaxis.None) Interface.MAV.cs.rcoverridech9 = pickchannel(9, JoyChannels[9].axis, JoyChannels[9].reverse, JoyChannels[9].expo);
-                    if (getJoystickAxis(10) != joystickaxis.None) Interface.MAV.cs.rcoverridech10 = pickchannel(10, JoyChannels[10].axis, JoyChannels[10].reverse, JoyChannels[10].expo);
-                    if (getJoystickAxis(11) != joystickaxis.None) Interface.MAV.cs.rcoverridech11 = pickchannel(11, JoyChannels[11].axis, JoyChannels[11].reverse, JoyChannels[11].expo);
-                    if (getJoystickAxis(12) != joystickaxis.None) Interface.MAV.cs.rcoverridech12 = pickchannel(12, JoyChannels[12].axis, JoyChannels[12].reverse, JoyChannels[12].expo);
-                    if (getJoystickAxis(13) != joystickaxis.None) Interface.MAV.cs.rcoverridech13 = pickchannel(13, JoyChannels[13].axis, JoyChannels[13].reverse, JoyChannels[13].expo);
-                    if (getJoystickAxis(14) != joystickaxis.None) Interface.MAV.cs.rcoverridech14 = pickchannel(14, JoyChannels[14].axis, JoyChannels[14].reverse, JoyChannels[14].expo);
-                    if (getJoystickAxis(15) != joystickaxis.None) Interface.MAV.cs.rcoverridech15 = pickchannel(15, JoyChannels[15].axis, JoyChannels[15].reverse, JoyChannels[15].expo);
-                    if (getJoystickAxis(16) != joystickaxis.None) Interface.MAV.cs.rcoverridech16 = pickchannel(16, JoyChannels[16].axis, JoyChannels[16].reverse, JoyChannels[16].expo);
-                    if (getJoystickAxis(17) != joystickaxis.None) Interface.MAV.cs.rcoverridech17 = pickchannel(17, JoyChannels[17].axis, JoyChannels[17].reverse, JoyChannels[17].expo);
-                    if (getJoystickAxis(18) != joystickaxis.None) Interface.MAV.cs.rcoverridech18 = pickchannel(18, JoyChannels[18].axis, JoyChannels[18].reverse, JoyChannels[18].expo);
-
+                    short[] RCOverrideChannels = new short[]
+                    {
+                        Interface.MAV.cs.rcoverridech1,
+                        Interface.MAV.cs.rcoverridech2,
+                        Interface.MAV.cs.rcoverridech3,
+                        Interface.MAV.cs.rcoverridech4,
+                        Interface.MAV.cs.rcoverridech5,
+                        Interface.MAV.cs.rcoverridech6,
+                        Interface.MAV.cs.rcoverridech7,
+                        Interface.MAV.cs.rcoverridech8,
+                        Interface.MAV.cs.rcoverridech9,
+                        Interface.MAV.cs.rcoverridech10,
+                        Interface.MAV.cs.rcoverridech11,
+                        Interface.MAV.cs.rcoverridech12,
+                        Interface.MAV.cs.rcoverridech13,
+                        Interface.MAV.cs.rcoverridech14,
+                        Interface.MAV.cs.rcoverridech15,
+                        Interface.MAV.cs.rcoverridech16,
+                        Interface.MAV.cs.rcoverridech17,
+                        Interface.MAV.cs.rcoverridech18
+                    };
+                    for (int i = 3; i <= 18; i++)
+                    {
+                        if (getJoystickAxis(i) != joystickaxis.None) RCOverrideChannels[i - 1] = pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo);
+                    }
 
                     // disable button actions when not connected.
                     if (Interface.BaseStream.IsOpen)
