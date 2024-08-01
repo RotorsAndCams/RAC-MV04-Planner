@@ -155,10 +155,8 @@ namespace MV04.Camera
         }
 
         private Timer RecordingTimer;
-        //
-        // @"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! decodebin ! autovideosink sync=false queue max-size-buffers=1 max-size-bytes=0 max-size-time=0";
-        // @"rtspsrc location=rtsp://192.168.0.203:554/live1 latency=0 ! decodebin ! autovideosink sync=false queue max-size-buffers=1 max-size-bytes=0 max-size-time=0";
-        public static readonly string url = @"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+        
+        public static readonly string url = $"rtspsrc location=rtsp://{SettingManager.Get(Setting.CameraStreamIP)}:{SettingManager.Get(Setting.CameraStreamPort)}/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";               //@"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 
         #endregion
 
