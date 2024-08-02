@@ -442,7 +442,7 @@ namespace MissionPlanner.GCSViews
 #endif
         }
 
-        List<Bitmap> _bitmapsForVideo = new List<Bitmap>();
+        List<string> _bitmapsForVideo = new List<string>();
         System.Windows.Forms.Timer _videoRecordTimer = new System.Windows.Forms.Timer();
         System.Windows.Forms.Timer _videoSaveSegmentTimer = new System.Windows.Forms.Timer();
 
@@ -461,10 +461,25 @@ namespace MissionPlanner.GCSViews
                     pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height));
 
                     if (_actualCameraVideoImage != null)
-                        _bitmapsForVideo.Add(_actualCameraVideoImage);
+                    {
+
+                        string name = Directory.GetCurrentDirectory() + "//screenshot-" + _fileCount + ".png";
+
+
+                        _actualCameraVideoImage.Save(name, ImageFormat.Png);
+
+
+                        _bitmapsForVideo.Add(name);
+                        _fileCount++;
+                        _actualCameraVideoImage.Dispose();
+                    }
+
                 }
             }
         }
+
+        string _tempPath = "";
+        int _fileCount = 0;
 
         /// <summary>
         /// write the list to a file
@@ -481,20 +496,38 @@ namespace MissionPlanner.GCSViews
                     using(VideoFileWriter writer = new VideoFileWriter())
                     {
 
-                        writer.Open("testrecord" + DateTime.Now.Millisecond, 1024, 768, _frameRate, VideoCodec.MPEG4);
+                        writer.Open("testrecord" + DateTime.Now.Millisecond, 1920, 1080, _frameRate, VideoCodec.MPEG4);
 
-                        foreach(Bitmap bm in _bitmapsForVideo)
+                        foreach(string location in _bitmapsForVideo)
                         {
-                            Bitmap bm_formatted = new Bitmap(bm,1024, 768);
+                            Bitmap bm = System.Drawing.Image.FromFile(location) as Bitmap;
+                            Bitmap bm_formatted = new Bitmap(bm, 1920, 1080);
                             writer.WriteVideoFrame(bm_formatted);
+                            bm.Dispose();
+                            bm_formatted.Dispose();
                         }
                         writer.Close();
                     }
-
+                    DeleteTempFiles();
                     _bitmapsForVideo.Clear();
+                    _fileCount = 0;
                 }
             }
         }
+
+        private void DeleteTempFiles()
+        {
+            try
+            {
+                foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()).Where(x => new FileInfo(x).Name.Contains("screenshot")))
+                {
+                    File.Delete(file);
+                }
+            }
+            catch { }
+            
+        }
+
         int _frameRate = 10;
         bool _recordingInProgress = false;
         int _segmentLength;
@@ -526,9 +559,11 @@ namespace MissionPlanner.GCSViews
         {
             //bool success = CameraHandler.Instance.StopRecording();
             _recordingInProgress = false;
+
             _videoRecordTimer?.Stop();
             _videoSaveSegmentTimer?.Stop();
             _bitmapsForVideo.Clear();
+            DeleteTempFiles();
 
             //#if DEBUG
             //            if (success)
