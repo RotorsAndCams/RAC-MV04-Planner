@@ -500,10 +500,10 @@ namespace MissionPlanner.GCSViews
             {
                 lock (_bitmapsForVideo)
                 {
-                    using(VideoFileWriter writer = new VideoFileWriter())
+                    using (VideoFileWriter writer = new VideoFileWriter())
                     {
 
-                        writer.Open("testrecord" + DateTime.Now.Millisecond, 1920, 1080, _frameRate, VideoCodec.MPEG4);
+                        writer.Open("testrecord" + DateTime.Now.ToString("yyyyMMddHHmmss"), 1920, 1080, _frameRate, VideoCodec.MPEG4);
 
                         foreach(string location in _bitmapsForVideo)
                         {
@@ -1333,13 +1333,6 @@ namespace MissionPlanner.GCSViews
 
         private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
         {
-
-            //if (!_cameraFullScreenForm.Visible)
-            //{
-            //    VideoControl = CameraHandler.Instance.CameraVideoControl;
-            //    //this.pnl_CameraScreen.Controls.Add(VideoControl);
-            //    VideoControl.Dock = DockStyle.Fill;
-            //}
             ReconnectCameraStreamAndControl();
         }
 
