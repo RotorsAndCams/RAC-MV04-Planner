@@ -69,6 +69,12 @@ namespace MV04.Camera
         public MavProto.SysReport Report { get; set; }
     }
 
+    public class DoRecordingEventArgs : EventArgs
+    {
+
+        public string SaveFilePath { get; set; }
+    }
+
     public class CameraHandler
     {
         public event EventHandler<ReportEventArgs> event_ReportArrived;
@@ -460,85 +466,79 @@ namespace MV04.Camera
 
         #region Video Methods
 
-        public bool DoPhoto()
+
+        public event EventHandler<DoRecordingEventArgs> event_DoPhoto;
+        public event EventHandler<DoRecordingEventArgs> event_StartVideoRecording;
+        public event EventHandler event_StopVideoRecording;
+
+        public void DoPhoto()
         {
-            if (_VideoControl != null)
-            {
-                string sepChar = "_";
-                string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
-                string droneID = sysID.ToString().PadLeft(3, '0');
-                string dronePos = DronePos.UTM.ToString().Replace(" ", "");
-                string targPos = TargPos.UTM.ToString().Replace(" ", "");
+            string sepChar = "_";
+            string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string droneID = sysID.ToString().PadLeft(3, '0');
+            string dronePos = DronePos.UTM.ToString().Replace(" ", "");
+            string targPos = TargPos.UTM.ToString().Replace(" ", "");
 
-                string filePath = MediaSavePath + dateTime + sepChar + droneID + sepChar + dronePos + sepChar + targPos;
+            string filePath = MediaSavePath + dateTime + sepChar + droneID + sepChar + dronePos + sepChar + targPos;
 
-                OpenGLControl oglc = _VideoControl.Controls[0] as OpenGLControl;
-                OpenGL ogl = oglc.OpenGL;
-
-                Bitmap bmp = new Bitmap(oglc.Width, oglc.Height);
-                BitmapData bmpd = bmp.LockBits(oglc.Bounds, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-                ogl.ReadPixels(0, 0, oglc.Width, oglc.Height, OpenGL.GL_BGR, OpenGL.GL_UNSIGNED_BYTE, bmpd.Scan0);
-                bmp.UnlockBits(bmpd);
-                bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
-
-                bmp.Save(filePath + ".png", ImageFormat.Png);
-
-                return File.Exists(filePath + ".png");
-            }
-            else
-            {
-                return false;
-            }
+            if (event_DoPhoto != null)
+                event_DoPhoto(this, new DoRecordingEventArgs() { SaveFilePath = filePath });
         }
-        public bool StartRecording(TimeSpan? segmentLength)
+        public void StartRecording(TimeSpan? segmentLength)
         {
-            if (_VideoControl != null)
-            {
-                if (segmentLength.HasValue)
-                {
-                    RecordingTimer = new Timer()
-                    {
-                        Enabled = false,
-                        Interval = (int)Math.Round(segmentLength.Value.TotalMilliseconds)
-                    };
+            //if (_VideoControl != null)
+            //{
+            //    if (segmentLength.HasValue)
+            //    {
+            //        RecordingTimer = new Timer()
+            //        {
+            //            Enabled = false,
+            //            Interval = (int)Math.Round(segmentLength.Value.TotalMilliseconds)
+            //        };
 
-                    RecordingTimer.Tick += (sender, eventArgs) =>
-                    {
-                        // Stop & save previous recording
-                        _VideoControl.VideoControlStopRec();
+            //        RecordingTimer.Tick += (sender, eventArgs) =>
+            //        {
+            //            // Stop & save previous recording
+            //            _VideoControl.VideoControlStopRec();
 
-                        string _sepChar = "_";
-                        string _dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
-                        string _droneID = sysID.ToString().PadLeft(3, '0');
-                        string _dronePos = DronePos.UTM.ToString().Replace(" ", "");
-                        string _targPos = TargPos.UTM.ToString().Replace(" ", "");
-                        string _filePath = MediaSavePath + _dateTime + _sepChar + _droneID + _sepChar + _dronePos + _sepChar + _targPos;
+            //            string _sepChar = "_";
+            //            string _dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+            //            string _droneID = sysID.ToString().PadLeft(3, '0');
+            //            string _dronePos = DronePos.UTM.ToString().Replace(" ", "");
+            //            string _targPos = TargPos.UTM.ToString().Replace(" ", "");
+            //            string _filePath = MediaSavePath + _dateTime + _sepChar + _droneID + _sepChar + _dronePos + _sepChar + _targPos;
 
-                        // Start new recording
-                        _VideoControl.VideoControlStartRec(_filePath + ".ts");
-                    };
+            //            // Start new recording
+            //            _VideoControl.VideoControlStartRec(_filePath + ".ts");
+            //        };
 
-                    // Start recording timer
-                    RecordingTimer.Start();
-                }
+            //        // Start recording timer
+            //        RecordingTimer.Start();
+            //    }
 
-                string sepChar = "_";
-                string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
-                string droneID = sysID.ToString().PadLeft(3, '0');
-                string dronePos = DronePos.UTM.ToString().Replace(" ", "");
-                string targPos = TargPos.UTM.ToString().Replace(" ", "");
-                string filePath = MediaSavePath + dateTime + sepChar + droneID + sepChar + dronePos + sepChar + targPos;
+            //    string sepChar = "_";
+            //    string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+            //    string droneID = sysID.ToString().PadLeft(3, '0');
+            //    string dronePos = DronePos.UTM.ToString().Replace(" ", "");
+            //    string targPos = TargPos.UTM.ToString().Replace(" ", "");
+            //    string filePath = MediaSavePath + dateTime + sepChar + droneID + sepChar + dronePos + sepChar + targPos;
 
-                // Start first recording
-                _VideoControl.VideoControlStartRec(filePath + ".ts");
+            //    // Start first recording
+            //    _VideoControl.VideoControlStartRec(filePath + ".ts");
 
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
+
+
+            
+            //if(event_StartVideoRecording != null)
+                
         }
+
         public bool StopRecording()
         {
             if (_VideoControl != null)

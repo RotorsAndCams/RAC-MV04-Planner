@@ -122,6 +122,9 @@ namespace MissionPlanner.GCSViews
             StartCameraStream();
             StartCameraControl();
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
+            CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
+            //CameraHandler.Instance.event_StartVideoRecording +=;
+            //CameraHandler.Instance.event_StopVideoRecording +=;
 
             SetStopButtonVisibility();
 
@@ -198,7 +201,10 @@ namespace MissionPlanner.GCSViews
             _videoSaveSegmentTimer.Tick += _videoSaveSegmentTimer_Tick;
         }
 
-        
+        private void Instance_event_DoPhoto(object sender, DoRecordingEventArgs e)
+        {
+            this.DoPhoto();
+        }
 
         private void CameraView_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -315,7 +321,7 @@ namespace MissionPlanner.GCSViews
                 {"Switch crosshairs", () => { ChangeCrossHair(); }},
                 {"Do photo", () => { DoPhoto(); }},
                 {"Start recording (loop)", () => { StartRecording(); }},
-                {"Start recording (infinite)", () => { StartRecordingInfinite(); }},
+                //{"Start recording (infinite)", () => { StartRecordingInfinite(); }},
                 {"Stop recording", () => { StopRecording(); }},
                 {"Set mode", () => { new CameraModeSelectorForm().Show(); }},
                 {"Tracker mode", () => { new TrackerPosForm().Show(); }},
@@ -427,15 +433,16 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-        private void DoPhoto()
+        private void DoPhoto(string path = null)
         {
-            //bool success = CameraHandler.Instance.DoPhoto();
-
             _actualCameraImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
             pb_CameraGstream.DrawToBitmap(_actualCameraImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height));
 
+            if (path == null)
+                path = "test" + DateTime.Now.Millisecond + ".jpg";
+
             if (_actualCameraImage != null)
-                _actualCameraImage.Save("test" + DateTime.Now.Millisecond + ".jpg", ImageFormat.Jpeg);  //TODO megfelelő helyre névvel létrehozni
+                _actualCameraImage.Save(path, ImageFormat.Jpeg);
 
 #if DEBUG
             AddToOSDDebug("Photo taken");
@@ -531,6 +538,7 @@ namespace MissionPlanner.GCSViews
         int _frameRate = 10;
         bool _recordingInProgress = false;
         int _segmentLength;
+
         private void StartRecording()
         {
             int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
@@ -539,20 +547,6 @@ namespace MissionPlanner.GCSViews
             _videoSaveSegmentTimer?.Start();
 
             _recordingInProgress = true;
-
-
-        }
-
-        private void StartRecordingInfinite()
-        {
-            bool success = CameraHandler.Instance.StartRecording(null);
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug("Recording started (infinite)");
-            else
-                AddToOSDDebug("Recording failed to start");
-#endif
         }
 
         private void StopRecording()
@@ -565,12 +559,6 @@ namespace MissionPlanner.GCSViews
             _bitmapsForVideo.Clear();
             DeleteTempFiles();
 
-            //#if DEBUG
-            //            if (success)
-            //                AddToOSDDebug("Recording stopped");
-            //            else
-            //                AddToOSDDebug("Recording failed to stopped");
-            //#endif
         }
 
         private async Task ResetZoom()
