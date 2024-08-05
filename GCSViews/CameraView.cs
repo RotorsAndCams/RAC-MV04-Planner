@@ -33,6 +33,11 @@ using Accord.Video.FFMPEG;
 
 namespace MissionPlanner.GCSViews
 {
+    public class BitMapEventArgs : EventArgs
+    {
+        public Bitmap img { get; set; }
+    }
+
     public partial class CameraView : MyUserControl//, IActivate, IDeactivate
     {
         #region Fields
@@ -248,6 +253,10 @@ namespace MissionPlanner.GCSViews
                     OnNewFrame(img.Width, img.Height);
 
                 }
+
+
+                if (event_BroadCastImage != null)
+                    event_BroadCastImage(this, new BitMapEventArgs() { img = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height) });
             }
             catch (Exception ex)
             {
@@ -256,7 +265,7 @@ namespace MissionPlanner.GCSViews
                 img = null;
             }
         }
-
+        public event EventHandler<BitMapEventArgs> event_BroadCastImage;
         Bitmap _actualCameraImage;
         Bitmap _actualCameraVideoImage;
 
