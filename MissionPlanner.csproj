@@ -858,6 +858,7 @@
     <Compile Include="Controls\FollowMe.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GCSViews\BitMapEventArgs.cs" />
     <Compile Include="GCSViews\CameraFullScreenForm.cs">
       <SubType>Form</SubType>
     </Compile>

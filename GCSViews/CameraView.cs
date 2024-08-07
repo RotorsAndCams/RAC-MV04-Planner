@@ -165,7 +165,7 @@ namespace MissionPlanner.GCSViews
             this.DoubleBuffered = true;
 
             pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
-
+            FetchHudDataTimer.Start();
             GStreamer.onNewImage += (sender, image) =>
             {
                 try
