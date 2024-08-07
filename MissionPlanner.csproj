@@ -864,7 +864,9 @@
     <Compile Include="GCSViews\CameraFullScreenForm.Designer.cs">
       <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GCSViews\CameraView.cs" />
+    <Compile Include="GCSViews\CameraView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="GCSViews\CameraView.Designer.cs">
       <DependentUpon>CameraView.cs</DependentUpon>
     </Compile>
