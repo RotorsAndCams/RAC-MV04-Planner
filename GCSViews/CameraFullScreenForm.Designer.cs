@@ -39,7 +39,7 @@
             this.btn_StopTracking.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
             this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
-            this.btn_StopTracking.Location = new System.Drawing.Point(1239, 12);
+            this.btn_StopTracking.Location = new System.Drawing.Point(1423, 12);
             this.btn_StopTracking.Name = "btn_StopTracking";
             this.btn_StopTracking.Size = new System.Drawing.Size(85, 80);
             this.btn_StopTracking.TabIndex = 1;
@@ -63,7 +63,7 @@
             this.pb_Stream.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pb_Stream.Location = new System.Drawing.Point(0, 0);
             this.pb_Stream.Name = "pb_Stream";
-            this.pb_Stream.Size = new System.Drawing.Size(1216, 673);
+            this.pb_Stream.Size = new System.Drawing.Size(1520, 841);
             this.pb_Stream.TabIndex = 2;
             this.pb_Stream.TabStop = false;
             // 

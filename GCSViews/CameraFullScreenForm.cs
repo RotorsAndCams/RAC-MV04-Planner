@@ -113,7 +113,7 @@ namespace MissionPlanner.GCSViews
 
                     if (_gr != e.Graphics)
                         _gr = e.Graphics;
-                    FetchHudData();
+                    //FetchHudData();
                     OnNewFrame(img.Width, img.Height);
 
                 }

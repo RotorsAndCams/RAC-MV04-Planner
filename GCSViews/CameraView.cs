@@ -98,7 +98,7 @@ namespace MissionPlanner.GCSViews
             CameraStreamIP = SettingManager.Get(Setting.CameraStreamIP);
             CameraStreamPort = int.Parse(SettingManager.Get(Setting.CameraStreamPort));
             FetchHudDataTimer.Interval = 100; // 10Hz
-            FetchHudDataTimer.Tick += (sender, eventArgs) => FetchHudData();
+            //FetchHudDataTimer.Tick += (sender, eventArgs) => FetchHudData();
 
             // Create default drawing objects
             DefaultFont = new Font(FontFamily.GenericMonospace, this.Font.SizeInPoints * 2f);
@@ -163,9 +163,8 @@ namespace MissionPlanner.GCSViews
                 true);
 
             this.DoubleBuffered = true;
-
+            pbgr = pb_CameraGstream.CreateGraphics();
             pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
-            FetchHudDataTimer.Start();
             GStreamer.onNewImage += (sender, image) =>
             {
                 try
@@ -184,6 +183,8 @@ namespace MissionPlanner.GCSViews
                     else
                         pb_CameraGstream.Invalidate();
 
+                    
+
                 }
                 catch (Exception ex)
                 {
@@ -199,7 +200,10 @@ namespace MissionPlanner.GCSViews
 
             _videoSaveSegmentTimer.Interval = _segmentLength*1000;
             _videoSaveSegmentTimer.Tick += _videoSaveSegmentTimer_Tick;
+            pb_CameraGstream.Invalidate();
         }
+
+        Graphics pbgr;
 
         private void Instance_event_DoPhoto(object sender, DoRecordingEventArgs e)
         {
@@ -230,7 +234,7 @@ namespace MissionPlanner.GCSViews
 
         Image img;
         private readonly object _bgimagelock = new object();
-        Graphics _gr;
+        //Graphics _gr;
         private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
         {
             try
@@ -242,10 +246,10 @@ namespace MissionPlanner.GCSViews
                         e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
                     }
 
-                    if(_gr != e.Graphics)
-                        _gr = e.Graphics;
-
-                    OnNewFrame(img.Width, img.Height);
+                    //if(_gr != e.Graphics)
+                    //    _gr = e.Graphics;
+                    FetchHudData();
+                    OnNewFrame(img.Width, img.Height, e.Graphics);
 
                 }
             }
@@ -374,7 +378,7 @@ namespace MissionPlanner.GCSViews
             if (success)
             {
                 FetchHudData();
-                FetchHudDataTimer.Start();
+                //FetchHudDataTimer.Start();
 
 #if DEBUG
                 AddToOSDDebug("Video stream started");
@@ -707,7 +711,7 @@ namespace MissionPlanner.GCSViews
 
         #region Drawing
 
-        private void OnNewFrame(int width, int height)
+        private void OnNewFrame(int width, int height, Graphics _gr)
         {
             // frame_buf is 1920 x 1080 x 3 long
             // real frame is width x height
@@ -727,38 +731,38 @@ namespace MissionPlanner.GCSViews
             };
 
             // Datetime
-            Rectangle Datetime = DrawText(HudElements.Time, new Point(3, 3), ContentAlignment.TopLeft, HorizontalAlignment.Left);
+            Rectangle Datetime = DrawText(HudElements.Time, new Point(3, 3), ContentAlignment.TopLeft, HorizontalAlignment.Left, null,null,null, _gr);
 
             // Battery
-            Rectangle Battery = DrawText(HudElements.Battery, new Point(VideoRectangle.Width - 3, 3), ContentAlignment.TopRight, HorizontalAlignment.Right);
+            Rectangle Battery = DrawText(HudElements.Battery, new Point(VideoRectangle.Width - 3, 3), ContentAlignment.TopRight, HorizontalAlignment.Right, null, null, null, _gr);
 
             int topLeft = Datetime.Right;
             int topStep = ((Battery.Left - topLeft) / 4) / 2;
 
             // AGL
-            DrawText(HudElements.AGL, new Point(topLeft + topStep, 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
+            DrawText(HudElements.AGL, new Point(topLeft + topStep, 3), ContentAlignment.TopCenter, HorizontalAlignment.Left, null, null, null, _gr);
 
             // Velocity
-            DrawText(HudElements.Velocity, new Point(topLeft + (3 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
+            DrawText(HudElements.Velocity, new Point(topLeft + (3 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left, null, null, null, _gr);
 
             // TGD
-            DrawText(HudElements.TGD, new Point(topLeft + (5 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
+            DrawText(HudElements.TGD, new Point(topLeft + (5 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left, null, null, null, _gr);
 
             // Signal strengths
-            DrawText(HudElements.SignalStrengths, new Point(topLeft + (7 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Right);
+            DrawText(HudElements.SignalStrengths, new Point(topLeft + (7 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Right, null, null, null, _gr);
 
             // Camera info
-            DrawText(HudElements.Camera, new Point(3, Datetime.Bottom + 20), ContentAlignment.TopLeft, HorizontalAlignment.Right);
+            DrawText(HudElements.Camera, new Point(3, Datetime.Bottom + 20), ContentAlignment.TopLeft, HorizontalAlignment.Right, null, null, null, _gr);
 
             // Next waypoint
-            Rectangle nextWP = DrawText(HudElements.ToWaypoint, new Point(VideoRectangle.Width - 3, Battery.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right);
+            Rectangle nextWP = DrawText(HudElements.ToWaypoint, new Point(VideoRectangle.Width - 3, Battery.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right, null, null, null, _gr);
 
             // Operator distance
-            DrawText(HudElements.FromOperator, new Point(VideoRectangle.Width - 3, nextWP.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right);
+            DrawText(HudElements.FromOperator, new Point(VideoRectangle.Width - 3, nextWP.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right, null, null, null, _gr);
 
             // Coords
-            DrawText(HudElements.DroneGps, new Point(0, VideoRectangle.Height - 3), ContentAlignment.BottomLeft, HorizontalAlignment.Left);
-            DrawText(HudElements.TargetGps, new Point(VideoRectangle.Width - 3, VideoRectangle.Height - 3), ContentAlignment.BottomRight, HorizontalAlignment.Right);
+            DrawText(HudElements.DroneGps, new Point(0, VideoRectangle.Height - 3), ContentAlignment.BottomLeft, HorizontalAlignment.Left, null, null, null, _gr);
+            DrawText(HudElements.TargetGps, new Point(VideoRectangle.Width - 3, VideoRectangle.Height - 3), ContentAlignment.BottomRight, HorizontalAlignment.Right, null, null, null, _gr);
 
             #region Crosshairs
             int lineHeight = (int)Math.Round(VideoRectangle.Height * 0.1);
@@ -995,7 +999,7 @@ namespace MissionPlanner.GCSViews
             textFont = textFont ?? DefaultFont;
             textBrush = textBrush ?? DefaultBrush;
             drawArea = drawArea ?? VideoRectangle;
-            drawGraphics = _gr;
+            drawGraphics = drawGraphics != null ? drawGraphics : this.CreateGraphics();
 
             // Check position
             if (position.X >= 0
