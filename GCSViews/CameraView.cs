@@ -74,6 +74,19 @@ namespace MissionPlanner.GCSViews
 
         private bool _tripSwitchedOff = false;
 
+        Image img;
+        private readonly object _bgimagelock = new object();
+
+        Bitmap _actualCameraImage;
+        Bitmap _actualCameraVideoImage;
+
+        int _frameRate = 10;
+        bool _recordingInProgress = false;
+        int _segmentLength;
+
+        string _tempPath = "";
+        int _fileCount = 0;
+
         #endregion
 
         #region Conversion multipliers
@@ -163,7 +176,6 @@ namespace MissionPlanner.GCSViews
                 true);
 
             this.DoubleBuffered = true;
-            pbgr = pb_CameraGstream.CreateGraphics();
             pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
             GStreamer.onNewImage += (sender, image) =>
             {
@@ -203,8 +215,6 @@ namespace MissionPlanner.GCSViews
             pb_CameraGstream.Invalidate();
         }
 
-        Graphics pbgr;
-
         private void Instance_event_DoPhoto(object sender, DoRecordingEventArgs e)
         {
             this.DoPhoto();
@@ -226,15 +236,8 @@ namespace MissionPlanner.GCSViews
             {
                 MessageBox.Show(ex.Message);
             }
-            
-
-
-            
         }
 
-        Image img;
-        private readonly object _bgimagelock = new object();
-        //Graphics _gr;
         private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
         {
             try
@@ -246,10 +249,8 @@ namespace MissionPlanner.GCSViews
                         e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
                     }
 
-                    //if(_gr != e.Graphics)
-                    //    _gr = e.Graphics;
                     FetchHudData();
-                    OnNewFrame(img.Width, img.Height, e.Graphics);
+                    OnNewFrame(img.Width, img.Height, e.Graphics); 
 
                 }
             }
@@ -260,9 +261,6 @@ namespace MissionPlanner.GCSViews
                 img = null;
             }
         }
-
-        Bitmap _actualCameraImage;
-        Bitmap _actualCameraVideoImage;
 
         private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -489,8 +487,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        string _tempPath = "";
-        int _fileCount = 0;
 
         /// <summary>
         /// write the list to a file
@@ -538,10 +534,6 @@ namespace MissionPlanner.GCSViews
             catch { }
             
         }
-
-        int _frameRate = 10;
-        bool _recordingInProgress = false;
-        int _segmentLength;
 
         private void StartRecording()
         {
