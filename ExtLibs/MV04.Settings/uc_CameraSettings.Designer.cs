@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             this.tlp_Base = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.rb_AutoRecordNo = new System.Windows.Forms.RadioButton();
+            this.rb_AutoRecordYes = new System.Windows.Forms.RadioButton();
             this.comboBox_IrColorMode = new System.Windows.Forms.ComboBox();
             this.textBox_cameraControlPort = new System.Windows.Forms.TextBox();
             this.comboBox_coordFormat = new System.Windows.Forms.ComboBox();
@@ -49,20 +52,22 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.button_Save = new System.Windows.Forms.Button();
-            this.button_Cancel = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.label13 = new System.Windows.Forms.Label();
             this.numericUpDown_VideoSegmentLength = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.radioButton_AutoConnect_No = new System.Windows.Forms.RadioButton();
             this.radioButton_AutoConnect_Yes = new System.Windows.Forms.RadioButton();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.button_Cancel = new System.Windows.Forms.Button();
+            this.button_Save = new System.Windows.Forms.Button();
+            this.lb_AutoRecord = new System.Windows.Forms.Label();
             this.tlp_Base.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_VideoSegmentLength)).BeginInit();
             this.tableLayoutPanel4.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tlp_Base
@@ -71,6 +76,7 @@
             this.tlp_Base.ColumnCount = 2;
             this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150F));
             this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlp_Base.Controls.Add(this.tableLayoutPanel1, 1, 11);
             this.tlp_Base.Controls.Add(this.comboBox_IrColorMode, 1, 6);
             this.tlp_Base.Controls.Add(this.textBox_cameraControlPort, 1, 3);
             this.tlp_Base.Controls.Add(this.comboBox_coordFormat, 1, 7);
@@ -91,28 +97,69 @@
             this.tlp_Base.Controls.Add(this.label1, 0, 7);
             this.tlp_Base.Controls.Add(this.label8, 0, 3);
             this.tlp_Base.Controls.Add(this.label2, 0, 8);
-            this.tlp_Base.Controls.Add(this.tableLayoutPanel3, 1, 11);
             this.tlp_Base.Controls.Add(this.tableLayoutPanel2, 1, 5);
             this.tlp_Base.Controls.Add(this.tableLayoutPanel4, 1, 4);
+            this.tlp_Base.Controls.Add(this.tableLayoutPanel3, 1, 12);
+            this.tlp_Base.Controls.Add(this.lb_AutoRecord, 0, 11);
             this.tlp_Base.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlp_Base.ForeColor = System.Drawing.Color.White;
             this.tlp_Base.Location = new System.Drawing.Point(0, 0);
             this.tlp_Base.Name = "tlp_Base";
-            this.tlp_Base.RowCount = 12;
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090908F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tlp_Base.Size = new System.Drawing.Size(392, 370);
+            this.tlp_Base.RowCount = 13;
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692607F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.691839F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.689466F));
+            this.tlp_Base.Size = new System.Drawing.Size(392, 394);
             this.tlp_Base.TabIndex = 26;
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.rb_AutoRecordNo, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.rb_AutoRecordYes, 0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(153, 333);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 1;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(236, 24);
+            this.tableLayoutPanel1.TabIndex = 33;
+            // 
+            // rb_AutoRecordNo
+            // 
+            this.rb_AutoRecordNo.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.rb_AutoRecordNo.AutoSize = true;
+            this.rb_AutoRecordNo.Location = new System.Drawing.Point(55, 3);
+            this.rb_AutoRecordNo.Name = "rb_AutoRecordNo";
+            this.rb_AutoRecordNo.Size = new System.Drawing.Size(47, 17);
+            this.rb_AutoRecordNo.TabIndex = 22;
+            this.rb_AutoRecordNo.TabStop = true;
+            this.rb_AutoRecordNo.Text = "Nem";
+            this.rb_AutoRecordNo.UseVisualStyleBackColor = true;
+            // 
+            // rb_AutoRecordYes
+            // 
+            this.rb_AutoRecordYes.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.rb_AutoRecordYes.AutoSize = true;
+            this.rb_AutoRecordYes.Location = new System.Drawing.Point(3, 3);
+            this.rb_AutoRecordYes.Name = "rb_AutoRecordYes";
+            this.rb_AutoRecordYes.Size = new System.Drawing.Size(46, 17);
+            this.rb_AutoRecordYes.TabIndex = 21;
+            this.rb_AutoRecordYes.TabStop = true;
+            this.rb_AutoRecordYes.Text = "Igen";
+            this.rb_AutoRecordYes.UseVisualStyleBackColor = true;
             // 
             // comboBox_IrColorMode
             // 
@@ -336,47 +383,6 @@
             this.label2.Text = "Magasság mértékegység";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // tableLayoutPanel3
-            // 
-            this.tableLayoutPanel3.ColumnCount = 2;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel3.Controls.Add(this.button_Save, 0, 0);
-            this.tableLayoutPanel3.Controls.Add(this.button_Cancel, 1, 0);
-            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(153, 333);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 1;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(236, 34);
-            this.tableLayoutPanel3.TabIndex = 29;
-            // 
-            // button_Save
-            // 
-            this.button_Save.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.button_Save.BackColor = System.Drawing.Color.Black;
-            this.button_Save.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.button_Save.Location = new System.Drawing.Point(77, 3);
-            this.button_Save.Name = "button_Save";
-            this.button_Save.Size = new System.Drawing.Size(75, 27);
-            this.button_Save.TabIndex = 0;
-            this.button_Save.Text = "Save";
-            this.button_Save.UseVisualStyleBackColor = false;
-            this.button_Save.Click += new System.EventHandler(this.button_Save_Click);
-            // 
-            // button_Cancel
-            // 
-            this.button_Cancel.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.button_Cancel.BackColor = System.Drawing.Color.Black;
-            this.button_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.button_Cancel.Location = new System.Drawing.Point(158, 3);
-            this.button_Cancel.Name = "button_Cancel";
-            this.button_Cancel.Size = new System.Drawing.Size(75, 27);
-            this.button_Cancel.TabIndex = 1;
-            this.button_Cancel.Text = "Reset";
-            this.button_Cancel.UseVisualStyleBackColor = false;
-            this.button_Cancel.Click += new System.EventHandler(this.button_Cancel_Click);
-            // 
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.ColumnCount = 2;
@@ -449,21 +455,74 @@
             this.radioButton_AutoConnect_Yes.Text = "Igen";
             this.radioButton_AutoConnect_Yes.UseVisualStyleBackColor = true;
             // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.ColumnCount = 2;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel3.Controls.Add(this.button_Cancel, 1, 0);
+            this.tableLayoutPanel3.Controls.Add(this.button_Save, 0, 0);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(153, 363);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 1;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(236, 28);
+            this.tableLayoutPanel3.TabIndex = 29;
+            // 
+            // button_Cancel
+            // 
+            this.button_Cancel.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.button_Cancel.BackColor = System.Drawing.Color.Black;
+            this.button_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.button_Cancel.Location = new System.Drawing.Point(158, 3);
+            this.button_Cancel.Name = "button_Cancel";
+            this.button_Cancel.Size = new System.Drawing.Size(75, 22);
+            this.button_Cancel.TabIndex = 1;
+            this.button_Cancel.Text = "Reset";
+            this.button_Cancel.UseVisualStyleBackColor = false;
+            this.button_Cancel.Click += new System.EventHandler(this.button_Cancel_Click);
+            // 
+            // button_Save
+            // 
+            this.button_Save.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.button_Save.BackColor = System.Drawing.Color.Black;
+            this.button_Save.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.button_Save.Location = new System.Drawing.Point(77, 3);
+            this.button_Save.Name = "button_Save";
+            this.button_Save.Size = new System.Drawing.Size(75, 22);
+            this.button_Save.TabIndex = 0;
+            this.button_Save.Text = "Save";
+            this.button_Save.UseVisualStyleBackColor = false;
+            this.button_Save.Click += new System.EventHandler(this.button_Save_Click);
+            // 
+            // lb_AutoRecord
+            // 
+            this.lb_AutoRecord.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.lb_AutoRecord.AutoSize = true;
+            this.lb_AutoRecord.Location = new System.Drawing.Point(3, 338);
+            this.lb_AutoRecord.Name = "lb_AutoRecord";
+            this.lb_AutoRecord.Size = new System.Drawing.Size(134, 13);
+            this.lb_AutoRecord.TabIndex = 32;
+            this.lb_AutoRecord.Text = "AutoRecordCameraScreen";
+            // 
             // uc_CameraSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tlp_Base);
             this.Name = "uc_CameraSettings";
-            this.Size = new System.Drawing.Size(392, 370);
+            this.Size = new System.Drawing.Size(392, 394);
             this.tlp_Base.ResumeLayout(false);
             this.tlp_Base.PerformLayout();
-            this.tableLayoutPanel3.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_VideoSegmentLength)).EndInit();
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel4.PerformLayout();
+            this.tableLayoutPanel3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -500,5 +559,9 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.RadioButton radioButton_AutoConnect_No;
         private System.Windows.Forms.RadioButton radioButton_AutoConnect_Yes;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.RadioButton rb_AutoRecordNo;
+        private System.Windows.Forms.RadioButton rb_AutoRecordYes;
+        private System.Windows.Forms.Label lb_AutoRecord;
     }
 }

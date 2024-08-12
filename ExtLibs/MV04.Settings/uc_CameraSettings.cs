@@ -37,6 +37,9 @@ namespace MV04.Settings
             comboBox_altFormat.SelectedItem = GetValue(returnData, Setting.AltFormat);
             comboBox_distFormat.SelectedItem = GetValue(returnData, Setting.DistFormat);
             comboBox_speedFormat.SelectedItem = GetValue(returnData, Setting.SpeedFormat);
+
+            rb_AutoRecordYes.Checked = bool.Parse(GetValue(returnData, Setting.AutoRecordVideoStream));
+            rb_AutoRecordNo.Checked = !rb_AutoRecordYes.Checked;
         }
 
 
@@ -71,6 +74,7 @@ namespace MV04.Settings
             SetIfValid(returnData, Setting.AltFormat, comboBox_altFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.DistFormat, comboBox_distFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.SpeedFormat, comboBox_speedFormat.SelectedItem.ToString());
+            SetIfValid(returnData, Setting.AutoRecordVideoStream, radioButton_AutoConnect_Yes.Checked.ToString());
 
             SettingManager.Save(returnData);
 

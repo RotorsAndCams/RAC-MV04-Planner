@@ -22,7 +22,8 @@ namespace MV04.Settings
         GPSType,
         AltFormat,
         DistFormat,
-        SpeedFormat
+        SpeedFormat,
+        AutoRecordVideoStream
     }
 
     public class SettingItem
@@ -130,7 +131,14 @@ namespace MV04.Settings
                                 "kmph",
                                 "knots"
                             }.Contains(value)
-                        )
+                        ),
+                        new SettingItem(Setting.AutoRecordVideoStream, true.ToString(), value =>
+                            !string.IsNullOrWhiteSpace(value)
+                            && new List<string>(){
+                                true.ToString(),
+                                false.ToString()
+                            }.Contains(value)
+                            )
                     };
 
                     // Create reset backup
