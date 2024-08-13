@@ -86,6 +86,7 @@ namespace MissionPlanner.GCSViews
 
         string _tempPath = "";
         int _fileCount = 0;
+        NvSystemModes _cameraState;
 
         #endregion
 
@@ -215,74 +216,6 @@ namespace MissionPlanner.GCSViews
             pb_CameraGstream.Invalidate();
         }
 
-        private void Instance_event_DoPhoto(object sender, DoRecordingEventArgs e)
-        {
-            this.DoPhoto();
-        }
-
-        private void CameraView_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            try
-            {
-                CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
-                _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
-                pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
-                LEDStateHandler.LedStateChanged -= LEDStateHandler_LedStateChanged;
-                StateHandler.MV04StateChange -= StateHandler_MV04StateChange;
-
-                GStreamer.StopAll();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
-        {
-            try
-            {
-                if (img != null)
-                {
-                    lock (this._bgimagelock)
-                    {
-                        e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
-                    }
-
-                    FetchHudData();
-                    OnNewFrame(img.Width, img.Height, e.Graphics); 
-
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"{ex.Message}");
-                img.Dispose();
-                img = null;
-            }
-        }
-
-        private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            string mode = MainV2.comPort.MAV.cs.mode;
-            int agl = (int)MainV2.comPort.MAV.cs.alt;
-
-            bool droneFlightMode = mode.ToUpper() == "GUIDED" || mode.ToUpper() == "AUTO" || mode.ToUpper() == "LOITER";
-            bool droneAGLMoreThanZero = agl > 0;
-            bool currentStateFlight = StateHandler.CurrentSate == MV04_State.Takeoff || StateHandler.CurrentSate == MV04_State.Follow || StateHandler.CurrentSate == MV04_State.Auto || StateHandler.CurrentSate == MV04_State.Manual;
-
-            int state = 0;
-
-            if (droneAGLMoreThanZero || currentStateFlight)
-            {
-                return;
-            }
-
-            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, state, 0, 0, 0, 0, 0);
-            _tripSwitchedOff = true;
-            btn_TripSwitchOnOff.BackColor = Color.Black;
-        }
-
         #endregion
 
         #region Init
@@ -307,10 +240,6 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void DrawUI()
         {
-            // Video stream control
-            //this.pnl_CameraScreen.Controls.Add(VideoControl);
-            //VideoControl.Dock = DockStyle.Fill;
-
             // Test functions
             #region Test functions
 
@@ -1281,6 +1210,74 @@ namespace MissionPlanner.GCSViews
 
         #region EventHandlers
 
+        private void Instance_event_DoPhoto(object sender, DoRecordingEventArgs e)
+        {
+            this.DoPhoto();
+        }
+
+        private void CameraView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
+                _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
+                pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
+                LEDStateHandler.LedStateChanged -= LEDStateHandler_LedStateChanged;
+                StateHandler.MV04StateChange -= StateHandler_MV04StateChange;
+
+                GStreamer.StopAll();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
+        {
+            try
+            {
+                if (img != null)
+                {
+                    lock (this._bgimagelock)
+                    {
+                        e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
+                    }
+
+                    FetchHudData();
+                    OnNewFrame(img.Width, img.Height, e.Graphics);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}");
+                img.Dispose();
+                img = null;
+            }
+        }
+
+        private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            string mode = MainV2.comPort.MAV.cs.mode;
+            int agl = (int)MainV2.comPort.MAV.cs.alt;
+
+            bool droneFlightMode = mode.ToUpper() == "GUIDED" || mode.ToUpper() == "AUTO" || mode.ToUpper() == "LOITER";
+            bool droneAGLMoreThanZero = agl > 0;
+            bool currentStateFlight = StateHandler.CurrentSate == MV04_State.Takeoff || StateHandler.CurrentSate == MV04_State.Follow || StateHandler.CurrentSate == MV04_State.Auto || StateHandler.CurrentSate == MV04_State.Manual;
+
+            int state = 0;
+
+            if (droneAGLMoreThanZero || currentStateFlight)
+            {
+                return;
+            }
+
+            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, state, 0, 0, 0, 0, 0);
+            _tripSwitchedOff = true;
+            btn_TripSwitchOnOff.BackColor = Color.Black;
+        }
+
         private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
         {
             ChangeCrossHair();
@@ -1344,50 +1341,11 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        /// <summary>
-        /// Handles a double mouse click on the video area
-        /// </summary>
-        private void OnVideoDoubleClick(object sender, EventArgs e)
-        {
-            //Point p = VideoControl.PointToClient(Cursor.Position);
-
-//#if DEBUG
-//            AddToOSDDebug($"Double clicked at X={p.X} Y={p.Y}");
-//#endif
-        }
-
         private void btn_Settings_Click(object sender, EventArgs e)
         {
             //SettingManager.OpenDialog();
             CameraSettingsForm.Instance.ShowDialog();
             CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
-        }
-
-        /// <summary>
-        /// Handles a mouse click on the video area
-        /// </summary>
-        private void OnVideoClick(int x, int y)
-        {
-            if (x <= 0 || y <= 0 || IsCameraTrackingModeActive)
-                return;
-
-            IsCameraTrackingModeActive = true;
-
-            CameraHandler.Instance.StartTracking(new Point(x, y));
-
-            Point _trackPos = new Point(x, y);
-
-            // Constrain tracking pos
-            _trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
-            _trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
-
-#if DEBUG
-            AddToOSDDebug($"calculated clicked at X={_trackPos.X} Y={_trackPos.Y}");
-            AddToOSDDebug($"built in clicked at X={x} Y={y}");
-            
-#endif
-
-            SetStopButtonVisibility();
         }
 
         private void btn_FPVCameraMode_Click(object sender, EventArgs e)
@@ -1438,8 +1396,6 @@ namespace MissionPlanner.GCSViews
             //}
         }
 
-        NvSystemModes _cameraState;
-
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
         {
             try
@@ -1483,7 +1439,6 @@ namespace MissionPlanner.GCSViews
             
 
         }
-
 
         private void StateHandler_MV04StateChange(object sender, MV04StateChangeEventArgs e)
         {
@@ -1581,6 +1536,33 @@ namespace MissionPlanner.GCSViews
                 btn_TripSwitchOnOff.BackColor = Color.Black;
             }
 
+
+        }
+
+        /// <summary>
+        /// Start camera tracking
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void pb_CameraGstream_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.X <= 0 || e.Y <= 0)
+                return;
+
+            if (IsCameraTrackingModeActive)
+                return;
+
+            IsCameraTrackingModeActive = true;
+
+            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y));
+
+            //Point _trackPos = new Point(e.X, e.Y);
+
+            //// Constrain tracking pos
+            //_trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
+            //_trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
+
+            //MessageBox.Show("(X: " + e.X + " ," + "Y: " + e.Y + ")\n" + "(CX: " + _trackPos.X + ", " + _trackPos.Y + ")");
 
         }
 
@@ -1776,26 +1758,6 @@ namespace MissionPlanner.GCSViews
         #endregion
 
 
-        private void pb_CameraGstream_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            if (e.X <= 0 || e.Y <= 0)
-                return;
-
-            if (IsCameraTrackingModeActive)
-                return;
-
-            IsCameraTrackingModeActive = true;
-
-            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y));
-
-            //Point _trackPos = new Point(e.X, e.Y);
-
-            //// Constrain tracking pos
-            //_trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
-            //_trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
-
-            //MessageBox.Show("(X: " + e.X + " ," + "Y: " + e.Y + ")\n" + "(CX: " + _trackPos.X + ", " + _trackPos.Y + ")");
-
-        }
+        
     }
 }
