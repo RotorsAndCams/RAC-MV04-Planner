@@ -190,7 +190,7 @@
     <value>tlp_VisibleElements</value>
   </data>
   <data name="&gt;&gt;btn_NUC.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="btn_BIT.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -354,6 +354,45 @@
   <data name="tlp_VisibleElements.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
+  <data name="btn_StartStopRecording.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="btn_StartStopRecording.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="btn_StartStopRecording.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Stencil, 18pt</value>
+  </data>
+  <data name="btn_StartStopRecording.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btn_StartStopRecording.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 186</value>
+  </data>
+  <data name="btn_StartStopRecording.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 0</value>
+  </data>
+  <data name="btn_StartStopRecording.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 93</value>
+  </data>
+  <data name="btn_StartStopRecording.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
+  </data>
+  <data name="btn_StartStopRecording.Text" xml:space="preserve">
+    <value>RECORD</value>
+  </data>
+  <data name="&gt;&gt;btn_StartStopRecording.Name" xml:space="preserve">
+    <value>btn_StartStopRecording</value>
+  </data>
+  <data name="&gt;&gt;btn_StartStopRecording.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btn_StartStopRecording.Parent" xml:space="preserve">
+    <value>tlp_VisibleElements</value>
+  </data>
+  <data name="&gt;&gt;btn_StartStopRecording.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="btn_DayCamera.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -394,7 +433,7 @@
     <value>tlp_VisibleElements</value>
   </data>
   <data name="&gt;&gt;btn_DayCamera.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="btn_Reconnect.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -436,7 +475,7 @@
     <value>tlp_VisibleElements</value>
   </data>
   <data name="&gt;&gt;btn_Reconnect.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="btn_NightCamera.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -478,7 +517,7 @@
     <value>tlp_VisibleElements</value>
   </data>
   <data name="&gt;&gt;btn_NightCamera.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="btn_AdvancedSettings.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -511,13 +550,13 @@
     <value>tlp_VisibleElements</value>
   </data>
   <data name="&gt;&gt;btn_AdvancedSettings.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="tlp_VisibleElements.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
   <data name="tlp_VisibleElements.RowCount" type="System.Int32, mscorlib">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="tlp_VisibleElements.Size" type="System.Drawing.Size, System.Drawing">
     <value>404, 279</value>
@@ -538,7 +577,7 @@
     <value>2</value>
   </data>
   <data name="tlp_VisibleElements.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_DayCamera" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_Reconnect" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_NightCamera" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_NUC" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_AdvancedSettings" Row="2" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,33,33333,Percent,33,33333,Percent,33,33333" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_StartStopRecording" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_DayCamera" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_Reconnect" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_NightCamera" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_NUC" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_AdvancedSettings" Row="2" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,33,33333,Percent,33,33333,Percent,33,33333" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="uc_CameraSettings.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 285</value>

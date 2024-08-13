@@ -88,6 +88,9 @@ namespace MissionPlanner.GCSViews
         int _fileCount = 0;
         NvSystemModes _cameraState;
 
+        
+
+
         #endregion
 
         #region Conversion multipliers
@@ -137,8 +140,6 @@ namespace MissionPlanner.GCSViews
             StartCameraControl();
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
             CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
-            //CameraHandler.Instance.event_StartVideoRecording +=;
-            //CameraHandler.Instance.event_StopVideoRecording +=;
 
             SetStopButtonVisibility();
 
@@ -196,8 +197,34 @@ namespace MissionPlanner.GCSViews
                     else
                         pb_CameraGstream.Invalidate();
 
-                    
 
+                    //new Thread(() =>
+                    //{
+                    //    if (_recordingInProgress)
+                    //    {
+                    //        lock (_bitmapsForVideo)
+                    //        {
+                    //            _actualCameraVideoImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
+
+                    //            Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height)); });
+
+
+                    //            if (_actualCameraVideoImage != null)
+                    //            {
+
+                    //                string name = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//screenshot-" + _fileCount + ".png";
+
+                    //                _actualCameraVideoImage.Save(name, ImageFormat.Png);
+
+                    //                _bitmapsForVideo.Add(name);
+                    //                _fileCount++;
+                    //                _actualCameraVideoImage.Dispose();
+                    //            }
+
+                    //        }
+                    //    }
+
+                    //}).Start();
                 }
                 catch (Exception ex)
                 {
@@ -207,13 +234,21 @@ namespace MissionPlanner.GCSViews
 
             this.FormClosing += CameraView_FormClosing;
             
-            _videoRecordTimer.Interval = 500;
-            _videoRecordTimer.Tick += _videoRecordTimer_Tick;
+            _videoRecordTimer.Interval = 100;
+            _videoRecordTimer.Elapsed += _videoRecordTimer_Tick;
             _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
 
-            _videoSaveSegmentTimer.Interval = _segmentLength*1000;
-            _videoSaveSegmentTimer.Tick += _videoSaveSegmentTimer_Tick;
+            _videoSaveSegmentTimer.Interval = _segmentLength*500;
+            _videoSaveSegmentTimer.Elapsed += _videoSaveSegmentTimer_Tick;
             pb_CameraGstream.Invalidate();
+
+            bool autoRecord = bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream));
+
+            if (autoRecord)
+            {
+                StartRecording();
+            }
+
         }
 
         #endregion
@@ -240,6 +275,8 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void DrawUI()
         {
+            CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
+            CameraSettingsForm.Instance.event_StartStopRecording += Instance_event_StartStopRecording;
             // Test functions
             #region Test functions
 
@@ -252,7 +289,6 @@ namespace MissionPlanner.GCSViews
                 {"Switch crosshairs", () => { ChangeCrossHair(); }},
                 {"Do photo", () => { DoPhoto(); }},
                 {"Start recording (loop)", () => { StartRecording(); }},
-                //{"Start recording (infinite)", () => { StartRecordingInfinite(); }},
                 {"Stop recording", () => { StopRecording(); }},
                 {"Set mode", () => { new CameraModeSelectorForm().Show(); }},
                 {"Tracker mode", () => { new TrackerPosForm().Show(); }},
@@ -305,7 +341,6 @@ namespace MissionPlanner.GCSViews
             if (success)
             {
                 FetchHudData();
-                //FetchHudDataTimer.Start();
 
 #if DEBUG
                 AddToOSDDebug("Video stream started");
@@ -381,8 +416,8 @@ namespace MissionPlanner.GCSViews
         }
 
         List<string> _bitmapsForVideo = new List<string>();
-        System.Windows.Forms.Timer _videoRecordTimer = new System.Windows.Forms.Timer();
-        System.Windows.Forms.Timer _videoSaveSegmentTimer = new System.Windows.Forms.Timer();
+        System.Timers.Timer _videoRecordTimer = new System.Timers.Timer();
+        System.Timers.Timer _videoSaveSegmentTimer = new System.Timers.Timer();
 
         /// <summary>
         /// Add bitmap to the list
@@ -391,29 +426,33 @@ namespace MissionPlanner.GCSViews
         /// <param name="e"></param>
         private void _videoRecordTimer_Tick(object sender, EventArgs e)
         {
-            if (_recordingInProgress)
+            new Thread(() =>
             {
-                lock (_bitmapsForVideo)
+                if (_recordingInProgress)
                 {
-                    _actualCameraVideoImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
-                    pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height));
-
-                    if (_actualCameraVideoImage != null)
+                    lock (_bitmapsForVideo)
                     {
+                        _actualCameraVideoImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
 
-                        string name = Directory.GetCurrentDirectory() + "//screenshot-" + _fileCount + ".png";
-
-
-                        _actualCameraVideoImage.Save(name, ImageFormat.Png);
+                        Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height)); });
 
 
-                        _bitmapsForVideo.Add(name);
-                        _fileCount++;
-                        _actualCameraVideoImage.Dispose();
+                        if (_actualCameraVideoImage != null)
+                        {
+
+                            string name = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//screenshot-" + _fileCount + ".png";
+
+                            _actualCameraVideoImage.Save(name, ImageFormat.Png);
+
+                            _bitmapsForVideo.Add(name);
+                            _fileCount++;
+                            _actualCameraVideoImage.Dispose();
+                        }
+
                     }
-
                 }
-            }
+            }).Start();
+            
         }
 
 
@@ -425,37 +464,55 @@ namespace MissionPlanner.GCSViews
         /// <exception cref="NotImplementedException"></exception>
         private void _videoSaveSegmentTimer_Tick(object sender, EventArgs e)
         {
-            if (_recordingInProgress)
+            try
             {
-                lock (_bitmapsForVideo)
+                _videoRecordTimer?.Stop();
+                _videoSaveSegmentTimer?.Stop();
+
+                new Thread(() =>
                 {
-                    using (VideoFileWriter writer = new VideoFileWriter())
+                    if (_recordingInProgress)
                     {
-
-                        writer.Open("testrecord" + DateTime.Now.ToString("yyyyMMddHHmmss"), 1920, 1080, _frameRate, VideoCodec.MPEG4);
-
-                        foreach(string location in _bitmapsForVideo)
+                        lock (_bitmapsForVideo)
                         {
-                            Bitmap bm = System.Drawing.Image.FromFile(location) as Bitmap;
-                            Bitmap bm_formatted = new Bitmap(bm, 1920, 1080);
-                            writer.WriteVideoFrame(bm_formatted);
-                            bm.Dispose();
-                            bm_formatted.Dispose();
+                            using (VideoFileWriter writer = new VideoFileWriter())
+                            {
+                                writer.Open(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//testrecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4);
+
+                                foreach (string location in _bitmapsForVideo)
+                                {
+                                    Bitmap bm = System.Drawing.Image.FromFile(location) as Bitmap;
+                                    Bitmap bm_formatted = new Bitmap(bm, 1920, 1080);
+                                    writer.WriteVideoFrame(bm_formatted);
+                                    //bm.Dispose();
+                                    //bm_formatted.Dispose();
+                                }
+                                writer.Close();
+
+                                DeleteTempFiles();
+                                _bitmapsForVideo.Clear();
+                                _fileCount = 0;
+                            }
+                            
                         }
-                        writer.Close();
                     }
-                    DeleteTempFiles();
-                    _bitmapsForVideo.Clear();
-                    _fileCount = 0;
-                }
+                }).Start();
+
+                _videoRecordTimer?.Start();
+                _videoSaveSegmentTimer?.Start();
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("CameraView - _videoSaveSegmentTimer_Tick " + ex.Message);
+            }
+
         }
 
         private void DeleteTempFiles()
         {
             try
             {
-                foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()).Where(x => new FileInfo(x).Name.Contains("screenshot")))
+                foreach (var file in Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)).Where(x => new FileInfo(x).Name.Contains("screenshot")))
                 {
                     File.Delete(file);
                 }
@@ -476,11 +533,13 @@ namespace MissionPlanner.GCSViews
 
         private void StopRecording()
         {
-            //bool success = CameraHandler.Instance.StopRecording();
             _recordingInProgress = false;
 
             _videoRecordTimer?.Stop();
+            _videoRecordTimer.Close();
             _videoSaveSegmentTimer?.Stop();
+            _videoRecordTimer.Close();
+
             _bitmapsForVideo.Clear();
             DeleteTempFiles();
 
@@ -605,7 +664,6 @@ namespace MissionPlanner.GCSViews
 #endif
         }
 
-
         private bool StartGstreamerCameraStream(string p_url)
         {
             try
@@ -625,8 +683,6 @@ namespace MissionPlanner.GCSViews
         {
             GStreamer.StopAll();
         }
-
-
 
         #endregion
 
@@ -1219,13 +1275,21 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
-                _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
-                pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
-                LEDStateHandler.LedStateChanged -= LEDStateHandler_LedStateChanged;
-                StateHandler.MV04StateChange -= StateHandler_MV04StateChange;
-
                 GStreamer.StopAll();
+
+                if (_recordingInProgress)
+                    StopRecording();
+
+                //_videoRecordTimer.Elapsed -= _videoRecordTimer_Tick;
+                //_videoSaveSegmentTimer.Elapsed -= _videoSaveSegmentTimer_Tick;
+
+                //CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
+                //LEDStateHandler.LedStateChanged -= LEDStateHandler_LedStateChanged;
+                //StateHandler.MV04StateChange -= StateHandler_MV04StateChange;
+                //_droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
+
+                //pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
+                
             }
             catch (Exception ex)
             {
@@ -1252,8 +1316,6 @@ namespace MissionPlanner.GCSViews
             catch (Exception ex)
             {
                 MessageBox.Show($"{ex.Message}");
-                img.Dispose();
-                img = null;
             }
         }
 
@@ -1343,9 +1405,18 @@ namespace MissionPlanner.GCSViews
 
         private void btn_Settings_Click(object sender, EventArgs e)
         {
-            //SettingManager.OpenDialog();
             CameraSettingsForm.Instance.ShowDialog();
-            CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
+            
+        }
+
+        private void Instance_event_StartStopRecording(object sender, EventArgs e)
+        {
+            if(_recordingInProgress)
+                StopRecording();
+            else
+                StartRecording();
+
+            CameraSettingsForm.Instance.SetRecordingStatus(_recordingInProgress);
         }
 
         private void btn_FPVCameraMode_Click(object sender, EventArgs e)

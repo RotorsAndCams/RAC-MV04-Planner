@@ -42,6 +42,7 @@
             this.btn_NightCamera = new System.Windows.Forms.Button();
             this.btn_AdvancedSettings = new System.Windows.Forms.Button();
             this.uc_CameraSettings = new MV04.Settings.uc_CameraSettings();
+            this.btn_StartStopRecording = new System.Windows.Forms.Button();
             this.pnl_DisabledControlsByDefault.SuspendLayout();
             this.tlp_VisibleElements.SuspendLayout();
             this.SuspendLayout();
@@ -110,6 +111,7 @@
             // tlp_VisibleElements
             // 
             resources.ApplyResources(this.tlp_VisibleElements, "tlp_VisibleElements");
+            this.tlp_VisibleElements.Controls.Add(this.btn_StartStopRecording, 0, 2);
             this.tlp_VisibleElements.Controls.Add(this.btn_DayCamera, 0, 0);
             this.tlp_VisibleElements.Controls.Add(this.btn_Reconnect, 1, 1);
             this.tlp_VisibleElements.Controls.Add(this.btn_NightCamera, 1, 0);
@@ -163,6 +165,15 @@
             resources.ApplyResources(this.uc_CameraSettings, "uc_CameraSettings");
             this.uc_CameraSettings.Name = "uc_CameraSettings";
             // 
+            // btn_StartStopRecording
+            // 
+            resources.ApplyResources(this.btn_StartStopRecording, "btn_StartStopRecording");
+            this.btn_StartStopRecording.BackColor = System.Drawing.Color.Black;
+            this.btn_StartStopRecording.ForeColor = System.Drawing.Color.White;
+            this.btn_StartStopRecording.Name = "btn_StartStopRecording";
+            this.btn_StartStopRecording.UseVisualStyleBackColor = false;
+            this.btn_StartStopRecording.Click += new System.EventHandler(this.btn_StartStopRecording_Click);
+            // 
             // CameraSettingsForm
             // 
             resources.ApplyResources(this, "$this");
@@ -200,5 +211,6 @@
         private System.Windows.Forms.Panel pnl_DisabledControlsByDefault;
         private System.Windows.Forms.Button btn_AdvancedSettings;
         private Settings.uc_CameraSettings uc_CameraSettings;
+        private System.Windows.Forms.Button btn_StartStopRecording;
     }
 }
