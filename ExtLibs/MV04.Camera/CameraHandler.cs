@@ -251,7 +251,7 @@ namespace MV04.Camera
                 MessageBox.Show("Invalid MavProto - CameraHandler - ctor");
             }
 #if DEBUG
-            url = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+            url = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=25/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 #endif
         }
 
