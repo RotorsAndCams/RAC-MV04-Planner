@@ -56,8 +56,6 @@ namespace MissionPlanner.GCSViews
         bool OSDDebug = true;
         string[] OSDDebugLines = new string[10];
 
-        private enum_MV04_CameraModes previousCameraMode;
-
         private CameraFullScreenForm _cameraFullScreenForm;
         private bool _isFPVModeActive = false;
         public static Size Trip5Size = new Size(1920, 1200);
@@ -1106,7 +1104,7 @@ namespace MissionPlanner.GCSViews
         {
             if (_isFPVModeActive)
             {
-                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)previousCameraMode);
+                CameraHandler.Instance.SetMode(CameraHandler.Instance.PrevCameraMode);
 
                 _isFPVModeActive = false;
                 btn_FPVCameraMode.BackColor = Color.Black;
@@ -1154,29 +1152,25 @@ namespace MissionPlanner.GCSViews
 
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
         {
-
-            var status = e.Report.systemMode;
-
             #region test
+            byte systemMode = e.Report.systemMode;
 
-            var test = e.Report.status_flags;
+            byte test = e.Report.status_flags;
 
-            var stg = (NvSystemModes)((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]).systemMode;
+            NvSystemModes stg = CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]);
 
             _cameraState = stg;
-
             #endregion
 
-            string st = ((MavProto.NvSystemModes)status).ToString();
+            string systemModeStr = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report).ToString();
 
             //Test: Set Camera Status
             if (InvokeRequired)
             {
-                Invoke(new Action(() => { SetCameraStatusValue(st); }));
+                Invoke(new Action(() => { SetCameraStatusValue(systemModeStr); }));
             }
             else
-                SetCameraStatusValue(st);
-
+                SetCameraStatusValue(systemModeStr);
 
             //Test: Set Drone Status
             if (InvokeRequired)
@@ -1340,7 +1334,7 @@ namespace MissionPlanner.GCSViews
                 return;
             }
 
-            var cameraMode = (NvSystemModes)((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]).systemMode;
+            NvSystemModes cameraMode = CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]);
 
             switch (StateHandler.CurrentSate)
             {

@@ -164,7 +164,7 @@ namespace MV04.Camera
 
         public int CameraControlPort { get; set; }
 
-        private NvSystemModes PrevCameraMode;
+        public NvSystemModes PrevCameraMode { get; private set; }
 
         private MavProto _mavProto = null;
 
@@ -445,6 +445,55 @@ namespace MV04.Camera
             return;
         }
 
+        /// <summary>
+        /// Convert System Report systemMode field to MavProto.NvSystemModes enum value
+        /// </summary>
+        /// <param name="sysReportMode">System report systemMode field value</param>
+        /// <returns>Converted system mode (or GRR if not found)</returns>
+        public NvSystemModes SysReportModeToMavProtoMode(byte sysReportMode)
+        {
+            switch (sysReportMode)
+            {
+                case 0:
+                    return NvSystemModes.Stow;
+                case 1:
+                    return NvSystemModes.Pilot;
+                //case 2: Retract
+                //case 3: Retract Lock
+                case 4:
+                    return NvSystemModes.Observation;
+                case 5:
+                    return NvSystemModes.GRR;
+                case 6:
+                    return NvSystemModes.HoldCoordinate;
+                case 7:
+                    return NvSystemModes.PTC; // Point To Coordinate
+                case 8:
+                    return NvSystemModes.LocalPosition;
+                case 9:
+                    return NvSystemModes.GlobalPosition;
+                case 10:
+                    return NvSystemModes.Tracking;
+                case 11:
+                    return NvSystemModes.EPR; // Extended Pitch Range
+                //case 12: BIT
+                case 13:
+                    return NvSystemModes.Nadir;
+                default:
+                    return NvSystemModes.GRR;
+            }
+        }
+
+        /// <summary>
+        /// Convert System Report systemMode field to MavProto.NvSystemModes enum value
+        /// </summary>
+        /// <param name="sysReport">System report object</param>
+        /// <returns>Converted system mode (or GRR if not found)</returns>
+        public NvSystemModes SysReportModeToMavProtoMode(SysReport sysReport)
+        {
+            return SysReportModeToMavProtoMode(sysReport.systemMode);
+        }
+
         #region Video Methods
 
         public bool DoPhoto()
@@ -578,28 +627,38 @@ namespace MV04.Camera
 
         public bool SetMode(NvSystemModes mode)
         {
-            if (IsCameraControlConnected
-                &&
-                (mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok)
+            if (IsCameraControlConnected)
             {
-                switch (mode)
+                // Get current camera mode
+                NvSystemModes currentMode = HasCameraReport(MavReportType.SystemReport) ?
+                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
+                    NvSystemModes.GRR;
+
+                if ((mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok)
                 {
-                    // Start gimbal moving timer in modes that support it
-                    case NvSystemModes.HoldCoordinate:
-                    case NvSystemModes.Observation:
-                    case NvSystemModes.LocalPosition:
-                    case NvSystemModes.GlobalPosition:
-                    case NvSystemModes.GRR:
-                    case NvSystemModes.PTC:
-                    case NvSystemModes.UnstabilizedPosition:
-                        StartGimbal();
-                        break;
-                    // Stop gimbal moving timer in modes that don't support it
-                    default:
-                        StopGimbal();
-                        break;
+                    // Save as previous camera mode
+                    PrevCameraMode = currentMode;
+
+                    // Start or stop gimbal timer
+                    switch (mode)
+                    {
+                        // Start gimbal moving timer in modes that support it
+                        case NvSystemModes.HoldCoordinate:
+                        case NvSystemModes.Observation:
+                        case NvSystemModes.LocalPosition:
+                        case NvSystemModes.GlobalPosition:
+                        case NvSystemModes.GRR:
+                        case NvSystemModes.PTC:
+                        case NvSystemModes.UnstabilizedPosition:
+                            StartGimbal();
+                            break;
+                        // Stop gimbal moving timer in modes that don't support it
+                        default:
+                            StopGimbal();
+                            break;
+                    }
+                    return true;
                 }
-                return true;
             }
             return false;
         }
@@ -653,10 +712,9 @@ namespace MV04.Camera
             if (IsCameraControlConnected)
             {
                 // Save current camera mode
-                if (HasCameraReport(MavReportType.SystemReport))
-                    PrevCameraMode = (NvSystemModes)((SysReport)CameraReports[MavReportType.SystemReport]).systemMode;
-                else
-                    PrevCameraMode = NvSystemModes.GRR;
+                PrevCameraMode = HasCameraReport(MavReportType.SystemReport) ?
+                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
+                    NvSystemModes.GRR;
 
                 // Handle default tracking pos (center)
                 Point _trackPos = trackPos ?? new Point(640, 360);
