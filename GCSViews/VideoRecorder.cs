@@ -33,15 +33,17 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                List<string> actList;
+                //List<string> actList;
 
-                lock (_bitmapsForVideo)
-                {
-                    actList = new List<string>(_bitmapsForVideo);
-                    _bitmapsForVideo.Clear();
-                }
+                //lock (_bitmapsForVideo)
+                //{
+                //    actList = new List<string>(_bitmapsForVideo);
+                //    _bitmapsForVideo.Clear();
+                //}
                     
-                Task.Factory.StartNew(() => { WriteVideoToFile(actList); });
+                //Task.Factory.StartNew(() => { WriteVideoToFile(actList); });
+
+                _writer.Close();
             }
             catch (Exception ex)
             {
@@ -55,7 +57,7 @@ namespace MissionPlanner.GCSViews
             {
                 using (VideoFileWriter writer = new VideoFileWriter())
                 {
-                    writer.Open(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//testrecord" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4);
+                    writer.Open(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//testrecord" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4, 100000);
 
                     foreach (string location in actualImageList)
                     {
@@ -89,9 +91,20 @@ namespace MissionPlanner.GCSViews
 
         //----------
 
+        VideoFileWriter _writer = new VideoFileWriter();
+
         public void AddNewImage(Bitmap bm)
         {
-            Task.Factory.StartNew(() => { WriteImageToFile(bm); });
+            if (_writer.IsOpen)
+            {
+                _writer.WriteVideoFrame(bm);
+            }
+            else
+            {
+                _writer.Open(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//testrecord" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4, 100000);
+                _writer.WriteVideoFrame(bm);
+            }
+            //Task.Factory.StartNew(() => { WriteImageToFile(bm); });
 
         }
 

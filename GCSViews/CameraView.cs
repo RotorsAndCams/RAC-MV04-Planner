@@ -205,9 +205,9 @@ namespace MissionPlanner.GCSViews
                     {
                         lock (_lockImageSaveTimer)
                         {
-                            var _actualCameraVideoImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
+                            var _actualCameraVideoImage = new Bitmap(1920, 1080);
 
-                            Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height)); });
+                            Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, 1920, 1080)); });
 
                             _videoRecorder.AddNewImage(_actualCameraVideoImage);
                         }
