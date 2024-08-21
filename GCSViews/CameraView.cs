@@ -78,7 +78,6 @@ namespace MissionPlanner.GCSViews
         private readonly object _bgimagelock = new object();
 
         Bitmap _actualCameraImage;
-        Bitmap _actualCameraVideoImage;
 
         int _frameRate = 25;
         bool _recordingInProgress = false;
@@ -179,6 +178,10 @@ namespace MissionPlanner.GCSViews
 
             this.DoubleBuffered = true;
             pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
+
+
+            DeleteTempFiles();
+
             GStreamer.onNewImage += (sender, image) =>
             {
                 try
@@ -197,6 +200,19 @@ namespace MissionPlanner.GCSViews
                     else
                         pb_CameraGstream.Invalidate();
 
+                    //
+                    if (_recordingInProgress)
+                    {
+                        lock (_lockImageSaveTimer)
+                        {
+                            var _actualCameraVideoImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
+
+                            Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height)); });
+
+                            _videoRecorder.AddNewImage(_actualCameraVideoImage);
+                        }
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -206,12 +222,10 @@ namespace MissionPlanner.GCSViews
 
             this.FormClosing += CameraView_FormClosing;
             
-            _videoRecordTimer.Interval = 100;
+            _videoRecordTimer.Interval = 40;
             _videoRecordTimer.Elapsed += _videoRecordTimer_Tick;
             _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
 
-            _videoSaveSegmentTimer.Interval = 10000;
-            _videoSaveSegmentTimer.Elapsed += _videoSaveSegmentTimer_Tick;
             pb_CameraGstream.Invalidate();
 
             bool autoRecord = bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream));
@@ -387,9 +401,9 @@ namespace MissionPlanner.GCSViews
 #endif
         }
 
-        List<string> _bitmapsForVideo = new List<string>();
+        object _lockImageSaveTimer = new object();
         System.Timers.Timer _videoRecordTimer = new System.Timers.Timer();
-        System.Timers.Timer _videoSaveSegmentTimer = new System.Timers.Timer();
+        private VideoRecorder _videoRecorder = new VideoRecorder();
 
         /// <summary>
         /// Add bitmap to the list
@@ -398,91 +412,18 @@ namespace MissionPlanner.GCSViews
         /// <param name="e"></param>
         private void _videoRecordTimer_Tick(object sender, EventArgs e)
         {
-            if (_recordingInProgress)
-            {
-                lock (_bitmapsForVideo)
-                {
-                    _actualCameraVideoImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
+            //if (_recordingInProgress)
+            //{
+            //    lock (_lockImageSaveTimer)
+            //    {
+            //        var _actualCameraVideoImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
 
-                    Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height)); });
+            //        Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height)); });
 
+            //        _videoRecorder.AddNewImage(_actualCameraVideoImage);
+            //    }
+            //}
 
-                    if (_actualCameraVideoImage != null)
-                    {
-
-                        string name = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//screenshot-" + DateTime.Now.ToString("yyyymmddhhmmss") + ".png";
-
-                        _actualCameraVideoImage.Save(name, ImageFormat.Png);
-
-                        _bitmapsForVideo.Add(name);
-                        _actualCameraVideoImage.Dispose();
-                    }
-
-                }
-            }
-
-        }
-
-
-        /// <summary>
-        /// write the list to a file
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        private void _videoSaveSegmentTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                //_videoRecordTimer?.Stop();
-                _videoSaveSegmentTimer?.Stop();
-
-                List<string> templist;
-                lock (_bitmapsForVideo)
-                {
-                    templist = new List<string>(_bitmapsForVideo);
-                    _bitmapsForVideo.Clear();
-                }
-
-                if (_recordingInProgress)
-                {
-                    
-
-                    using (VideoFileWriter writer = new VideoFileWriter())
-                    {
-                        writer.Open(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//testrecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4);
-
-                        foreach (string location in templist)
-                        {
-                            Bitmap bm = System.Drawing.Image.FromFile(location) as Bitmap;
-                            Bitmap bm_formatted = new Bitmap(bm, 1920, 1080);
-                            writer.WriteVideoFrame(bm_formatted);
-                            //bm.Dispose();
-                            //bm_formatted.Dispose();
-                        }
-                        writer.Close();
-
-
-                        foreach (string location in templist)
-                        {
-                            try
-                            {
-                                File.Delete(location);
-                            }
-                            catch { }
-                        }
-
-                        templist.Clear();
-                    }
-                }
-
-                //_videoRecordTimer?.Start();
-                _videoSaveSegmentTimer?.Start();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("CameraView - _videoSaveSegmentTimer_Tick " + ex.Message);
-            }
 
         }
 
@@ -504,7 +445,7 @@ namespace MissionPlanner.GCSViews
             int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
 
             _videoRecordTimer?.Start();
-            _videoSaveSegmentTimer?.Start();
+            _videoRecorder.Start();
 
             _recordingInProgress = true;
         }
@@ -515,10 +456,9 @@ namespace MissionPlanner.GCSViews
 
             _videoRecordTimer?.Stop();
             _videoRecordTimer.Close();
-            _videoSaveSegmentTimer?.Stop();
-            _videoRecordTimer.Close();
 
-            _bitmapsForVideo.Clear();
+            _videoRecorder.Stop();
+
             DeleteTempFiles();
 
         }
@@ -1288,7 +1228,6 @@ namespace MissionPlanner.GCSViews
 
                     FetchHudData();
                     OnNewFrame(img.Width, img.Height, e.Graphics);
-
                 }
             }
             catch (Exception ex)
