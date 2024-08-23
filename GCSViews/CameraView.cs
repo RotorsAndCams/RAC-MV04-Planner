@@ -179,9 +179,6 @@ namespace MissionPlanner.GCSViews
             this.DoubleBuffered = true;
             pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
 
-
-            DeleteTempFiles();
-
             GStreamer.onNewImage += (sender, image) =>
             {
                 try
@@ -201,17 +198,12 @@ namespace MissionPlanner.GCSViews
                         pb_CameraGstream.Invalidate();
 
                     //
-                    if (_recordingInProgress)
-                    {
-                        lock (_lockImageSaveTimer)
-                        {
-                            var _actualCameraVideoImage = new Bitmap(1920, 1080);
+                    //Task.Factory.StartNew(() => {
 
-                            Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, 1920, 1080)); });
+                        
 
-                            _videoRecorder.AddNewImage(_actualCameraVideoImage);
-                        }
-                    }
+                    //});
+                    
 
                 }
                 catch (Exception ex)
@@ -262,7 +254,7 @@ namespace MissionPlanner.GCSViews
         private void DrawUI()
         {
             CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
-            CameraSettingsForm.Instance.event_StartStopRecording += Instance_event_StartStopRecording;
+            CameraSettingsForm.Instance.event_StartStopRecording += CameraSettings_event_StartStopRecording;
             // Test functions
             #region Test functions
 
@@ -412,32 +404,18 @@ namespace MissionPlanner.GCSViews
         /// <param name="e"></param>
         private void _videoRecordTimer_Tick(object sender, EventArgs e)
         {
-            //if (_recordingInProgress)
-            //{
-            //    lock (_lockImageSaveTimer)
-            //    {
-            //        var _actualCameraVideoImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
-
-            //        Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height)); });
-
-            //        _videoRecorder.AddNewImage(_actualCameraVideoImage);
-            //    }
-            //}
-
-
-        }
-
-        private void DeleteTempFiles()
-        {
-            try
+            if (_recordingInProgress)
             {
-                foreach (var file in Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)).Where(x => new FileInfo(x).Name.Contains("screenshot")))
+                lock (_lockImageSaveTimer)
                 {
-                    File.Delete(file);
+                    var _actualCameraVideoImage = new Bitmap(1920, 1080);
+
+                    Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, 1920, 1080)); });
+
+                    _videoRecorder.AddNewImage(_actualCameraVideoImage);
+
                 }
             }
-            catch { }
-            
         }
 
         private void StartRecording()
@@ -458,8 +436,6 @@ namespace MissionPlanner.GCSViews
             _videoRecordTimer.Close();
 
             _videoRecorder.Stop();
-
-            DeleteTempFiles();
 
         }
 
@@ -1193,21 +1169,25 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                GStreamer.StopAll();
 
-                if (_recordingInProgress)
                     StopRecording();
 
-                //_videoRecordTimer.Elapsed -= _videoRecordTimer_Tick;
-                //_videoSaveSegmentTimer.Elapsed -= _videoSaveSegmentTimer_Tick;
+                    _videoRecorder.Close();
 
-                //CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
-                //LEDStateHandler.LedStateChanged -= LEDStateHandler_LedStateChanged;
-                //StateHandler.MV04StateChange -= StateHandler_MV04StateChange;
-                //_droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
-
-                //pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
+                    _videoRecordTimer.Elapsed -= _videoRecordTimer_Tick;
                 
+                    
+                GStreamer.StopAll();
+
+                CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
+                LEDStateHandler.LedStateChanged -= LEDStateHandler_LedStateChanged;
+                StateHandler.MV04StateChange -= StateHandler_MV04StateChange;
+                
+                _droneStatusTimer.Stop();
+                _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
+
+                pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
+
             }
             catch (Exception ex)
             {
@@ -1326,7 +1306,7 @@ namespace MissionPlanner.GCSViews
             
         }
 
-        private void Instance_event_StartStopRecording(object sender, EventArgs e)
+        private void CameraSettings_event_StartStopRecording(object sender, EventArgs e)
         {
             if(_recordingInProgress)
                 StopRecording();
