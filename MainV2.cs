@@ -873,8 +873,8 @@ namespace MissionPlanner
 
             if (splash != null)
             {
-                this.Text = splash?.Text;
-                titlebar = splash?.Text;
+                //this.Text = splash?.Text;
+                //titlebar = splash?.Text;
             }
 
             if (!MONO) // windows only
@@ -1137,10 +1137,10 @@ namespace MissionPlanner
 #endif
 #endif
 
-            if (Program.IconFile != null)
-            {
-                this.Icon = Icon.FromHandle(((Bitmap) Program.IconFile).GetHicon());
-            }
+            //if (Program.IconFile != null)
+            //{
+            //    this.Icon = Icon.FromHandle(((Bitmap) Program.IconFile).GetHicon());
+            //}
 
             //MenuArduPilot.Image = new Bitmap(Properties.Resources._0d92fed790a3a70170e61a86db103f399a595c70,
             //    (int) (200), 31);
@@ -1158,6 +1158,9 @@ namespace MissionPlanner
 
             // save config to test we have write access
             SaveConfig();
+
+            this.Text = "";
+            this.ShowIcon = false;
         }
 
         void cmb_sysid_Click(object sender, EventArgs e)
@@ -1787,7 +1790,7 @@ namespace MissionPlanner
                     Settings.Instance[_connectionControl.CMB_serialport.Text.Replace(" ","_") + "_BAUD"] =
                         _connectionControl.CMB_baudrate.Text;
 
-                    this.Text = titlebar + " " + comPort.MAV.VersionString;
+                    //this.Text = titlebar + " " + comPort.MAV.VersionString;
 
                     // refresh config window if needed
                     if (MyView.current != null && showui)
