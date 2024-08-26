@@ -248,43 +248,62 @@ namespace MissionPlanner.GCSViews
                 + (hasSysRep ? (int)Math.Round(((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).roll) : 0).ToString().PadLeft(7) + "°";
 
             // UAV position
-            Coordinate droneCoord = new Coordinate(cs.lat, cs.lng, DateTime.Now);
+            (double lat, double lng) droneLatLng = (cs.lat, cs.lng);
             string dronePos;
-            switch (SettingManager.Get(Setting.GPSType).ToUpper())
+            if (droneLatLng.lat >= -90 && droneLatLng.lat <= 90
+                &&
+                droneLatLng.lng >= -180 && droneLatLng.lng <= 180)
             {
-                case "MGRS":
-                    dronePos = droneCoord.MGRS.ToString();
-                    break;
-                default: // WGS84
-                    dronePos = droneCoord.UTM.ToString();
-                    break;
+                Coordinate droneCoord = new Coordinate(droneLatLng.lat, droneLatLng.lng, DateTime.Now);
+                switch (SettingManager.Get(Setting.GPSType).ToUpper())
+                {
+                    case "MGRS":
+                        dronePos = droneCoord.MGRS.ToString();
+                        break;
+                    default: // WGS84
+                        dronePos = droneCoord.UTM.ToString();
+                        break;
+                }
+
+                CameraHandler.Instance.DronePos = droneCoord; // Update CameraHandler
             }
+            else
+            {
+                dronePos = "UNKNOWN";
+            }
+
             HudElements.DroneGps = "UAV"
                 + SettingManager.Get(Setting.GPSType).ToUpper().PadLeft(dronePos.Length - 3)
                 + $"\n" + dronePos;
 
-            CameraHandler.Instance.DronePos = droneCoord; // Update CameraHandler
-
             // Camera target position
-            Coordinate targetCoord = new Coordinate(
-                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat : 0,
-                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon : 0,
-                DateTime.Now);
+            (float lat, float lng) targetLatLng = (hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat : 0, hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon : 0);
             string targetPos;
-            switch (SettingManager.Get(Setting.GPSType).ToUpper())
+            if (targetLatLng.lat >= -90 && targetLatLng.lat <= 90
+                &&
+                targetLatLng.lng >= -180 && targetLatLng.lng <= 180)
             {
-                case "MGRS":
-                    targetPos = targetCoord.MGRS.ToString();
-                    break;
-                default: // WGS84
-                    targetPos = targetCoord.UTM.ToString();
-                    break;
+                Coordinate targetCoord = new Coordinate(targetLatLng.lat, targetLatLng.lng, DateTime.Now);
+                switch (SettingManager.Get(Setting.GPSType).ToUpper())
+                {
+                    case "MGRS":
+                        targetPos = targetCoord.MGRS.ToString();
+                        break;
+                    default: // WGS84
+                        targetPos = targetCoord.UTM.ToString();
+                        break;
+                }
+
+                CameraHandler.Instance.TargPos = targetCoord; // Update CameraHandler
             }
+            else
+            {
+                targetPos = "UNKNOWN";
+            }
+
             HudElements.TargetGps = "TRG"
                 + SettingManager.Get(Setting.GPSType).ToUpper().PadLeft(targetPos.Length - 3)
                 + $"\n" + targetPos;
-
-            CameraHandler.Instance.TargPos = targetCoord; // Update CameraHandler
 
             HudElements.LineDistance = 10;
             // TODO: Optimize HudElements.LineDistance on the fly to make it easy to read on the screen

@@ -59,8 +59,6 @@ namespace MissionPlanner.GCSViews
         bool OSDDebug = true;
         string[] OSDDebugLines = new string[10];
 
-        private enum_MV04_CameraModes previousCameraMode;
-
         private CameraFullScreenForm _cameraFullScreenForm;
         private bool _isFPVModeActive = false;
         public static Size Trip5Size = new Size(1920, 1200);
@@ -1107,43 +1105,62 @@ namespace MissionPlanner.GCSViews
                 + (hasSysRep ? (int)Math.Round(((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).roll) : 0).ToString().PadLeft(7) + "°";
 
             // UAV position
-            Coordinate droneCoord = new Coordinate(cs.lat, cs.lng, DateTime.Now);
+            (double lat, double lng) droneLatLng = (cs.lat, cs.lng);
             string dronePos;
-            switch (SettingManager.Get(Setting.GPSType).ToUpper())
+            if (droneLatLng.lat >= -90 && droneLatLng.lat <= 90
+                &&
+                droneLatLng.lng >= -180 && droneLatLng.lng <= 180)
             {
-                case "MGRS":
-                    dronePos = droneCoord.MGRS.ToString();
-                    break;
-                default: // WGS84
-                    dronePos = droneCoord.UTM.ToString();
-                    break;
+                Coordinate droneCoord = new Coordinate(droneLatLng.lat, droneLatLng.lng, DateTime.Now);
+                switch (SettingManager.Get(Setting.GPSType).ToUpper())
+                {
+                    case "MGRS":
+                        dronePos = droneCoord.MGRS.ToString();
+                        break;
+                    default: // WGS84
+                        dronePos = droneCoord.UTM.ToString();
+                        break;
+                }
+
+                CameraHandler.Instance.DronePos = droneCoord; // Update CameraHandler
             }
+            else
+            {
+                dronePos = "UNKNOWN";
+            }
+
             HudElements.DroneGps = "UAV"
                 + SettingManager.Get(Setting.GPSType).ToUpper().PadLeft(dronePos.Length - 3)
                 + $"\n" + dronePos;
 
-            CameraHandler.Instance.DronePos = droneCoord; // Update CameraHandler
-
             // Camera target position
-            Coordinate targetCoord = new Coordinate(
-                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat : 0,
-                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon : 0,
-                DateTime.Now);
+            (float lat, float lng) targetLatLng = (hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat : 0, hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon : 0);
             string targetPos;
-            switch (SettingManager.Get(Setting.GPSType).ToUpper())
+            if (targetLatLng.lat >= -90 && targetLatLng.lat <= 90
+                &&
+                targetLatLng.lng >= -180 && targetLatLng.lng <= 180)
             {
-                case "MGRS":
-                    targetPos = targetCoord.MGRS.ToString();
-                    break;
-                default: // WGS84
-                    targetPos = targetCoord.UTM.ToString();
-                    break;
+                Coordinate targetCoord = new Coordinate(targetLatLng.lat, targetLatLng.lng, DateTime.Now);
+                switch (SettingManager.Get(Setting.GPSType).ToUpper())
+                {
+                    case "MGRS":
+                        targetPos = targetCoord.MGRS.ToString();
+                        break;
+                    default: // WGS84
+                        targetPos = targetCoord.UTM.ToString();
+                        break;
+                }
+
+                CameraHandler.Instance.TargPos = targetCoord; // Update CameraHandler
             }
+            else
+            {
+                targetPos = "UNKNOWN";
+            }
+
             HudElements.TargetGps = "TRG"
                 + SettingManager.Get(Setting.GPSType).ToUpper().PadLeft(targetPos.Length - 3)
                 + $"\n" + targetPos;
-
-            CameraHandler.Instance.TargPos = targetCoord; // Update CameraHandler
 
             HudElements.LineDistance = 10;
             // TODO: Optimize HudElements.LineDistance on the fly to make it easy to read on the screen
@@ -1320,7 +1337,7 @@ namespace MissionPlanner.GCSViews
         {
             if (_isFPVModeActive)
             {
-                CameraHandler.Instance.SetMode((MavProto.NvSystemModes)previousCameraMode);
+                CameraHandler.Instance.SetMode(CameraHandler.Instance.PrevCameraMode);
 
                 _isFPVModeActive = false;
                 btn_FPVCameraMode.BackColor = Color.Black;
@@ -1366,45 +1383,38 @@ namespace MissionPlanner.GCSViews
 
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
         {
+            
             try
             {
-                var status = e.Report.systemMode;
-
                 #region test
+                byte systemMode = e.Report.systemMode;
 
-                var test = e.Report.status_flags;
+                byte test = e.Report.status_flags;
 
-                var stg = (NvSystemModes)((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]).systemMode;
+                NvSystemModes stg = CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]);
 
                 _cameraState = stg;
-
                 #endregion
 
-                string st = ((MavProto.NvSystemModes)status).ToString();
-
+                string systemModeStr = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report).ToString();
 
                 //Test: Set Camera Status
                 if (InvokeRequired)
-                {
-                    Invoke(new Action(() => { SetCameraStatusValue(st); }));
-                }
+                    Invoke(new Action(() => { SetCameraStatusValue(systemModeStr); }));
                 else
-                    SetCameraStatusValue(st);
-
+                    SetCameraStatusValue(systemModeStr);
 
                 //Test: Set Drone Status
                 if (InvokeRequired)
-                {
                     Invoke(new Action(() => { SetDroneStatusValue(); }));
-                }
                 else
                     SetDroneStatusValue();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
-            
+
 
         }
 
@@ -1579,7 +1589,7 @@ namespace MissionPlanner.GCSViews
                 return;
             }
 
-            var cameraMode = (NvSystemModes)((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]).systemMode;
+            NvSystemModes cameraMode = CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]);
 
             switch (StateHandler.CurrentSate)
             {
