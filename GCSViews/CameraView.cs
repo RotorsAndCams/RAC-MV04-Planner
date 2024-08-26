@@ -227,6 +227,8 @@ namespace MissionPlanner.GCSViews
 
         }
 
+        
+
         #endregion
 
         #region Init
@@ -403,17 +405,30 @@ namespace MissionPlanner.GCSViews
         /// <param name="e"></param>
         private void _videoRecordTimer_Tick(object sender, EventArgs e)
         {
-            if (_recordingInProgress)
+            lock (_lockImageSaveTimer)
             {
-                lock (_lockImageSaveTimer)
+                if (_recordingInProgress)
                 {
-                    var _actualCameraVideoImage = new Bitmap(1920, 1080);
 
-                    Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, 1920, 1080)); });
+                    try
+                    {
+                        var _actualCameraVideoImage = new Bitmap(1920, 1080);
 
-                    _videoRecorder.AddNewImage(_actualCameraVideoImage);
+                        Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, 1920, 1080)); });
+
+                        _videoRecorder.AddNewImage(_actualCameraVideoImage);
+                    }
+                    catch { }
+
+
 
                 }
+                else
+                {
+                    _videoRecordTimer.Stop();
+                    _videoRecordTimer.Close();
+                }
+
             }
         }
 
@@ -567,11 +582,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private void StopGstreamerCameraStream()
-        {
-            GStreamer.StopAll();
-        }
-
         #endregion
 
         #region Drawing
@@ -675,151 +685,6 @@ namespace MissionPlanner.GCSViews
                 DrawText(HudElements.LineDistance.ToString(), new Point((VideoRectangle.Width / 2) + HudElements.LineSpacing, (VideoRectangle.Height / 2) + lineHeight + 3), ContentAlignment.TopCenter, HorizontalAlignment.Center, new Font(DefaultFont.FontFamily, this.Font.SizeInPoints, FontStyle.Regular));
             }
             #endregion
-
-            // OSDDebug
-            if (OSDDebug && !string.IsNullOrWhiteSpace(OSDDebugLines[0]))
-            {
-                string text = OSDDebugLines[0];
-                for (int i = 1; i < OSDDebugLines.Length; i++)
-                {
-                    if (!string.IsNullOrWhiteSpace(OSDDebugLines[i]))
-                    {
-                        text += "\n" + OSDDebugLines[i];
-                    }
-                }
-
-                DrawText(text, new Point(VideoRectangle.Width - 3, VideoRectangle.Height / 2), ContentAlignment.TopRight, HorizontalAlignment.Left, new Font(DefaultFont.FontFamily, DefaultFont.Size * 0.75f), Brushes.Lime);
-            }
-        }
-
-
-        /// <summary>
-        /// Handles every new frame
-        /// </summary>
-        private void OnNewFrame(byte[] frame_buf, stream_status status, int width, int height)
-        {
-            // frame_buf is 1920 x 1080 x 3 long
-            // real frame is width x height
-
-            // Create drawing objects
-            gr = Graphics.FromImage(new Bitmap(width, height, 3 * width, System.Drawing.Imaging.PixelFormat.Format24bppRgb, Marshal.UnsafeAddrOfPinnedArrayElement(frame_buf, 0)));
-            gr.InterpolationMode = InterpolationMode.High;
-            gr.SmoothingMode = SmoothingMode.HighQuality;
-            gr.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-            gr.CompositingQuality = CompositingQuality.HighQuality;
-            VideoRectangle = new Rectangle()
-            {
-                X = (int)Math.Round(gr.VisibleClipBounds.X),
-                Y = (int)Math.Round(gr.VisibleClipBounds.Y),
-                Width = (int)Math.Round(gr.VisibleClipBounds.Width),
-                Height = (int)Math.Round(gr.VisibleClipBounds.Height)
-            };
-
-            if (status == stream_status.StreamDetectionOk)
-            {
-                // Datetime
-                Rectangle Datetime = DrawText(HudElements.Time, new Point(3, 3), ContentAlignment.TopLeft, HorizontalAlignment.Left);
-
-                // Battery
-                Rectangle Battery = DrawText(HudElements.Battery, new Point(VideoRectangle.Width - 3, 3), ContentAlignment.TopRight, HorizontalAlignment.Right);
-
-                int topLeft = Datetime.Right;
-                int topStep = ((Battery.Left - topLeft) / 4) / 2;
-
-                // AGL
-                DrawText(HudElements.AGL, new Point(topLeft + topStep, 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
-
-                // Velocity
-                DrawText(HudElements.Velocity, new Point(topLeft + (3 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
-
-                // TGD
-                DrawText(HudElements.TGD, new Point(topLeft + (5 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
-
-                // Signal strengths
-                DrawText(HudElements.SignalStrengths, new Point(topLeft + (7 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Right);
-
-                // Camera info
-                DrawText(HudElements.Camera, new Point(3, Datetime.Bottom + 20), ContentAlignment.TopLeft, HorizontalAlignment.Right);
-
-                // Next waypoint
-                Rectangle nextWP = DrawText(HudElements.ToWaypoint, new Point(VideoRectangle.Width - 3, Battery.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right);
-
-                // Operator distance
-                DrawText(HudElements.FromOperator, new Point(VideoRectangle.Width - 3, nextWP.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right);
-
-                // Coords
-                DrawText(HudElements.DroneGps, new Point(0, VideoRectangle.Height - 3), ContentAlignment.BottomLeft, HorizontalAlignment.Left);
-                DrawText(HudElements.TargetGps, new Point(VideoRectangle.Width - 3, VideoRectangle.Height - 3), ContentAlignment.BottomRight, HorizontalAlignment.Right);
-
-                #region Crosshairs
-                int lineHeight = (int)Math.Round(VideoRectangle.Height * 0.1);
-                Pen linePen = new Pen(Color.Red, 1);
-
-                if (HudElements.Crosshairs == CrosshairsType.Plus) // Plus
-                {
-                    gr.DrawLine(linePen,
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) + lineHeight, VideoRectangle.Height / 2);
-                    gr.DrawLine(linePen,
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        VideoRectangle.Width / 2, (VideoRectangle.Height / 2) + lineHeight);
-                    gr.DrawLine(linePen,
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) - lineHeight, VideoRectangle.Height / 2);
-                    gr.DrawLine(linePen,
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        VideoRectangle.Width / 2, (VideoRectangle.Height / 2) - lineHeight);
-                }
-                else // Horizontal
-                {
-                    // Draw center ^ character
-                    gr.DrawLine(new Pen(Color.Red, 3),
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) - Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-                    gr.DrawLine(new Pen(Color.Red, 3),
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) + Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-
-                    for (int i = 1; i <= 3; i++)
-                    {
-                        // Draw lines to the right
-                        gr.DrawLine(linePen,
-                            (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
-                            (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-
-                        // Draw lines to the left
-                        gr.DrawLine(linePen,
-                            (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
-                            (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-                    }
-
-                    // Draw number under first right line
-                    DrawText(HudElements.LineDistance.ToString(), new Point((VideoRectangle.Width / 2) + HudElements.LineSpacing, (VideoRectangle.Height / 2) + lineHeight + 3), ContentAlignment.TopCenter, HorizontalAlignment.Center, new Font(DefaultFont.FontFamily, this.Font.SizeInPoints, FontStyle.Regular));
-                }
-                #endregion
-            }
-            else // Stream is not OK, Stream needs therapy
-            {
-                // Clean screen
-                gr.Clear(Color.FromArgb(0, 128, 0));
-
-                // Print status message
-                string message = "";
-                switch (status)
-                {
-                    case stream_status.StreamIdle:
-                        message = "STREAM IDLE";
-                        break;
-                    case stream_status.StreamAcquiring:
-                        message = "AQUIRING STREAM";
-                        break;
-                    case stream_status.StreamLost:
-                        message = "STREAM LOST";
-                        break;
-                    default: break;
-                }
-                DrawText(message, new Point((VideoRectangle.Width / 2) + rnd.Next(-20, 21), (VideoRectangle.Height / 2) + rnd.Next(-20, 21)), ContentAlignment.MiddleCenter, HorizontalAlignment.Center, new Font(DefaultFont.FontFamily, DefaultFont.Size * 2f, FontStyle.Bold));
-            }
 
             // OSDDebug
             if (OSDDebug && !string.IsNullOrWhiteSpace(OSDDebugLines[0]))
@@ -1178,35 +1043,21 @@ namespace MissionPlanner.GCSViews
             this.DoPhoto();
         }
 
-        object closeObj = new object();
-
         private void CameraView_FormClosing(object sender, FormClosingEventArgs e)
         {
-            lock (closeObj)
+            try
             {
-                _recordingInProgress = false;
-
-                _videoRecordTimer?.Stop();
-                _videoRecordTimer.Elapsed -= _videoRecordTimer_Tick;
+                _videoRecorder.Stop();
+                _videoRecorder = null;
+                GC.Collect();
 
                 GStreamer.StopAll();
 
-                CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
-                LEDStateHandler.LedStateChanged -= LEDStateHandler_LedStateChanged;
-                StateHandler.MV04StateChange -= StateHandler_MV04StateChange;
-
                 _droneStatusTimer.Stop();
-                _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
 
                 pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
-
-
-
-                _videoRecorder.Stop();
-                _videoRecorder.Close();
             }
-            
-
+            catch { }
 
         }
 

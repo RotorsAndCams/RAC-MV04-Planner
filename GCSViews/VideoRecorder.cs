@@ -34,34 +34,41 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                if (_writer.IsOpen)
+
+                if (!_recordingInProgress)
                 {
-                    _writer.Close();
-                    _videoRecorderTimer.Stop();
+                    Stop();
+
+                    return;
                 }
                     
+
+                _writer.Flush();
+                _writer.Close();
+                _videoRecorderTimer.Stop();
+                
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Recorder - _videoSaveSegmentTimer_Tick " + ex.Message);
-            }
+            catch{}
         }
 
         public void AddNewImage(Bitmap bm)
         {
-            if (_writer.IsOpen)
+            try
             {
-                _writer.WriteVideoFrame(bm);
-            }
-            else
-            {
-                _writer.Open(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//testrecord" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4, 100000);
-                _writer.WriteVideoFrame(bm);
-                _videoRecorderTimer.Start();
-            }
+                if (_writer.IsOpen)
+                {
+                    _writer.WriteVideoFrame(bm);
+                }
+                else
+                {
 
-            bm.Dispose();
-            GC.Collect();
+                    _writer.Open(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//testrecord" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4, 100000);
+                    _writer.WriteVideoFrame(bm);
+                    _videoRecorderTimer.Start();
+                }
+            }
+            catch { }
+
 
         }
 
@@ -73,25 +80,28 @@ namespace MissionPlanner.GCSViews
 
         public void Stop()
         {
-            _recordingInProgress = false;
+            lock (_videoRecorderTimer)
+            {
+                try
+                {
+                    _recordingInProgress = false;
+                    _videoRecorderTimer.Stop();
+                    _videoRecorderTimer.Close();
+                    _writer.Flush();
 
-            _videoRecorderTimer.Stop();
-            _videoRecorderTimer.Close();
+                    _writer.Dispose();
+                }
+                catch { }
+            }
+            
 
-            if (_writer.IsOpen)
-                _writer.Close();
             
+
             
-                
+
+            
+
         }
 
-        public void Close()
-        {
-            if (_writer.IsOpen)
-                _writer.Close();
-
-            _writer.Dispose();
-        }
-        
     }
 }
