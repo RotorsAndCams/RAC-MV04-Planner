@@ -261,11 +261,11 @@ namespace MissionPlanner
             }
 
             Splash = new MissionPlanner.Splash();
-            if (SplashBG != null)
-            {
-                Splash.BackgroundImage = SplashBG;
-                Splash.pictureBox1.Visible = false;
-            }
+            //if (SplashBG != null)
+            //{
+            //    Splash.BackgroundImage = SplashBG;
+            //    Splash.pictureBox1.Visible = false;
+            //}
 
             Console.WriteLine("IconFile");
             if (IconFile != null)

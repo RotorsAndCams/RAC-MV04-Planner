@@ -4909,6 +4909,8 @@
     <None Include="Resources\camera-64.png" />
     <None Include="Resources\confirm-64.png" />
     <None Include="Resources\power-64.png" />
+    <None Include="Resources\secopplanner2.png" />
+    <None Include="Resources\Logo_SecopPlanner2.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
