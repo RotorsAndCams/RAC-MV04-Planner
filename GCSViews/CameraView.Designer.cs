@@ -111,7 +111,6 @@
             this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
             this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
             this.btn_StopTracking.Name = "btn_StopTracking";
             this.btn_StopTracking.UseVisualStyleBackColor = false;
             this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
@@ -121,7 +120,6 @@
             this.btn_ResetZoom.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_ResetZoom, "btn_ResetZoom");
             this.btn_ResetZoom.ForeColor = System.Drawing.Color.White;
-            this.btn_ResetZoom.Image = global::MissionPlanner.Properties.Resources.icons8_reset_50;
             this.btn_ResetZoom.Name = "btn_ResetZoom";
             this.btn_ResetZoom.UseVisualStyleBackColor = false;
             this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
@@ -140,7 +138,6 @@
             this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
             this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
-            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.power_64;
             this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
             this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
             this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
@@ -150,7 +147,6 @@
             this.btn_ChangeCrosshair.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_ChangeCrosshair, "btn_ChangeCrosshair");
             this.btn_ChangeCrosshair.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_ChangeCrosshair.Image = global::MissionPlanner.Properties.Resources.icons8_crosshair_50;
             this.btn_ChangeCrosshair.Name = "btn_ChangeCrosshair";
             this.btn_ChangeCrosshair.UseVisualStyleBackColor = false;
             this.btn_ChangeCrosshair.Click += new System.EventHandler(this.btn_ChangeCrosshair_Click);
@@ -160,7 +156,6 @@
             this.btn_FullScreen.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_FullScreen, "btn_FullScreen");
             this.btn_FullScreen.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_FullScreen.Image = global::MissionPlanner.Properties.Resources.icons8_fullscreen_50;
             this.btn_FullScreen.Name = "btn_FullScreen";
             this.btn_FullScreen.UseVisualStyleBackColor = false;
             this.btn_FullScreen.Click += new System.EventHandler(this.btn_FullScreen_Click);
@@ -192,7 +187,6 @@
             this.btn_Settings.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_Settings, "btn_Settings");
             this.btn_Settings.ForeColor = System.Drawing.Color.Black;
-            this.btn_Settings.Image = global::MissionPlanner.Properties.Resources.icons8_settings_100;
             this.btn_Settings.Name = "btn_Settings";
             this.btn_Settings.UseVisualStyleBackColor = false;
             this.btn_Settings.Click += new System.EventHandler(this.btn_Settings_Click);
@@ -288,21 +282,18 @@
             // pb_DroneTakeOff
             // 
             resources.ApplyResources(this.pb_DroneTakeOff, "pb_DroneTakeOff");
-            this.pb_DroneTakeOff.Image = global::MissionPlanner.Properties.Resources.drone_takeoff_;
             this.pb_DroneTakeOff.Name = "pb_DroneTakeOff";
             this.pb_DroneTakeOff.TabStop = false;
             // 
             // pb_InfraLight
             // 
             resources.ApplyResources(this.pb_InfraLight, "pb_InfraLight");
-            this.pb_InfraLight.Image = global::MissionPlanner.Properties.Resources.motion_sensor_30;
             this.pb_InfraLight.Name = "pb_InfraLight";
             this.pb_InfraLight.TabStop = false;
             // 
             // pb_PositionIndicator
             // 
             resources.ApplyResources(this.pb_PositionIndicator, "pb_PositionIndicator");
-            this.pb_PositionIndicator.Image = global::MissionPlanner.Properties.Resources.headlight_30;
             this.pb_PositionIndicator.Name = "pb_PositionIndicator";
             this.pb_PositionIndicator.TabStop = false;
             // 
@@ -350,7 +341,6 @@
             resources.ApplyResources(this.btn_SetAlt, "btn_SetAlt");
             this.btn_SetAlt.BackColor = System.Drawing.Color.Black;
             this.btn_SetAlt.ForeColor = System.Drawing.Color.Black;
-            this.btn_SetAlt.Image = global::MissionPlanner.Properties.Resources.confirm_64;
             this.btn_SetAlt.Name = "btn_SetAlt";
             this.btn_SetAlt.UseVisualStyleBackColor = false;
             this.btn_SetAlt.Click += new System.EventHandler(this.btn_SetAlt_Click);
@@ -360,7 +350,6 @@
             resources.ApplyResources(this.btn_Down, "btn_Down");
             this.btn_Down.BackColor = System.Drawing.Color.Black;
             this.btn_Down.ForeColor = System.Drawing.Color.Black;
-            this.btn_Down.Image = global::MissionPlanner.Properties.Resources.icons8_down_64__1_;
             this.btn_Down.Name = "btn_Down";
             this.btn_Down.UseVisualStyleBackColor = false;
             this.btn_Down.Click += new System.EventHandler(this.btn_Down_Click);
@@ -370,7 +359,6 @@
             resources.ApplyResources(this.btn_Up, "btn_Up");
             this.btn_Up.BackColor = System.Drawing.Color.Black;
             this.btn_Up.ForeColor = System.Drawing.Color.Black;
-            this.btn_Up.Image = global::MissionPlanner.Properties.Resources.icons8_upward_arrow_64;
             this.btn_Up.Name = "btn_Up";
             this.btn_Up.UseVisualStyleBackColor = false;
             this.btn_Up.Click += new System.EventHandler(this.btn_Up_Click);
