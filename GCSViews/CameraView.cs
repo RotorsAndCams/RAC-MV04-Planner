@@ -51,7 +51,7 @@ namespace MissionPlanner.GCSViews
         Graphics gr;
         HudElements HudElements = new HudElements();
 
-        System.Windows.Forms.Timer FetchHudDataTimer = new System.Windows.Forms.Timer();
+        System.Timers.Timer FetchHudDataTimer = new System.Timers.Timer();
 
         (int major, int minor, int build) CameraControlDLLVersion;
 
@@ -112,7 +112,7 @@ namespace MissionPlanner.GCSViews
             CameraStreamIP = SettingManager.Get(Setting.CameraStreamIP);
             CameraStreamPort = int.Parse(SettingManager.Get(Setting.CameraStreamPort));
             FetchHudDataTimer.Interval = 100; // 10Hz
-            //FetchHudDataTimer.Tick += (sender, eventArgs) => FetchHudData();
+            FetchHudDataTimer.Elapsed += (sender, eventArgs) => FetchHudData();
 
             // Create default drawing objects
             DefaultFont = new Font(FontFamily.GenericMonospace, this.Font.SizeInPoints * 2f);
@@ -317,6 +317,7 @@ namespace MissionPlanner.GCSViews
             if (success)
             {
                 FetchHudData();
+                FetchHudDataTimer.Start();
 
 #if DEBUG
                 AddToOSDDebug("Video stream started");
@@ -429,12 +430,7 @@ namespace MissionPlanner.GCSViews
         private void StopRecording()
         {
             _recordingInProgress = false;
-
             _videoRecordTimer?.Stop();
-            _videoRecordTimer.Close();
-
-            _videoRecorder.Stop();
-
         }
 
         private async Task ResetZoom()
@@ -1182,32 +1178,36 @@ namespace MissionPlanner.GCSViews
             this.DoPhoto();
         }
 
+        object closeObj = new object();
+
         private void CameraView_FormClosing(object sender, FormClosingEventArgs e)
         {
-            try
+            lock (closeObj)
             {
-                StopRecording();
+                _recordingInProgress = false;
 
-                _videoRecorder.Close();
-
+                _videoRecordTimer?.Stop();
                 _videoRecordTimer.Elapsed -= _videoRecordTimer_Tick;
-                 
+
                 GStreamer.StopAll();
 
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
                 LEDStateHandler.LedStateChanged -= LEDStateHandler_LedStateChanged;
                 StateHandler.MV04StateChange -= StateHandler_MV04StateChange;
-                
+
                 _droneStatusTimer.Stop();
                 _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
 
                 pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
 
+
+
+                _videoRecorder.Stop();
+                _videoRecorder.Close();
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            
+
+
         }
 
         private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
@@ -1221,7 +1221,7 @@ namespace MissionPlanner.GCSViews
                         e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
                     }
 
-                    FetchHudData();
+                    //FetchHudData();
                     OnNewFrame(img.Width, img.Height, e.Graphics);
                 }
             }

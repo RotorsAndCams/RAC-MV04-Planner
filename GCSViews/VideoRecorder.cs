@@ -35,9 +35,11 @@ namespace MissionPlanner.GCSViews
             try
             {
                 if (_writer.IsOpen)
+                {
                     _writer.Close();
-                
-                
+                    _videoRecorderTimer.Stop();
+                }
+                    
             }
             catch (Exception ex)
             {
@@ -55,6 +57,7 @@ namespace MissionPlanner.GCSViews
             {
                 _writer.Open(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//testrecord" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4, 100000);
                 _writer.WriteVideoFrame(bm);
+                _videoRecorderTimer.Start();
             }
 
             bm.Dispose();
