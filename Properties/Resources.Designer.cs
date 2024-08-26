@@ -1047,6 +1047,16 @@ namespace MissionPlanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap inverted_cam_but {
+            get {
+                object obj = ResourceManager.GetObject("inverted_cam_but", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap light_01 {
             get {
                 object obj = ResourceManager.GetObject("light_01", resourceCulture);

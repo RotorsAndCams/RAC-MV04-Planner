@@ -4911,6 +4911,7 @@
     <None Include="Resources\power-64.png" />
     <None Include="Resources\secopplanner2.png" />
     <None Include="Resources\Logo_SecopPlanner2.png" />
+    <None Include="Resources\inverted_cam_but.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
