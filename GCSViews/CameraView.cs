@@ -1186,14 +1186,12 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
+                StopRecording();
 
-                    StopRecording();
+                _videoRecorder.Close();
 
-                    _videoRecorder.Close();
-
-                    _videoRecordTimer.Elapsed -= _videoRecordTimer_Tick;
-                
-                    
+                _videoRecordTimer.Elapsed -= _videoRecordTimer_Tick;
+                 
                 GStreamer.StopAll();
 
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
@@ -1320,7 +1318,6 @@ namespace MissionPlanner.GCSViews
         private void btn_Settings_Click(object sender, EventArgs e)
         {
             CameraSettingsForm.Instance.ShowDialog();
-            
         }
 
         private void CameraSettings_event_StartStopRecording(object sender, EventArgs e)
@@ -1735,7 +1732,5 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-
-        
     }
 }
