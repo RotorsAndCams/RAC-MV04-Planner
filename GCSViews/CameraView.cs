@@ -40,11 +40,8 @@ namespace MissionPlanner.GCSViews
         public static CameraView instance;
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        //VideoControl VideoControl;
-        (int major, int minor, int build) VideoControlDLLVersion;
-        string CameraStreamIP;
-        int CameraStreamPort;
-        bool CameraStreamAJC = false;
+        string CameraIP;
+        int CameraStreamChannel;
         new Font DefaultFont;
         Brush DefaultBrush;
         Rectangle VideoRectangle;
@@ -106,20 +103,16 @@ namespace MissionPlanner.GCSViews
             InitializeComponent();
             instance = this;
 
-            // Video control
-            //VideoControl = CameraHandler.Instance.CameraVideoControl;
-            VideoControlDLLVersion = CameraHandler.Instance.StreamDLLVersion;
-            CameraStreamIP = SettingManager.Get(Setting.CameraStreamIP);
-            CameraStreamPort = int.Parse(SettingManager.Get(Setting.CameraStreamPort));
+            // Camera
+            CameraIP = SettingManager.Get(Setting.CameraIP);
+            CameraStreamChannel = int.Parse(SettingManager.Get(Setting.CameraStreamChannel));
             FetchHudDataTimer.Interval = 100; // 10Hz
             FetchHudDataTimer.Elapsed += (sender, eventArgs) => FetchHudData();
+            CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
 
             // Create default drawing objects
             DefaultFont = new Font(FontFamily.GenericMonospace, this.Font.SizeInPoints * 2f);
             DefaultBrush = new SolidBrush(Color.Red);
-
-            // Camera control
-            CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
 
             // Snapshot & video save location
             CameraHandler.Instance.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
@@ -336,7 +329,7 @@ namespace MissionPlanner.GCSViews
         private void StartCameraControl()
         {
             bool success = CameraHandler.Instance.CameraControlConnect(
-                IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
+                IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
 #if DEBUG
