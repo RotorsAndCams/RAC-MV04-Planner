@@ -15,39 +15,41 @@ namespace MissionPlanner.GCSViews
 {
     public class VideoRecorder
     {
+        #region Fields
+
         VideoFileWriter _writer = new VideoFileWriter();
         System.Timers.Timer _videoRecorderTimer;
+        int _segmentLength = 30; // seconds
         int _frameRate = 10;
         bool _recordingInProgress;
 
         object _recordingLock = new object();
-        
+
+        #endregion
+
+        #region Methods
 
         public VideoRecorder()
         {
             _videoRecorderTimer = new System.Timers.Timer();
             _videoRecorderTimer.Elapsed += _videoRecorderTimer_Elapsed;
-            _videoRecorderTimer.Interval = 30*1000;
-
+            _videoRecorderTimer.Interval = _segmentLength * 1000;
         }
 
         private void _videoRecorderTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             try
             {
-
                 if (!_recordingInProgress)
                 {
                     Stop();
 
                     return;
                 }
-                    
 
                 _writer.Flush();
                 _writer.Close();
                 _videoRecorderTimer.Stop();
-                
             }
             catch{}
         }
@@ -96,8 +98,8 @@ namespace MissionPlanner.GCSViews
                 _writer.Dispose();
             }
             catch { }
-
         }
 
+        #endregion
     }
 }
