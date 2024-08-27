@@ -82,9 +82,6 @@ namespace MissionPlanner.GCSViews
         int _fileCount = 0;
         NvSystemModes _cameraState;
 
-        
-
-
         #endregion
 
         #region Conversion multipliers
@@ -377,7 +374,7 @@ namespace MissionPlanner.GCSViews
             pb_CameraGstream.DrawToBitmap(_actualCameraImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height));
 
             if (path == null)
-                path = "test" + DateTime.Now.Millisecond + ".jpg";
+                path = CameraHandler.Instance.MediaSavePath + "test" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
 
             if (_actualCameraImage != null)
                 _actualCameraImage.Save(path, ImageFormat.Jpeg);
