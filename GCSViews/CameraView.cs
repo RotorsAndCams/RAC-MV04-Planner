@@ -1047,8 +1047,12 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                _videoRecorder.Stop();
-                _videoRecorder = null;
+                if(_videoRecorder != null)
+                {
+                    _videoRecorder.Stop();
+                    _videoRecorder = null;
+                }
+                
                 GC.Collect();
 
                 GStreamer.StopAll();

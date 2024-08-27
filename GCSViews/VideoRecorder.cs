@@ -1,4 +1,5 @@
 ﻿using Accord.Video.FFMPEG;
+using MV04.Camera;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -61,14 +62,19 @@ namespace MissionPlanner.GCSViews
                 }
                 else
                 {
+                    string sepChar = "_";
+                    string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    string droneID = CameraHandler.sysID.ToString().PadLeft(3, '0');
+                    string dronePos = CameraHandler.Instance.DronePos.UTM.ToString().Replace(" ", "");
+                    string targPos = CameraHandler.Instance.TargPos.UTM.ToString().Replace(" ", "");
+                    string filePath = CameraHandler.Instance.MediaSavePath + dateTime + sepChar + droneID + sepChar + dronePos + sepChar + targPos;
 
-                    _writer.Open(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//testrecord" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4, 100000);
+                    _writer.Open(filePath + ".mp4", 1920, 1080, _frameRate, VideoCodec.MPEG4, 100000);
                     _writer.WriteVideoFrame(bm);
                     _videoRecorderTimer.Start();
                 }
             }
             catch { }
-
 
         }
 
@@ -80,26 +86,16 @@ namespace MissionPlanner.GCSViews
 
         public void Stop()
         {
-            lock (_videoRecorderTimer)
+            try
             {
-                try
-                {
-                    _recordingInProgress = false;
-                    _videoRecorderTimer.Stop();
-                    _videoRecorderTimer.Close();
-                    _writer.Flush();
+                _recordingInProgress = false;
+                _videoRecorderTimer.Stop();
+                _videoRecorderTimer.Close();
+                _writer.Flush();
 
-                    _writer.Dispose();
-                }
-                catch { }
+                _writer.Dispose();
             }
-            
-
-            
-
-            
-
-            
+            catch { }
 
         }
 

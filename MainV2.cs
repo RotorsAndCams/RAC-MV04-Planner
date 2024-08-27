@@ -1159,7 +1159,8 @@ namespace MissionPlanner
             // save config to test we have write access
             SaveConfig();
 
-            this.Text = "";
+            
+            this.Text = "Secop Planner 2" + " " + comPort.MAV.VersionString;
             this.ShowIcon = false;
         }
 
@@ -1790,7 +1791,7 @@ namespace MissionPlanner
                     Settings.Instance[_connectionControl.CMB_serialport.Text.Replace(" ","_") + "_BAUD"] =
                         _connectionControl.CMB_baudrate.Text;
 
-                    //this.Text = titlebar + " " + comPort.MAV.VersionString;
+                    this.Text = comPort.MAV.VersionString;
 
                     // refresh config window if needed
                     if (MyView.current != null && showui)
