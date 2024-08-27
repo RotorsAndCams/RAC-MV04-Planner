@@ -206,7 +206,7 @@ namespace MissionPlanner.GCSViews
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Gst error" + ex.Message);
+                    //MessageBox.Show("Gst error" + ex.Message);
                 }
             };
 
@@ -1135,18 +1135,40 @@ namespace MissionPlanner.GCSViews
 
         private void btn_FullScreen_Click(object sender, EventArgs e)
         {
+            //if (_cameraFullScreenForm != null)
+            //{
+            //    try
+            //    {
+            //        _cameraFullScreenForm.Show();
+            //    }
+            //    catch { }
+
+
+            //}
+            //else
+            //{
+            //    _cameraFullScreenForm = new CameraFullScreenForm();
+            //    _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
+            //    _cameraFullScreenForm.FormClosing += _cameraFullScreenForm_FormClosing;
+            //    _cameraFullScreenForm.ShowDialog();
+            //}
+            _cameraFullScreenForm = new CameraFullScreenForm();
+            _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
+            _cameraFullScreenForm.FormClosing += _cameraFullScreenForm_FormClosing;
+            _cameraFullScreenForm.ShowDialog();
+        }
+
+        private void _cameraFullScreenForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
             if (_cameraFullScreenForm != null)
             {
-                _cameraFullScreenForm.Show();
-
-            }
-            else
-            {
-                _cameraFullScreenForm = new CameraFullScreenForm();
-                _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
-                _cameraFullScreenForm.ShowDialog();
+                _cameraFullScreenForm.VisibleChanged -= FullScreenForm_VisibleChanged;
+                _cameraFullScreenForm.FormClosing -= _cameraFullScreenForm_FormClosing;
+                _cameraFullScreenForm.Dispose();
+                _cameraFullScreenForm = null;
             }
         }
+
 
         private void btn_ResetZoom_Click(object sender, EventArgs e)
         {

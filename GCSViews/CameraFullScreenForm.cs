@@ -33,7 +33,7 @@ namespace MissionPlanner.GCSViews
         const double Mps_to_Knots = 1.94384449;
         #endregion
         Rectangle VideoRectangle;
-        System.Windows.Forms.Timer FetchHudDataTimer = new System.Windows.Forms.Timer();
+        System.Timers.Timer FetchHudDataTimer = new System.Timers.Timer();
         new Font DefaultFont;
         Brush DefaultBrush;
         public CameraFullScreenForm()
@@ -49,7 +49,6 @@ namespace MissionPlanner.GCSViews
             this.btn_Close.BringToFront();
             this.btn_StopTracking.BringToFront();
 
-            this.FormClosing += CameraFullScreenForm_FormClosing;
 
             this.pb_Stream.Paint += pb_Stream_Paint;
 
@@ -61,7 +60,7 @@ namespace MissionPlanner.GCSViews
             this.DoubleBuffered = true;
 
             FetchHudDataTimer.Interval = 100; // 10Hz
-            FetchHudDataTimer.Tick += (sender, eventArgs) => FetchHudData();
+            FetchHudDataTimer.Elapsed += (sender, eventArgs) => FetchHudData();
             FetchHudData();
             FetchHudDataTimer.Start();
             GStreamer.onNewImage += (sender, image) =>
@@ -85,17 +84,11 @@ namespace MissionPlanner.GCSViews
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Gst error" + ex.Message);
                 }
             };
 
         }
 
-        private void CameraFullScreenForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            e.Cancel = true;
-            this.Hide();
-        }
 
         private void pb_Stream_Paint(object sender, PaintEventArgs e)
         {
