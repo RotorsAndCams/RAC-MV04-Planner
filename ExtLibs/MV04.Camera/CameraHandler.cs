@@ -162,13 +162,13 @@ namespace MV04.Camera
 
         private Timer RecordingTimer;
         
-        public static string url = $"rtspsrc location=rtsp://{SettingManager.Get(Setting.CameraStreamIP)}:{SettingManager.Get(Setting.CameraStreamPort)}/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";               //@"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+        public static string url = $"rtspsrc location=rtsp://{SettingManager.Get(Setting.CameraIP)}:554/live{SettingManager.Get(Setting.CameraStreamChannel)} latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";               //@"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 
         #endregion
 
         #region Camera control Fields
 
-        public IPAddress CameraControlIP { get; set; }
+        public IPAddress CameraIP { get; set; }
 
         public int CameraControlPort { get; set; }
 
@@ -242,7 +242,7 @@ namespace MV04.Camera
         {
             GetIPAndPortFromSettings();
 
-            _mavProto = new MavProto(2, CameraControlIP, CameraControlPort, OnReport, OnAck);
+            _mavProto = new MavProto(2, CameraIP, CameraControlPort, OnReport, OnAck);
 
             StartCommunicationWithdevice();
 
@@ -261,13 +261,13 @@ namespace MV04.Camera
 
         private void GetIPAndPortFromSettings()
         {
-            CameraControlIP = IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP));
+            CameraIP = IPAddress.Parse(SettingManager.Get(Setting.CameraIP));
             CameraControlPort = int.Parse(SettingManager.Get(Setting.CameraControlPort));
 
             if (CameraControlPort == 0)
                 CameraControlPort = CameraControlPort == 0 ? 10024 : CameraControlPort;
-            if (CameraControlIP == null)
-                CameraControlIP = CameraControlIP ?? new IPAddress(new byte[] { 192, 168, 0, 203 });
+            if (CameraIP == null)
+                CameraIP = CameraIP ?? new IPAddress(new byte[] { 192, 168, 0, 203 });
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace MV04.Camera
 
         public bool CameraControlConnect(IPAddress ip, int port)
         {
-            CameraControlIP = ip;
+            CameraIP = ip;
             CameraControlPort = port;
 
             GimbalTimer = new System.Windows.Forms.Timer();
@@ -305,17 +305,17 @@ namespace MV04.Camera
 
         #endregion
 
+        #region Methods
+
         public void StartGstreamer(string u)
         {
-                GStreamer.StartA(u);
+            GStreamer.StartA(u);
         }
 
         public void StopGstreamer()
         {
             GStreamer.StopAll();
         }
-
-        #region Methods
 
         public bool HasCameraReport(MavReportType report_type)
         {

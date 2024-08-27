@@ -15,9 +15,8 @@ namespace MV04.Settings
             this.BringToFront();
 
             // Set UI from formData
-            textBox_cameraStreamIp.Text = GetValue(formData, Setting.CameraStreamIP);
-            textBox_cameraStreamPort.Text = GetValue(formData, Setting.CameraStreamPort);
-            textBox_cameraControlIp.Text = GetValue(formData, Setting.CameraControlIP);
+            textBox_cameraIp.Text = GetValue(formData, Setting.CameraIP);
+            comboBox_cameraStreamChannel.SelectedItem = GetValue(formData, Setting.CameraStreamChannel);
             textBox_cameraControlPort.Text = GetValue(formData, Setting.CameraControlPort);
             radioButton_AutoConnect_Yes.Checked = bool.Parse(GetValue(formData, Setting.AutoConnect));
             radioButton_AutoConnect_No.Checked = !radioButton_AutoConnect_Yes.Checked;
@@ -34,9 +33,8 @@ namespace MV04.Settings
         private void button_Save_Click(object sender, EventArgs e)
         {
             // Validate & save contents
-            SetIfValid(returnData, Setting.CameraStreamIP, textBox_cameraStreamIp.Text);
-            SetIfValid(returnData, Setting.CameraStreamPort, textBox_cameraStreamPort.Text);
-            SetIfValid(returnData, Setting.CameraControlIP, textBox_cameraControlIp.Text);
+            SetIfValid(returnData, Setting.CameraIP, textBox_cameraIp.Text);
+            SetIfValid(returnData, Setting.CameraStreamChannel, comboBox_cameraStreamChannel.SelectedItem.ToString());
             SetIfValid(returnData, Setting.CameraControlPort, textBox_cameraControlPort.Text);
             SetIfValid(returnData, Setting.AutoConnect, radioButton_AutoConnect_Yes.Checked.ToString());
             SetIfValid(returnData, Setting.VideoSegmentLength, numericUpDown_VideoSegmentLength.Value.ToString());
