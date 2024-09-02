@@ -194,11 +194,15 @@ namespace MV04.Camera
             }
         }
 
+        private bool _IsCameraControlConnected = false;
+
         public bool IsCameraControlConnected
         {
             get
             {
-                return IsValid(_mavProto);
+                return
+                    _IsCameraControlConnected
+                    && IsValid(_mavProto);
             }
         }
 
@@ -290,7 +294,12 @@ namespace MV04.Camera
             GimbalTimer.Enabled = false;
             GimbalTimer.Tick += GimbalTimer_Tick;
 
-            return IsValid(_mavProto);
+            if (IsValid(_mavProto))
+            {
+                _IsCameraControlConnected = true;
+                return true;
+            }
+            return false;
         }
 
         public bool StartStream(IPAddress ip, int port, VideoDecoder.RawFrameReadyCB onNewFrame, VideoControl.VideoControlClickDelegate onClick)
