@@ -6,6 +6,7 @@ using MissionPlanner.Utilities;
 using MV04.Camera;
 using MV04.Settings;
 using MV04.State;
+using MV04.TestForms;
 using NetTopologySuite.Operation.Valid;
 using NextVisionVideoControlLibrary;
 using OpenTK.Graphics.ES11;
@@ -269,6 +270,7 @@ namespace MissionPlanner.GCSViews
                 {"Do NUC", async () => { await DoNUC(); }},
                 {"Test Gstreamer", async () => { new GstreamerTestForm().Show(); }},
                 {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
+                {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }}
             };
 
             #endregion
@@ -1598,6 +1600,5 @@ namespace MissionPlanner.GCSViews
         }
 
         #endregion
-
     }
 }

@@ -1,4 +1,4 @@
-﻿using MV04.GCS;
+﻿using MV04.Joystick;
 
 namespace MissionPlanner.Joystick
 {

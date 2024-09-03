@@ -1,5 +1,6 @@
 ﻿using MissionPlanner.Controls;
 using MissionPlanner.Utilities;
+using MV04.Joystick;
 using SharpDX.DirectInput;
 using System;
 using System.Drawing;
@@ -73,10 +74,15 @@ namespace MissionPlanner.Joystick
             {
                 var config = tempjoystick.getChannel(a);
 
-                var ax = new JoystickAxis()
+                bool isMV04Channel = JoystickHandler.JoystickAxies.Count(x => x.RCChannelNo == a) > 0;
+                string labelText = isMV04Channel ?
+                    Enum.GetName(typeof(MV04_JoystickFunction), JoystickHandler.JoystickAxies.Single(x => x.RCChannelNo == a).Function).Replace('_', ' ') :
+                    "RC " + a;
+
+                var ax = new JoystickAxis() // JoystickAxis control
                 {
                     ChannelNo = a,
-                    Label = "RC " + a,
+                    Label = labelText,
                     AxisArray = (Enum.GetValues(typeof(joystickaxis))),
                     ChannelValue = config.axis.ToString(),
                     ExpoValue = config.expo.ToString(),
@@ -98,7 +104,6 @@ namespace MissionPlanner.Joystick
                 Controls.Add(ax);
 
                 y += ax.Height;
-
 
                 if ((ax.Bottom + 30) > this.Height)
                     this.Height = ax.Bottom;
@@ -202,6 +207,9 @@ namespace MissionPlanner.Joystick
                     if (joy == null)
                     {
                         joy = JoystickBase.Create(() => MainV2.comPort);
+
+                        maxaxis = joy.getNumAxes();
+
                         for (int a = 1; a <= maxaxis; a++)
                         {
                             var config = joy.getChannel(a);
@@ -217,7 +225,7 @@ namespace MissionPlanner.Joystick
 
                         noButtons = joy.getNumButtons();
 
-                        noButtons = Math.Min(16, noButtons);
+                        //noButtons = Math.Min(16, noButtons);
 
                         SuspendLayout();
 
@@ -244,6 +252,12 @@ namespace MissionPlanner.Joystick
                     }
 
                     MainV2.joystick.elevons = CHK_elevons.Checked;
+
+                    // Direct assignment is faster than setting with reflection
+                    /*for (int i = 1; i <= 18; i++)
+                    {
+                        MainV2.comPort.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(MainV2.comPort.MAV.cs, joy.getValueForChannel(i));
+                    }*/
 
                     MainV2.comPort.MAV.cs.rcoverridech1 = joy.getValueForChannel(1);
                     MainV2.comPort.MAV.cs.rcoverridech2 = joy.getValueForChannel(2);
@@ -477,7 +491,7 @@ namespace MissionPlanner.Joystick
                     new Joy_MV04_Arm((string)cmb.Tag).ShowDialog();
                     break;
                 case buttonfunction.MV04_ImageSensor:
-                    new Joy_MV04_CameraMode((string)cmb.Tag).ShowDialog();
+                    new Joy_MV04_ImageSensor((string)cmb.Tag).ShowDialog();
                     break;
                 case buttonfunction.MV04_FlightMode:
                     new Joy_MV04_FlightMode((string)cmb.Tag).ShowDialog();

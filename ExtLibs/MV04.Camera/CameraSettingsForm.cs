@@ -64,7 +64,6 @@ namespace MV04.Camera
                 {
                     DisableControls();
                 }
-
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
