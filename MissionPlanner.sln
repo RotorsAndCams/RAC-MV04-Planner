@@ -209,7 +209,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MV04.Camera", "ExtLibs\MV04
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAC-Propatria-MPPlugin-IFP-CameraControl", "Plugins\IFP_CameraControl\RAC-Propatria-MPPlugin-IFP-CameraControl.csproj", "{E64BBA16-FFD3-4552-BDBA-AFBD2DA778EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAC-Propatria-MPPlugin-IFP-UAVControl", "Plugins\IFP_UAVControl\RAC-Propatria-MPPlugin-IFP-UAVControl.csproj", "{D07C91F0-D6BC-446F-90D8-38B3ED851980}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAC-Propatria-MPPlugin-IFP-UAVControl_OLD", "Plugins\IFP_UAVControl\RAC-Propatria-MPPlugin-IFP-UAVControl_OLD.csproj", "{D07C91F0-D6BC-446F-90D8-38B3ED851980}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
