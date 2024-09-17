@@ -25,9 +25,8 @@ namespace MV04.Settings
         {
             returnData = SettingManager.GetSettings();
 
-            textBox_cameraStreamIp.Text = GetValue(returnData, Setting.CameraStreamIP);
-            textBox_cameraStreamPort.Text = GetValue(returnData, Setting.CameraStreamPort);
-            textBox_cameraControlIp.Text = GetValue(returnData, Setting.CameraControlIP);
+            textBox_cameraIp.Text = GetValue(returnData, Setting.CameraIP);
+            comboBox_cameraStreamChannel.SelectedItem = GetValue(returnData, Setting.CameraStreamChannel);
             textBox_cameraControlPort.Text = GetValue(returnData, Setting.CameraControlPort);
             radioButton_AutoConnect_Yes.Checked = bool.Parse(GetValue(returnData, Setting.AutoConnect));
             radioButton_AutoConnect_No.Checked = !radioButton_AutoConnect_Yes.Checked;
@@ -37,6 +36,9 @@ namespace MV04.Settings
             comboBox_altFormat.SelectedItem = GetValue(returnData, Setting.AltFormat);
             comboBox_distFormat.SelectedItem = GetValue(returnData, Setting.DistFormat);
             comboBox_speedFormat.SelectedItem = GetValue(returnData, Setting.SpeedFormat);
+
+            rb_AutoRecordYes.Checked = bool.Parse(GetValue(returnData, Setting.AutoRecordVideoStream));
+            rb_AutoRecordNo.Checked = !rb_AutoRecordYes.Checked;
         }
 
 
@@ -60,9 +62,8 @@ namespace MV04.Settings
 
         private void button_Save_Click(object sender, EventArgs e)
         {
-            SetIfValid(returnData, Setting.CameraStreamIP, textBox_cameraStreamIp.Text);
-            SetIfValid(returnData, Setting.CameraStreamPort, textBox_cameraStreamPort.Text);
-            SetIfValid(returnData, Setting.CameraControlIP, textBox_cameraControlIp.Text);
+            SetIfValid(returnData, Setting.CameraIP, textBox_cameraIp.Text);
+            SetIfValid(returnData, Setting.CameraStreamChannel, comboBox_cameraStreamChannel.SelectedItem.ToString());
             SetIfValid(returnData, Setting.CameraControlPort, textBox_cameraControlPort.Text);
             SetIfValid(returnData, Setting.AutoConnect, radioButton_AutoConnect_Yes.Checked.ToString());
             SetIfValid(returnData, Setting.VideoSegmentLength, numericUpDown_VideoSegmentLength.Value.ToString());
@@ -71,6 +72,7 @@ namespace MV04.Settings
             SetIfValid(returnData, Setting.AltFormat, comboBox_altFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.DistFormat, comboBox_distFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.SpeedFormat, comboBox_speedFormat.SelectedItem.ToString());
+            SetIfValid(returnData, Setting.AutoRecordVideoStream, radioButton_AutoConnect_Yes.Checked.ToString());
 
             SettingManager.Save(returnData);
 

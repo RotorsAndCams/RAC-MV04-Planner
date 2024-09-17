@@ -873,8 +873,8 @@ namespace MissionPlanner
 
             if (splash != null)
             {
-                this.Text = splash?.Text;
-                titlebar = splash?.Text;
+                //this.Text = splash?.Text;
+                //titlebar = splash?.Text;
             }
 
             if (!MONO) // windows only
@@ -1137,17 +1137,18 @@ namespace MissionPlanner
 #endif
 #endif
 
-            if (Program.IconFile != null)
-            {
-                this.Icon = Icon.FromHandle(((Bitmap) Program.IconFile).GetHicon());
-            }
+            //if (Program.IconFile != null)
+            //{
+            //    this.Icon = Icon.FromHandle(((Bitmap) Program.IconFile).GetHicon());
+            //}
 
-            MenuArduPilot.Image = new Bitmap(Properties.Resources._0d92fed790a3a70170e61a86db103f399a595c70,
-                (int) (200), 31);
+            //MenuArduPilot.Image = new Bitmap(Properties.Resources._0d92fed790a3a70170e61a86db103f399a595c70,
+            //    (int) (200), 31);
             MenuArduPilot.Width = MenuArduPilot.Image.Width;
+            MenuArduPilot.Height = MenuArduPilot.Image.Height+2;
 
-            if (Program.Logo2 != null)
-                MenuArduPilot.Image = Program.Logo2;
+            //if (Program.Logo2 != null)
+            //    MenuArduPilot.Image = Program.Logo2;
 
             Application.DoEvents();
 
@@ -1157,6 +1158,10 @@ namespace MissionPlanner
 
             // save config to test we have write access
             SaveConfig();
+
+            
+            this.Text = "Secop Planner 2" + " " + comPort.MAV.VersionString;
+            this.ShowIcon = false;
         }
 
         void cmb_sysid_Click(object sender, EventArgs e)
@@ -1786,7 +1791,7 @@ namespace MissionPlanner
                     Settings.Instance[_connectionControl.CMB_serialport.Text.Replace(" ","_") + "_BAUD"] =
                         _connectionControl.CMB_baudrate.Text;
 
-                    this.Text = titlebar + " " + comPort.MAV.VersionString;
+                    this.Text = comPort.MAV.VersionString;
 
                     // refresh config window if needed
                     if (MyView.current != null && showui)
@@ -2039,212 +2044,7 @@ namespace MissionPlanner
         }
 
 
-        /// <summary>
-        /// overriding the OnCLosing is a bit cleaner than handling the event, since it
-        /// is this object.
-        ///
-        /// This happens before FormClosed
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
 
-            log.Info("MainV2_FormClosing");
-
-            log.Info("GMaps write cache");
-            // speed up tile saving on exit
-            GMap.NET.GMaps.Instance.CacheOnIdleRead = false;
-            GMap.NET.GMaps.Instance.BoostCacheEngine = true;
-
-            Settings.Instance["MainHeight"] = this.Height.ToString();
-            Settings.Instance["MainWidth"] = this.Width.ToString();
-            Settings.Instance["MainMaximised"] = this.WindowState.ToString();
-
-            Settings.Instance["MainLocX"] = this.Location.X.ToString();
-            Settings.Instance["MainLocY"] = this.Location.Y.ToString();
-
-            log.Info("close logs");
-
-            // close bases connection
-            try
-            {
-                comPort.logreadmode = false;
-                if (comPort.logfile != null)
-                    comPort.logfile.Close();
-
-                if (comPort.rawlogfile != null)
-                    comPort.rawlogfile.Close();
-
-                comPort.logfile = null;
-                comPort.rawlogfile = null;
-            }
-            catch
-            {
-            }
-
-            log.Info("close ports");
-            // close all connections
-            foreach (var port in Comports)
-            {
-                try
-                {
-                    port.logreadmode = false;
-                    if (port.logfile != null)
-                        port.logfile.Close();
-
-                    if (port.rawlogfile != null)
-                        port.rawlogfile.Close();
-
-                    port.logfile = null;
-                    port.rawlogfile = null;
-                }
-                catch
-                {
-                }
-            }
-
-            log.Info("stop adsb");
-            Utilities.adsb.Stop();
-
-            log.Info("stop WarningEngine");
-            Warnings.WarningEngine.Stop();
-
-            log.Info("stop GStreamer");
-            GStreamer.StopAll();
-
-            log.Info("closing vlcrender");
-            try
-            {
-                while (vlcrender.store.Count > 0)
-                    vlcrender.store[0].Stop();
-            }
-            catch
-            {
-            }
-
-            log.Info("closing pluginthread");
-
-            pluginthreadrun = false;
-
-            if (pluginthread != null)
-            {
-                try
-                {
-                    while (!PluginThreadrunner.WaitOne(100)) Application.DoEvents();
-                }
-                catch
-                {
-                }
-
-                pluginthread.Join();
-            }
-
-            log.Info("closing serialthread");
-
-            serialThread = false;
-
-            log.Info("closing joystickthread");
-
-            joystickthreadrun = false;
-
-            log.Info("closing httpthread");
-
-            // if we are waiting on a socket we need to force an abort
-            httpserver.Stop();
-
-            log.Info("sorting tlogs");
-            try
-            {
-                System.Threading.ThreadPool.QueueUserWorkItem((WaitCallback) delegate
-                    {
-                        try
-                        {
-                            MissionPlanner.Log.LogSort.SortLogs(Directory.GetFiles(Settings.Instance.LogDir, "*.tlog"));
-                        }
-                        catch
-                        {
-                        }
-                    }
-                );
-            }
-            catch
-            {
-            }
-
-            log.Info("closing MyView");
-
-            // close all tabs
-            MyView.Dispose();
-
-            log.Info("closing fd");
-            try
-            {
-                FlightData.Dispose();
-            }
-            catch
-            {
-            }
-
-            log.Info("closing fp");
-            try
-            {
-                FlightPlanner.Dispose();
-            }
-            catch
-            {
-            }
-
-            log.Info("closing sim");
-            try
-            {
-                Simulation.Dispose();
-            }
-            catch
-            {
-            }
-
-            try
-            {
-                if (comPort.BaseStream.IsOpen)
-                    comPort.Close();
-            }
-            catch
-            {
-            } // i get alot of these errors, the port is still open, but not valid - user has unpluged usb
-
-            // save config
-            SaveConfig();
-
-            Console.WriteLine(httpthread?.IsAlive);
-            Console.WriteLine(pluginthread?.IsAlive);
-
-            log.Info("MainV2_FormClosing done");
-
-            if (MONO)
-                this.Dispose();
-        }
-
-
-        /// <summary>
-        /// this happens after FormClosing...
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected override void OnFormClosed(FormClosedEventArgs e)
-        {
-            base.OnFormClosed(e);
-
-            Console.WriteLine("MainV2_FormClosed");
-
-            if (joystick != null)
-            {
-                while (!joysendThreadExited)
-                    Thread.Sleep(10);
-
-                joystick.Dispose(); //proper clean up of joystick.
-            }
-        }
 
         private void LoadConfig()
         {
@@ -4648,11 +4448,11 @@ namespace MissionPlanner
         {
             try
             {
-                System.Diagnostics.Process.Start("https://ardupilot.org/?utm_source=Menu&utm_campaign=MP");
+                System.Diagnostics.Process.Start("https://rotorsandcams.com/");
             }
             catch
             {
-                CustomMessageBox.Show("Failed to open url https://ardupilot.org");
+                CustomMessageBox.Show("Failed to open url https://rotorsandcams.com/");
             }
         }
 
@@ -4789,6 +4589,11 @@ namespace MissionPlanner
                     break;
                 }
             }
+        }
+
+        private void MainV2_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            MyView.Dispose();
         }
     }
 }

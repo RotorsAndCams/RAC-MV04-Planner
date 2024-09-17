@@ -66,8 +66,8 @@
             this.tlp_AGLData = new System.Windows.Forms.TableLayoutPanel();
             this.lb_AltitudeValue = new System.Windows.Forms.Label();
             this.lb_Agl = new System.Windows.Forms.Label();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.pnl_CameraScreen = new System.Windows.Forms.Panel();
+            this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
+            this.pb_CameraGstream = new System.Windows.Forms.PictureBox();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
@@ -86,7 +86,8 @@
             this.tlp_AGLContainer.SuspendLayout();
             this.tlp_AGLIncrement.SuspendLayout();
             this.tlp_AGLData.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
+            this.tlp_CVBase.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_CameraGstream)).BeginInit();
             this.SuspendLayout();
             // 
             // tlp_ControlsBase
@@ -139,7 +140,7 @@
             this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
             this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
-            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.power_64;
+            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.inverted_cam_but;
             this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
             this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
             this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
@@ -394,25 +395,26 @@
             this.lb_Agl.ForeColor = System.Drawing.Color.White;
             this.lb_Agl.Name = "lb_Agl";
             // 
-            // tableLayoutPanel2
+            // tlp_CVBase
             // 
-            resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
-            this.tableLayoutPanel2.Controls.Add(this.pnl_CameraScreen, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.tlp_ControlsBase, 1, 0);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            resources.ApplyResources(this.tlp_CVBase, "tlp_CVBase");
+            this.tlp_CVBase.Controls.Add(this.tlp_ControlsBase, 1, 0);
+            this.tlp_CVBase.Controls.Add(this.pb_CameraGstream, 0, 0);
+            this.tlp_CVBase.Name = "tlp_CVBase";
             // 
-            // pnl_CameraScreen
+            // pb_CameraGstream
             // 
-            this.pnl_CameraScreen.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.pnl_CameraScreen, "pnl_CameraScreen");
-            this.pnl_CameraScreen.Name = "pnl_CameraScreen";
+            resources.ApplyResources(this.pb_CameraGstream, "pb_CameraGstream");
+            this.pb_CameraGstream.Name = "pb_CameraGstream";
+            this.pb_CameraGstream.TabStop = false;
+            this.pb_CameraGstream.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pb_CameraGstream_MouseDoubleClick);
             // 
             // CameraView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             resources.ApplyResources(this, "$this");
             this.BackColor = System.Drawing.Color.Black;
-            this.Controls.Add(this.tableLayoutPanel2);
+            this.Controls.Add(this.tlp_CVBase);
             this.Name = "CameraView";
             this.tlp_ControlsBase.ResumeLayout(false);
             this.tlp_Buttonsection2.ResumeLayout(false);
@@ -438,50 +440,52 @@
             this.tlp_AGLIncrement.PerformLayout();
             this.tlp_AGLData.ResumeLayout(false);
             this.tlp_AGLData.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
+            this.tlp_CVBase.ResumeLayout(false);
+            this.tlp_CVBase.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_CameraGstream)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
         private System.Windows.Forms.TableLayoutPanel tlp_ControlsBase;
-        private System.Windows.Forms.TableLayoutPanel tlp_SensorLights;
-        private System.Windows.Forms.TableLayoutPanel tlp_DeviceStatusInfo;
-        private System.Windows.Forms.Panel pnl_SettingsPanel;
+        private System.Windows.Forms.TableLayoutPanel tlp_Buttonsection2;
+        private System.Windows.Forms.Button btn_StopTracking;
+        private System.Windows.Forms.Button btn_ResetZoom;
+        private System.Windows.Forms.TableLayoutPanel tlp_ButtonSection1;
+        private System.Windows.Forms.Button btn_TripSwitchOnOff;
+        private System.Windows.Forms.Button btn_ChangeCrosshair;
+        private System.Windows.Forms.Button btn_FullScreen;
+        private System.Windows.Forms.Button btn_FPVCameraMode;
         private System.Windows.Forms.TableLayoutPanel tlp_InfoBase;
+        private System.Windows.Forms.Panel pnl_SettingsPanel;
+        private System.Windows.Forms.Button btn_Settings;
         private System.Windows.Forms.Panel pnl_DeviceState;
+        private System.Windows.Forms.TableLayoutPanel tlp_StatusUpper;
+        private System.Windows.Forms.TableLayoutPanel tlp_DeviceStatusInfo;
+        private System.Windows.Forms.Label lb_DroneStatusValue;
+        private System.Windows.Forms.Label lb_GCSSelectedStateValue;
+        private System.Windows.Forms.Panel pnl_GCS;
+        private System.Windows.Forms.Label lb_GCSSelectedState;
+        private System.Windows.Forms.Panel pnl_Drone;
+        private System.Windows.Forms.Label lb_Drone;
+        private System.Windows.Forms.Panel pnl_Camera;
+        private System.Windows.Forms.Label lb_Camera;
+        private System.Windows.Forms.Label lb_CameraStatusValue;
+        private System.Windows.Forms.TableLayoutPanel tlp_SensorLights;
+        private System.Windows.Forms.PictureBox pb_DroneTakeOff;
+        private System.Windows.Forms.PictureBox pb_InfraLight;
+        private System.Windows.Forms.PictureBox pb_PositionIndicator;
         private System.Windows.Forms.TableLayoutPanel tlp_AGLContainer;
+        private Controls.ColorSlider cs_ColorSliderAltitude;
         private System.Windows.Forms.TableLayoutPanel tlp_AGLIncrement;
+        private System.Windows.Forms.Button btn_SetAlt;
         private System.Windows.Forms.Button btn_Down;
         private System.Windows.Forms.Button btn_Up;
         private System.Windows.Forms.TableLayoutPanel tlp_AGLData;
         private System.Windows.Forms.Label lb_AltitudeValue;
         private System.Windows.Forms.Label lb_Agl;
-        private System.Windows.Forms.Label lb_CameraStatusValue;
-        private System.Windows.Forms.Label lb_DroneStatusValue;
-        private System.Windows.Forms.Label lb_Camera;
-        private System.Windows.Forms.Label lb_Drone;
-        private System.Windows.Forms.TableLayoutPanel tlp_ButtonSection1;
-        private System.Windows.Forms.Button btn_ResetZoom;
-        private System.Windows.Forms.Button btn_Settings;
-        private System.Windows.Forms.Button btn_FullScreen;
-        private System.Windows.Forms.Button btn_StopTracking;
-        private System.Windows.Forms.Button btn_ChangeCrosshair;
-        private Controls.ColorSlider cs_ColorSliderAltitude;
-        private System.Windows.Forms.PictureBox pb_PositionIndicator;
-        private System.Windows.Forms.PictureBox pb_InfraLight;
-        private System.Windows.Forms.PictureBox pb_DroneTakeOff;
-        private System.Windows.Forms.Button btn_FPVCameraMode;
-        private System.Windows.Forms.TableLayoutPanel tlp_Buttonsection2;
-        private System.Windows.Forms.TableLayoutPanel tlp_StatusUpper;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Panel pnl_CameraScreen;
-        private System.Windows.Forms.Label lb_GCSSelectedState;
-        private System.Windows.Forms.Label lb_GCSSelectedStateValue;
-        private System.Windows.Forms.Panel pnl_Drone;
-        private System.Windows.Forms.Panel pnl_GCS;
-        private System.Windows.Forms.Panel pnl_Camera;
-        private System.Windows.Forms.Button btn_SetAlt;
-        private System.Windows.Forms.Button btn_TripSwitchOnOff;
+        private System.Windows.Forms.TableLayoutPanel tlp_CVBase;
+        private System.Windows.Forms.PictureBox pb_CameraGstream;
     }
 }

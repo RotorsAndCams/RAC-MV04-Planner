@@ -1,4 +1,4 @@
-﻿# MV04 GCS Remote functions<!-- omit from toc -->
+# MV04 GCS Remote functions<!-- omit from toc -->
 
 1. [How to add new joystick button function](#how-to-add-new-joystick-button-function)
 

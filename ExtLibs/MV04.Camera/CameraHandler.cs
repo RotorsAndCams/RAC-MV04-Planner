@@ -69,6 +69,12 @@ namespace MV04.Camera
         public MavProto.SysReport Report { get; set; }
     }
 
+    public class DoRecordingEventArgs : EventArgs
+    {
+
+        public string SaveFilePath { get; set; }
+    }
+
     public class CameraHandler
     {
         public event EventHandler<ReportEventArgs> event_ReportArrived;
@@ -112,7 +118,7 @@ namespace MV04.Camera
             get
             {
                 (int major, int minor, int build) version = (0, 0, 0);
-                _VideoControl.VideoControlGetVersion(ref version.major, ref version.minor, ref version.build);
+                //_VideoControl.VideoControlGetVersion(ref version.major, ref version.minor, ref version.build);
                 return version;
             }
         }
@@ -155,12 +161,14 @@ namespace MV04.Camera
         }
 
         private Timer RecordingTimer;
+        
+        public static string url = $"rtspsrc location=rtsp://{SettingManager.Get(Setting.CameraIP)}:554/live{SettingManager.Get(Setting.CameraStreamChannel)} latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";               //@"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 
         #endregion
 
         #region Camera control Fields
 
-        public IPAddress CameraControlIP { get; set; }
+        public IPAddress CameraIP { get; set; }
 
         public int CameraControlPort { get; set; }
 
@@ -186,11 +194,15 @@ namespace MV04.Camera
             }
         }
 
+        private bool _IsCameraControlConnected = false;
+
         public bool IsCameraControlConnected
         {
             get
             {
-                return IsValid(_mavProto);
+                return
+                    _IsCameraControlConnected
+                    && IsValid(_mavProto);
             }
         }
 
@@ -234,8 +246,7 @@ namespace MV04.Camera
         {
             GetIPAndPortFromSettings();
 
-            _mavProto = new MavProto(2, CameraControlIP, CameraControlPort, OnReport, OnAck);
-            _VideoControl = new VideoControl();
+            _mavProto = new MavProto(2, CameraIP, CameraControlPort, OnReport, OnAck);
 
             StartCommunicationWithdevice();
 
@@ -243,6 +254,9 @@ namespace MV04.Camera
             {
                 MessageBox.Show("Invalid MavProto - CameraHandler - ctor");
             }
+//#if DEBUG
+//            url = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=25/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+//#endif
         }
 
         #endregion
@@ -251,13 +265,13 @@ namespace MV04.Camera
 
         private void GetIPAndPortFromSettings()
         {
-            CameraControlIP = IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP));
+            CameraIP = IPAddress.Parse(SettingManager.Get(Setting.CameraIP));
             CameraControlPort = int.Parse(SettingManager.Get(Setting.CameraControlPort));
 
             if (CameraControlPort == 0)
                 CameraControlPort = CameraControlPort == 0 ? 10024 : CameraControlPort;
-            if (CameraControlIP == null)
-                CameraControlIP = CameraControlIP ?? new IPAddress(new byte[] { 192, 168, 0, 203 });
+            if (CameraIP == null)
+                CameraIP = CameraIP ?? new IPAddress(new byte[] { 192, 168, 0, 203 });
         }
 
         /// <summary>
@@ -273,14 +287,19 @@ namespace MV04.Camera
 
         public bool CameraControlConnect(IPAddress ip, int port)
         {
-            CameraControlIP = ip;
+            CameraIP = ip;
             CameraControlPort = port;
 
             GimbalTimer = new System.Windows.Forms.Timer();
             GimbalTimer.Enabled = false;
             GimbalTimer.Tick += GimbalTimer_Tick;
 
-            return IsValid(_mavProto);
+            if (IsValid(_mavProto))
+            {
+                _IsCameraControlConnected = true;
+                return true;
+            }
+            return false;
         }
 
         public bool StartStream(IPAddress ip, int port, VideoDecoder.RawFrameReadyCB onNewFrame, VideoControl.VideoControlClickDelegate onClick)
@@ -296,6 +315,16 @@ namespace MV04.Camera
         #endregion
 
         #region Methods
+
+        public void StartGstreamer(string u)
+        {
+            GStreamer.StartA(u);
+        }
+
+        public void StopGstreamer()
+        {
+            GStreamer.StopAll();
+        }
 
         public bool HasCameraReport(MavReportType report_type)
         {
@@ -496,85 +525,79 @@ namespace MV04.Camera
 
         #region Video Methods
 
-        public bool DoPhoto()
+
+        public event EventHandler<DoRecordingEventArgs> event_DoPhoto;
+        public event EventHandler<DoRecordingEventArgs> event_StartVideoRecording;
+        public event EventHandler event_StopVideoRecording;
+
+        public void DoPhoto()
         {
-            if (_VideoControl != null)
-            {
-                string sepChar = "_";
-                string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
-                string droneID = sysID.ToString().PadLeft(3, '0');
-                string dronePos = DronePos.UTM.ToString().Replace(" ", "");
-                string targPos = TargPos.UTM.ToString().Replace(" ", "");
+            string sepChar = "_";
+            string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string droneID = sysID.ToString().PadLeft(3, '0');
+            string dronePos = DronePos.UTM.ToString().Replace(" ", "");
+            string targPos = TargPos.UTM.ToString().Replace(" ", "");
 
-                string filePath = MediaSavePath + dateTime + sepChar + droneID + sepChar + dronePos + sepChar + targPos;
+            string filePath = MediaSavePath + dateTime + sepChar + droneID + sepChar + dronePos + sepChar + targPos;
 
-                OpenGLControl oglc = _VideoControl.Controls[0] as OpenGLControl;
-                OpenGL ogl = oglc.OpenGL;
-
-                Bitmap bmp = new Bitmap(oglc.Width, oglc.Height);
-                BitmapData bmpd = bmp.LockBits(oglc.Bounds, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-                ogl.ReadPixels(0, 0, oglc.Width, oglc.Height, OpenGL.GL_BGR, OpenGL.GL_UNSIGNED_BYTE, bmpd.Scan0);
-                bmp.UnlockBits(bmpd);
-                bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
-
-                bmp.Save(filePath + ".png", ImageFormat.Png);
-
-                return File.Exists(filePath + ".png");
-            }
-            else
-            {
-                return false;
-            }
+            if (event_DoPhoto != null)
+                event_DoPhoto(this, new DoRecordingEventArgs() { SaveFilePath = filePath });
         }
-        public bool StartRecording(TimeSpan? segmentLength)
+        public void StartRecording(TimeSpan? segmentLength)
         {
-            if (_VideoControl != null)
-            {
-                if (segmentLength.HasValue)
-                {
-                    RecordingTimer = new Timer()
-                    {
-                        Enabled = false,
-                        Interval = (int)Math.Round(segmentLength.Value.TotalMilliseconds)
-                    };
+            //if (_VideoControl != null)
+            //{
+            //    if (segmentLength.HasValue)
+            //    {
+            //        RecordingTimer = new Timer()
+            //        {
+            //            Enabled = false,
+            //            Interval = (int)Math.Round(segmentLength.Value.TotalMilliseconds)
+            //        };
 
-                    RecordingTimer.Tick += (sender, eventArgs) =>
-                    {
-                        // Stop & save previous recording
-                        _VideoControl.VideoControlStopRec();
+            //        RecordingTimer.Tick += (sender, eventArgs) =>
+            //        {
+            //            // Stop & save previous recording
+            //            _VideoControl.VideoControlStopRec();
 
-                        string _sepChar = "_";
-                        string _dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
-                        string _droneID = sysID.ToString().PadLeft(3, '0');
-                        string _dronePos = DronePos.UTM.ToString().Replace(" ", "");
-                        string _targPos = TargPos.UTM.ToString().Replace(" ", "");
-                        string _filePath = MediaSavePath + _dateTime + _sepChar + _droneID + _sepChar + _dronePos + _sepChar + _targPos;
+            //            string _sepChar = "_";
+            //            string _dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+            //            string _droneID = sysID.ToString().PadLeft(3, '0');
+            //            string _dronePos = DronePos.UTM.ToString().Replace(" ", "");
+            //            string _targPos = TargPos.UTM.ToString().Replace(" ", "");
+            //            string _filePath = MediaSavePath + _dateTime + _sepChar + _droneID + _sepChar + _dronePos + _sepChar + _targPos;
 
-                        // Start new recording
-                        _VideoControl.VideoControlStartRec(_filePath + ".ts");
-                    };
+            //            // Start new recording
+            //            _VideoControl.VideoControlStartRec(_filePath + ".ts");
+            //        };
 
-                    // Start recording timer
-                    RecordingTimer.Start();
-                }
+            //        // Start recording timer
+            //        RecordingTimer.Start();
+            //    }
 
-                string sepChar = "_";
-                string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
-                string droneID = sysID.ToString().PadLeft(3, '0');
-                string dronePos = DronePos.UTM.ToString().Replace(" ", "");
-                string targPos = TargPos.UTM.ToString().Replace(" ", "");
-                string filePath = MediaSavePath + dateTime + sepChar + droneID + sepChar + dronePos + sepChar + targPos;
+            //    string sepChar = "_";
+            //    string dateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+            //    string droneID = sysID.ToString().PadLeft(3, '0');
+            //    string dronePos = DronePos.UTM.ToString().Replace(" ", "");
+            //    string targPos = TargPos.UTM.ToString().Replace(" ", "");
+            //    string filePath = MediaSavePath + dateTime + sepChar + droneID + sepChar + dronePos + sepChar + targPos;
 
-                // Start first recording
-                _VideoControl.VideoControlStartRec(filePath + ".ts");
+            //    // Start first recording
+            //    _VideoControl.VideoControlStartRec(filePath + ".ts");
 
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
+
+
+            
+            //if(event_StartVideoRecording != null)
+                
         }
+
         public bool StopRecording()
         {
             if (_VideoControl != null)
@@ -723,8 +746,10 @@ namespace MV04.Camera
                 _trackPos.X = Constrain(_trackPos.X, 0, 1280);
                 _trackPos.Y = Constrain(_trackPos.Y, 0, 720);
 
+                MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.TrackOnPosition, 0);
                 // Start tracking
-                return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.Track, 0) == mav_error.ok;
+                //return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.Track, 0) == mav_error.ok;
+                return true;
             }
 
             return false;
@@ -736,7 +761,7 @@ namespace MV04.Camera
                 &&
                 (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, 0, 0, (int)TrackerMode.Disable, 0) == mav_error.ok)
             {
-                if (resetToPrevMode) SetMode(PrevCameraMode);
+                SetMode(NvSystemModes.GRR);
                 return true;
             }
 
@@ -860,6 +885,7 @@ namespace MV04.Camera
             return IsCameraControlConnected
                 && (mav_error)MavCmdDoNUC(CameraControl.mav_comm, CameraControl.ackCb) == mav_error.ok;
         }
+
 
         #endregion
 

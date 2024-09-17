@@ -100,11 +100,12 @@ namespace MissionPlanner.Joystick
             // BUT_detch
             // 
             this.BUT_detch.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.BUT_detch.Location = new System.Drawing.Point(141, 3);
+            this.BUT_detch.Location = new System.Drawing.Point(163, 2);
             this.BUT_detch.Name = "BUT_detch";
             this.BUT_detch.Size = new System.Drawing.Size(45, 23);
             this.BUT_detch.TabIndex = 62;
             this.BUT_detch.Text = "Auto Detect";
+            this.BUT_detch.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
             this.BUT_detch.UseVisualStyleBackColor = true;
             this.BUT_detch.Click += new System.EventHandler(this.BUT_detch_Click);
             // 
@@ -123,7 +124,7 @@ namespace MissionPlanner.Joystick
             // 
             this.label13.AutoSize = true;
             this.label13.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label13.Location = new System.Drawing.Point(2, 8);
+            this.label13.Location = new System.Drawing.Point(3, 7);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(22, 13);
             this.label13.TabIndex = 60;
@@ -132,9 +133,9 @@ namespace MissionPlanner.Joystick
             // expo_ch
             // 
             this.expo_ch.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.expo_ch.Location = new System.Drawing.Point(300, 7);
+            this.expo_ch.Location = new System.Drawing.Point(320, 7);
             this.expo_ch.Name = "expo_ch";
-            this.expo_ch.Size = new System.Drawing.Size(100, 13);
+            this.expo_ch.Size = new System.Drawing.Size(80, 13);
             this.expo_ch.TabIndex = 59;
             this.expo_ch.Text = "0";
             this.expo_ch.TextChanged += new System.EventHandler(this.expo_ch_TextChanged);
@@ -144,7 +145,7 @@ namespace MissionPlanner.Joystick
             this.ProgressBarCH.DrawLabel = true;
             this.ProgressBarCH.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.ProgressBarCH.Label = null;
-            this.ProgressBarCH.Location = new System.Drawing.Point(192, 2);
+            this.ProgressBarCH.Location = new System.Drawing.Point(214, 3);
             this.ProgressBarCH.Maximum = 2200;
             this.ProgressBarCH.maxline = 0;
             this.ProgressBarCH.Minimum = 800;
@@ -162,7 +163,7 @@ namespace MissionPlanner.Joystick
             "X",
             "Y",
             "SL1"});
-            this.CMB_CH.Location = new System.Drawing.Point(65, 3);
+            this.CMB_CH.Location = new System.Drawing.Point(87, 3);
             this.CMB_CH.Name = "CMB_CH";
             this.CMB_CH.Size = new System.Drawing.Size(70, 21);
             this.CMB_CH.TabIndex = 57;

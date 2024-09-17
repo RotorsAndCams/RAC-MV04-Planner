@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MV04.GCS")]
+[assembly: AssemblyTitle("MV04.TestForms")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MV04.GCS")]
+[assembly: AssemblyProduct("MV04.TestForms")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("40a838b6-38cc-47df-9179-3e6445d3313f")]
+[assembly: Guid("18f51b30-42ed-4b41-9b68-32de4ad0b1dd")]
 
 // Version information for an assembly consists of the following four values:
 //

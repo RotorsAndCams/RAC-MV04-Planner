@@ -11,9 +11,8 @@ namespace MV04.Settings
 {
     public enum Setting
     {
-        CameraStreamIP,
-        CameraStreamPort,
-        CameraControlIP,
+        CameraIP,
+        CameraStreamChannel,
         CameraControlPort,
         AutoConnect,
         VideoSegmentLength,
@@ -22,7 +21,8 @@ namespace MV04.Settings
         GPSType,
         AltFormat,
         DistFormat,
-        SpeedFormat
+        SpeedFormat,
+        AutoRecordVideoStream
     }
 
     public class SettingItem
@@ -53,24 +53,17 @@ namespace MV04.Settings
                     // Define settings and default values
                     _SettingCollection = new HashSet<SettingItem>
                     {
-                        new SettingItem(Setting.CameraStreamIP, "225.1.2.3", value =>
+                        new SettingItem(Setting.CameraIP, "192.168.0.203", value =>
                             !string.IsNullOrWhiteSpace(value)
                             && value.Count(c => c == '.') == 3
                             && value.Split('.').Length == 4
                             && value.Split('.').All(s => int.TryParse(s, out int i))
                             && value.Split('.').All(s => int.Parse(s) >= 0 && int.Parse(s) <= 255)
                         ),
-                        new SettingItem(Setting.CameraStreamPort, "11024", value =>
+                        new SettingItem(Setting.CameraStreamChannel, "0", value =>
                             !string.IsNullOrWhiteSpace(value)
-                            && int.TryParse(value, out int port)
-                            && port >= 1024 && port <= 65536
-                        ),
-                        new SettingItem(Setting.CameraControlIP, "192.168.0.203", value =>
-                            !string.IsNullOrWhiteSpace(value)
-                            && value.Count(c => c == '.') == 3
-                            && value.Split('.').Length == 4
-                            && value.Split('.').All(s => int.TryParse(s, out int i))
-                            && value.Split('.').All(s => int.Parse(s) >= 0 && int.Parse(s) <= 255)
+                            && int.TryParse(value, out int channel)
+                            && (channel == 0 || channel == 1)
                         ),
                         new SettingItem(Setting.CameraControlPort, "10024", value =>
                             !string.IsNullOrWhiteSpace(value)
@@ -130,7 +123,14 @@ namespace MV04.Settings
                                 "kmph",
                                 "knots"
                             }.Contains(value)
-                        )
+                        ),
+                        new SettingItem(Setting.AutoRecordVideoStream, true.ToString(), value =>
+                            !string.IsNullOrWhiteSpace(value)
+                            && new List<string>(){
+                                true.ToString(),
+                                false.ToString()
+                            }.Contains(value)
+                            )
                     };
 
                     // Create reset backup

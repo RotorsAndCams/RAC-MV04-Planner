@@ -2,7 +2,7 @@
 using MissionPlanner.ArduPilot;
 using MissionPlanner.Utilities;
 using MV04.Camera;
-using MV04.GCS;
+using MV04.Joystick;
 using MV04.State;
 using System;
 using System.Collections;
@@ -68,17 +68,9 @@ namespace MissionPlanner.Joystick
             if (currentInterface() == null)
                 return;
 
-            if (Interface.MAV.cs.firmware == Firmwares.ArduPlane)
-            {
-                loadconfig("joystickbuttons" + Interface.MAV.cs.firmware + ".xml",
-                    "joystickaxis" + Interface.MAV.cs.firmware + ".xml");
-            }
-            else if (Interface.MAV.cs.firmware == Firmwares.ArduCopter2)
-            {
-                loadconfig("joystickbuttons" + Interface.MAV.cs.firmware + ".xml",
-                    "joystickaxis" + Interface.MAV.cs.firmware + ".xml");
-            }
-            else if (Interface.MAV.cs.firmware == Firmwares.ArduRover)
+            if (Interface.MAV.cs.firmware == Firmwares.ArduPlane
+                || Interface.MAV.cs.firmware == Firmwares.ArduCopter2
+                || Interface.MAV.cs.firmware == Firmwares.ArduRover)
             {
                 loadconfig("joystickbuttons" + Interface.MAV.cs.firmware + ".xml",
                     "joystickaxis" + Interface.MAV.cs.firmware + ".xml");
@@ -214,6 +206,59 @@ namespace MissionPlanner.Joystick
         public void setAxis(int channel, joystickaxis axis)
         {
             JoyChannels[channel].axis = axis;
+        }
+
+        /// <summary>
+        /// Switch the pre-defined joystick axis pairs to control either the UAV or the camera
+        /// </summary>
+        /// <param name="axisPair">UAV pitch - Camera pitch or UAV throttle - Camera zoom</param>
+        /// <param name="axisMode">UAV control or Camera control</param>
+        public void MV04_SetAxis(MV04_AxisPair axisPair, MV04_AxisMode axisMode)
+        {
+            // Check for wrong joystick axis settings
+            joystickaxis axis = (joystickaxis)JoystickHandler.GetAxis(axisPair); ;
+            if (axis == joystickaxis.None)
+            {
+                string errorMsg = $"Joystick setup error - RC channels {"UAV " + Enum.GetName(typeof(MV04_AxisPair), axisPair).Replace("_", " & Cam ")} are both set to {Enum.GetName(typeof(joystickaxis), joystickaxis.None)}({(int)joystickaxis.None})";
+                CustomMessageBox.Show(errorMsg);
+                log.Info(errorMsg);
+                return;
+            }
+
+            // Apply axis switch
+            if (axisPair == MV04_AxisPair.Pitch_Pitch)
+            {
+                int UAV_Pitch_RCChannel = JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Pitch).RCChannelNo,
+                    Cam_Pitch_RCChannel = JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Pitch).RCChannelNo;
+                if (axisMode == MV04_AxisMode.UAV)
+                {
+                    setAxis(UAV_Pitch_RCChannel, axis);
+                    setAxis(Cam_Pitch_RCChannel, joystickaxis.None);
+                }
+                else // MV04_AxisMode.Cam
+                {
+                    setAxis(UAV_Pitch_RCChannel, joystickaxis.None);
+                    setAxis(Cam_Pitch_RCChannel, axis);
+                }
+            }
+            else // MV04_AxisPair.Throttle_Zoom
+            {
+                int UAV_Throttle_RCChannel = JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Throttle).RCChannelNo,
+                    Cam_Zoom_RCChannel = JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Zoom).RCChannelNo;
+                if (axisMode == MV04_AxisMode.UAV)
+                {
+                    setAxis(UAV_Throttle_RCChannel, axis);
+                    setAxis(Cam_Zoom_RCChannel, joystickaxis.None);
+                }
+                else // MV04_AxisMode.Cam
+                {
+                    setAxis(UAV_Throttle_RCChannel, joystickaxis.None);
+                    setAxis(Cam_Zoom_RCChannel, axis);
+                }
+            }
+
+            // Trigger axies changed event
+            JoystickHandler.TriggerJoystickAxiesChangedEvent(axisPair, axisMode);
         }
 
         public void setChannel(int channel, joystickaxis axis, bool reverse, int expo)
@@ -358,15 +403,13 @@ namespace MissionPlanner.Joystick
         {
             if (but.buttonno != -1)
             {
-                // only do_set_relay and Button_axis0-1 uses the button up option
-                if (buttondown == false)
+                // Only Do_Set_Relay and Button_axis0-1 uses the button up option
+                if (!buttondown
+                    && but.function != buttonfunction.Do_Set_Relay
+                    && but.function != buttonfunction.Button_axis0
+                    && but.function != buttonfunction.Button_axis1)
                 {
-                    if (but.function != buttonfunction.Do_Set_Relay &&
-                        but.function != buttonfunction.Button_axis0 &&
-                        but.function != buttonfunction.Button_axis1)
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 switch (but.function)
@@ -382,18 +425,21 @@ namespace MissionPlanner.Joystick
                                 {
                                     Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, mode);
 
-                                    // Trigger MV04 state change event
+                                    // Trigger MV04 state change events
                                     switch (mode.ToLower())
                                     {
                                         case "rtl":
                                         case "smart_rtl":
                                         case "auto rtl":
+                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Stow);
                                             StateHandler.CurrentSate = MV04_State.RTL;
                                             break;
                                         case "land":
+                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Nadir);
                                             StateHandler.CurrentSate = MV04_State.Land;
                                             break;
                                         default:
+                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             StateHandler.CurrentSate = MV04_State.Unknown;
                                             break;
                                     }
@@ -440,11 +486,14 @@ namespace MissionPlanner.Joystick
                             {
                                 // Get takeoff altitude parameter (or set default value)
                                 float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
-                                Settings.Instance["takeoff_alt"] = takeoffAlt.ToString();
+                                Settings.Instance["takeoff_alt"] = takeoffAlt.ToString(CultureInfo.InvariantCulture);
 
                                 // Do takeoff procedure
-                                Interface.setMode("Guided");
+                                //Interface.setMode("Guided");
                                 Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
+
+                                // TODO: Set camera mode for TAKEOFF
+                                //CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Nadir),
 
                                 // Trigger MV04 state change event
                                 StateHandler.CurrentSate = MV04_State.Takeoff;
@@ -473,45 +522,31 @@ namespace MissionPlanner.Joystick
                         {
                             try
                             {
-                                int buttonNumber = (int) but.buttonno;
-                                int relayChannelNumber = (int) but.p1;
-                                int state = buttondown == true ? 1 : 0;
+                                /*
+                                Command         | Input channel
+                                ----------------+--------------
+                                Power LED       | 19
+                                IR indicator    | 30
+                                Red indcator    | 31
+                                */
 
-
-                                //landing led on: 19 , off: 17
-
-                                //tekerő off: 29, IR: 30 , Pos: 31 vagy az egyik vagy a másik látható fény
-
-                                if (buttondown)
+                                switch (but.buttonno)
                                 {
-                                    switch (buttonNumber)
-                                    {
-                                        case 18:    //Landing LED on
-                                            LEDStateHandler.LandingLEDState = enum_LandingLEDState.On;
-                                            break;
-                                        case 29:    //Visibility IR light 
-                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.IR;
-                                            break;
-                                        case 30:    //Visibility Pos light
-                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.RedLight;
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    switch (buttonNumber)
-                                    {
-                                        case 18:    //Landing LED off
-                                            LEDStateHandler.LandingLEDState = enum_LandingLEDState.Off;
-                                            break;
-                                        case 29:
-                                        case 30:    //Visibility Pos light off
-                                            LEDStateHandler.PositionLEDState = enum_PositionLEDState.Off;
-                                            break;
-                                    }
+                                    case 19: // Power LED
+                                        LEDStateHandler.LandingLEDState = buttondown ? enum_LandingLEDState.On : enum_LandingLEDState.Off;
+                                        break;
+                                    case 30: // IR indicator LED
+                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.IR : enum_PositionLEDState.Off;
+                                        break;
+                                    case 31: // Red indicator LED
+                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.RedLight : enum_PositionLEDState.Off;
+                                        break;
                                 }
 
-                                Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,MAVLink.MAV_CMD.DO_SET_RELAY, relayChannelNumber, state, 0, 0, 0, 0, 0);
+                                Interface.doCommand((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY,
+                                    but.p1,             // Relay number
+                                    buttondown ? 1 : 0, // Relay state
+                                    0, 0, 0, 0, 0);
                             }
                             catch
                             {
@@ -656,161 +691,148 @@ namespace MissionPlanner.Joystick
 
                     // MV04 functions
                     case buttonfunction.MV04_SnapShot:
-                        if (buttondown) // Only execute on button push (not on release)
+                        _context.Send(delegate
                         {
-                            _context.Send(delegate
+                            try
                             {
-                                try
-                                {
-                                    CameraHandler.Instance.DoPhoto();
-                                }
-                                catch
-                                {
-                                    CustomMessageBox.Show("Failed to MV04_SnapShot");
-                                }
-                            }, null);
-                        }
+                                CameraHandler.Instance.DoPhoto();
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_SnapShot");
+                            }
+                        }, null);
                         break;
                     case buttonfunction.MV04_FlightMode:
-                        if (buttondown) // Only execute on button push (not on release)
+                        _context.Send(delegate
                         {
-                            _context.Send(delegate
+                            try
                             {
-                                try
+                                switch ((buttonfunction_mv04_FlightMode_option)(int)Math.Round(but.p1))
                                 {
-                                    switch ((buttonfunction_mv04_FlightMode_option)(int)Math.Round(but.p1))
-                                    {
-                                        case buttonfunction_mv04_FlightMode_option.Manual:
-
-                                            //notify components about state change
-                                            StateHandler.CurrentSate = MV04_State.Manual;
-                                            //set drone mode
-                                            Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
-                                            //Interface.setMode("LOITER");
-                                            //set camera mode
-                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
-                                            // TODO: Switch joysticks to Manual mode
-                                            break;
-                                        case buttonfunction_mv04_FlightMode_option.TapToFly:
-                                            StateHandler.CurrentSate = MV04_State.TapToFly;
-                                            Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
-                                            //Interface.setMode("GUIDED");
-                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
-                                            // TODO: Switch joysticks to TapToFly mode
-                                            break;
-                                        case buttonfunction_mv04_FlightMode_option.Auto:
-                                            StateHandler.CurrentSate = MV04_State.Auto;
-                                            Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Auto");
-                                            //Interface.setMode("AUTO");
-                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
-                                            // TODO: Switch joysticks to Auto mode
-                                            break;
-                                        case buttonfunction_mv04_FlightMode_option.Follow:
-                                            StateHandler.CurrentSate = MV04_State.Follow;
-                                            // TODO: Switch UAV, camera and joysticks to Follow mode
-                                            break;
-                                        default: break;
-                                    }
+                                    case buttonfunction_mv04_FlightMode_option.Manual:
+                                        Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
+                                        CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                        MV04_SetAxis(MV04_AxisPair.Pitch_Pitch, MV04_AxisMode.UAV);
+                                        MV04_SetAxis(MV04_AxisPair.Throttle_Zoom, MV04_AxisMode.UAV);
+                                        StateHandler.CurrentSate = MV04_State.Manual;
+                                        break;
+                                    
+                                    case buttonfunction_mv04_FlightMode_option.TapToFly:
+                                        Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
+                                        CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                        MV04_SetAxis(MV04_AxisPair.Pitch_Pitch, MV04_AxisMode.Cam);
+                                        MV04_SetAxis(MV04_AxisPair.Throttle_Zoom, MV04_AxisMode.Cam);
+                                        StateHandler.CurrentSate = MV04_State.TapToFly;
+                                        break;
+                                    
+                                    case buttonfunction_mv04_FlightMode_option.Auto:
+                                        Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Auto");
+                                        CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                        MV04_SetAxis(MV04_AxisPair.Pitch_Pitch, MV04_AxisMode.Cam);
+                                        MV04_SetAxis(MV04_AxisPair.Throttle_Zoom, MV04_AxisMode.Cam);
+                                        StateHandler.CurrentSate = MV04_State.Auto;
+                                        break;
+                                    
+                                    case buttonfunction_mv04_FlightMode_option.Follow:
+                                        // TODO: Switch UAV to Follow mode
+                                        MV04_SetAxis(MV04_AxisPair.Pitch_Pitch, MV04_AxisMode.Cam);
+                                        MV04_SetAxis(MV04_AxisPair.Throttle_Zoom, MV04_AxisMode.Cam);
+                                        StateHandler.CurrentSate = MV04_State.Follow;
+                                        break;
+                                    
+                                    default: break;
                                 }
-                                catch
-                                {
-                                    CustomMessageBox.Show("Failed to MV04_FlightMode");
-                                }
-                            }, null);
-                        }
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_FlightMode");
+                            }
+                        }, null);
                         break;
                     case buttonfunction.MV04_ImageSensor:
-                        if (buttondown) // Only execute on button push (not on release)
+                        _context.Send(delegate
                         {
-                            _context.Send(delegate
+                            try
                             {
-                                try
-                                {
-                                    CameraHandler.Instance.SetImageSensor((int)Math.Round(but.p1) == 1);
-                                    // p1 = 0 -> Day   -> false
-                                    // p1 = 1 -> Night -> true
-                                }
-                                catch
-                                {
-                                    CustomMessageBox.Show("Failed to MV04_ImageSensor");
-                                }
-                            }, null);
-                        }
+                                // p1 = 0 -> Day   -> false
+                                // p1 = 1 -> Night -> true
+                                CameraHandler.Instance.SetImageSensor((int)Math.Round(but.p1) == 1);
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_ImageSensor");
+                            }
+                        }, null);
                         break;
                     case buttonfunction.MV04_Arm:
-                        if (buttondown) // Only execute on button push (not on release)
+                        _context.Send(delegate
                         {
-                            _context.Send(delegate
+                            try
                             {
-                                try
+                                switch ((buttonfunction_mv04_Arm_option)(int)Math.Round(but.p1))
                                 {
-                                    switch ((buttonfunction_mv04_Arm_option)(int)Math.Round(but.p1))
-                                    {
-                                        case buttonfunction_mv04_Arm_option.Safe:
-                                            Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
-                                            Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 1u, target_system = (byte)   Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
-                                            break;
-                                        case buttonfunction_mv04_Arm_option.Armed:
-                                            Interface.setMode(new MAVLink.mavlink_set_mode_t() { custom_mode = 0u, target_system = (byte)   Interface.sysidcurrent }, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
-                                            Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
-                                            break;
-                                        default: break;
-                                    }
+                                    case buttonfunction_mv04_Arm_option.Safe:
+                                        // Disarm, safety on
+                                        Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
+                                        Thread.Sleep(100); // Give time for the previos message to go through
+                                        Interface.doSafety((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
+                                        break;
+                                    case buttonfunction_mv04_Arm_option.Armed:
+                                        // Safety off, arm
+                                        Interface.doSafety((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
+                                        Thread.Sleep(100); // Give time for the previos message to go through
+                                        Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
+                                        break;
+                                    default: break;
                                 }
-                                catch
-                                {
-                                    CustomMessageBox.Show("Failed to MV04_Arm");
-                                }
-                            }, null);
-                        }
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_Arm");
+                            }
+                        }, null);
                         break;
                     case buttonfunction.MV04_Pitch:
-                        if (buttondown) // Only execute on button push (not on release)
+                        _context.Send(delegate
                         {
-                            _context.Send(delegate
+                            try
                             {
-                                try
-                                {
-                                    // p1 = 0 -> Pitch stop
-                                    // p1 = 1 -> Pitch up
-                                    // p1 = 2 -> Pitch down
-                                    CameraHandler.Instance.SetCameraPitch((PitchDirection)(int)Math.Round(but.p1));
-                                }
-                                catch
-                                {
-                                    CustomMessageBox.Show("Failed to MV04_Pitch");
-                                }
-                            }, null);
-                        }
+                                // p1 = 0 -> Pitch stop
+                                // p1 = 1 -> Pitch up
+                                // p1 = 2 -> Pitch down
+                                CameraHandler.Instance.SetCameraPitch((PitchDirection)(int)Math.Round(but.p1));
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_Pitch");
+                            }
+                        }, null);
                         break;
                     case buttonfunction.MV04_Zoom:
-                        if (buttondown) // Only execute on button push (not on release)
+                        _context.Send(delegate
                         {
-                            _context.Send(delegate
+                            try
                             {
-                                try
-                                {
-                                    // p1 = 0 -> Zoom stop
-                                    // p1 = 1 -> Zoom in
-                                    // p1 = 2 -> Zoom out
-                                    CameraHandler.Instance.SetZoom((ZoomState)Math.Round(but.p1));
-                                }
-                                catch
-                                {
-                                    CustomMessageBox.Show("Failed to MV04_Zoom");
-                                }
-                            }, null);
-                        }
+                                // p1 = 0 -> Zoom stop
+                                // p1 = 1 -> Zoom in
+                                // p1 = 2 -> Zoom out
+                                CameraHandler.Instance.SetZoom((ZoomState)Math.Round(but.p1));
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_Zoom");
+                            }
+                        }, null);
                         break;
                 }
             }
         }
 
-        const int RESXu = 1024;
+        /*const int RESXu = 1024;
         const int RESXul = 1024;
         const int RESXl = 1024;
         const int RESKul = 100;
-        /*
 
         ushort expou(ushort x, ushort k)
         {
@@ -840,11 +862,7 @@ namespace MissionPlanner.Joystick
                 y = expou((ushort)x, (ushort)k);
             }
             return neg ? -y : y;
-        }
-
-        */
-
-
+        }*/
 
         public abstract void UnAcquireJoyStick();
 
@@ -883,6 +901,8 @@ namespace MissionPlanner.Joystick
         }
 
         public abstract int getNumButtons();
+
+        public abstract int getNumAxes();
 
         public joystickaxis getJoystickAxis(int channel)
         {
@@ -1191,6 +1211,27 @@ namespace MissionPlanner.Joystick
                 return false;
             }
 
+            // Check if some pairs of axies are set to the same value
+            // UAV_Pitch <-> Cam_Pitch
+            // UAV_Throttle <-> Cam_Zoom
+            if (this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Pitch).RCChannelNo) != this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Pitch).RCChannelNo)
+                ||
+                this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Throttle).RCChannelNo) != this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Zoom).RCChannelNo)
+                )
+            {
+                CustomMessageBox.Show($"The following pairs of RC channels must be set to the same RC Axis!\n\n{Enum.GetName(typeof(MV04_JoystickFunction), MV04_JoystickFunction.UAV_Pitch).Replace('_', ' ')} <-> {Enum.GetName(typeof(MV04_JoystickFunction), MV04_JoystickFunction.Cam_Pitch).Replace('_', ' ')}\n{Enum.GetName(typeof(MV04_JoystickFunction), MV04_JoystickFunction.UAV_Throttle).Replace('_', ' ')} <-> {Enum.GetName(typeof(MV04_JoystickFunction), MV04_JoystickFunction.Cam_Zoom).Replace('_', ' ')}", "Joystick axis setup error");
+                return false;
+            }
+
+            // Save MV04 relevant axis settings
+            foreach (MV04_Axis axis in JoystickHandler.JoystickAxies)
+            {
+                if (axis.RCChannelNo > 0 && axis.RCChannelNo <= this.getNumAxes())
+                {
+                    axis.RCAxis = (int)this.getJoystickAxis(axis.RCChannelNo);
+                }
+            }
+
             enabled = true;
 
             System.Threading.Thread t11 = new System.Threading.Thread(new System.Threading.ThreadStart(mainloop))
@@ -1277,26 +1318,22 @@ namespace MissionPlanner.Joystick
                                 JoyChannels[2].reverse, JoyChannels[2].expo);
                         //(ushort)(((int)state.Y / 65.535) + 1000);
                     }
-                    if (getJoystickAxis(3) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech3 = pickchannel(3, JoyChannels[3].axis, JoyChannels[3].reverse,
-                            JoyChannels[3].expo); //(ushort)(1000 - ((int)slider[0] / 65.535) + 1000);
-                    if (getJoystickAxis(4) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech4 = pickchannel(4, JoyChannels[4].axis, JoyChannels[4].reverse,
-                            JoyChannels[4].expo); //(ushort)(((int)state.X / 65.535) + 1000);
 
-                    if (getJoystickAxis(5) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech5 = pickchannel(5, JoyChannels[5].axis, JoyChannels[5].reverse,
-                            JoyChannels[5].expo);
-                    if (getJoystickAxis(6) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech6 = pickchannel(6, JoyChannels[6].axis, JoyChannels[6].reverse,
-                            JoyChannels[6].expo);
-                    if (getJoystickAxis(7) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech7 = pickchannel(7, JoyChannels[7].axis, JoyChannels[7].reverse,
-                            JoyChannels[7].expo);
-                    if (getJoystickAxis(8) != joystickaxis.None)
-                        Interface.MAV.cs.rcoverridech8 = pickchannel(8, JoyChannels[8].axis, JoyChannels[8].reverse,
-                            JoyChannels[8].expo);
+                    // Direct assignment is faster than setting with reflection
+                    /*for (int i = 3; i <= 18; i++)
+                    {
+                        if (getJoystickAxis(i) != joystickaxis.None)
+                        {
+                            Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo));
+                        }
+                    }*/
 
+                    if (getJoystickAxis(3) != joystickaxis.None) Interface.MAV.cs.rcoverridech3 = pickchannel(3, JoyChannels[3].axis, JoyChannels[3].reverse, JoyChannels[3].expo);
+                    if (getJoystickAxis(4) != joystickaxis.None) Interface.MAV.cs.rcoverridech4 = pickchannel(4, JoyChannels[4].axis, JoyChannels[4].reverse, JoyChannels[4].expo);
+                    if (getJoystickAxis(5) != joystickaxis.None) Interface.MAV.cs.rcoverridech5 = pickchannel(5, JoyChannels[5].axis, JoyChannels[5].reverse, JoyChannels[5].expo);
+                    if (getJoystickAxis(6) != joystickaxis.None) Interface.MAV.cs.rcoverridech6 = pickchannel(6, JoyChannels[6].axis, JoyChannels[6].reverse, JoyChannels[6].expo);
+                    if (getJoystickAxis(7) != joystickaxis.None) Interface.MAV.cs.rcoverridech7 = pickchannel(7, JoyChannels[7].axis, JoyChannels[7].reverse, JoyChannels[7].expo);
+                    if (getJoystickAxis(8) != joystickaxis.None) Interface.MAV.cs.rcoverridech8 = pickchannel(8, JoyChannels[8].axis, JoyChannels[8].reverse, JoyChannels[8].expo);
                     if (getJoystickAxis(9) != joystickaxis.None) Interface.MAV.cs.rcoverridech9 = pickchannel(9, JoyChannels[9].axis, JoyChannels[9].reverse, JoyChannels[9].expo);
                     if (getJoystickAxis(10) != joystickaxis.None) Interface.MAV.cs.rcoverridech10 = pickchannel(10, JoyChannels[10].axis, JoyChannels[10].reverse, JoyChannels[10].expo);
                     if (getJoystickAxis(11) != joystickaxis.None) Interface.MAV.cs.rcoverridech11 = pickchannel(11, JoyChannels[11].axis, JoyChannels[11].reverse, JoyChannels[11].expo);
@@ -1307,7 +1344,6 @@ namespace MissionPlanner.Joystick
                     if (getJoystickAxis(16) != joystickaxis.None) Interface.MAV.cs.rcoverridech16 = pickchannel(16, JoyChannels[16].axis, JoyChannels[16].reverse, JoyChannels[16].expo);
                     if (getJoystickAxis(17) != joystickaxis.None) Interface.MAV.cs.rcoverridech17 = pickchannel(17, JoyChannels[17].axis, JoyChannels[17].reverse, JoyChannels[17].expo);
                     if (getJoystickAxis(18) != joystickaxis.None) Interface.MAV.cs.rcoverridech18 = pickchannel(18, JoyChannels[18].axis, JoyChannels[18].reverse, JoyChannels[18].expo);
-
 
                     // disable button actions when not connected.
                     if (Interface.BaseStream.IsOpen)

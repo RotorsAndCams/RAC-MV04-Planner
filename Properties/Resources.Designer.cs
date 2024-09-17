@@ -1047,6 +1047,16 @@ namespace MissionPlanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap inverted_cam_but {
+            get {
+                object obj = ResourceManager.GetObject("inverted_cam_but", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap light_01 {
             get {
                 object obj = ResourceManager.GetObject("light_01", resourceCulture);
@@ -1170,6 +1180,16 @@ namespace MissionPlanner.Properties {
         public static System.Drawing.Bitmap light_tuningconfig_icon {
             get {
                 object obj = ResourceManager.GetObject("light_tuningconfig_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Logo_SecopPlanner2 {
+            get {
+                object obj = ResourceManager.GetObject("Logo_SecopPlanner2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1814,6 +1834,16 @@ namespace MissionPlanner.Properties {
         public static System.Drawing.Bitmap rover_11 {
             get {
                 object obj = ResourceManager.GetObject("rover_11", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap secopplanner2 {
+            get {
+                object obj = ResourceManager.GetObject("secopplanner2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

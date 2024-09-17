@@ -1,4 +1,4 @@
-﻿using MV04.GCS;
+﻿using MV04.Joystick;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -41,14 +41,11 @@
             this.comboBox_coordFormat = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox_cameraStreamPort = new System.Windows.Forms.TextBox();
-            this.textBox_cameraStreamIp = new System.Windows.Forms.TextBox();
+            this.textBox_cameraIp = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.comboBox_IrColorMode = new System.Windows.Forms.ComboBox();
-            this.textBox_cameraControlIp = new System.Windows.Forms.TextBox();
             this.textBox_cameraControlPort = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.radioButton_AutoConnect_Yes = new System.Windows.Forms.RadioButton();
             this.radioButton_AutoConnect_No = new System.Windows.Forms.RadioButton();
@@ -60,6 +57,7 @@
             this.numericUpDown_VideoSegmentLength = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.comboBox_cameraStreamChannel = new System.Windows.Forms.ComboBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -95,7 +93,7 @@
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(43, 218);
+            this.label1.Location = new System.Drawing.Point(43, 208);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(104, 13);
             this.label1.TabIndex = 2;
@@ -111,7 +109,7 @@
             "mps",
             "kmph",
             "knots"});
-            this.comboBox_speedFormat.Location = new System.Drawing.Point(153, 304);
+            this.comboBox_speedFormat.Location = new System.Drawing.Point(153, 303);
             this.comboBox_speedFormat.Name = "comboBox_speedFormat";
             this.comboBox_speedFormat.Size = new System.Drawing.Size(228, 21);
             this.comboBox_speedFormat.TabIndex = 9;
@@ -125,7 +123,7 @@
             "m",
             "km",
             "ft"});
-            this.comboBox_distFormat.Location = new System.Drawing.Point(153, 274);
+            this.comboBox_distFormat.Location = new System.Drawing.Point(153, 270);
             this.comboBox_distFormat.Name = "comboBox_distFormat";
             this.comboBox_distFormat.Size = new System.Drawing.Size(228, 21);
             this.comboBox_distFormat.TabIndex = 8;
@@ -138,7 +136,7 @@
             this.comboBox_altFormat.Items.AddRange(new object[] {
             "m",
             "ft"});
-            this.comboBox_altFormat.Location = new System.Drawing.Point(153, 244);
+            this.comboBox_altFormat.Location = new System.Drawing.Point(153, 237);
             this.comboBox_altFormat.Name = "comboBox_altFormat";
             this.comboBox_altFormat.Size = new System.Drawing.Size(228, 21);
             this.comboBox_altFormat.TabIndex = 7;
@@ -147,7 +145,7 @@
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(22, 248);
+            this.label2.Location = new System.Drawing.Point(22, 241);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(125, 13);
             this.label2.TabIndex = 3;
@@ -158,7 +156,7 @@
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(27, 278);
+            this.label3.Location = new System.Drawing.Point(27, 274);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(120, 13);
             this.label3.TabIndex = 4;
@@ -169,7 +167,7 @@
             // 
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(24, 308);
+            this.label4.Location = new System.Drawing.Point(24, 307);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(123, 13);
             this.label4.TabIndex = 5;
@@ -184,7 +182,7 @@
             this.comboBox_coordFormat.Items.AddRange(new object[] {
             "WGS84",
             "MGRS"});
-            this.comboBox_coordFormat.Location = new System.Drawing.Point(153, 214);
+            this.comboBox_coordFormat.Location = new System.Drawing.Point(153, 204);
             this.comboBox_coordFormat.Name = "comboBox_coordFormat";
             this.comboBox_coordFormat.Size = new System.Drawing.Size(228, 21);
             this.comboBox_coordFormat.TabIndex = 6;
@@ -193,45 +191,37 @@
             // 
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(57, 8);
+            this.label5.Location = new System.Drawing.Point(91, 10);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(90, 13);
+            this.label5.Size = new System.Drawing.Size(56, 13);
             this.label5.TabIndex = 10;
-            this.label5.Text = "Kamera stream IP";
+            this.label5.Text = "Kamera IP";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // label6
             // 
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(48, 38);
+            this.label6.Location = new System.Drawing.Point(25, 43);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(99, 13);
+            this.label6.Size = new System.Drawing.Size(122, 13);
             this.label6.TabIndex = 11;
-            this.label6.Text = "Kamera stream Port";
+            this.label6.Text = "Kamera stream Csatorna";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // textBox_cameraStreamPort
+            // textBox_cameraIp
             // 
-            this.textBox_cameraStreamPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_cameraStreamPort.Location = new System.Drawing.Point(153, 35);
-            this.textBox_cameraStreamPort.Name = "textBox_cameraStreamPort";
-            this.textBox_cameraStreamPort.Size = new System.Drawing.Size(228, 20);
-            this.textBox_cameraStreamPort.TabIndex = 12;
-            // 
-            // textBox_cameraStreamIp
-            // 
-            this.textBox_cameraStreamIp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_cameraStreamIp.Location = new System.Drawing.Point(153, 5);
-            this.textBox_cameraStreamIp.Name = "textBox_cameraStreamIp";
-            this.textBox_cameraStreamIp.Size = new System.Drawing.Size(228, 20);
-            this.textBox_cameraStreamIp.TabIndex = 13;
+            this.textBox_cameraIp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_cameraIp.Location = new System.Drawing.Point(153, 6);
+            this.textBox_cameraIp.Name = "textBox_cameraIp";
+            this.textBox_cameraIp.Size = new System.Drawing.Size(228, 20);
+            this.textBox_cameraIp.TabIndex = 13;
             // 
             // label7
             // 
             this.label7.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(83, 188);
+            this.label7.Location = new System.Drawing.Point(83, 175);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(64, 13);
             this.label7.TabIndex = 14;
@@ -248,23 +238,15 @@
             "BlackHot",
             "Color",
             "ColorInverse"});
-            this.comboBox_IrColorMode.Location = new System.Drawing.Point(153, 184);
+            this.comboBox_IrColorMode.Location = new System.Drawing.Point(153, 171);
             this.comboBox_IrColorMode.Name = "comboBox_IrColorMode";
             this.comboBox_IrColorMode.Size = new System.Drawing.Size(228, 21);
             this.comboBox_IrColorMode.TabIndex = 15;
             // 
-            // textBox_cameraControlIp
-            // 
-            this.textBox_cameraControlIp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_cameraControlIp.Location = new System.Drawing.Point(153, 65);
-            this.textBox_cameraControlIp.Name = "textBox_cameraControlIp";
-            this.textBox_cameraControlIp.Size = new System.Drawing.Size(228, 20);
-            this.textBox_cameraControlIp.TabIndex = 19;
-            // 
             // textBox_cameraControlPort
             // 
             this.textBox_cameraControlPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_cameraControlPort.Location = new System.Drawing.Point(153, 95);
+            this.textBox_cameraControlPort.Location = new System.Drawing.Point(153, 72);
             this.textBox_cameraControlPort.Name = "textBox_cameraControlPort";
             this.textBox_cameraControlPort.Size = new System.Drawing.Size(228, 20);
             this.textBox_cameraControlPort.TabIndex = 18;
@@ -273,29 +255,18 @@
             // 
             this.label8.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(40, 98);
+            this.label8.Location = new System.Drawing.Point(40, 76);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(107, 13);
             this.label8.TabIndex = 17;
             this.label8.Text = "Kamera vezérlés Port";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // label9
-            // 
-            this.label9.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(49, 68);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(98, 13);
-            this.label9.TabIndex = 16;
-            this.label9.Text = "Kamera vezérlés IP";
-            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
             // label10
             // 
             this.label10.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(55, 128);
+            this.label10.Location = new System.Drawing.Point(55, 109);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(92, 13);
             this.label10.TabIndex = 20;
@@ -306,7 +277,7 @@
             // 
             this.radioButton_AutoConnect_Yes.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.radioButton_AutoConnect_Yes.AutoSize = true;
-            this.radioButton_AutoConnect_Yes.Location = new System.Drawing.Point(3, 3);
+            this.radioButton_AutoConnect_Yes.Location = new System.Drawing.Point(3, 5);
             this.radioButton_AutoConnect_Yes.Name = "radioButton_AutoConnect_Yes";
             this.radioButton_AutoConnect_Yes.Size = new System.Drawing.Size(46, 17);
             this.radioButton_AutoConnect_Yes.TabIndex = 21;
@@ -318,7 +289,7 @@
             // 
             this.radioButton_AutoConnect_No.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.radioButton_AutoConnect_No.AutoSize = true;
-            this.radioButton_AutoConnect_No.Location = new System.Drawing.Point(55, 3);
+            this.radioButton_AutoConnect_No.Location = new System.Drawing.Point(55, 5);
             this.radioButton_AutoConnect_No.Name = "radioButton_AutoConnect_No";
             this.radioButton_AutoConnect_No.Size = new System.Drawing.Size(47, 17);
             this.radioButton_AutoConnect_No.TabIndex = 22;
@@ -330,7 +301,7 @@
             // 
             this.label11.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(19, 158);
+            this.label11.Location = new System.Drawing.Point(19, 142);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(128, 13);
             this.label11.TabIndex = 24;
@@ -342,45 +313,43 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.comboBox_IrColorMode, 1, 6);
-            this.tableLayoutPanel1.Controls.Add(this.textBox_cameraControlPort, 1, 3);
-            this.tableLayoutPanel1.Controls.Add(this.comboBox_coordFormat, 1, 7);
-            this.tableLayoutPanel1.Controls.Add(this.comboBox_altFormat, 1, 8);
-            this.tableLayoutPanel1.Controls.Add(this.comboBox_distFormat, 1, 9);
-            this.tableLayoutPanel1.Controls.Add(this.textBox_cameraControlIp, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.comboBox_speedFormat, 1, 10);
+            this.tableLayoutPanel1.Controls.Add(this.comboBox_IrColorMode, 1, 5);
+            this.tableLayoutPanel1.Controls.Add(this.textBox_cameraControlPort, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.comboBox_coordFormat, 1, 6);
+            this.tableLayoutPanel1.Controls.Add(this.comboBox_altFormat, 1, 7);
+            this.tableLayoutPanel1.Controls.Add(this.comboBox_distFormat, 1, 8);
+            this.tableLayoutPanel1.Controls.Add(this.comboBox_speedFormat, 1, 9);
             this.tableLayoutPanel1.Controls.Add(this.label5, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.textBox_cameraStreamPort, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.textBox_cameraStreamIp, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label11, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.textBox_cameraIp, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label11, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.label6, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.label7, 0, 6);
-            this.tableLayoutPanel1.Controls.Add(this.label9, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.label4, 0, 10);
-            this.tableLayoutPanel1.Controls.Add(this.label10, 0, 4);
-            this.tableLayoutPanel1.Controls.Add(this.label3, 0, 9);
-            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 7);
-            this.tableLayoutPanel1.Controls.Add(this.label8, 0, 3);
-            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 8);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel3, 1, 11);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 5);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 1, 4);
+            this.tableLayoutPanel1.Controls.Add(this.label7, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.label4, 0, 9);
+            this.tableLayoutPanel1.Controls.Add(this.label10, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.label3, 0, 8);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 6);
+            this.tableLayoutPanel1.Controls.Add(this.label8, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 7);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel3, 1, 10);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 4);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 1, 3);
+            this.tableLayoutPanel1.Controls.Add(this.comboBox_cameraStreamChannel, 1, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 12;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090908F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
+            this.tableLayoutPanel1.RowCount = 11;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.999999F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(384, 361);
             this.tableLayoutPanel1.TabIndex = 25;
             // 
@@ -407,18 +376,18 @@
             this.tableLayoutPanel2.Controls.Add(this.label13, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.numericUpDown_VideoSegmentLength, 0, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(153, 153);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(153, 135);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(228, 24);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(228, 27);
             this.tableLayoutPanel2.TabIndex = 30;
             // 
             // label13
             // 
             this.label13.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(213, 5);
+            this.label13.Location = new System.Drawing.Point(213, 7);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(12, 13);
             this.label13.TabIndex = 26;
@@ -440,12 +409,25 @@
             this.tableLayoutPanel4.Controls.Add(this.radioButton_AutoConnect_No, 1, 0);
             this.tableLayoutPanel4.Controls.Add(this.radioButton_AutoConnect_Yes, 0, 0);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(153, 123);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(153, 102);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 1;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(228, 24);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(228, 27);
             this.tableLayoutPanel4.TabIndex = 31;
+            // 
+            // comboBox_cameraStreamChannel
+            // 
+            this.comboBox_cameraStreamChannel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox_cameraStreamChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_cameraStreamChannel.FormattingEnabled = true;
+            this.comboBox_cameraStreamChannel.Items.AddRange(new object[] {
+            "0",
+            "1"});
+            this.comboBox_cameraStreamChannel.Location = new System.Drawing.Point(153, 39);
+            this.comboBox_cameraStreamChannel.Name = "comboBox_cameraStreamChannel";
+            this.comboBox_cameraStreamChannel.Size = new System.Drawing.Size(228, 21);
+            this.comboBox_cameraStreamChannel.TabIndex = 32;
             // 
             // SettingForm
             // 
@@ -486,14 +468,11 @@
         private System.Windows.Forms.ComboBox comboBox_altFormat;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox textBox_cameraStreamPort;
-        private System.Windows.Forms.TextBox textBox_cameraStreamIp;
+        private System.Windows.Forms.TextBox textBox_cameraIp;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox comboBox_IrColorMode;
-        private System.Windows.Forms.TextBox textBox_cameraControlIp;
         private System.Windows.Forms.TextBox textBox_cameraControlPort;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.RadioButton radioButton_AutoConnect_Yes;
         private System.Windows.Forms.RadioButton radioButton_AutoConnect_No;
@@ -505,5 +484,6 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ComboBox comboBox_cameraStreamChannel;
     }
 }

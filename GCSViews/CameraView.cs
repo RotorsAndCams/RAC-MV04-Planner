@@ -6,6 +6,7 @@ using MissionPlanner.Utilities;
 using MV04.Camera;
 using MV04.Settings;
 using MV04.State;
+using MV04.TestForms;
 using NetTopologySuite.Operation.Valid;
 using NextVisionVideoControlLibrary;
 using OpenTK.Graphics.ES11;
@@ -15,6 +16,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.Globalization;
 using System.IO;
@@ -23,10 +25,12 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.RightsManagement;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static IronPython.Modules._ast;
 using static MV04.Camera.MavProto;
+using Accord.Video.FFMPEG;
 
 namespace MissionPlanner.GCSViews
 {
@@ -37,18 +41,15 @@ namespace MissionPlanner.GCSViews
         public static CameraView instance;
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        VideoControl VideoControl;
-        (int major, int minor, int build) VideoControlDLLVersion;
-        string CameraStreamIP;
-        int CameraStreamPort;
-        bool CameraStreamAJC = false;
+        string CameraIP;
+        int CameraStreamChannel;
         new Font DefaultFont;
         Brush DefaultBrush;
         Rectangle VideoRectangle;
-        Graphics VideoGraphics;
+        Graphics gr;
         HudElements HudElements = new HudElements();
 
-        Timer FetchHudDataTimer = new Timer();
+        System.Timers.Timer FetchHudDataTimer = new System.Timers.Timer();
 
         (int major, int minor, int build) CameraControlDLLVersion;
 
@@ -66,6 +67,21 @@ namespace MissionPlanner.GCSViews
 
         public const int _maxAllowedAltitudeValue = 500;
         public const int _minAllowedAltitudeValue = 50;
+
+        private bool _tripSwitchedOff = false;
+
+        Image img;
+        private readonly object _bgimagelock = new object();
+
+        Bitmap _actualCameraImage;
+
+        int _frameRate = 25;
+        bool _recordingInProgress = false;
+        int _segmentLength;
+
+        string _tempPath = "";
+        int _fileCount = 0;
+        NvSystemModes _cameraState;
 
         #endregion
 
@@ -85,20 +101,16 @@ namespace MissionPlanner.GCSViews
             InitializeComponent();
             instance = this;
 
-            // Video control
-            VideoControl = CameraHandler.Instance.CameraVideoControl;
-            VideoControlDLLVersion = CameraHandler.Instance.StreamDLLVersion;
-            CameraStreamIP = SettingManager.Get(Setting.CameraStreamIP);
-            CameraStreamPort = int.Parse(SettingManager.Get(Setting.CameraStreamPort));
+            // Camera
+            CameraIP = SettingManager.Get(Setting.CameraIP);
+            CameraStreamChannel = int.Parse(SettingManager.Get(Setting.CameraStreamChannel));
             FetchHudDataTimer.Interval = 100; // 10Hz
-            FetchHudDataTimer.Tick += (sender, eventArgs) => FetchHudData();
+            FetchHudDataTimer.Elapsed += (sender, eventArgs) => FetchHudData();
+            CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
 
             // Create default drawing objects
             DefaultFont = new Font(FontFamily.GenericMonospace, this.Font.SizeInPoints * 2f);
             DefaultBrush = new SolidBrush(Color.Red);
-
-            // Camera control
-            CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
 
             // Snapshot & video save location
             CameraHandler.Instance.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
@@ -115,6 +127,7 @@ namespace MissionPlanner.GCSViews
             StartCameraStream();
             StartCameraControl();
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
+            CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
 
             SetStopButtonVisibility();
 
@@ -141,43 +154,71 @@ namespace MissionPlanner.GCSViews
             else
                 this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
 
-
             //timer for camera switchoff
             _cameraSwitchOffTimer = new System.Timers.Timer();
             _cameraSwitchOffTimer.Elapsed += _cameraSwitchOffTimer_Elapsed;
             _cameraSwitchOffTimer.Interval = 30000;
             _cameraSwitchOffTimer.Enabled = true;
 
-        }
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.UserPaint |
+                ControlStyles.OptimizedDoubleBuffer,
+                true);
 
+            this.DoubleBuffered = true;
+            pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
 
-
-        PictureBox pictureBox;
-        private bool _tripSwitchedOff = false;
-
-        private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            string mode = MainV2.comPort.MAV.cs.mode;
-            int agl = (int)MainV2.comPort.MAV.cs.alt;
-
-            bool droneFlightMode = mode.ToUpper() == "GUIDED" || mode.ToUpper() == "AUTO" || mode.ToUpper() == "LOITER";
-            bool droneAGLMoreThanZero = agl > 0;
-            bool currentStateFlight = StateHandler.CurrentSate == MV04_State.Takeoff || StateHandler.CurrentSate == MV04_State.Follow || StateHandler.CurrentSate == MV04_State.Auto || StateHandler.CurrentSate == MV04_State.Manual;
-
-            int state = 0;
-
-            //test
-            if (/*droneFlightMode || */ droneAGLMoreThanZero || currentStateFlight)
+            GStreamer.onNewImage += (sender, image) =>
             {
-                return;
-            }
-            //else
-            //    state = 1;
+                try
+                {
+                    if (image == null) return;
 
-            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, state, 0, 0, 0, 0, 0);
-            _tripSwitchedOff = true;
-            btn_TripSwitchOnOff.BackColor = Color.Black;
+                    img = new Bitmap(image.Width, image.Height, 4 * image.Width,
+                                System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
+                                image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
+                                    .Scan0);
+
+                    if (img == null) return;
+
+                    if (InvokeRequired)
+                        Invoke(new Action(() => pb_CameraGstream.Invalidate()));
+                    else
+                        pb_CameraGstream.Invalidate();
+
+                    //
+                    //Task.Factory.StartNew(() => {
+
+                        
+
+                    //});
+                    
+
+                }
+                catch (Exception ex)
+                {
+                    //MessageBox.Show("Gst error" + ex.Message);
+                }
+            };
+
+            this.FormClosing += CameraView_FormClosing;
+            
+            _videoRecordTimer.Interval = 40;
+            _videoRecordTimer.Elapsed += _videoRecordTimer_Tick;
+            _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
+
+            pb_CameraGstream.Invalidate();
+
+            bool autoRecord = bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream));
+
+            if (autoRecord)
+            {
+                StartRecording();
+            }
+
         }
+
+        
 
         #endregion
 
@@ -203,10 +244,8 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void DrawUI()
         {
-            // Video stream control
-            this.pnl_CameraScreen.Controls.Add(VideoControl);
-            VideoControl.Dock = DockStyle.Fill;
-
+            CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
+            CameraSettingsForm.Instance.event_StartStopRecording += CameraSettings_event_StartStopRecording;
             // Test functions
             #region Test functions
 
@@ -219,7 +258,6 @@ namespace MissionPlanner.GCSViews
                 {"Switch crosshairs", () => { ChangeCrossHair(); }},
                 {"Do photo", () => { DoPhoto(); }},
                 {"Start recording (loop)", () => { StartRecording(); }},
-                {"Start recording (infinite)", () => { StartRecordingInfinite(); }},
                 {"Stop recording", () => { StopRecording(); }},
                 {"Set mode", () => { new CameraModeSelectorForm().Show(); }},
                 {"Tracker mode", () => { new TrackerPosForm().Show(); }},
@@ -232,6 +270,7 @@ namespace MissionPlanner.GCSViews
                 {"Do NUC", async () => { await DoNUC(); }},
                 {"Test Gstreamer", async () => { new GstreamerTestForm().Show(); }},
                 {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
+                {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }}
             };
 
             #endregion
@@ -267,7 +306,7 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraStream()
         {
-            bool success = CameraHandler.Instance.StartStream(IPAddress.Parse(CameraStreamIP), CameraStreamPort, OnNewFrame, OnVideoClick);
+            bool success = StartGstreamerCameraStream(CameraHandler.url);
 
             if (success)
             {
@@ -289,7 +328,7 @@ namespace MissionPlanner.GCSViews
         private void StartCameraControl()
         {
             bool success = CameraHandler.Instance.CameraControlConnect(
-                IPAddress.Parse(SettingManager.Get(Setting.CameraControlIP)),
+                IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
 #if DEBUG
@@ -331,52 +370,74 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-        private void DoPhoto()
+        private void DoPhoto(string path = null)
         {
-            bool success = CameraHandler.Instance.DoPhoto();
+            _actualCameraImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
+            pb_CameraGstream.DrawToBitmap(_actualCameraImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height));
+
+            if (path == null)
+                path = CameraHandler.Instance.MediaSavePath + "test" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
+
+            if (_actualCameraImage != null)
+                _actualCameraImage.Save(path, ImageFormat.Jpeg);
 
 #if DEBUG
-            if (success)
-                AddToOSDDebug("Photo taken");
+            AddToOSDDebug("Photo taken");
 #endif
+        }
+
+        object _lockImageSaveTimer = new object();
+        System.Timers.Timer _videoRecordTimer = new System.Timers.Timer();
+        private VideoRecorder _videoRecorder = new VideoRecorder();
+
+        /// <summary>
+        /// Add bitmap to the list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _videoRecordTimer_Tick(object sender, EventArgs e)
+        {
+            lock (_lockImageSaveTimer)
+            {
+                if (_recordingInProgress)
+                {
+
+                    try
+                    {
+                        var _actualCameraVideoImage = new Bitmap(1920, 1080);
+
+                        Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, 1920, 1080)); });
+
+                        _videoRecorder.AddNewImage(_actualCameraVideoImage);
+                    }
+                    catch { }
+
+
+
+                }
+                else
+                {
+                    _videoRecordTimer.Stop();
+                    _videoRecordTimer.Close();
+                }
+
+            }
         }
 
         private void StartRecording()
         {
             int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
 
-            bool success = CameraHandler.Instance.StartRecording(TimeSpan.FromSeconds(sl));
+            _videoRecordTimer?.Start();
+            _videoRecorder.Start();
 
-#if DEBUG
-            if (success)
-                AddToOSDDebug($"Recording started ({sl}s loop)");
-            else
-                AddToOSDDebug("Recording started (infinite)");
-#endif
-        }
-
-        private void StartRecordingInfinite()
-        {
-            bool success = CameraHandler.Instance.StartRecording(null);
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug("Recording started (infinite)");
-            else
-                AddToOSDDebug("Recording failed to start");
-#endif
+            _recordingInProgress = true;
         }
 
         private void StopRecording()
         {
-            bool success = CameraHandler.Instance.StopRecording();
-
-#if DEBUG
-            if (success)
-                AddToOSDDebug("Recording stopped");
-            else
-                AddToOSDDebug("Recording failed to stopped");
-#endif
+            _recordingInProgress = false;
+            _videoRecordTimer?.Stop();
         }
 
         private async Task ResetZoom()
@@ -498,139 +559,124 @@ namespace MissionPlanner.GCSViews
 #endif
         }
 
-
+        private bool StartGstreamerCameraStream(string p_url)
+        {
+            try
+            {
+                CameraHandler.Instance.StartGstreamer(p_url);
+                //GStreamer.StartA(p_url);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                CustomMessageBox.Show(ex.ToString(), Strings.ERROR);
+                return false;
+            }
+        }
 
         #endregion
 
         #region Drawing
 
-        /// <summary>
-        /// Handles every new frame
-        /// </summary>
-        private void OnNewFrame(byte[] frame_buf, stream_status status, int width, int height)
+        private void OnNewFrame(int width, int height, Graphics _gr)
         {
             // frame_buf is 1920 x 1080 x 3 long
             // real frame is width x height
 
             // Create drawing objects
-            VideoGraphics = Graphics.FromImage(new Bitmap(width, height, 3 * width, System.Drawing.Imaging.PixelFormat.Format24bppRgb, Marshal.UnsafeAddrOfPinnedArrayElement(frame_buf, 0)));
-            VideoGraphics.InterpolationMode = InterpolationMode.High;
-            VideoGraphics.SmoothingMode = SmoothingMode.HighQuality;
-            VideoGraphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-            VideoGraphics.CompositingQuality = CompositingQuality.HighQuality;
+            
+            _gr.InterpolationMode = InterpolationMode.High;
+            _gr.SmoothingMode = SmoothingMode.HighQuality;
+            _gr.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+            _gr.CompositingQuality = CompositingQuality.HighQuality;
             VideoRectangle = new Rectangle()
             {
-                X = (int)Math.Round(VideoGraphics.VisibleClipBounds.X),
-                Y = (int)Math.Round(VideoGraphics.VisibleClipBounds.Y),
-                Width = (int)Math.Round(VideoGraphics.VisibleClipBounds.Width),
-                Height = (int)Math.Round(VideoGraphics.VisibleClipBounds.Height)
+                X = (int)Math.Round(_gr.VisibleClipBounds.X),
+                Y = (int)Math.Round(_gr.VisibleClipBounds.Y),
+                Width = (int)Math.Round(_gr.VisibleClipBounds.Width),
+                Height = (int)Math.Round(_gr.VisibleClipBounds.Height)
             };
 
-            if (status == stream_status.StreamDetectionOk)
+            // Datetime
+            Rectangle Datetime = DrawText(HudElements.Time, new Point(3, 3), ContentAlignment.TopLeft, HorizontalAlignment.Left, null,null,null, _gr);
+
+            // Battery
+            Rectangle Battery = DrawText(HudElements.Battery, new Point(VideoRectangle.Width - 3, 3), ContentAlignment.TopRight, HorizontalAlignment.Right, null, null, null, _gr);
+
+            int topLeft = Datetime.Right;
+            int topStep = ((Battery.Left - topLeft) / 4) / 2;
+
+            // AGL
+            DrawText(HudElements.AGL, new Point(topLeft + topStep, 3), ContentAlignment.TopCenter, HorizontalAlignment.Left, null, null, null, _gr);
+
+            // Velocity
+            DrawText(HudElements.Velocity, new Point(topLeft + (3 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left, null, null, null, _gr);
+
+            // TGD
+            DrawText(HudElements.TGD, new Point(topLeft + (5 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left, null, null, null, _gr);
+
+            // Signal strengths
+            DrawText(HudElements.SignalStrengths, new Point(topLeft + (7 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Right, null, null, null, _gr);
+
+            // Camera info
+            DrawText(HudElements.Camera, new Point(3, Datetime.Bottom + 20), ContentAlignment.TopLeft, HorizontalAlignment.Right, null, null, null, _gr);
+
+            // Next waypoint
+            Rectangle nextWP = DrawText(HudElements.ToWaypoint, new Point(VideoRectangle.Width - 3, Battery.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right, null, null, null, _gr);
+
+            // Operator distance
+            DrawText(HudElements.FromOperator, new Point(VideoRectangle.Width - 3, nextWP.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right, null, null, null, _gr);
+
+            // Coords
+            DrawText(HudElements.DroneGps, new Point(0, VideoRectangle.Height - 3), ContentAlignment.BottomLeft, HorizontalAlignment.Left, null, null, null, _gr);
+            DrawText(HudElements.TargetGps, new Point(VideoRectangle.Width - 3, VideoRectangle.Height - 3), ContentAlignment.BottomRight, HorizontalAlignment.Right, null, null, null, _gr);
+
+            #region Crosshairs
+            int lineHeight = (int)Math.Round(VideoRectangle.Height * 0.1);
+            Pen linePen = new Pen(Color.Red, 1);
+
+            if (HudElements.Crosshairs == CrosshairsType.Plus) // Plus
             {
-                // Datetime
-                Rectangle Datetime = DrawText(HudElements.Time, new Point(3, 3), ContentAlignment.TopLeft, HorizontalAlignment.Left);
-
-                // Battery
-                Rectangle Battery = DrawText(HudElements.Battery, new Point(VideoRectangle.Width - 3, 3), ContentAlignment.TopRight, HorizontalAlignment.Right);
-
-                int topLeft = Datetime.Right;
-                int topStep = ((Battery.Left - topLeft) / 4) / 2;
-
-                // AGL
-                DrawText(HudElements.AGL, new Point(topLeft + topStep, 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
-
-                // Velocity
-                DrawText(HudElements.Velocity, new Point(topLeft + (3 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
-
-                // TGD
-                DrawText(HudElements.TGD, new Point(topLeft + (5 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left);
-
-                // Signal strengths
-                DrawText(HudElements.SignalStrengths, new Point(topLeft + (7 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Right);
-
-                // Camera info
-                DrawText(HudElements.Camera, new Point(3, Datetime.Bottom + 20), ContentAlignment.TopLeft, HorizontalAlignment.Right);
-
-                // Next waypoint
-                Rectangle nextWP = DrawText(HudElements.ToWaypoint, new Point(VideoRectangle.Width - 3, Battery.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right);
-
-                // Operator distance
-                DrawText(HudElements.FromOperator, new Point(VideoRectangle.Width - 3, nextWP.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right);
-
-                // Coords
-                DrawText(HudElements.DroneGps, new Point(0, VideoRectangle.Height - 3), ContentAlignment.BottomLeft, HorizontalAlignment.Left);
-                DrawText(HudElements.TargetGps, new Point(VideoRectangle.Width - 3, VideoRectangle.Height - 3), ContentAlignment.BottomRight, HorizontalAlignment.Right);
-
-                #region Crosshairs
-                int lineHeight = (int)Math.Round(VideoRectangle.Height * 0.1);
-                Pen linePen = new Pen(Color.Red, 1);
-
-                if (HudElements.Crosshairs == CrosshairsType.Plus) // Plus
-                {
-                    VideoGraphics.DrawLine(linePen,
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) + lineHeight, VideoRectangle.Height / 2);
-                    VideoGraphics.DrawLine(linePen,
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        VideoRectangle.Width / 2, (VideoRectangle.Height / 2) + lineHeight);
-                    VideoGraphics.DrawLine(linePen,
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) - lineHeight, VideoRectangle.Height / 2);
-                    VideoGraphics.DrawLine(linePen,
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        VideoRectangle.Width / 2, (VideoRectangle.Height / 2) - lineHeight);
-                }
-                else // Horizontal
-                {
-                    // Draw center ^ character
-                    VideoGraphics.DrawLine(new Pen(Color.Red, 3),
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) - Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-                    VideoGraphics.DrawLine(new Pen(Color.Red, 3),
-                        VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) + Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-
-                    for (int i = 1; i <= 3; i++)
-                    {
-                        // Draw lines to the right
-                        VideoGraphics.DrawLine(linePen,
-                            (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
-                            (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-
-                        // Draw lines to the left
-                        VideoGraphics.DrawLine(linePen,
-                            (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
-                            (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-                    }
-
-                    // Draw number under first right line
-                    DrawText(HudElements.LineDistance.ToString(), new Point((VideoRectangle.Width / 2) + HudElements.LineSpacing, (VideoRectangle.Height / 2) + lineHeight + 3), ContentAlignment.TopCenter, HorizontalAlignment.Center, new Font(DefaultFont.FontFamily, this.Font.SizeInPoints, FontStyle.Regular));
-                }
-                #endregion
+                _gr.DrawLine(linePen,
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    (VideoRectangle.Width / 2) + lineHeight, VideoRectangle.Height / 2);
+                _gr.DrawLine(linePen,
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    VideoRectangle.Width / 2, (VideoRectangle.Height / 2) + lineHeight);
+                _gr.DrawLine(linePen,
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    (VideoRectangle.Width / 2) - lineHeight, VideoRectangle.Height / 2);
+                _gr.DrawLine(linePen,
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    VideoRectangle.Width / 2, (VideoRectangle.Height / 2) - lineHeight);
             }
-            else // Stream is not OK, Stream needs therapy
+            else // Horizontal
             {
-                // Clean screen
-                VideoGraphics.Clear(Color.FromArgb(0, 128, 0));
+                // Draw center ^ character
+                _gr.DrawLine(new Pen(Color.Red, 3),
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    (VideoRectangle.Width / 2) - Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
+                _gr.DrawLine(new Pen(Color.Red, 3),
+                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
+                    (VideoRectangle.Width / 2) + Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
 
-                // Print status message
-                string message = "";
-                switch (status)
+                for (int i = 1; i <= 3; i++)
                 {
-                    case stream_status.StreamIdle:
-                        message = "STREAM IDLE";
-                        break;
-                    case stream_status.StreamAcquiring:
-                        message = "AQUIRING STREAM";
-                        break;
-                    case stream_status.StreamLost:
-                        message = "STREAM LOST";
-                        break;
-                    default: break;
+                    // Draw lines to the right
+                    _gr.DrawLine(linePen,
+                        (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
+                        (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
+
+                    // Draw lines to the left
+                    _gr.DrawLine(linePen,
+                        (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
+                        (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
                 }
-                DrawText(message, new Point((VideoRectangle.Width / 2) + rnd.Next(-20, 21), (VideoRectangle.Height / 2) + rnd.Next(-20, 21)), ContentAlignment.MiddleCenter, HorizontalAlignment.Center, new Font(DefaultFont.FontFamily, DefaultFont.Size * 2f, FontStyle.Bold));
+
+                // Draw number under first right line
+                DrawText(HudElements.LineDistance.ToString(), new Point((VideoRectangle.Width / 2) + HudElements.LineSpacing, (VideoRectangle.Height / 2) + lineHeight + 3), ContentAlignment.TopCenter, HorizontalAlignment.Center, new Font(DefaultFont.FontFamily, this.Font.SizeInPoints, FontStyle.Regular));
             }
+            #endregion
 
             // OSDDebug
             if (OSDDebug && !string.IsNullOrWhiteSpace(OSDDebugLines[0]))
@@ -675,7 +721,7 @@ namespace MissionPlanner.GCSViews
             textFont = textFont ?? DefaultFont;
             textBrush = textBrush ?? DefaultBrush;
             drawArea = drawArea ?? VideoRectangle;
-            drawGraphics = drawGraphics ?? VideoGraphics;
+            drawGraphics = drawGraphics != null ? drawGraphics : this.CreateGraphics();
 
             // Check position
             if (position.X >= 0
@@ -984,6 +1030,75 @@ namespace MissionPlanner.GCSViews
 
         #region EventHandlers
 
+        private void Instance_event_DoPhoto(object sender, DoRecordingEventArgs e)
+        {
+            this.DoPhoto();
+        }
+
+        private void CameraView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                if(_videoRecorder != null)
+                {
+                    _videoRecorder.Stop();
+                    _videoRecorder = null;
+                }
+                
+                GC.Collect();
+
+                GStreamer.StopAll();
+
+                _droneStatusTimer.Stop();
+
+                pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
+            }
+            catch { }
+
+        }
+
+        private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
+        {
+            try
+            {
+                if (img != null)
+                {
+                    lock (this._bgimagelock)
+                    {
+                        e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
+                    }
+
+                    //FetchHudData();
+                    OnNewFrame(img.Width, img.Height, e.Graphics);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}");
+            }
+        }
+
+        private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            string mode = MainV2.comPort.MAV.cs.mode;
+            int agl = (int)MainV2.comPort.MAV.cs.alt;
+
+            bool droneFlightMode = mode.ToUpper() == "GUIDED" || mode.ToUpper() == "AUTO" || mode.ToUpper() == "LOITER";
+            bool droneAGLMoreThanZero = agl > 0;
+            bool currentStateFlight = StateHandler.CurrentSate == MV04_State.Takeoff || StateHandler.CurrentSate == MV04_State.Follow || StateHandler.CurrentSate == MV04_State.Auto || StateHandler.CurrentSate == MV04_State.Manual;
+
+            int state = 0;
+
+            if (droneAGLMoreThanZero || currentStateFlight)
+            {
+                return;
+            }
+
+            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, state, 0, 0, 0, 0, 0);
+            _tripSwitchedOff = true;
+            btn_TripSwitchOnOff.BackColor = Color.Black;
+        }
+
         private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
         {
             ChangeCrossHair();
@@ -1012,18 +1127,40 @@ namespace MissionPlanner.GCSViews
 
         private void btn_FullScreen_Click(object sender, EventArgs e)
         {
+            //if (_cameraFullScreenForm != null)
+            //{
+            //    try
+            //    {
+            //        _cameraFullScreenForm.Show();
+            //    }
+            //    catch { }
+
+
+            //}
+            //else
+            //{
+            //    _cameraFullScreenForm = new CameraFullScreenForm();
+            //    _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
+            //    _cameraFullScreenForm.FormClosing += _cameraFullScreenForm_FormClosing;
+            //    _cameraFullScreenForm.ShowDialog();
+            //}
+            _cameraFullScreenForm = new CameraFullScreenForm();
+            _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
+            _cameraFullScreenForm.FormClosing += _cameraFullScreenForm_FormClosing;
+            _cameraFullScreenForm.ShowDialog();
+        }
+
+        private void _cameraFullScreenForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
             if (_cameraFullScreenForm != null)
             {
-                _cameraFullScreenForm.Show();
-
-            }
-            else
-            {
-                _cameraFullScreenForm = new CameraFullScreenForm();
-                _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
-                _cameraFullScreenForm.ShowDialog();
+                _cameraFullScreenForm.VisibleChanged -= FullScreenForm_VisibleChanged;
+                _cameraFullScreenForm.FormClosing -= _cameraFullScreenForm_FormClosing;
+                _cameraFullScreenForm.Dispose();
+                _cameraFullScreenForm = null;
             }
         }
+
 
         private void btn_ResetZoom_Click(object sender, EventArgs e)
         {
@@ -1032,13 +1169,6 @@ namespace MissionPlanner.GCSViews
 
         private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
         {
-
-            if (!_cameraFullScreenForm.Visible)
-            {
-                VideoControl = CameraHandler.Instance.CameraVideoControl;
-                this.pnl_CameraScreen.Controls.Add(VideoControl);
-                VideoControl.Dock = DockStyle.Fill;
-            }
             ReconnectCameraStreamAndControl();
         }
 
@@ -1054,50 +1184,19 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        /// <summary>
-        /// Handles a double mouse click on the video area
-        /// </summary>
-        private void OnVideoDoubleClick(object sender, EventArgs e)
-        {
-            Point p = VideoControl.PointToClient(Cursor.Position);
-
-#if DEBUG
-            AddToOSDDebug($"Double clicked at X={p.X} Y={p.Y}");
-#endif
-        }
-
         private void btn_Settings_Click(object sender, EventArgs e)
         {
-            //SettingManager.OpenDialog();
             CameraSettingsForm.Instance.ShowDialog();
-            CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
         }
 
-        /// <summary>
-        /// Handles a mouse click on the video area
-        /// </summary>
-        private void OnVideoClick(int x, int y)
+        private void CameraSettings_event_StartStopRecording(object sender, EventArgs e)
         {
-            if (x <= 0 || y <= 0 || IsCameraTrackingModeActive)
-                return;
+            if(_recordingInProgress)
+                StopRecording();
+            else
+                StartRecording();
 
-            IsCameraTrackingModeActive = true;
-
-            CameraHandler.Instance.StartTracking(new Point(x, y));
-
-            Point _trackPos = new Point(x, y);
-
-            // Constrain tracking pos
-            _trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
-            _trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
-
-#if DEBUG
-            AddToOSDDebug($"calculated clicked at X={_trackPos.X} Y={_trackPos.Y}");
-            AddToOSDDebug($"built in clicked at X={x} Y={y}");
-            
-#endif
-
-            SetStopButtonVisibility();
+            CameraSettingsForm.Instance.SetRecordingStatus(_recordingInProgress);
         }
 
         private void btn_FPVCameraMode_Click(object sender, EventArgs e)
@@ -1128,67 +1227,62 @@ namespace MissionPlanner.GCSViews
 
         private void CameraView_Resize(object sender, EventArgs e)
         {
-            if (this.Size.Width < 1270)
-            {
-                this.pnl_CameraScreen.Padding = new Padding(0, 60, 0, 60);
-                this.pnl_CameraScreen.MinimumSize = new Size(620, 360);
-                this.pnl_CameraScreen.Size = new Size(620, 360);
-            }
-            else if (this.Size.Width < 1590)
-            {
-                this.pnl_CameraScreen.Padding = new Padding(0, 30, 0, 30);
-                this.pnl_CameraScreen.MinimumSize = new Size(960, 540);
-                this.pnl_CameraScreen.Size = new Size(960, 540);
-            }
-            else
-            {
-                this.pnl_CameraScreen.Padding = new Padding(0, 0, 0, 0);
-                this.pnl_CameraScreen.MinimumSize = new Size(1280, 720);
-                this.pnl_CameraScreen.Size = new Size(1280, 720);
-            }
+            //if (this.Size.Width < 1270)
+            //{
+            //    this.pnl_CameraScreen.Padding = new Padding(0, 60, 0, 60);
+            //    this.pnl_CameraScreen.MinimumSize = new Size(620, 360);
+            //    this.pnl_CameraScreen.Size = new Size(620, 360);
+            //}
+            //else if (this.Size.Width < 1590)
+            //{
+            //    this.pnl_CameraScreen.Padding = new Padding(0, 30, 0, 30);
+            //    this.pnl_CameraScreen.MinimumSize = new Size(960, 540);
+            //    this.pnl_CameraScreen.Size = new Size(960, 540);
+            //}
+            //else
+            //{
+            //    this.pnl_CameraScreen.Padding = new Padding(0, 0, 0, 0);
+            //    this.pnl_CameraScreen.MinimumSize = new Size(1280, 720);
+            //    this.pnl_CameraScreen.Size = new Size(1280, 720);
+            //}
         }
-
-        NvSystemModes _cameraState;
 
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
         {
-            #region test
-            byte systemMode = e.Report.systemMode;
-
-            byte test = e.Report.status_flags;
-
-            NvSystemModes stg = CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]);
-
-            _cameraState = stg;
-            #endregion
-
-            string systemModeStr = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report).ToString();
-
-            //Test: Set Camera Status
-            if (InvokeRequired)
+            
+            try
             {
-                Invoke(new Action(() => { SetCameraStatusValue(systemModeStr); }));
-            }
-            else
-                SetCameraStatusValue(systemModeStr);
+                #region test
+                byte systemMode = e.Report.systemMode;
 
-            //Test: Set Drone Status
-            if (InvokeRequired)
+                byte test = e.Report.status_flags;
+
+                NvSystemModes stg = CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]);
+
+                _cameraState = stg;
+                #endregion
+
+                string systemModeStr = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report).ToString();
+
+                //Test: Set Camera Status
+                if (InvokeRequired)
+                    Invoke(new Action(() => { SetCameraStatusValue(systemModeStr); }));
+                else
+                    SetCameraStatusValue(systemModeStr);
+
+                //Test: Set Drone Status
+                if (InvokeRequired)
+                    Invoke(new Action(() => { SetDroneStatusValue(); }));
+                else
+                    SetDroneStatusValue();
+            }
+            catch (Exception ex)
             {
-                Invoke(new Action(() => { SetDroneStatusValue(); }));
+                Console.WriteLine(ex.ToString());
             }
-            else
-                SetDroneStatusValue();
 
-            ////Test: Set GCS Status
-            //if (InvokeRequired)
-            //{
-            //    Invoke(new Action(() => SetGCSStatus()));
-            //}
-            //else
-            //    SetGCSStatus();
+
         }
-
 
         private void StateHandler_MV04StateChange(object sender, MV04StateChangeEventArgs e)
         {
@@ -1286,6 +1380,33 @@ namespace MissionPlanner.GCSViews
                 btn_TripSwitchOnOff.BackColor = Color.Black;
             }
 
+
+        }
+
+        /// <summary>
+        /// Start camera tracking
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void pb_CameraGstream_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.X <= 0 || e.Y <= 0)
+                return;
+
+            if (IsCameraTrackingModeActive)
+                return;
+
+            IsCameraTrackingModeActive = true;
+
+            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y));
+
+            //Point _trackPos = new Point(e.X, e.Y);
+
+            //// Constrain tracking pos
+            //_trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
+            //_trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
+
+            //MessageBox.Show("(X: " + e.X + " ," + "Y: " + e.Y + ")\n" + "(CX: " + _trackPos.X + ", " + _trackPos.Y + ")");
 
         }
 
@@ -1478,11 +1599,6 @@ namespace MissionPlanner.GCSViews
 
         }
 
-
-
         #endregion
-
-        
-
     }
 }

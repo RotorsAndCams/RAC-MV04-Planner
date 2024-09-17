@@ -327,8 +327,8 @@
     <EmbeddedResource Include="Joystick\Joy_Mount_Mode.uk.resx">
       <DependentUpon>Joy_Mount_Mode.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Joystick\Joy_MV04_CameraMode.resx">
-      <DependentUpon>Joy_MV04_CameraMode.cs</DependentUpon>
+    <EmbeddedResource Include="Joystick\Joy_MV04_ImageSensor.resx">
+      <DependentUpon>Joy_MV04_ImageSensor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Joystick\Joy_MV04_FlightMode.resx">
       <DependentUpon>Joy_MV04_FlightMode.cs</DependentUpon>
@@ -527,9 +527,9 @@
       <Project>{e12dbd68-f282-491a-be11-5e6ff21932c1}</Project>
       <Name>MV04.Camera</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\MV04.GCS\MV04.GCS.csproj">
-      <Project>{40A838B6-38CC-47DF-9179-3E6445D3313F}</Project>
-      <Name>MV04.GCS</Name>
+    <ProjectReference Include="ExtLibs\MV04.Joystick\MV04.Joystick.csproj">
+      <Project>{493588B5-2F58-402B-A315-DA5153DDD9CC}</Project>
+      <Name>MV04.Joystick</Name>
     </ProjectReference>
     <ProjectReference Include="ExtLibs\MV04.Settings\MV04.Settings.csproj">
       <Project>{2a73fa7a-705c-467e-9c31-f1d0978e366e}</Project>
@@ -538,6 +538,10 @@
     <ProjectReference Include="ExtLibs\MV04.State\MV04.State.csproj">
       <Project>{78FD6E54-F55E-46B8-89F9-2A655C031D5A}</Project>
       <Name>MV04.State</Name>
+    </ProjectReference>
+    <ProjectReference Include="ExtLibs\MV04.TestForms\MV04.TestForms.csproj">
+      <Project>{18f51b30-42ed-4b41-9b68-32de4ad0b1dd}</Project>
+      <Name>MV04.TestForms</Name>
     </ProjectReference>
     <ProjectReference Include="ExtLibs\netDxf\netDxf.csproj">
       <Project>{785380e0-ceb9-4c34-82e5-60d0e33e848e}</Project>
@@ -618,7 +622,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Accord">
+      <Version>3.8.0</Version>
+    </PackageReference>
     <PackageReference Include="Accord.Imaging">
+      <Version>3.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="Accord.Video">
+      <Version>3.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="Accord.Video.FFMPEG.x64">
       <Version>3.8.0</Version>
     </PackageReference>
     <PackageReference Include="Accord.Vision">
@@ -849,6 +862,7 @@
     <Compile Include="Controls\FollowMe.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GCSViews\BitMapEventArgs.cs" />
     <Compile Include="GCSViews\CameraFullScreenForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -981,6 +995,7 @@
     <Compile Include="GCSViews\GstreamerTestForm.Designer.cs">
       <DependentUpon>GstreamerTestForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GCSViews\VideoRecorder.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Joystick\JoystickAxis.cs">
       <SubType>UserControl</SubType>
@@ -991,11 +1006,11 @@
     <Compile Include="Joystick\Joy_MV04_Arm.Designer.cs">
       <DependentUpon>Joy_MV04_Arm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Joystick\Joy_MV04_CameraMode.cs">
+    <Compile Include="Joystick\Joy_MV04_ImageSensor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Joystick\Joy_MV04_CameraMode.Designer.cs">
-      <DependentUpon>Joy_MV04_CameraMode.cs</DependentUpon>
+    <Compile Include="Joystick\Joy_MV04_ImageSensor.Designer.cs">
+      <DependentUpon>Joy_MV04_ImageSensor.cs</DependentUpon>
     </Compile>
     <Compile Include="Joystick\Joy_MV04_FlightMode.cs">
       <SubType>Form</SubType>
@@ -4898,6 +4913,9 @@
     <None Include="Resources\camera-64.png" />
     <None Include="Resources\confirm-64.png" />
     <None Include="Resources\power-64.png" />
+    <None Include="Resources\secopplanner2.png" />
+    <None Include="Resources\Logo_SecopPlanner2.png" />
+    <None Include="Resources\inverted_cam_but.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

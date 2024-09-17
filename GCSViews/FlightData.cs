@@ -5103,21 +5103,24 @@ namespace MissionPlanner.GCSViews
         {
             if (MainV2.comPort.BaseStream.IsOpen)
             {
-                string alt = Settings.Instance["takeoff_alt", "5"];
+                float takeoffAlt = 10;
+                if (!Settings.Instance.ContainsKey("takeoff_alt"))
+                {
+                    string takeoffAltStr = takeoffAlt.ToString(CultureInfo.InvariantCulture);
+                    if (InputBox.Show("Enter Alt", "Enter Takeoff Alt", ref takeoffAltStr) == DialogResult.OK)
+                    {
+                        takeoffAlt = float.Parse(takeoffAltStr, CultureInfo.InvariantCulture);
+                    }
+                    Settings.Instance["takeoff_alt"] = takeoffAltStr;
+                }
+                takeoffAlt = float.Parse(Settings.Instance["takeoff_alt"], CultureInfo.InvariantCulture);
 
-                if (DialogResult.Cancel == InputBox.Show("Enter Alt", "Enter Takeoff Alt", ref alt))
-                    return;
-
-                var altf = float.Parse(alt, CultureInfo.InvariantCulture);
-
-                Settings.Instance["takeoff_alt"] = altf.ToString();
-
-                MainV2.comPort.setMode("GUIDED");
+                //MainV2.comPort.setMode("GUIDED");
 
                 try
                 {
                     MainV2.comPort.doCommand((byte) MainV2.comPort.sysidcurrent, (byte) MainV2.comPort.compidcurrent,
-                        MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, altf);
+                        MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
 
                     // Trigger MV04 state change event
                     StateHandler.CurrentSate = MV04_State.Takeoff;

@@ -1,4 +1,4 @@
-﻿using MV04.GCS;
+﻿using MV04.Joystick;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace MissionPlanner.Joystick
 {
-    public partial class Joy_MV04_CameraMode : Form
+    public partial class Joy_MV04_ImageSensor : Form
     {
-        public Joy_MV04_CameraMode(string tag)
+        public Joy_MV04_ImageSensor(string tag)
         {
             InitializeComponent();
             Utilities.ThemeManager.ApplyThemeTo(this);
