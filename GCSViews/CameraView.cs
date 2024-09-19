@@ -31,6 +31,7 @@ using System.Windows.Forms;
 using static IronPython.Modules._ast;
 using static MV04.Camera.MavProto;
 using Accord.Video.FFMPEG;
+using MV04.SingleYaw;
 
 namespace MissionPlanner.GCSViews
 {
@@ -119,16 +120,19 @@ namespace MissionPlanner.GCSViews
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
             MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
-            // Draw UI
-            DrawUI();
-
-            DisableControls();
-
+            // Connect to camera
             StartCameraStream();
             StartCameraControl();
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
             CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
 
+            // Start single yaw
+            // TODO: Start single yaw handler automatically after connection
+            //SingleYawHandler.StartSingleYaw(MainV2.comPort);
+
+            // Draw UI
+            DrawUI();
+            DisableControls();
             SetStopButtonVisibility();
 
             //States
@@ -246,6 +250,7 @@ namespace MissionPlanner.GCSViews
         {
             CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
             CameraSettingsForm.Instance.event_StartStopRecording += CameraSettings_event_StartStopRecording;
+            
             // Test functions
             #region Test functions
 
@@ -270,7 +275,9 @@ namespace MissionPlanner.GCSViews
                 {"Do NUC", async () => { await DoNUC(); }},
                 {"Test Gstreamer", async () => { new GstreamerTestForm().Show(); }},
                 {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
-                {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }}
+                {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }},
+                {"Start single-yaw loop", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort); }},
+                {"Stop single-yaw loop", async () => { SingleYawHandler.StopSingleYaw(); }},
             };
 
             #endregion
