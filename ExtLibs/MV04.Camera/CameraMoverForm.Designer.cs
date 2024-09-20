@@ -66,7 +66,6 @@
             this.button_Center.TabIndex = 1;
             this.button_Center.Text = "⚪";
             this.button_Center.UseVisualStyleBackColor = true;
-            this.button_Center.Visible = false;
             this.button_Center.Click += new System.EventHandler(this.button_Center_Click);
             // 
             // button_Down
