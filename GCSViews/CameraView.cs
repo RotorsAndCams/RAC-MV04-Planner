@@ -278,6 +278,7 @@ namespace MissionPlanner.GCSViews
                 {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }},
                 {"Start single-yaw loop", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort); }},
                 {"Stop single-yaw loop", async () => { SingleYawHandler.StopSingleYaw(); }},
+                {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
             };
 
             #endregion

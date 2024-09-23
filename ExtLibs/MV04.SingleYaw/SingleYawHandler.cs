@@ -1,13 +1,26 @@
 ﻿using log4net;
 using MissionPlanner;
+using MissionPlanner.ArduPilot;
 using MV04.Camera;
 using System;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
+using System.Security.Cryptography;
 using System.Timers;
 
 namespace MV04.SingleYaw
 {
+    public class SingleYawCommandEventArgs: EventArgs
+    {
+        public int Deg { get; set; }
+
+        public int Speed { get; set; }
+
+        public int Dir { get; set; }
+
+        public int Frame { get; set; }
+    }
+
     public static class SingleYawHandler
     {
         #region Fields
@@ -23,6 +36,17 @@ namespace MV04.SingleYaw
         private static int _YawAdjustInterval = 100; // ms
 
         private static int _YawAdjustTreshold = 3; // deg
+
+        public static bool IsRunning
+        {
+            get
+            {
+                return _YawAdjustTimer != null
+                    && _YawAdjustTimer.Enabled;
+            }
+        }
+
+        public static event EventHandler<SingleYawCommandEventArgs> SingleYawCommand;
         #endregion
 
         #region Methods
@@ -41,13 +65,23 @@ namespace MV04.SingleYaw
                 return;
             }
 
+            // Check direction
+            int Dir = cameraYaw >= 0 ? -1 : 1; // 1=CW, -1=CCW, (0 = Auto)
+
             // Send MAV_CMD_CONDITION_YAW
             MAVLink.doCommand(MAVLink.MAV.sysid, MAVLink.MAV.compid, global::MAVLink.MAV_CMD.CONDITION_YAW,
-                cameraYaw,  // Deg
-                100,        // Speed (Deg/s)
-                -1,         // Dir (1=CW, -1=CCW) -> CCW matches camera report yaw direction
-                1,          // Abs/Rel (0=Abs, 1=Rel)
+                Math.Abs(cameraYaw),    // Deg
+                100,                    // Speed (Deg/s)
+                Dir,                    // Dir
+                1,                      // Abs/Rel (0=Abs, 1=Rel)
                 0, 0, 0, false);
+
+            // Raise single-yaw command event
+            TriggerSingleYawCommandEvent(
+                (int)Math.Round(Math.Abs(cameraYaw)),
+                100,
+                Dir,
+                1);
 
             // Log
             string turnDir = cameraYaw < 0 ? "CCW" : "CW";
@@ -84,6 +118,23 @@ namespace MV04.SingleYaw
             _YawAdjustTimer.Stop();
 
             log.Info("Single-Yaw loop stopped");
+        }
+
+        /// <summary>
+        /// Trigger Single-Yaw Command Event
+        /// </summary>
+        public static void TriggerSingleYawCommandEvent(int deg, int speed, int dir, int frame)
+        {
+            if (SingleYawCommand != null)
+            {
+                SingleYawCommand(null, new SingleYawCommandEventArgs()
+                {
+                    Deg = deg,
+                    Speed = speed,
+                    Dir = dir,
+                    Frame = frame
+                });
+            }
         }
         #endregion
     }
