@@ -536,10 +536,10 @@ namespace MissionPlanner.Joystick
                                         LEDStateHandler.LandingLEDState = buttondown ? enum_LandingLEDState.On : enum_LandingLEDState.Off;
                                         break;
                                     case 30: // IR indicator LED
-                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.IR : enum_PositionLEDState.Off;
+                                        LEDStateHandler.PositionLEDState_IR = buttondown ? enum_PositionLEDState_IR.On : enum_PositionLEDState_IR.Off;
                                         break;
                                     case 31: // Red indicator LED
-                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.RedLight : enum_PositionLEDState.Off;
+                                        LEDStateHandler.PositionLEDState_RedLight = buttondown ? enum_PositionLEDState_RedLight.On : enum_PositionLEDState_RedLight.Off;
                                         break;
                                 }
 

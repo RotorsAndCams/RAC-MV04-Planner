@@ -12,22 +12,30 @@ namespace MV04.State
         On
     }
 
-    public enum enum_PositionLEDState
+    public enum enum_PositionLEDState_IR
     {
         Off,
-        IR,
-        RedLight
+        On
     }
+
+    public enum enum_PositionLEDState_RedLight 
+    {
+        Off,
+        On
+    }
+
 
     public class LEDStateChangedEventArgs: EventArgs
     {
         public enum_LandingLEDState LandingLEDState { get; set; }
-        public enum_PositionLEDState PositionLEDState { get; set; }
+        public enum_PositionLEDState_IR PositionLEDState_IR { get; set; }
+        public enum_PositionLEDState_RedLight PositionLEDState_RedLight { get; set; }
 
-        public LEDStateChangedEventArgs(enum_LandingLEDState landing, enum_PositionLEDState position)
+        public LEDStateChangedEventArgs(enum_LandingLEDState landing, enum_PositionLEDState_IR position_IR, enum_PositionLEDState_RedLight position_RedLight)
         {
             LandingLEDState = landing;
-            PositionLEDState = position;
+            PositionLEDState_IR = position_IR;
+            PositionLEDState_RedLight = position_RedLight;
         }
     }
 
@@ -46,21 +54,33 @@ namespace MV04.State
             }
         }
 
-        private static enum_PositionLEDState _positionState;
-        public static enum_PositionLEDState PositionLEDState
+        private static enum_PositionLEDState_IR _positionStateIR;
+        public static enum_PositionLEDState_IR PositionLEDState_IR
         {
-            get { return _positionState; }
+            get { return _positionStateIR; }
             set
             {
-                _positionState = value;
+                _positionStateIR = value;
                 OnValueChanged();
             }
         }
 
+        private static enum_PositionLEDState_RedLight _postionRedLight;
+        public static enum_PositionLEDState_RedLight PositionLEDState_RedLight
+        {
+            get { return _postionRedLight;}
+            set
+            {
+                _postionRedLight = value;
+                OnValueChanged();
+            }
+        }
+
+
         private static void OnValueChanged()
         {
             if (LedStateChanged != null)
-                LedStateChanged(null, new LEDStateChangedEventArgs(_landingState, _positionState));
+                LedStateChanged(null, new LEDStateChangedEventArgs(_landingState, _positionStateIR, _postionRedLight));
         }
         
     }
