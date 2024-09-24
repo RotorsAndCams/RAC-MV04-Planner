@@ -1,14 +1,6 @@
 ﻿using MissionPlanner;
-using MissionPlanner.ArduPilot;
 using MV04.SingleYaw;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MV04.TestForms
@@ -16,6 +8,7 @@ namespace MV04.TestForms
     public partial class SingleYawForm : Form
     {
         private MAVLinkInterface _MAVLink;
+        private const double DEG_TO_RAD = Math.PI / 180.0;
 
         public SingleYawForm(MAVLinkInterface MAVLink)
         {
@@ -34,9 +27,13 @@ namespace MV04.TestForms
             // Update label on Single-Yaw command event
             SingleYawHandler.SingleYawCommand += (sender, ea) =>
             {
-                lock (label_LastSent)
+                if (label_LastSent.InvokeRequired)
                 {
-                    label_LastSent.Text = $"MAV_CMD_CONDITION_YAW({ea.Deg}, {ea.Speed}, {ea.Dir}, {ea.Frame})";
+                    label_LastSent?.Invoke((MethodInvoker)(() => label_LastSent.Text = $"RC{ea.RCChannel}OVERRIDE({ea.RCOutput})"));
+                }
+                else
+                {
+                    label_LastSent.Text = $"RC{ea.RCChannel}OVERRIDE({ea.RCOutput})";
                 }
             };
         }
@@ -68,11 +65,22 @@ namespace MV04.TestForms
                 0, 0, 0, false);
 
             // Raise single-yaw command event
-            SingleYawHandler.TriggerSingleYawCommandEvent(
-                (int)numericUpDown_Deg.Value,
-                (int)numericUpDown_Speed.Value,
-                (int)Dir,
-                (int)Frame);
+            //SingleYawHandler.TriggerSingleYawCommandEvent(
+            //    (int)numericUpDown_Deg.Value,
+            //    (int)numericUpDown_Speed.Value,
+            //    (int)Dir,
+            //    (int)Frame);
+        }
+
+        private void button_SendSetPos_Click(object sender, EventArgs e)
+        {
+            // Set parameters
+            float yaw = (float)numericUpDown_Deg.Value * (float)DEG_TO_RAD;
+            ushort type_mask = 0b101111111111; // Ingore all except yaw
+
+            //_MAVLink.sendPacket(new MAVLink.mavlink_set_position_target_local_ned_t(
+            //    0, 0, 0, 
+            //    ), _MAVLink.MAV.sysid, _MAVLink.MAV.compid);
         }
 
         private void button_SwitchSingleYaw_Click(object sender, EventArgs e)
@@ -88,6 +96,12 @@ namespace MV04.TestForms
 
             string buttonStr = SingleYawHandler.IsRunning ? " OFF" : " ON";
             button_SwitchSingleYaw.Text = button_SwitchSingleYaw.Text.Replace(" OFF", "").Replace(" ON", "") + buttonStr;
+        }
+
+        private void button_SetYingleYawParams_Click(object sender, EventArgs e)
+        {
+            SingleYawHandler.TestCameraYaw = (int)numericUpDown_CameraYaw.Value;
+            SingleYawHandler.TestKp = (double)numericUpDown_Kp.Value;
         }
     }
 }

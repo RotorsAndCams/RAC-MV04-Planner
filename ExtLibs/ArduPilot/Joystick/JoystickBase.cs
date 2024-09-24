@@ -1329,7 +1329,7 @@ namespace MissionPlanner.Joystick
 
                     // TODO: RC7 set to a constant TRIM for UAV yaw channel
                     // (Real UAV yaw is controlled by the single-yaw loop via the CONDITION_YAW command)
-                    Interface.MAV.cs.rcoverridech7 = Interface.MAV.param.ContainsKey("RC7_TRIM") ? (short)Math.Round(Interface.MAV.param["RC7_TRIM"].Value) : (short)1500;
+                    //Interface.MAV.cs.rcoverridech7 = Interface.MAV.param.ContainsKey("RC7_TRIM") ? (short)Math.Round(Interface.MAV.param["RC7_TRIM"].Value) : (short)1500;
 
                     // Direct assignment is faster than setting with reflection
                     /*
