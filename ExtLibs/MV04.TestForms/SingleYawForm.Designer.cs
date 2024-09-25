@@ -46,6 +46,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.button_SetYingleYawParams = new System.Windows.Forms.Button();
+            this.checkBox_ForceYaw = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Deg)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Speed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_CameraYaw)).BeginInit();
@@ -102,7 +103,7 @@
             this.button_SendYaw.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.button_SendYaw.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.button_SendYaw.Location = new System.Drawing.Point(12, 265);
+            this.button_SendYaw.Location = new System.Drawing.Point(12, 273);
             this.button_SendYaw.Name = "button_SendYaw";
             this.button_SendYaw.Size = new System.Drawing.Size(347, 50);
             this.button_SendYaw.TabIndex = 3;
@@ -116,7 +117,7 @@
             this.button_SwitchSingleYaw.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.button_SwitchSingleYaw.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.button_SwitchSingleYaw.Location = new System.Drawing.Point(12, 377);
+            this.button_SwitchSingleYaw.Location = new System.Drawing.Point(12, 385);
             this.button_SwitchSingleYaw.Name = "button_SwitchSingleYaw";
             this.button_SwitchSingleYaw.Size = new System.Drawing.Size(347, 50);
             this.button_SwitchSingleYaw.TabIndex = 4;
@@ -200,7 +201,7 @@
             this.label_LastSent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label_LastSent.AutoSize = true;
             this.label_LastSent.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label_LastSent.Location = new System.Drawing.Point(12, 430);
+            this.label_LastSent.Location = new System.Drawing.Point(12, 438);
             this.label_LastSent.Name = "label_LastSent";
             this.label_LastSent.Size = new System.Drawing.Size(51, 20);
             this.label_LastSent.TabIndex = 9;
@@ -211,7 +212,7 @@
             this.button_SendSetPos.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.button_SendSetPos.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.button_SendSetPos.Location = new System.Drawing.Point(12, 321);
+            this.button_SendSetPos.Location = new System.Drawing.Point(12, 329);
             this.button_SendSetPos.Name = "button_SendSetPos";
             this.button_SendSetPos.Size = new System.Drawing.Size(347, 50);
             this.button_SendSetPos.TabIndex = 10;
@@ -291,6 +292,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkBox_ForceYaw);
             this.groupBox1.Controls.Add(this.button_SetYingleYawParams);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label6);
@@ -298,15 +300,16 @@
             this.groupBox1.Controls.Add(this.numericUpDown_Kp);
             this.groupBox1.Location = new System.Drawing.Point(12, 142);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(347, 116);
+            this.groupBox1.Size = new System.Drawing.Size(347, 117);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Aingle-Yaw Params";
             // 
             // button_SetYingleYawParams
             // 
+            this.button_SetYingleYawParams.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button_SetYingleYawParams.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.button_SetYingleYawParams.Location = new System.Drawing.Point(267, 80);
+            this.button_SetYingleYawParams.Location = new System.Drawing.Point(266, 81);
             this.button_SetYingleYawParams.Name = "button_SetYingleYawParams";
             this.button_SetYingleYawParams.Size = new System.Drawing.Size(75, 30);
             this.button_SetYingleYawParams.TabIndex = 15;
@@ -314,11 +317,23 @@
             this.button_SetYingleYawParams.UseVisualStyleBackColor = true;
             this.button_SetYingleYawParams.Click += new System.EventHandler(this.button_SetYingleYawParams_Click);
             // 
+            // checkBox_ForceYaw
+            // 
+            this.checkBox_ForceYaw.AutoSize = true;
+            this.checkBox_ForceYaw.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBox_ForceYaw.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.checkBox_ForceYaw.Location = new System.Drawing.Point(191, 17);
+            this.checkBox_ForceYaw.Name = "checkBox_ForceYaw";
+            this.checkBox_ForceYaw.Size = new System.Drawing.Size(64, 24);
+            this.checkBox_ForceYaw.TabIndex = 16;
+            this.checkBox_ForceYaw.Text = "force";
+            this.checkBox_ForceYaw.UseVisualStyleBackColor = true;
+            // 
             // SingleYawForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(371, 459);
+            this.ClientSize = new System.Drawing.Size(371, 467);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button_SendSetPos);
             this.Controls.Add(this.label_LastSent);
@@ -367,5 +382,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button button_SetYingleYawParams;
+        private System.Windows.Forms.CheckBox checkBox_ForceYaw;
     }
 }

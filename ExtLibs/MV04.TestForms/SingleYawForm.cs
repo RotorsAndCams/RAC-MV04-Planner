@@ -29,7 +29,7 @@ namespace MV04.TestForms
             {
                 if (label_LastSent.InvokeRequired)
                 {
-                    label_LastSent?.Invoke((MethodInvoker)(() => label_LastSent.Text = $"RC{ea.RCChannel}OVERRIDE({ea.RCOutput})"));
+                    label_LastSent?.BeginInvoke((MethodInvoker)(() => label_LastSent.Text = $"RC{ea.RCChannel}OVERRIDE({ea.RCOutput})"));
                 }
                 else
                 {
@@ -100,8 +100,9 @@ namespace MV04.TestForms
 
         private void button_SetYingleYawParams_Click(object sender, EventArgs e)
         {
-            SingleYawHandler.TestCameraYaw = (int)numericUpDown_CameraYaw.Value;
             SingleYawHandler.TestKp = (double)numericUpDown_Kp.Value;
+            SingleYawHandler.TestCameraYaw = (int)numericUpDown_CameraYaw.Value;
+            SingleYawHandler.ForceTestCameraYaw = checkBox_ForceYaw.Checked;
         }
     }
 }

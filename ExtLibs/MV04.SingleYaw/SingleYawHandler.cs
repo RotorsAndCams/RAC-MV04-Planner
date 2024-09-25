@@ -35,6 +35,7 @@ namespace MV04.SingleYaw
 
         public static double TestKp = 1;
         public static int TestCameraYaw = 0;
+        public static bool ForceTestCameraYaw = false;
 
         private static Timer _YawAdjustTimer;
 
@@ -94,10 +95,13 @@ namespace MV04.SingleYaw
         {
             // Get camera yaw
             float cameraYaw = 0; // positive is CCW
-            cameraYaw = TestCameraYaw; // TODO: Testing constant camera yaw error
             if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.SystemReport))
             {
                 cameraYaw = ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).roll;
+            }
+            if (ForceTestCameraYaw)
+            {
+                cameraYaw = TestCameraYaw;
             }
 
             // Check if above treshold
@@ -107,9 +111,9 @@ namespace MV04.SingleYaw
             }*/
 
             // Calculate RCOverride
-            short RCOverride = _YawRCParams._YawRCReversed ?
-                (short)(_YawRCParams._YawRCTrim - (TestKp * (0 - cameraYaw))) :
-                (short)(_YawRCParams._YawRCTrim + (TestKp * (0 - cameraYaw)));
+            short RCOverride = /*_YawRCParams._YawRCReversed ?*/
+                (short)(_YawRCParams._YawRCTrim - (TestKp * (0 - cameraYaw)))/* :
+                (short)(_YawRCParams._YawRCTrim + (TestKp * (0 - cameraYaw)))*/;
 
             // Clamp RCOverride
             if (RCOverride < _YawRCParams._YawRCMin) RCOverride = _YawRCParams._YawRCMin;
