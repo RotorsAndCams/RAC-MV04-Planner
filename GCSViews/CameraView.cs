@@ -127,8 +127,7 @@ namespace MissionPlanner.GCSViews
             CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
 
             // Start single yaw
-            // TODO: Start single yaw handler automatically after connection
-            //SingleYawHandler.StartSingleYaw(MainV2.comPort);
+            SingleYawHandler.StartSingleYaw(MainV2.comPort);
 
             // Draw UI
             DrawUI();
