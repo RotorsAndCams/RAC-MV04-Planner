@@ -63,6 +63,10 @@
       <Project>{e12dbd68-f282-491a-be11-5e6ff21932c1}</Project>
       <Name>MV04.Camera</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj">
+      <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
+      <Name>MissionPlanner.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

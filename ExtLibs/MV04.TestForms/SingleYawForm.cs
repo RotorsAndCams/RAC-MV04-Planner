@@ -16,8 +16,7 @@ namespace MV04.TestForms
 
             _MAVLink = MAVLink;
 
-            comboBox_Dir.SelectedIndex = 0;
-            comboBox_Frame.SelectedIndex = 0;
+            numericUpDown_Kp.Value = (decimal)SingleYawHandler.ControlMulti;
 
             if (SingleYawHandler.IsRunning)
             {
@@ -33,54 +32,11 @@ namespace MV04.TestForms
                 }
                 else
                 {
-                    label_LastSent.Text = $"RC{ea.RCChannel}OVERRIDE({ea.RCOutput})";
+                    label_LastSent.Text = $"RC{ea.RCChannel} override CamYaw={ea.Deg}, RC={ea.RCOutput}";
                 }
             };
-        }
 
-        private void button_SendYaw_Click(object sender, EventArgs e)
-        {
-            // Set combobox parameters
-            float Dir;
-            switch (comboBox_Dir.SelectedIndex)
-            {
-                case 0: // CW
-                    Dir = 1;
-                    break;
-                case 1: // CCW
-                    Dir = -1;
-                    break;
-                default: // Auto
-                    Dir = 0;
-                    break;
-            }
-            float Frame = (float)comboBox_Frame.SelectedIndex;
-
-            // Send MAV_CMD_CONDITION_YAW
-            _MAVLink.doCommand(_MAVLink.MAV.sysid, _MAVLink.MAV.compid, MAVLink.MAV_CMD.CONDITION_YAW,
-                (float)numericUpDown_Deg.Value,     // Deg
-                (float)numericUpDown_Speed.Value,   // Speed (Deg/s)
-                Dir,                                // Dir (1=CW, -1=CCW)
-                Frame,                              // Frame (0=Abs, 1=Rel)
-                0, 0, 0, false);
-
-            // Raise single-yaw command event
-            //SingleYawHandler.TriggerSingleYawCommandEvent(
-            //    (int)numericUpDown_Deg.Value,
-            //    (int)numericUpDown_Speed.Value,
-            //    (int)Dir,
-            //    (int)Frame);
-        }
-
-        private void button_SendSetPos_Click(object sender, EventArgs e)
-        {
-            // Set parameters
-            float yaw = (float)numericUpDown_Deg.Value * (float)DEG_TO_RAD;
-            ushort type_mask = 0b101111111111; // Ingore all except yaw
-
-            //_MAVLink.sendPacket(new MAVLink.mavlink_set_position_target_local_ned_t(
-            //    0, 0, 0, 
-            //    ), _MAVLink.MAV.sysid, _MAVLink.MAV.compid);
+            SingleYawHandler.SingleYawMessage += (sender, ea) => LogLine(ea.Message);
         }
 
         private void button_SwitchSingleYaw_Click(object sender, EventArgs e)
@@ -100,9 +56,28 @@ namespace MV04.TestForms
 
         private void button_SetYingleYawParams_Click(object sender, EventArgs e)
         {
-            SingleYawHandler.TestKp = (double)numericUpDown_Kp.Value;
+            SingleYawHandler.ControlMulti = (double)numericUpDown_Kp.Value;
             SingleYawHandler.TestCameraYaw = (int)numericUpDown_CameraYaw.Value;
             SingleYawHandler.ForceTestCameraYaw = checkBox_ForceYaw.Checked;
+        }
+
+        public void LogLine(string line)
+        {
+            if (textBox_Log.InvokeRequired)
+            {
+                textBox_Log?.BeginInvoke(new MethodInvoker(() => LogLine(line)));
+            }
+            else
+            {
+                if (textBox_Log.Text.Length > 0)
+                {
+                    textBox_Log.Text += Environment.NewLine;
+                }
+                textBox_Log.Text += DateTime.Now.ToString("HH:mm:ss - ") + line;
+
+                textBox_Log.SelectionStart = textBox_Log.TextLength;
+                textBox_Log.ScrollToCaret();
+            }
         }
     }
 }

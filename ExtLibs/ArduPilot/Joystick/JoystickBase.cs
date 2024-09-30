@@ -984,10 +984,10 @@ namespace MissionPlanner.Joystick
             switch (axis)
             {
                 case joystickaxis.None:
-                    working = ushort.MaxValue/2;
+                    working = ushort.MaxValue / 2;
                     break;
                 case joystickaxis.Pass:
-                    working = (int) (((float) (trim - min)/range)*ushort.MaxValue);
+                    working = (int)(((float)(trim - min) / range) * ushort.MaxValue);
                     break;
                 case joystickaxis.ARx:
                     working = state.ARx;
@@ -998,7 +998,7 @@ namespace MissionPlanner.Joystick
                     break;
 
                 case joystickaxis.ARz:
-                    working = state.ARz;
+                    //working = state.ARz;
                     break;
 
                 case joystickaxis.AX:
@@ -1319,9 +1319,12 @@ namespace MissionPlanner.Joystick
                         //(ushort)(((int)state.Y / 65.535) + 1000);
                     }
 
+                    int yawChannel = JoystickHandler.JoystickAxies.Single(ja => ja.Function == MV04_JoystickFunction.UAV_Yaw).RCChannelNo;
+
                     for (int i = 3; i <= 18; i++)
                     {
-                        if (getJoystickAxis(i) != joystickaxis.None)
+                        if (getJoystickAxis(i) != joystickaxis.None
+                            && i != yawChannel)
                         {
                             Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo));
                         }
