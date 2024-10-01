@@ -84,6 +84,20 @@ namespace MissionPlanner.GCSViews
         int _fileCount = 0;
         NvSystemModes _cameraState;
 
+        public float SlantRange
+        {
+            get
+            {
+                float pitch = ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).pitch;
+                float height = MainV2.comPort.MAV.cs.alt;
+
+                float result = (float)(height / Math.Cos(pitch));
+
+                return result;
+            }
+
+        }
+
         #endregion
 
         #region Conversion multipliers
