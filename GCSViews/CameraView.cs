@@ -137,7 +137,7 @@ namespace MissionPlanner.GCSViews
             //States
             SetDroneStatusValue();
             this.Resize += CameraView_Resize;
-            SetDroneLEDStates(enum_LandingLEDState.Off, enum_PositionLEDState.Off);
+            SetDroneLEDStates(enum_LandingLEDState.Off, enum_PositionLEDState_IR.Off, enum_PositionLEDState_RedLight.Off);
             LEDStateHandler.LedStateChanged += LEDStateHandler_LedStateChanged;
 
             StateHandler.MV04StateChange += StateHandler_MV04StateChange;
@@ -1338,10 +1338,10 @@ namespace MissionPlanner.GCSViews
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => { SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState); }));
+                Invoke(new Action(() => { SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState_IR, e.PositionLEDState_RedLight); }));
             }
             else
-                SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState);
+                SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState_IR, e.PositionLEDState_RedLight);
         }
 
         private void btn_SetAlt_Click(object sender, EventArgs e)
@@ -1575,34 +1575,24 @@ namespace MissionPlanner.GCSViews
             BlinkControl(this.pnl_GCS);
         }
 
-        private void SetDroneLEDStates(enum_LandingLEDState landing, enum_PositionLEDState position)
+        private void SetDroneLEDStates(enum_LandingLEDState landing, enum_PositionLEDState_IR position_IR, enum_PositionLEDState_RedLight position_LEDLight)
         {
+            //LED
             if (landing == enum_LandingLEDState.On)
-            {
                 this.pb_DroneTakeOff.Visible = true;
-            }
             else
-            {
                 this.pb_DroneTakeOff.Visible = false;
-            }
+            //IR
+            if(position_IR == enum_PositionLEDState_IR.On)
+                this.pb_InfraLight.Visible = true;
+            else
+                this.pb_InfraLight.Visible = false;
+            //Red
+            if (position_LEDLight == enum_PositionLEDState_RedLight.On)
+                this.pb_PositionIndicator.Visible = true;
+            else
+                this.pb_PositionIndicator.Visible = false;
 
-            switch (position)
-            {
-                case enum_PositionLEDState.Off:
-                    this.pb_InfraLight.Visible = false;
-                    this.pb_PositionIndicator.Visible = false;
-                    break;
-                case enum_PositionLEDState.IR:
-                    this.pb_PositionIndicator.Visible = false;
-                    this.pb_InfraLight.Visible = true;
-                    break;
-                case enum_PositionLEDState.RedLight:
-                    this.pb_InfraLight.Visible = false;
-                    this.pb_PositionIndicator.Visible = true;
-                    break;
-                default:
-                    break;
-            }
 
         }
 

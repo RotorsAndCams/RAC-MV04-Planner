@@ -525,21 +525,21 @@ namespace MissionPlanner.Joystick
                                 /*
                                 Command         | Input channel
                                 ----------------+--------------
-                                Power LED       | 19
-                                IR indicator    | 30
-                                Red indcator    | 31
+                                Power LED       | 18
+                                IR indicator    | 29
+                                Red indcator    | 30
                                 */
 
                                 switch (but.buttonno)
                                 {
-                                    case 19: // Power LED
+                                    case 18: // Power LED
                                         LEDStateHandler.LandingLEDState = buttondown ? enum_LandingLEDState.On : enum_LandingLEDState.Off;
                                         break;
-                                    case 30: // IR indicator LED
-                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.IR : enum_PositionLEDState.Off;
+                                    case 29: // IR indicator LED
+                                        LEDStateHandler.PositionLEDState_IR = buttondown ? enum_PositionLEDState_IR.On : enum_PositionLEDState_IR.Off;
                                         break;
-                                    case 31: // Red indicator LED
-                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.RedLight : enum_PositionLEDState.Off;
+                                    case 30: // Red indicator LED
+                                        LEDStateHandler.PositionLEDState_RedLight = buttondown ? enum_PositionLEDState_RedLight.On : enum_PositionLEDState_RedLight.Off;
                                         break;
                                 }
 
