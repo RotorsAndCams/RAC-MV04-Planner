@@ -1,5 +1,6 @@
 ﻿using Accord.Video.FFMPEG;
 using MV04.Camera;
+using MV04.Settings;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -20,7 +21,7 @@ namespace MissionPlanner.GCSViews
         VideoFileWriter _writer = new VideoFileWriter();
         System.Timers.Timer _videoRecorderTimer;
         int _segmentLength = 30; // seconds
-        int _frameRate = 10;
+        int _frameRate = 25/1;
         bool _recordingInProgress;
 
         object _recordingLock = new object();
@@ -33,6 +34,23 @@ namespace MissionPlanner.GCSViews
         {
             _videoRecorderTimer = new System.Timers.Timer();
             _videoRecorderTimer.Elapsed += _videoRecorderTimer_Elapsed;
+
+
+            #region get segmentlength from settings
+
+            int VideoLengthSetting = 30;
+
+            try
+            {
+                VideoLengthSetting = int.Parse(SettingManager.GetSettings().FirstOrDefault(s => s.Setting == Setting.VideoSegmentLength).Value);
+            }
+            catch { VideoLengthSetting = 30; }
+
+
+            _segmentLength = VideoLengthSetting;
+
+            #endregion
+
             _videoRecorderTimer.Interval = _segmentLength * 1000;
         }
 
