@@ -1423,10 +1423,22 @@ namespace MissionPlanner.GCSViews
 
         private void SetStopButtonVisibility()
         {
-            if (IsCameraTrackingModeActive)
-                btn_StopTracking.Visible = true;
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => {
+                    if (IsCameraTrackingModeActive)
+                        btn_StopTracking.Visible = true;
+                    else
+                        btn_StopTracking.Visible = false;
+                }));
+            }  
             else
-                btn_StopTracking.Visible = false;
+            {
+                if (IsCameraTrackingModeActive)
+                    btn_StopTracking.Visible = true;
+                else
+                    btn_StopTracking.Visible = false;
+            }
         }
 
         private void SetDroneStatusValue()
