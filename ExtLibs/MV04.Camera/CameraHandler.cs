@@ -746,10 +746,8 @@ namespace MV04.Camera
                 _trackPos.X = Constrain(_trackPos.X, 0, 1280);
                 _trackPos.Y = Constrain(_trackPos.Y, 0, 720);
 
-                MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.TrackOnPosition, 0);
                 // Start tracking
-                //return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.Track, 0) == mav_error.ok;
-                return true;
+                return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.Track/*OnPosition*/, 0) == mav_error.ok;
             }
 
             return false;
