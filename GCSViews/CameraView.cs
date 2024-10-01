@@ -31,6 +31,7 @@ using System.Windows.Forms;
 using static IronPython.Modules._ast;
 using static MV04.Camera.MavProto;
 using Accord.Video.FFMPEG;
+using MV04.SingleYaw;
 
 namespace MissionPlanner.GCSViews
 {
@@ -133,22 +134,24 @@ namespace MissionPlanner.GCSViews
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
             MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
-            // Draw UI
-            DrawUI();
-
-            DisableControls();
-
+            // Connect to camera
             StartCameraStream();
             StartCameraControl();
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
             CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
 
+            // Start single yaw
+            SingleYawHandler.StartSingleYaw(MainV2.comPort);
+
+            // Draw UI
+            DrawUI();
+            DisableControls();
             SetStopButtonVisibility();
 
             //States
             SetDroneStatusValue();
             this.Resize += CameraView_Resize;
-            SetDroneLEDStates(enum_LandingLEDState.Off, enum_PositionLEDState.Off);
+            SetDroneLEDStates(enum_LandingLEDState.Off, enum_PositionLEDState_IR.Off, enum_PositionLEDState_RedLight.Off);
             LEDStateHandler.LedStateChanged += LEDStateHandler_LedStateChanged;
 
             StateHandler.MV04StateChange += StateHandler_MV04StateChange;
@@ -260,6 +263,7 @@ namespace MissionPlanner.GCSViews
         {
             CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
             CameraSettingsForm.Instance.event_StartStopRecording += CameraSettings_event_StartStopRecording;
+            
             // Test functions
             #region Test functions
 
@@ -284,7 +288,10 @@ namespace MissionPlanner.GCSViews
                 {"Do NUC", async () => { await DoNUC(); }},
                 {"Test Gstreamer", async () => { new GstreamerTestForm().Show(); }},
                 {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
-                {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }}
+                {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }},
+                {"Start single-yaw loop", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort); }},
+                {"Stop single-yaw loop", async () => { SingleYawHandler.StopSingleYaw(); }},
+                {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
             };
 
             #endregion
@@ -1345,10 +1352,10 @@ namespace MissionPlanner.GCSViews
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => { SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState); }));
+                Invoke(new Action(() => { SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState_IR, e.PositionLEDState_RedLight); }));
             }
             else
-                SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState);
+                SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState_IR, e.PositionLEDState_RedLight);
         }
 
         private void btn_SetAlt_Click(object sender, EventArgs e)
@@ -1582,34 +1589,24 @@ namespace MissionPlanner.GCSViews
             BlinkControl(this.pnl_GCS);
         }
 
-        private void SetDroneLEDStates(enum_LandingLEDState landing, enum_PositionLEDState position)
+        private void SetDroneLEDStates(enum_LandingLEDState landing, enum_PositionLEDState_IR position_IR, enum_PositionLEDState_RedLight position_LEDLight)
         {
+            //LED
             if (landing == enum_LandingLEDState.On)
-            {
                 this.pb_DroneTakeOff.Visible = true;
-            }
             else
-            {
                 this.pb_DroneTakeOff.Visible = false;
-            }
+            //IR
+            if(position_IR == enum_PositionLEDState_IR.On)
+                this.pb_InfraLight.Visible = true;
+            else
+                this.pb_InfraLight.Visible = false;
+            //Red
+            if (position_LEDLight == enum_PositionLEDState_RedLight.On)
+                this.pb_PositionIndicator.Visible = true;
+            else
+                this.pb_PositionIndicator.Visible = false;
 
-            switch (position)
-            {
-                case enum_PositionLEDState.Off:
-                    this.pb_InfraLight.Visible = false;
-                    this.pb_PositionIndicator.Visible = false;
-                    break;
-                case enum_PositionLEDState.IR:
-                    this.pb_PositionIndicator.Visible = false;
-                    this.pb_InfraLight.Visible = true;
-                    break;
-                case enum_PositionLEDState.RedLight:
-                    this.pb_InfraLight.Visible = false;
-                    this.pb_PositionIndicator.Visible = true;
-                    break;
-                default:
-                    break;
-            }
 
         }
 
