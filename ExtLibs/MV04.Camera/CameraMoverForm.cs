@@ -26,30 +26,65 @@ namespace MV04.Camera
             this.DialogResult = DialogResult.OK;
         }
 
-        private void button_ZoomIn_MouseDown(object sender, MouseEventArgs e) => CameraHandler.Instance.SetZoom(ZoomState.In);
+        private void button_ZoomIn_MouseDown(object sender, MouseEventArgs e)
+        {
+            CameraHandler.Instance.SetZoom(ZoomState.In);
+        }
 
-        private void button_ZoomIn_MouseUp(object sender, MouseEventArgs e) => CameraHandler.Instance.SetZoom(ZoomState.Stop);
+        private void button_ZoomIn_MouseUp(object sender, MouseEventArgs e)
+        {
+            CameraHandler.Instance.SetZoom(ZoomState.Stop);
+        }
 
-        private void button_ZoomOut_MouseDown(object sender, MouseEventArgs e) => CameraHandler.Instance.SetZoom(ZoomState.Out);
+        private void button_ZoomOut_MouseDown(object sender, MouseEventArgs e)
+        {
+            CameraHandler.Instance.SetZoom(ZoomState.Out);
+        }
 
-        private void button_Up_MouseDown(object sender, MouseEventArgs e) => CameraHandler.Instance.SetCameraPitch(PitchDirection.Up);
+        private void button_Up_MouseDown(object sender, MouseEventArgs e)
+        {
+            CameraHandler.Instance.SetCameraPitch(PitchDirection.Up);
+        }
 
-        private void button_Up_MouseUp(object sender, MouseEventArgs e) => CameraHandler.Instance.SetCameraPitch(PitchDirection.Stop);
+        private void button_Up_MouseUp(object sender, MouseEventArgs e)
+        {
+            CameraHandler.Instance.SetCameraPitch(PitchDirection.Stop);
+        }
 
-        private void button_Down_MouseDown(object sender, MouseEventArgs e) => CameraHandler.Instance.SetCameraPitch(PitchDirection.Down);
+        private void button_Down_MouseDown(object sender, MouseEventArgs e)
+        {
+            CameraHandler.Instance.SetCameraPitch(PitchDirection.Down);
+        }
 
-        private void button_Right_MouseDown(object sender, MouseEventArgs e) => CameraHandler.Instance.SetCameraYaw(YawDirection.Right);
+        private void button_Right_MouseDown(object sender, MouseEventArgs e)
+        {
+            CameraHandler.Instance.SetCameraYaw(YawDirection.Right);
+        }
 
-        private void button_Right_MouseUp(object sender, MouseEventArgs e) => CameraHandler.Instance.SetCameraYaw(YawDirection.Stop);
+        private void button_Right_MouseUp(object sender, MouseEventArgs e)
+        {
+            CameraHandler.Instance.SetCameraYaw(YawDirection.Stop);
+        }
 
-        private void button_Left_MouseDown(object sender, MouseEventArgs e) => CameraHandler.Instance.SetCameraYaw(YawDirection.Left);
+        private void button_Left_MouseDown(object sender, MouseEventArgs e)
+        {
+            CameraHandler.Instance.SetCameraYaw(YawDirection.Left);
+        }
 
         private void button_Center_Click(object sender, EventArgs e)
         {
+            // Stop gimbal
             CameraHandler.Instance.SetCameraPitch(PitchDirection.Stop);
             CameraHandler.Instance.SetCameraYaw(YawDirection.Stop);
             CameraHandler.Instance.SetZoom(ZoomState.Stop);
+            
+            // Reset zoom
             CameraHandler.Instance.ResetZoom();
+
+            // Center camera
+            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Stow);
+            Thread.Sleep(100);
+            CameraHandler.Instance.SetMode(CameraHandler.Instance.PrevCameraMode);
         }
     }
 }

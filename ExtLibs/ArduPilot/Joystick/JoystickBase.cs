@@ -984,10 +984,10 @@ namespace MissionPlanner.Joystick
             switch (axis)
             {
                 case joystickaxis.None:
-                    working = ushort.MaxValue/2;
+                    working = ushort.MaxValue / 2;
                     break;
                 case joystickaxis.Pass:
-                    working = (int) (((float) (trim - min)/range)*ushort.MaxValue);
+                    working = (int)(((float)(trim - min) / range) * ushort.MaxValue);
                     break;
                 case joystickaxis.ARx:
                     working = state.ARx;
@@ -998,7 +998,7 @@ namespace MissionPlanner.Joystick
                     break;
 
                 case joystickaxis.ARz:
-                    working = state.ARz;
+                    //working = state.ARz;
                     break;
 
                 case joystickaxis.AX:
@@ -1319,15 +1319,23 @@ namespace MissionPlanner.Joystick
                         //(ushort)(((int)state.Y / 65.535) + 1000);
                     }
 
-                    // Direct assignment is faster than setting with reflection
-                    /*for (int i = 3; i <= 18; i++)
+                    int yawChannel = JoystickHandler.JoystickAxies.Single(ja => ja.Function == MV04_JoystickFunction.UAV_Yaw).RCChannelNo;
+
+                    for (int i = 3; i <= 18; i++)
                     {
-                        if (getJoystickAxis(i) != joystickaxis.None)
+                        if (getJoystickAxis(i) != joystickaxis.None
+                            && i != yawChannel)
                         {
                             Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo));
                         }
-                    }*/
+                    }
 
+                    // TODO: RC7 set to a constant TRIM for UAV yaw channel
+                    // (Real UAV yaw is controlled by the single-yaw loop via the CONDITION_YAW command)
+                    //Interface.MAV.cs.rcoverridech7 = Interface.MAV.param.ContainsKey("RC7_TRIM") ? (short)Math.Round(Interface.MAV.param["RC7_TRIM"].Value) : (short)1500;
+
+                    // Direct assignment is faster than setting with reflection
+                    /*
                     if (getJoystickAxis(3) != joystickaxis.None) Interface.MAV.cs.rcoverridech3 = pickchannel(3, JoyChannels[3].axis, JoyChannels[3].reverse, JoyChannels[3].expo);
                     if (getJoystickAxis(4) != joystickaxis.None) Interface.MAV.cs.rcoverridech4 = pickchannel(4, JoyChannels[4].axis, JoyChannels[4].reverse, JoyChannels[4].expo);
                     if (getJoystickAxis(5) != joystickaxis.None) Interface.MAV.cs.rcoverridech5 = pickchannel(5, JoyChannels[5].axis, JoyChannels[5].reverse, JoyChannels[5].expo);
@@ -1343,7 +1351,7 @@ namespace MissionPlanner.Joystick
                     if (getJoystickAxis(15) != joystickaxis.None) Interface.MAV.cs.rcoverridech15 = pickchannel(15, JoyChannels[15].axis, JoyChannels[15].reverse, JoyChannels[15].expo);
                     if (getJoystickAxis(16) != joystickaxis.None) Interface.MAV.cs.rcoverridech16 = pickchannel(16, JoyChannels[16].axis, JoyChannels[16].reverse, JoyChannels[16].expo);
                     if (getJoystickAxis(17) != joystickaxis.None) Interface.MAV.cs.rcoverridech17 = pickchannel(17, JoyChannels[17].axis, JoyChannels[17].reverse, JoyChannels[17].expo);
-                    if (getJoystickAxis(18) != joystickaxis.None) Interface.MAV.cs.rcoverridech18 = pickchannel(18, JoyChannels[18].axis, JoyChannels[18].reverse, JoyChannels[18].expo);
+                    if (getJoystickAxis(18) != joystickaxis.None) Interface.MAV.cs.rcoverridech18 = pickchannel(18, JoyChannels[18].axis, JoyChannels[18].reverse, JoyChannels[18].expo);*/
 
                     // disable button actions when not connected.
                     if (Interface.BaseStream.IsOpen)
