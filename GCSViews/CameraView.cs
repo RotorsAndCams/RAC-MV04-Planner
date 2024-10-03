@@ -32,6 +32,7 @@ using static IronPython.Modules._ast;
 using static MV04.Camera.MavProto;
 using Accord.Video.FFMPEG;
 using MV04.SingleYaw;
+using System.Timers;
 
 namespace MissionPlanner.GCSViews
 {
@@ -289,6 +290,8 @@ namespace MissionPlanner.GCSViews
                 {"Start single-yaw loop", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort); }},
                 {"Stop single-yaw loop", async () => { SingleYawHandler.StopSingleYaw(); }},
                 {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
+                {"Feed telemetry", () => { StartFeed(); }},
+                {"Stop Feed telemetry", () => { StopFeed(); }}
             };
 
             #endregion
@@ -323,6 +326,43 @@ namespace MissionPlanner.GCSViews
         }
 
         #endregion
+
+
+        System.Timers.Timer _feedTimer = new System.Timers.Timer();
+        ElapsedEventHandler handler = null;
+        double followTestCounter = 0.0;
+        private void StartFeed()
+        {
+            PointLatLngAlt target = new PointLatLngAlt();
+            _feedTimer.Interval = 10000;
+            _feedTimer.Elapsed += handler = new ElapsedEventHandler(delegate (object sender, ElapsedEventArgs e) {
+
+                /*
+                    Simulated copter desired positions
+                    -35.3621410612455	149.164499044418	1
+                    -35.3619048250147	149.166129827499	2
+
+                 */
+
+                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                {
+                    alt = 30,                                                       //Can be dinamically modified
+                    lat = -35.3621410612455 + followTestCounter,                    
+                    lng = 149.164499044418,
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                });
+                followTestCounter += 0.001;
+            });
+
+            _feedTimer.Start();
+        }
+
+        private void StopFeed()
+        {
+            _feedTimer.Stop();
+        }
+
+
 
         #region CameraFunctions
 
