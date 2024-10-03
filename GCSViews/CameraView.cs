@@ -140,9 +140,6 @@ namespace MissionPlanner.GCSViews
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
             CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
 
-            // Start single yaw
-            SingleYawHandler.StartSingleYaw(MainV2.comPort);
-
             // Draw UI
             DrawUI();
             DisableControls();
@@ -351,6 +348,12 @@ namespace MissionPlanner.GCSViews
             bool success = CameraHandler.Instance.CameraControlConnect(
                 IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
+
+            // Auto start single-yaw loop
+            if (success)
+            {
+                SingleYawHandler.StartSingleYaw(MainV2.comPort);
+            }
 
 #if DEBUG
             if (success)
