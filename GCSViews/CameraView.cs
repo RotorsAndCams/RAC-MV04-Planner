@@ -302,14 +302,18 @@ namespace MissionPlanner.GCSViews
             cb_TestFunctions.Items.AddRange(testFunctions.Keys.ToArray());
             cb_TestFunctions.SelectedIndex = 0;
             cb_TestFunctions.Location = new Point(10, (this.Height / 3) + 0);
-            cb_TestFunctions.Width = 100;
+            cb_TestFunctions.Width = 300;
+            cb_TestFunctions.Font = new Font("Stencil", 16);
             this.Controls.Add(cb_TestFunctions);
             cb_TestFunctions.BringToFront();
 
             Button bt_DoTestFunction = new Button();
             bt_DoTestFunction.Text = "Test function";
             bt_DoTestFunction.Location = new Point(10, (this.Height / 3) + 25);
-            bt_DoTestFunction.Width = 100;
+            bt_DoTestFunction.Width = 300;
+            bt_DoTestFunction.Height = 50;
+            bt_DoTestFunction.BackColor = Color.White;
+            bt_DoTestFunction.ForeColor = Color.Black;
             bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
             this.Controls.Add(bt_DoTestFunction);
             bt_DoTestFunction.BringToFront();
