@@ -38,6 +38,17 @@ namespace MV04.SingleYaw
 
         private static int _YawAdjustTreshold = 3; // deg
 
+        private static bool _IsConnected
+        {
+            get
+            {
+                return MAVLink != null
+                    && MAVLink.BaseStream != null
+                    && MAVLink.BaseStream.IsOpen
+                    && CameraHandler.Instance.IsCameraControlConnected;
+            }
+        }
+
         /// <summary>
         /// MAVLink interface this procedure uses to send commands to the UAV
         /// </summary>
@@ -110,6 +121,12 @@ namespace MV04.SingleYaw
             // Set MAVLinkInterface
             SingleYawHandler.MAVLink = MAVLink;
 
+            // Check for connections
+            if (!_IsConnected)
+            {
+                return;
+            }
+
             // Get RC parameters
             _YawRCParams = (
                 (short)MAVLink.MAV.param[$"RC{_YawRCChannel}_MIN"].Value,
@@ -141,6 +158,12 @@ namespace MV04.SingleYaw
 
         private static void _YawAdjustTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            // Check for connections
+            if (!_IsConnected)
+            {
+                return;
+            }
+
             // Get camera yaw
             float cameraYaw = 0; // positive is CW
             if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.SystemReport))
@@ -191,7 +214,10 @@ namespace MV04.SingleYaw
             _YawAdjustTimer.Stop();
 
             // Send middle stick
-            MAVLink.MAV.cs.GetType().GetField($"rcoverridech{_YawRCChannel}").SetValue(MAVLink.MAV.cs, _YawRCParams._YawRCTrim);
+            if (_IsConnected)
+            {
+                MAVLink.MAV.cs.GetType().GetField($"rcoverridech{_YawRCChannel}").SetValue(MAVLink.MAV.cs, _YawRCParams._YawRCTrim);
+            }
 
             log.Info("Single-Yaw stopped");
             TriggerSingleYawCommandEvent(0, _YawRCChannel, _YawRCParams._YawRCTrim);

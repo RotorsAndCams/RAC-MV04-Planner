@@ -55,6 +55,10 @@
       <Project>{ca6345d3-7a6d-478b-a0ed-a58e50dcaa83}</Project>
       <Name>MissionPlanner.ArduPilot</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Interfaces\Interfaces.csproj">
+      <Project>{FD4D2994-9BEA-41A1-8C51-2E02D1E8503E}</Project>
+      <Name>Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mavlink\MAVLink.csproj">
       <Project>{13d2ec90-c41f-48a1-aada-859b6dc24edc}</Project>
       <Name>MAVLink</Name>
