@@ -231,9 +231,19 @@ namespace MissionPlanner.GCSViews
                 StartRecording();
             }
 
+            
+            lb = new Label();
+            lb.Text = "Debug";
+            lb.ForeColor = Color.White;
+            lb.Font = new Font("Stencil", 14);
+            this.Location = new Point(10, (this.Height / 3));
+            this.Controls.Add(lb);
+            lb.BringToFront();
+
         }
 
-        
+        Label lb;
+
 
         #endregion
 
@@ -344,14 +354,32 @@ namespace MissionPlanner.GCSViews
 
                  */
 
-                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                if (!IsCameraTrackingModeActive)
                 {
-                    alt = 30,                                                       //Can be dinamically modified
-                    lat = -35.3621410612455 + followTestCounter,                    
-                    lng = 149.164499044418,
-                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                });
-                followTestCounter += 0.001;
+                    //camera not tracking 
+                }
+
+                if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.GndCrsReport))
+                {
+                    var target_lat = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat;
+                    var target_lng = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon;
+                    var target_alt = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsAlt;
+
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                    {
+                        alt = target_alt + 30,
+                        lat = target_lat, //+ followTestCounter,                    
+                        lng = target_lng,
+                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                    });
+                    //followTestCounter += 0.001;
+                }
+                else
+                {
+                    //no report from camera
+                }
+
+
             });
 
             _feedTimer.Start();
