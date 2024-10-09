@@ -232,17 +232,17 @@ namespace MissionPlanner.GCSViews
             }
 
             
-            lb = new Label();
-            lb.Text = "Debug";
-            lb.ForeColor = Color.White;
-            lb.Font = new Font("Stencil", 14);
+            lb_FollowDebugText = new Label();
+            lb_FollowDebugText.Text = "Debug";
+            lb_FollowDebugText.ForeColor = Color.White;
+            lb_FollowDebugText.Font = new Font("Stencil", 14);
             this.Location = new Point(10, (this.Height / 3));
-            this.Controls.Add(lb);
-            lb.BringToFront();
+            this.Controls.Add(lb_FollowDebugText);
+            lb_FollowDebugText.BringToFront();
 
         }
 
-        Label lb;
+        Label lb_FollowDebugText;
 
 
         #endregion
@@ -364,6 +364,16 @@ namespace MissionPlanner.GCSViews
                     var target_lat = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat;
                     var target_lng = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon;
                     var target_alt = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsAlt;
+
+#if DEBUG
+
+                    //debug to screen
+                    if (InvokeRequired)
+                        Invoke(new Action(() => lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt));
+                    else
+                        lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt;
+
+#endif
 
                     MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
                     {
