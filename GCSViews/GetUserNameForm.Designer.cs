@@ -40,7 +40,7 @@
             this.tb_Name.Name = "tb_Name";
             this.tb_Name.Size = new System.Drawing.Size(332, 26);
             this.tb_Name.TabIndex = 0;
-            this.tb_Name.Text = "Enter your name and badge number";
+            this.tb_Name.Text = "Enter your name or badge number";
             this.tb_Name.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tb_Name_KeyDown);
             // 
             // lb_Name
