@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static IronPython.Modules._ast;
 
 namespace MissionPlanner.GCSViews
 {
@@ -25,44 +26,64 @@ namespace MissionPlanner.GCSViews
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string name = this.tb_Name.Text;
+            ProceedApplication();
+        }
 
-            if (name.Length < 3)
+        private void tb_Name_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
             {
-                MessageBox.Show("Enter a valid name");
+                ProceedApplication();
+            }
+        }
+
+        private void ProceedApplication()
+        {
+            if (!CheckInputIsValid())
+            {
                 return;
             }
-
-            //var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
-
-
-
-            //check valid text
-            //save text to xml
+                
 
             Save();
             this.Close();
+        }
 
+        private bool CheckInputIsValid()
+        {
+            if (this.tb_Name.Text.Length < 3)
+            {
+                CustomMessageBox.Show("Enter a valid name");
+                return false;
+            }
+            return true;
         }
 
         private void Save()
         {
-            var fileToWrite = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + PilotDataFileName;
+            try
+            {
+                var fileToWrite = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + PilotDataFileName;
 
-            //if (!File.Exists(fileToWrite))
-            //{ 
-            //    File.Create(fileToWrite);
-            //}
+                var lst = new List<PilotUserLog>();
 
-            var lst = JsonConvert.DeserializeObject<List<PilotUserLog>>(File.ReadAllText(fileToWrite)) ?? new List<PilotUserLog>();
+                if (File.Exists(fileToWrite))
+                    lst = JsonConvert.DeserializeObject<List<PilotUserLog>>(File.ReadAllText(fileToWrite));
 
-            lst.Add(new PilotUserLog() { Name = this.tb_Name.Text, Datetime = DateTime.Now.ToString("yyyyMMddHHmmss") });
+                lst.Add(new PilotUserLog() { Name = this.tb_Name.Text, Datetime = DateTime.Now.ToString("yyyyMMddHHmmss") });
+
+                File.WriteAllText(fileToWrite, lst.ToJSON());
+            }
+            catch(Exception ex)
+            {
+                //continue normal run
+                this.Close();
+            }
 
             
-
-            File.WriteAllText(fileToWrite, lst.ToJSON());
         }
+
+        
     }
 
     public class PilotUserLog
