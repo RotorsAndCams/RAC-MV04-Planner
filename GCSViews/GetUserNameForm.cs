@@ -85,6 +85,13 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+        private void GetUserNameForm_VisibleChanged(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            this.BringToFront();
+            this.Show();
+        }
+
     }
     /// <summary>
     /// Helper class for json to extend

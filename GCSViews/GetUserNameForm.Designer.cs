@@ -68,18 +68,22 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Gray;
-            this.ClientSize = new System.Drawing.Size(521, 109);
+            this.ClientSize = new System.Drawing.Size(519, 111);
             this.ControlBox = false;
             this.Controls.Add(this.btn_Start);
             this.Controls.Add(this.lb_Name);
             this.Controls.Add(this.tb_Name);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.MaximumSize = new System.Drawing.Size(535, 150);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(535, 150);
             this.Name = "GetUserNameForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Pilot Log In";
             this.TopMost = true;
+            this.VisibleChanged += new System.EventHandler(this.GetUserNameForm_VisibleChanged);
             this.ResumeLayout(false);
             this.PerformLayout();
 
