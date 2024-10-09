@@ -24,7 +24,7 @@ namespace MissionPlanner.GCSViews
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btn_Start_Click(object sender, EventArgs e)
         {
             ProceedApplication();
         }
@@ -43,7 +43,6 @@ namespace MissionPlanner.GCSViews
             {
                 return;
             }
-                
 
             Save();
             this.Close();
@@ -59,6 +58,10 @@ namespace MissionPlanner.GCSViews
             return true;
         }
 
+        /// <summary>
+        /// Read and save to json file the log info based on 
+        /// PilotUserLog class
+        /// </summary>
         private void Save()
         {
             try
@@ -80,12 +83,12 @@ namespace MissionPlanner.GCSViews
                 this.Close();
             }
 
-            
         }
 
-        
     }
-
+    /// <summary>
+    /// Helper class for json to extend
+    /// </summary>
     public class PilotUserLog
     {
         public string Name;
