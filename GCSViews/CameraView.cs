@@ -32,6 +32,7 @@ using static IronPython.Modules._ast;
 using static MV04.Camera.MavProto;
 using Accord.Video.FFMPEG;
 using MV04.SingleYaw;
+using System.Timers;
 
 namespace MissionPlanner.GCSViews
 {
@@ -230,9 +231,19 @@ namespace MissionPlanner.GCSViews
                 StartRecording();
             }
 
+            
+            lb_FollowDebugText = new Label();
+            lb_FollowDebugText.Text = "Debug";
+            lb_FollowDebugText.ForeColor = Color.White;
+            lb_FollowDebugText.Font = new Font("Stencil", 14);
+            this.Location = new Point(10, (this.Height / 3));
+            this.Controls.Add(lb_FollowDebugText);
+            lb_FollowDebugText.BringToFront();
+
         }
 
-        
+        Label lb_FollowDebugText;
+
 
         #endregion
 
@@ -289,6 +300,8 @@ namespace MissionPlanner.GCSViews
                 {"Start single-yaw loop", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort); }},
                 {"Stop single-yaw loop", async () => { SingleYawHandler.StopSingleYaw(); }},
                 {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
+                {"Feed telemetry", () => { StartFeed(); }},
+                {"Stop Feed telemetry", () => { StopFeed(); }}
             };
 
             #endregion
@@ -302,14 +315,18 @@ namespace MissionPlanner.GCSViews
             cb_TestFunctions.Items.AddRange(testFunctions.Keys.ToArray());
             cb_TestFunctions.SelectedIndex = 0;
             cb_TestFunctions.Location = new Point(10, (this.Height / 3) + 0);
-            cb_TestFunctions.Width = 100;
+            cb_TestFunctions.Width = 300;
+            cb_TestFunctions.Font = new Font("Stencil", 16);
             this.Controls.Add(cb_TestFunctions);
             cb_TestFunctions.BringToFront();
 
             Button bt_DoTestFunction = new Button();
             bt_DoTestFunction.Text = "Test function";
             bt_DoTestFunction.Location = new Point(10, (this.Height / 3) + 25);
-            bt_DoTestFunction.Width = 100;
+            bt_DoTestFunction.Width = 300;
+            bt_DoTestFunction.Height = 50;
+            bt_DoTestFunction.BackColor = Color.White;
+            bt_DoTestFunction.ForeColor = Color.Black;
             bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
             this.Controls.Add(bt_DoTestFunction);
             bt_DoTestFunction.BringToFront();
@@ -319,6 +336,71 @@ namespace MissionPlanner.GCSViews
         }
 
         #endregion
+
+
+        System.Timers.Timer _feedTimer = new System.Timers.Timer();
+        ElapsedEventHandler handler = null;
+        double followTestCounter = 0.0;
+        private void StartFeed()
+        {
+            PointLatLngAlt target = new PointLatLngAlt();
+            _feedTimer.Interval = 10000;
+            _feedTimer.Elapsed += handler = new ElapsedEventHandler(delegate (object sender, ElapsedEventArgs e) {
+
+                /*
+                    Simulated copter desired positions
+                    -35.3621410612455	149.164499044418	1
+                    -35.3619048250147	149.166129827499	2
+
+                 */
+
+                if (!IsCameraTrackingModeActive)
+                {
+                    //camera not tracking 
+                }
+
+                if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.GndCrsReport))
+                {
+                    var target_lat = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat;
+                    var target_lng = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon;
+                    var target_alt = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsAlt;
+
+#if DEBUG
+
+                    //debug to screen
+                    if (InvokeRequired)
+                        Invoke(new Action(() => lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt));
+                    else
+                        lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt;
+
+#endif
+
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                    {
+                        alt = target_alt + 30,
+                        lat = target_lat, //+ followTestCounter,                    
+                        lng = target_lng,
+                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                    });
+                    //followTestCounter += 0.001;
+                }
+                else
+                {
+                    //no report from camera
+                }
+
+
+            });
+
+            _feedTimer.Start();
+        }
+
+        private void StopFeed()
+        {
+            _feedTimer.Stop();
+        }
+
+
 
         #region CameraFunctions
 
