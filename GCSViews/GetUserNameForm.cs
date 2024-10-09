@@ -50,7 +50,8 @@ namespace MissionPlanner.GCSViews
 
         private bool CheckInputIsValid()
         {
-            if (this.tb_Name.Text.Length < 3)
+            if (this.tb_Name.Text.Length < 3 || 
+                this.tb_Name.Text.Equals("Enter your name and badge number"))
             {
                 CustomMessageBox.Show("Enter a valid name");
                 return false;
@@ -82,7 +83,6 @@ namespace MissionPlanner.GCSViews
                 //continue normal run
                 this.Close();
             }
-
         }
 
     }

@@ -49,9 +49,9 @@
             this.lb_Name.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.lb_Name.Location = new System.Drawing.Point(12, 15);
             this.lb_Name.Name = "lb_Name";
-            this.lb_Name.Size = new System.Drawing.Size(123, 16);
+            this.lb_Name.Size = new System.Drawing.Size(143, 16);
             this.lb_Name.TabIndex = 1;
-            this.lb_Name.Text = "Name / Badge num";
+            this.lb_Name.Text = "Name / Badge number";
             // 
             // btn_Start
             // 
@@ -69,11 +69,16 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Gray;
             this.ClientSize = new System.Drawing.Size(521, 109);
+            this.ControlBox = false;
             this.Controls.Add(this.btn_Start);
             this.Controls.Add(this.lb_Name);
             this.Controls.Add(this.tb_Name);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "GetUserNameForm";
-            this.Text = "GetUserNameForm";
+            this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Pilot Log In";
+            this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
 
