@@ -1,4 +1,5 @@
 ﻿using MissionPlanner.Utilities;
+using MissionPlanner.Utilities.nfz;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,6 +14,10 @@ namespace MV04.FlightPlanAnalyzer
     public static class FlightPlanAnalyzer
     {
         #region Fields
+        private static readonly double H_TO_S = 3600.0;
+
+        private static readonly double S_TO_H = 1.0 / 3600.0;
+
         private static (double AirSpeed, double Consumption)[] AirSpeedConsumptionTable =
         {
             // TODO: Populate AirSpeedConsumptionTable with measurements
@@ -36,22 +41,64 @@ namespace MV04.FlightPlanAnalyzer
 
         private static double BatteryVoltsToAh(double currentVolts, double maxVolts, double minVolts, int fullAmpHours)
         {
-            // TODO: Replace BatteryVoltsToAh with more precise (non-linear) function
             return fullAmpHours / (maxVolts - minVolts) * (currentVolts - minVolts);
+            // TODO: Replace BatteryVoltsToAh with more precise (non-linear) function
         }
 
-        private static double FPPathToAh(ConcurrentDictionary<int, mavlink_mission_item_int_t> flightPlan, Vector3D wind, PointLatLngAlt uavLocation)
+        private static double PointsToAh(PointLatLngAlt pos1, PointLatLngAlt pos2, double travelSpeed, double travelConsumption, double climbSpeed, double climbConsumption, double descSpeed, double descConsumption)
         {
-            // Get path vectors from flightplan
-            // TODO: How many paths are there? (not all mission items are WPs, +1 for the current location -> closest WP)
-            Vector3D[] Paths = new Vector3D[];
+            // Horizontal component
+            double horizontalDist = pos1.GetDistance(pos2);                             // m
+            double horizontalTime = horizontalDist / travelSpeed;                       // s
+            double horizontalConsumption = horizontalTime * S_TO_H * travelConsumption; // Ah
+            // TODO: Include the wind in the horizontal calculation
 
-            return 0;
+            // Vertical component
+            double verticalDist = Math.Abs(pos1.Alt - pos2.Alt),    // m
+                   verticalTime,                                    // s
+                   verticalConsumption;                             // A
+            if (pos1.Alt < pos2.Alt) // Climbing
+            {
+                verticalTime = verticalDist / climbSpeed;                       // s
+                verticalConsumption = verticalTime * S_TO_H * climbConsumption; // Ah
+            }
+            else // Descending
+            {
+                verticalTime = verticalDist / descSpeed;                        // s
+                verticalConsumption = verticalTime * S_TO_H * descConsumption;  // Ah
+            }
+
+            return horizontalConsumption + verticalConsumption;
         }
 
-        public static bool IsFlightPlanPossible(ConcurrentDictionary<int, mavlink_mission_item_int_t> plan, double batteryVoltage, Vector3D wind)
+        private static double FligtplanToAh(ConcurrentDictionary<int, mavlink_mission_item_int_t> flightPlan, int nextWP, PointLatLngAlt uavLocation, PointLatLngAlt homeLocation, double travelSpeed, double travelConsumption, double climbSpeed, double climbConsumption, double descSpeed, double descConsumption)
         {
-            return false;
+            // Filter nav commands
+            List<ushort> navCmdIds = new List<ushort>
+            {
+                (ushort)MAV_CMD.WAYPOINT,
+                (ushort)MAV_CMD.RETURN_TO_LAUNCH
+            };
+            Dictionary<int, mavlink_mission_item_int_t> nextNavOnly = (Dictionary<int, mavlink_mission_item_int_t>)flightPlan
+                .Where(c => c.Value.seq >= nextWP && navCmdIds.Contains(c.Value.command))
+                .OrderBy(c => c.Value.seq);
+            if (nextNavOnly.Count(c => c.Value.command == (ushort)MAV_CMD.RETURN_TO_LAUNCH) > 0)
+            {
+                // Disregard everything after RTL
+
+            }
+
+            // Create flight plan path segments
+            /* Segments
+                - uavLocation -> WPnext
+                - WPn -> WPn+1
+                - WPlast -> Home (if RTL)
+            */
+            List<(PointLatLngAlt pos1, PointLatLngAlt pos2)> segments = new List<(PointLatLngAlt pos1, PointLatLngAlt pos2)>();
+
+
+
+            return segments.Sum(s => PointsToAh(s.pos1, s.pos2, travelSpeed, travelConsumption, climbSpeed, climbConsumption, descSpeed, descConsumption));
         }
         #endregion
     }
