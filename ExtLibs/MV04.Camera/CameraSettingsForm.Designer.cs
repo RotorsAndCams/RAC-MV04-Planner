@@ -29,31 +29,18 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CameraSettingsForm));
-            this.btn_Polarity1 = new System.Windows.Forms.Button();
             this.btn_NUC = new System.Windows.Forms.Button();
-            this.btn_BIT = new System.Windows.Forms.Button();
-            this.btn_Polarity2 = new System.Windows.Forms.Button();
-            this.pnl_DisabledControlsByDefault = new System.Windows.Forms.Panel();
-            this.btn_WhiteHot = new System.Windows.Forms.Button();
-            this.btn_BlackHot = new System.Windows.Forms.Button();
-            this.tlp_VisibleElements = new System.Windows.Forms.TableLayoutPanel();
+            this.tlp_Buttons = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_StartStopRecording = new System.Windows.Forms.Button();
+            this.btn_AdvancedSettings = new System.Windows.Forms.Button();
             this.btn_DayCamera = new System.Windows.Forms.Button();
             this.btn_Reconnect = new System.Windows.Forms.Button();
             this.btn_NightCamera = new System.Windows.Forms.Button();
-            this.btn_AdvancedSettings = new System.Windows.Forms.Button();
             this.uc_CameraSettings = new MV04.Settings.uc_CameraSettings();
-            this.btn_StartStopRecording = new System.Windows.Forms.Button();
-            this.pnl_DisabledControlsByDefault.SuspendLayout();
-            this.tlp_VisibleElements.SuspendLayout();
+            this.tlp_Base = new System.Windows.Forms.TableLayoutPanel();
+            this.tlp_Buttons.SuspendLayout();
+            this.tlp_Base.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // btn_Polarity1
-            // 
-            resources.ApplyResources(this.btn_Polarity1, "btn_Polarity1");
-            this.btn_Polarity1.BackColor = System.Drawing.Color.Black;
-            this.btn_Polarity1.ForeColor = System.Drawing.Color.White;
-            this.btn_Polarity1.Name = "btn_Polarity1";
-            this.btn_Polarity1.UseVisualStyleBackColor = false;
             // 
             // btn_NUC
             // 
@@ -64,61 +51,35 @@
             this.btn_NUC.UseVisualStyleBackColor = false;
             this.btn_NUC.Click += new System.EventHandler(this.btn_NUC_Click);
             // 
-            // btn_BIT
+            // tlp_Buttons
             // 
-            resources.ApplyResources(this.btn_BIT, "btn_BIT");
-            this.btn_BIT.BackColor = System.Drawing.Color.Black;
-            this.btn_BIT.ForeColor = System.Drawing.Color.White;
-            this.btn_BIT.Name = "btn_BIT";
-            this.btn_BIT.UseVisualStyleBackColor = false;
+            resources.ApplyResources(this.tlp_Buttons, "tlp_Buttons");
+            this.tlp_Buttons.Controls.Add(this.btn_StartStopRecording, 0, 2);
+            this.tlp_Buttons.Controls.Add(this.btn_DayCamera, 0, 0);
+            this.tlp_Buttons.Controls.Add(this.btn_Reconnect, 1, 1);
+            this.tlp_Buttons.Controls.Add(this.btn_NightCamera, 1, 0);
+            this.tlp_Buttons.Controls.Add(this.btn_NUC, 0, 1);
+            this.tlp_Buttons.Controls.Add(this.btn_AdvancedSettings, 1, 5);
+            this.tlp_Buttons.ForeColor = System.Drawing.Color.White;
+            this.tlp_Buttons.Name = "tlp_Buttons";
             // 
-            // btn_Polarity2
+            // btn_StartStopRecording
             // 
-            resources.ApplyResources(this.btn_Polarity2, "btn_Polarity2");
-            this.btn_Polarity2.BackColor = System.Drawing.Color.Black;
-            this.btn_Polarity2.ForeColor = System.Drawing.Color.White;
-            this.btn_Polarity2.Name = "btn_Polarity2";
-            this.btn_Polarity2.UseVisualStyleBackColor = false;
+            resources.ApplyResources(this.btn_StartStopRecording, "btn_StartStopRecording");
+            this.btn_StartStopRecording.BackColor = System.Drawing.Color.Black;
+            this.btn_StartStopRecording.ForeColor = System.Drawing.Color.White;
+            this.btn_StartStopRecording.Name = "btn_StartStopRecording";
+            this.btn_StartStopRecording.UseVisualStyleBackColor = false;
+            this.btn_StartStopRecording.Click += new System.EventHandler(this.btn_StartStopRecording_Click);
             // 
-            // pnl_DisabledControlsByDefault
+            // btn_AdvancedSettings
             // 
-            this.pnl_DisabledControlsByDefault.Controls.Add(this.btn_BIT);
-            this.pnl_DisabledControlsByDefault.Controls.Add(this.btn_Polarity2);
-            this.pnl_DisabledControlsByDefault.Controls.Add(this.btn_WhiteHot);
-            this.pnl_DisabledControlsByDefault.Controls.Add(this.btn_Polarity1);
-            this.pnl_DisabledControlsByDefault.Controls.Add(this.btn_BlackHot);
-            resources.ApplyResources(this.pnl_DisabledControlsByDefault, "pnl_DisabledControlsByDefault");
-            this.pnl_DisabledControlsByDefault.Name = "pnl_DisabledControlsByDefault";
-            // 
-            // btn_WhiteHot
-            // 
-            resources.ApplyResources(this.btn_WhiteHot, "btn_WhiteHot");
-            this.btn_WhiteHot.BackColor = System.Drawing.Color.Black;
-            this.btn_WhiteHot.ForeColor = System.Drawing.Color.White;
-            this.btn_WhiteHot.Image = global::MV04.Camera.Properties.Resources.istanding_man_50;
-            this.btn_WhiteHot.Name = "btn_WhiteHot";
-            this.btn_WhiteHot.UseVisualStyleBackColor = false;
-            // 
-            // btn_BlackHot
-            // 
-            resources.ApplyResources(this.btn_BlackHot, "btn_BlackHot");
-            this.btn_BlackHot.BackColor = System.Drawing.Color.Black;
-            this.btn_BlackHot.ForeColor = System.Drawing.Color.White;
-            this.btn_BlackHot.Image = global::MV04.Camera.Properties.Resources.standing_man_50;
-            this.btn_BlackHot.Name = "btn_BlackHot";
-            this.btn_BlackHot.UseVisualStyleBackColor = false;
-            // 
-            // tlp_VisibleElements
-            // 
-            resources.ApplyResources(this.tlp_VisibleElements, "tlp_VisibleElements");
-            this.tlp_VisibleElements.Controls.Add(this.btn_StartStopRecording, 0, 2);
-            this.tlp_VisibleElements.Controls.Add(this.btn_DayCamera, 0, 0);
-            this.tlp_VisibleElements.Controls.Add(this.btn_Reconnect, 1, 1);
-            this.tlp_VisibleElements.Controls.Add(this.btn_NightCamera, 1, 0);
-            this.tlp_VisibleElements.Controls.Add(this.btn_NUC, 0, 1);
-            this.tlp_VisibleElements.Controls.Add(this.btn_AdvancedSettings, 1, 2);
-            this.tlp_VisibleElements.ForeColor = System.Drawing.Color.White;
-            this.tlp_VisibleElements.Name = "tlp_VisibleElements";
+            this.btn_AdvancedSettings.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_AdvancedSettings, "btn_AdvancedSettings");
+            this.btn_AdvancedSettings.ForeColor = System.Drawing.Color.White;
+            this.btn_AdvancedSettings.Image = global::MV04.Camera.Properties.Resources.more_50;
+            this.btn_AdvancedSettings.Name = "btn_AdvancedSettings";
+            this.btn_AdvancedSettings.UseVisualStyleBackColor = false;
             // 
             // btn_DayCamera
             // 
@@ -150,48 +111,33 @@
             this.btn_NightCamera.UseVisualStyleBackColor = false;
             this.btn_NightCamera.Click += new System.EventHandler(this.btn_NightCamera_Click);
             // 
-            // btn_AdvancedSettings
-            // 
-            this.btn_AdvancedSettings.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_AdvancedSettings, "btn_AdvancedSettings");
-            this.btn_AdvancedSettings.ForeColor = System.Drawing.Color.White;
-            this.btn_AdvancedSettings.Image = global::MV04.Camera.Properties.Resources.more_50;
-            this.btn_AdvancedSettings.Name = "btn_AdvancedSettings";
-            this.btn_AdvancedSettings.UseVisualStyleBackColor = false;
-            this.btn_AdvancedSettings.Click += new System.EventHandler(this.btn_AdvancedSettings_Click);
-            // 
             // uc_CameraSettings
             // 
             resources.ApplyResources(this.uc_CameraSettings, "uc_CameraSettings");
             this.uc_CameraSettings.Name = "uc_CameraSettings";
             // 
-            // btn_StartStopRecording
+            // tlp_Base
             // 
-            resources.ApplyResources(this.btn_StartStopRecording, "btn_StartStopRecording");
-            this.btn_StartStopRecording.BackColor = System.Drawing.Color.Black;
-            this.btn_StartStopRecording.ForeColor = System.Drawing.Color.White;
-            this.btn_StartStopRecording.Name = "btn_StartStopRecording";
-            this.btn_StartStopRecording.UseVisualStyleBackColor = false;
-            this.btn_StartStopRecording.Click += new System.EventHandler(this.btn_StartStopRecording_Click);
+            resources.ApplyResources(this.tlp_Base, "tlp_Base");
+            this.tlp_Base.Controls.Add(this.uc_CameraSettings, 1, 0);
+            this.tlp_Base.Controls.Add(this.tlp_Buttons, 0, 0);
+            this.tlp_Base.Name = "tlp_Base";
             // 
             // CameraSettingsForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.Controls.Add(this.uc_CameraSettings);
-            this.Controls.Add(this.pnl_DisabledControlsByDefault);
-            this.Controls.Add(this.tlp_VisibleElements);
+            this.Controls.Add(this.tlp_Base);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.KeyPreview = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "CameraSettingsForm";
             this.ShowIcon = false;
-            this.pnl_DisabledControlsByDefault.ResumeLayout(false);
-            this.pnl_DisabledControlsByDefault.PerformLayout();
-            this.tlp_VisibleElements.ResumeLayout(false);
-            this.tlp_VisibleElements.PerformLayout();
+            this.tlp_Buttons.ResumeLayout(false);
+            this.tlp_Buttons.PerformLayout();
+            this.tlp_Base.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -200,17 +146,12 @@
 
         private System.Windows.Forms.Button btn_DayCamera;
         private System.Windows.Forms.Button btn_NightCamera;
-        private System.Windows.Forms.Button btn_BlackHot;
-        private System.Windows.Forms.Button btn_WhiteHot;
-        private System.Windows.Forms.Button btn_Polarity1;
-        private System.Windows.Forms.Button btn_Polarity2;
         private System.Windows.Forms.Button btn_NUC;
-        private System.Windows.Forms.Button btn_BIT;
         private System.Windows.Forms.Button btn_Reconnect;
-        private System.Windows.Forms.TableLayoutPanel tlp_VisibleElements;
-        private System.Windows.Forms.Panel pnl_DisabledControlsByDefault;
+        private System.Windows.Forms.TableLayoutPanel tlp_Buttons;
         private System.Windows.Forms.Button btn_AdvancedSettings;
         private Settings.uc_CameraSettings uc_CameraSettings;
         private System.Windows.Forms.Button btn_StartStopRecording;
+        private System.Windows.Forms.TableLayoutPanel tlp_Base;
     }
 }

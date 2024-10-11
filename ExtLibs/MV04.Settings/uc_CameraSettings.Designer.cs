@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             this.tlp_Base = new System.Windows.Forms.TableLayoutPanel();
+            this.tlp_SYAutoStart = new System.Windows.Forms.TableLayoutPanel();
+            this.rb_NoSY = new System.Windows.Forms.RadioButton();
+            this.rb_YesSY = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.rb_AutoRecordNo = new System.Windows.Forms.RadioButton();
             this.rb_AutoRecordYes = new System.Windows.Forms.RadioButton();
@@ -55,22 +58,19 @@
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.radioButton_AutoConnect_No = new System.Windows.Forms.RadioButton();
             this.radioButton_AutoConnect_Yes = new System.Windows.Forms.RadioButton();
+            this.lb_AutoRecord = new System.Windows.Forms.Label();
+            this.comboBox_cameraStreamChannel = new System.Windows.Forms.ComboBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.button_Cancel = new System.Windows.Forms.Button();
             this.button_Save = new System.Windows.Forms.Button();
-            this.lb_AutoRecord = new System.Windows.Forms.Label();
-            this.comboBox_cameraStreamChannel = new System.Windows.Forms.ComboBox();
             this.lb_AutoStartSingleYaw = new System.Windows.Forms.Label();
-            this.tlp_SYAutoStart = new System.Windows.Forms.TableLayoutPanel();
-            this.rb_NoSY = new System.Windows.Forms.RadioButton();
-            this.rb_YesSY = new System.Windows.Forms.RadioButton();
             this.tlp_Base.SuspendLayout();
+            this.tlp_SYAutoStart.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_VideoSegmentLength)).BeginInit();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
-            this.tlp_SYAutoStart.SuspendLayout();
             this.SuspendLayout();
             // 
             // tlp_Base
@@ -124,6 +124,45 @@
             this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.689467F));
             this.tlp_Base.Size = new System.Drawing.Size(392, 384);
             this.tlp_Base.TabIndex = 26;
+            // 
+            // tlp_SYAutoStart
+            // 
+            this.tlp_SYAutoStart.ColumnCount = 2;
+            this.tlp_SYAutoStart.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tlp_SYAutoStart.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlp_SYAutoStart.Controls.Add(this.rb_NoSY, 1, 0);
+            this.tlp_SYAutoStart.Controls.Add(this.rb_YesSY, 0, 0);
+            this.tlp_SYAutoStart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlp_SYAutoStart.Location = new System.Drawing.Point(153, 322);
+            this.tlp_SYAutoStart.Name = "tlp_SYAutoStart";
+            this.tlp_SYAutoStart.RowCount = 1;
+            this.tlp_SYAutoStart.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlp_SYAutoStart.Size = new System.Drawing.Size(236, 23);
+            this.tlp_SYAutoStart.TabIndex = 36;
+            // 
+            // rb_NoSY
+            // 
+            this.rb_NoSY.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.rb_NoSY.AutoSize = true;
+            this.rb_NoSY.Location = new System.Drawing.Point(55, 3);
+            this.rb_NoSY.Name = "rb_NoSY";
+            this.rb_NoSY.Size = new System.Drawing.Size(47, 17);
+            this.rb_NoSY.TabIndex = 22;
+            this.rb_NoSY.TabStop = true;
+            this.rb_NoSY.Text = "Nem";
+            this.rb_NoSY.UseVisualStyleBackColor = true;
+            // 
+            // rb_YesSY
+            // 
+            this.rb_YesSY.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.rb_YesSY.AutoSize = true;
+            this.rb_YesSY.Location = new System.Drawing.Point(3, 3);
+            this.rb_YesSY.Name = "rb_YesSY";
+            this.rb_YesSY.Size = new System.Drawing.Size(46, 17);
+            this.rb_YesSY.TabIndex = 21;
+            this.rb_YesSY.TabStop = true;
+            this.rb_YesSY.Text = "Igen";
+            this.rb_YesSY.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel1
             // 
@@ -431,6 +470,29 @@
             this.radioButton_AutoConnect_Yes.Text = "Igen";
             this.radioButton_AutoConnect_Yes.UseVisualStyleBackColor = true;
             // 
+            // lb_AutoRecord
+            // 
+            this.lb_AutoRecord.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.lb_AutoRecord.AutoSize = true;
+            this.lb_AutoRecord.Location = new System.Drawing.Point(3, 298);
+            this.lb_AutoRecord.Name = "lb_AutoRecord";
+            this.lb_AutoRecord.Size = new System.Drawing.Size(134, 13);
+            this.lb_AutoRecord.TabIndex = 32;
+            this.lb_AutoRecord.Text = "AutoRecordCameraScreen";
+            // 
+            // comboBox_cameraStreamChannel
+            // 
+            this.comboBox_cameraStreamChannel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox_cameraStreamChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_cameraStreamChannel.FormattingEnabled = true;
+            this.comboBox_cameraStreamChannel.Items.AddRange(new object[] {
+            "0",
+            "1"});
+            this.comboBox_cameraStreamChannel.Location = new System.Drawing.Point(153, 33);
+            this.comboBox_cameraStreamChannel.Name = "comboBox_cameraStreamChannel";
+            this.comboBox_cameraStreamChannel.Size = new System.Drawing.Size(236, 21);
+            this.comboBox_cameraStreamChannel.TabIndex = 34;
+            // 
             // tableLayoutPanel3
             // 
             this.tableLayoutPanel3.ColumnCount = 2;
@@ -472,26 +534,6 @@
             this.button_Save.UseVisualStyleBackColor = false;
             this.button_Save.Click += new System.EventHandler(this.button_Save_Click);
             // 
-            // lb_AutoRecord
-            // 
-            this.lb_AutoRecord.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.lb_AutoRecord.AutoSize = true;
-            this.lb_AutoRecord.Location = new System.Drawing.Point(3, 298);
-            this.lb_AutoRecord.Name = "lb_AutoRecord";
-            this.lb_AutoRecord.Size = new System.Drawing.Size(134, 13);
-            this.lb_AutoRecord.TabIndex = 32;
-            this.lb_AutoRecord.Text = "AutoRecordCameraScreen";
-            // 
-            // comboBox_cameraStreamChannel
-            // 
-            this.comboBox_cameraStreamChannel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBox_cameraStreamChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_cameraStreamChannel.FormattingEnabled = true;
-            this.comboBox_cameraStreamChannel.Location = new System.Drawing.Point(153, 33);
-            this.comboBox_cameraStreamChannel.Name = "comboBox_cameraStreamChannel";
-            this.comboBox_cameraStreamChannel.Size = new System.Drawing.Size(236, 21);
-            this.comboBox_cameraStreamChannel.TabIndex = 34;
-            // 
             // lb_AutoStartSingleYaw
             // 
             this.lb_AutoStartSingleYaw.Anchor = System.Windows.Forms.AnchorStyles.Left;
@@ -502,45 +544,6 @@
             this.lb_AutoStartSingleYaw.TabIndex = 35;
             this.lb_AutoStartSingleYaw.Text = "AutoStartSingleYaw";
             // 
-            // tlp_SYAutoStart
-            // 
-            this.tlp_SYAutoStart.ColumnCount = 2;
-            this.tlp_SYAutoStart.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tlp_SYAutoStart.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlp_SYAutoStart.Controls.Add(this.rb_NoSY, 1, 0);
-            this.tlp_SYAutoStart.Controls.Add(this.rb_YesSY, 0, 0);
-            this.tlp_SYAutoStart.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tlp_SYAutoStart.Location = new System.Drawing.Point(153, 322);
-            this.tlp_SYAutoStart.Name = "tlp_SYAutoStart";
-            this.tlp_SYAutoStart.RowCount = 1;
-            this.tlp_SYAutoStart.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlp_SYAutoStart.Size = new System.Drawing.Size(236, 23);
-            this.tlp_SYAutoStart.TabIndex = 36;
-            // 
-            // rb_NoSY
-            // 
-            this.rb_NoSY.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.rb_NoSY.AutoSize = true;
-            this.rb_NoSY.Location = new System.Drawing.Point(55, 3);
-            this.rb_NoSY.Name = "rb_NoSY";
-            this.rb_NoSY.Size = new System.Drawing.Size(47, 17);
-            this.rb_NoSY.TabIndex = 22;
-            this.rb_NoSY.TabStop = true;
-            this.rb_NoSY.Text = "Nem";
-            this.rb_NoSY.UseVisualStyleBackColor = true;
-            // 
-            // rb_YesSY
-            // 
-            this.rb_YesSY.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.rb_YesSY.AutoSize = true;
-            this.rb_YesSY.Location = new System.Drawing.Point(3, 3);
-            this.rb_YesSY.Name = "rb_YesSY";
-            this.rb_YesSY.Size = new System.Drawing.Size(46, 17);
-            this.rb_YesSY.TabIndex = 21;
-            this.rb_YesSY.TabStop = true;
-            this.rb_YesSY.Text = "Igen";
-            this.rb_YesSY.UseVisualStyleBackColor = true;
-            // 
             // uc_CameraSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -550,6 +553,8 @@
             this.Size = new System.Drawing.Size(392, 384);
             this.tlp_Base.ResumeLayout(false);
             this.tlp_Base.PerformLayout();
+            this.tlp_SYAutoStart.ResumeLayout(false);
+            this.tlp_SYAutoStart.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -558,8 +563,6 @@
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel4.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
-            this.tlp_SYAutoStart.ResumeLayout(false);
-            this.tlp_SYAutoStart.PerformLayout();
             this.ResumeLayout(false);
 
         }

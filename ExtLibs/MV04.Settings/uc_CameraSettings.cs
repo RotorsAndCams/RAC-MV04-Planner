@@ -79,7 +79,6 @@ namespace MV04.Settings
             SetIfValid(returnData, Setting.AutoStartSingleYaw, rb_YesSY.Checked.ToString());
 
             SettingManager.Save(returnData);
-
         }
 
         private void button_Cancel_Click(object sender, EventArgs e)
