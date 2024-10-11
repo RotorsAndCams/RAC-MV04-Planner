@@ -31,11 +31,11 @@ namespace MissionPlanner.Joystick
         string joystickconfigbutton = "joystickbuttons.xml";
         string joystickconfigaxis = "joystickaxis.xml";
 
-        // set to default midpoint
+        // set to default
         protected int hat1 = 65535/2;
         protected int hat2 = 65535/2;
-        int custom0 = 65535/2;
-        int custom1 = 65535/2;
+        int custom0/* = 65535/2*/; // Button controlled axis should be LOW by default
+        int custom1/* = 65535/2*/; // 0 will be mapped to pwm-min by Expo()
 
         //no need for finalizer...
         //~Joystick()
