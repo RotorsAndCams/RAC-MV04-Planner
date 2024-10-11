@@ -31,8 +31,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CameraView));
             this.tlp_ControlsBase = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_Buttonsection2 = new System.Windows.Forms.TableLayoutPanel();
-            this.btn_StopTracking = new System.Windows.Forms.Button();
             this.btn_ResetZoom = new System.Windows.Forms.Button();
+            this.btn_StartStopSingleYaw = new System.Windows.Forms.Button();
+            this.btn_StopTracking = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
             this.btn_Settings = new System.Windows.Forms.Button();
@@ -53,6 +54,7 @@
             this.pb_InfraLight = new System.Windows.Forms.PictureBox();
             this.pb_PositionIndicator = new System.Windows.Forms.PictureBox();
             this.tlp_AGLContainer = new System.Windows.Forms.TableLayoutPanel();
+            this.cs_ColorSliderAltitude = new MissionPlanner.Controls.ColorSlider();
             this.tlp_AGLIncrement = new System.Windows.Forms.TableLayoutPanel();
             this.btn_SetAlt = new System.Windows.Forms.Button();
             this.btn_Down = new System.Windows.Forms.Button();
@@ -67,8 +69,6 @@
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
             this.pb_CameraGstream = new System.Windows.Forms.PictureBox();
-            this.btn_StartStopSingleYaw = new System.Windows.Forms.Button();
-            this.cs_ColorSliderAltitude = new MissionPlanner.Controls.ColorSlider();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
@@ -108,16 +108,6 @@
             this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 1, 1);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
             // 
-            // btn_StopTracking
-            // 
-            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
-            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
-            this.btn_StopTracking.Name = "btn_StopTracking";
-            this.btn_StopTracking.UseVisualStyleBackColor = false;
-            this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
-            // 
             // btn_ResetZoom
             // 
             this.btn_ResetZoom.BackColor = System.Drawing.Color.Black;
@@ -127,6 +117,25 @@
             this.btn_ResetZoom.Name = "btn_ResetZoom";
             this.btn_ResetZoom.UseVisualStyleBackColor = false;
             this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
+            // 
+            // btn_StartStopSingleYaw
+            // 
+            this.btn_StartStopSingleYaw.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_StartStopSingleYaw, "btn_StartStopSingleYaw");
+            this.btn_StartStopSingleYaw.ForeColor = System.Drawing.Color.White;
+            this.btn_StartStopSingleYaw.Name = "btn_StartStopSingleYaw";
+            this.btn_StartStopSingleYaw.UseVisualStyleBackColor = false;
+            this.btn_StartStopSingleYaw.Click += new System.EventHandler(this.btn_StartStopSingleYaw_Click);
+            // 
+            // btn_StopTracking
+            // 
+            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
+            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
+            this.btn_StopTracking.Name = "btn_StopTracking";
+            this.btn_StopTracking.UseVisualStyleBackColor = false;
+            this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
             // 
             // tlp_InfoBase
             // 
@@ -269,6 +278,27 @@
             this.tlp_AGLContainer.ForeColor = System.Drawing.Color.RosyBrown;
             this.tlp_AGLContainer.Name = "tlp_AGLContainer";
             // 
+            // cs_ColorSliderAltitude
+            // 
+            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
+            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
+            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
+            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
+            resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
+            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
+            this.cs_ColorSliderAltitude.Maximum = 500;
+            this.cs_ColorSliderAltitude.Minimum = 50;
+            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
+            this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
+            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
+            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
+            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
+            this.cs_ColorSliderAltitude.ThumbSize = 40;
+            this.cs_ColorSliderAltitude.ValueChanged += new System.EventHandler(this.cs_ColorSliderAltitude_ValueChanged);
+            // 
             // tlp_AGLIncrement
             // 
             resources.ApplyResources(this.tlp_AGLIncrement, "tlp_AGLIncrement");
@@ -389,36 +419,6 @@
             this.pb_CameraGstream.Name = "pb_CameraGstream";
             this.pb_CameraGstream.TabStop = false;
             this.pb_CameraGstream.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pb_CameraGstream_MouseDoubleClick);
-            // 
-            // btn_StartStopSingleYaw
-            // 
-            this.btn_StartStopSingleYaw.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_StartStopSingleYaw, "btn_StartStopSingleYaw");
-            this.btn_StartStopSingleYaw.ForeColor = System.Drawing.Color.White;
-            this.btn_StartStopSingleYaw.Name = "btn_StartStopSingleYaw";
-            this.btn_StartStopSingleYaw.UseVisualStyleBackColor = false;
-            this.btn_StartStopSingleYaw.Click += new System.EventHandler(this.btn_StartStopSingleYaw_Click);
-            // 
-            // cs_ColorSliderAltitude
-            // 
-            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
-            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
-            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
-            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
-            resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
-            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
-            this.cs_ColorSliderAltitude.Maximum = 500;
-            this.cs_ColorSliderAltitude.Minimum = 50;
-            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
-            this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
-            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
-            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
-            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
-            this.cs_ColorSliderAltitude.ThumbSize = 40;
-            this.cs_ColorSliderAltitude.ValueChanged += new System.EventHandler(this.cs_ColorSliderAltitude_ValueChanged);
             // 
             // CameraView
             // 
