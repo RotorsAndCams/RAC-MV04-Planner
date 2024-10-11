@@ -16,7 +16,7 @@ namespace MV04.FlightPlanAnalyzer
         #region Fields
         private static readonly double H_TO_S = 3600.0;
 
-        private static readonly double S_TO_H = 1.0 / 3600.0;
+        private static readonly double S_TO_H = 1.0 / H_TO_S;
 
         private static (double AirSpeed, double Consumption)[] AirSpeedConsumptionTable =
         {
@@ -79,24 +79,30 @@ namespace MV04.FlightPlanAnalyzer
                 (ushort)MAV_CMD.WAYPOINT,
                 (ushort)MAV_CMD.RETURN_TO_LAUNCH
             };
+
+            ushort rtlSeq = flightPlan.Count(c => c.Value.command == (ushort)MAV_CMD.RETURN_TO_LAUNCH) > 0 ?
+                flightPlan.Where(c => c.Value.command == (ushort)MAV_CMD.RETURN_TO_LAUNCH).Min(c => c.Value.seq) :
+                ushort.MaxValue;
+
             Dictionary<int, mavlink_mission_item_int_t> nextNavOnly = (Dictionary<int, mavlink_mission_item_int_t>)flightPlan
-                .Where(c => c.Value.seq >= nextWP && navCmdIds.Contains(c.Value.command))
+                .Where(c => c.Value.seq >= nextWP
+                    && c.Value.seq <= rtlSeq
+                    && navCmdIds.Contains(c.Value.command))
                 .OrderBy(c => c.Value.seq);
-            if (nextNavOnly.Count(c => c.Value.command == (ushort)MAV_CMD.RETURN_TO_LAUNCH) > 0)
-            {
-                // Disregard everything after RTL
 
-            }
-
-            // Create flight plan path segments
-            /* Segments
-                - uavLocation -> WPnext
-                - WPn -> WPn+1
-                - WPlast -> Home (if RTL)
-            */
+            // Create segments
             List<(PointLatLngAlt pos1, PointLatLngAlt pos2)> segments = new List<(PointLatLngAlt pos1, PointLatLngAlt pos2)>();
+            foreach (KeyValuePair<int, mavlink_mission_item_int_t> missionItem in nextNavOnly)
+            {
+                // uavLocation -> WPnext
+                if (missionItem.Value.seq == nextWP && rtlSeq != nextWP)
+                {
 
+                }
 
+                // WPn -> WPn + 1
+                // WPlast -> Home (if RTL)
+            }
 
             return segments.Sum(s => PointsToAh(s.pos1, s.pos2, travelSpeed, travelConsumption, climbSpeed, climbConsumption, descSpeed, descConsumption));
         }
