@@ -431,10 +431,19 @@ namespace MissionPlanner.GCSViews
                 IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
+            bool autoStartSingleYaw = bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw));
+
             // Auto start single-yaw loop
-            if (success)
+            if (success && autoStartSingleYaw)
             {
                 SingleYawHandler.StartSingleYaw(MainV2.comPort);
+
+                if (InvokeRequired)
+                    Invoke(new Action(() => SetSingleYawButton()));
+                else
+                    SetSingleYawButton();
+
+
             }
 
 #if DEBUG
@@ -1708,5 +1717,42 @@ namespace MissionPlanner.GCSViews
         }
 
         #endregion
+
+        private void btn_StartStopSingleYaw_Click(object sender, EventArgs e)
+        {
+            if (SingleYawHandler.IsRunning)
+            {
+                SingleYawHandler.StopSingleYaw();
+                this.btn_StartStopSingleYaw.Text = "Start Single Yaw";
+                this.btn_StartStopSingleYaw.BackColor = Color.Black;
+            }
+            else
+            {
+                SingleYawHandler.StartSingleYaw(MainV2.comPort);
+                if (SingleYawHandler.IsRunning)
+                {
+                    this.btn_StartStopSingleYaw.Text = "Stop Single Yaw";
+                    this.btn_StartStopSingleYaw.BackColor = Color.DarkGreen;
+                }
+            }
+                
+
+            
+
+        }
+
+        private void SetSingleYawButton()
+        {
+            if (!SingleYawHandler.IsRunning)
+            {
+                this.btn_StartStopSingleYaw.Text = "Start Single Yaw";
+                this.btn_StartStopSingleYaw.BackColor = Color.Black;
+            }
+            else
+            {
+                this.btn_StartStopSingleYaw.Text = "Stop Single Yaw";
+                this.btn_StartStopSingleYaw.BackColor = Color.DarkGreen;
+            }
+        }
     }
 }

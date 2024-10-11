@@ -39,6 +39,9 @@ namespace MV04.Settings
 
             rb_AutoRecordYes.Checked = bool.Parse(GetValue(returnData, Setting.AutoRecordVideoStream));
             rb_AutoRecordNo.Checked = !rb_AutoRecordYes.Checked;
+
+            rb_YesSY.Checked = bool.Parse(GetValue(returnData, Setting.AutoStartSingleYaw));
+            rb_NoSY.Checked = !rb_YesSY.Checked;
         }
 
 
@@ -62,6 +65,22 @@ namespace MV04.Settings
 
         private void button_Save_Click(object sender, EventArgs e)
         {
+
+
+            /*
+             SetIfValid(returnData, Setting.CameraIP, textBox_cameraIp.Text);
+            SetIfValid(returnData, Setting.CameraStreamChannel, comboBox_cameraStreamChannel.SelectedItem.ToString());
+            SetIfValid(returnData, Setting.CameraControlPort, textBox_cameraControlPort.Text);
+            SetIfValid(returnData, Setting.AutoConnect, radioButton_AutoConnect_Yes.Checked.ToString());
+            SetIfValid(returnData, Setting.VideoSegmentLength, numericUpDown_VideoSegmentLength.Value.ToString());
+            SetIfValid(returnData, Setting.IrColorMode, comboBox_IrColorMode.SelectedItem.ToString());
+            SetIfValid(returnData, Setting.GPSType, comboBox_coordFormat.SelectedItem.ToString());
+            SetIfValid(returnData, Setting.AltFormat, comboBox_altFormat.SelectedItem.ToString());
+            SetIfValid(returnData, Setting.DistFormat, comboBox_distFormat.SelectedItem.ToString());
+            SetIfValid(returnData, Setting.SpeedFormat, comboBox_speedFormat.SelectedItem.ToString());
+             
+             */
+
             SetIfValid(returnData, Setting.CameraIP, textBox_cameraIp.Text);
             SetIfValid(returnData, Setting.CameraStreamChannel, comboBox_cameraStreamChannel.SelectedItem.ToString());
             SetIfValid(returnData, Setting.CameraControlPort, textBox_cameraControlPort.Text);
@@ -73,9 +92,9 @@ namespace MV04.Settings
             SetIfValid(returnData, Setting.DistFormat, comboBox_distFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.SpeedFormat, comboBox_speedFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.AutoRecordVideoStream, radioButton_AutoConnect_Yes.Checked.ToString());
+            SetIfValid(returnData, Setting.AutoStartSingleYaw, rb_YesSY.Checked.ToString());
 
-            SettingManager.Save(returnData);
-
+            SettingManager.Save();
         }
 
         private void button_Cancel_Click(object sender, EventArgs e)
