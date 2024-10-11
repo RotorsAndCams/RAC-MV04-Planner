@@ -1729,15 +1729,21 @@ namespace MissionPlanner.GCSViews
             else
             {
                 SingleYawHandler.StartSingleYaw(MainV2.comPort);
-                this.btn_StartStopSingleYaw.Text = "Stop Single Yaw";
-                this.btn_StartStopSingleYaw.BackColor = Color.DarkGreen;
+                if (SingleYawHandler.IsRunning)
+                {
+                    this.btn_StartStopSingleYaw.Text = "Stop Single Yaw";
+                    this.btn_StartStopSingleYaw.BackColor = Color.DarkGreen;
+                }
             }
                 
+
+            
+
         }
 
         private void SetSingleYawButton()
         {
-            if (SingleYawHandler.IsRunning)
+            if (!SingleYawHandler.IsRunning)
             {
                 this.btn_StartStopSingleYaw.Text = "Start Single Yaw";
                 this.btn_StartStopSingleYaw.BackColor = Color.Black;
