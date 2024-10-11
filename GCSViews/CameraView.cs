@@ -431,8 +431,10 @@ namespace MissionPlanner.GCSViews
                 IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
+            bool autoStartSingleYaw = bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw));
+
             // Auto start single-yaw loop
-            if (success)
+            if (success && autoStartSingleYaw)
             {
                 SingleYawHandler.StartSingleYaw(MainV2.comPort);
             }

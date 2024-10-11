@@ -22,7 +22,8 @@ namespace MV04.Settings
         AltFormat,
         DistFormat,
         SpeedFormat,
-        AutoRecordVideoStream
+        AutoRecordVideoStream,
+        AutoStartSingleYaw
     }
 
     public class SettingItem
@@ -130,7 +131,14 @@ namespace MV04.Settings
                                 true.ToString(),
                                 false.ToString()
                             }.Contains(value)
-                            )
+                            ),
+                        new SettingItem(Setting.AutoStartSingleYaw, false.ToString(), value =>
+                            !string.IsNullOrWhiteSpace(value)
+                            && new List<string>(){
+                                true.ToString(),
+                                false.ToString()
+                            }.Contains(value)
+                        ),
                     };
 
                     // Create reset backup

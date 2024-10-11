@@ -39,6 +39,9 @@ namespace MV04.Settings
 
             rb_AutoRecordYes.Checked = bool.Parse(GetValue(returnData, Setting.AutoRecordVideoStream));
             rb_AutoRecordNo.Checked = !rb_AutoRecordYes.Checked;
+
+            rb_YesSY.Checked = bool.Parse(GetValue(returnData, Setting.AutoStartSingleYaw));
+            rb_NoSY.Checked = !rb_YesSY.Checked;
         }
 
 
@@ -73,6 +76,7 @@ namespace MV04.Settings
             SetIfValid(returnData, Setting.DistFormat, comboBox_distFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.SpeedFormat, comboBox_speedFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.AutoRecordVideoStream, radioButton_AutoConnect_Yes.Checked.ToString());
+            SetIfValid(returnData, Setting.AutoStartSingleYaw, rb_YesSY.Checked.ToString());
 
             SettingManager.Save(returnData);
 
