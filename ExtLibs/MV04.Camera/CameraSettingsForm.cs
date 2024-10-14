@@ -55,10 +55,40 @@ namespace MV04.Camera
             CameraHandler.Instance.DoNUC();
         }
 
-        private void btn_Reconnect_Click(object sender, EventArgs e)
+        bool isReconnecting = false;
+
+        private async void btn_Reconnect_Click(object sender, EventArgs e)
         {
-            if (event_ReconnectRequested != null)
-                event_ReconnectRequested(sender, e);
+            if (isReconnecting)
+                return;
+
+            this.btn_Reconnect.Enabled = false;
+
+            await Task.Run(() => {
+                DoReconnect();
+            });
+
+            this.btn_Reconnect.Enabled = true;
+        }
+
+        private void DoReconnect()
+        {
+            try
+            {
+                isReconnecting = true;
+                CameraHandler.Instance.StartGstreamer(CameraHandler.url);
+                CameraHandler.Instance.CameraControlConnect(
+                    IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
+                    int.Parse(SettingManager.Get(Setting.CameraControlPort)));
+
+                isReconnecting = false;
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Can not reconnect to camera: " + ex.Message);
+                isReconnecting = false;
+            }
         }
 
         public event EventHandler event_ReconnectRequested;

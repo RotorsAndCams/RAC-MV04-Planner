@@ -12,6 +12,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static MV04.Camera.MavProto;
@@ -160,7 +161,7 @@ namespace MV04.Camera
             }
         }
 
-        private Timer RecordingTimer;
+        private System.Threading.Timer RecordingTimer;
         
         public static string url = $"rtspsrc location=rtsp://{SettingManager.Get(Setting.CameraIP)}:554/live{SettingManager.Get(Setting.CameraStreamChannel)} latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";               //@"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 
@@ -316,9 +317,38 @@ namespace MV04.Camera
 
         #region Methods
 
+        System.Threading.Thread _currentGstream = null;
+        private object _currentGstreamLock = new object();
         public void StartGstreamer(string u)
         {
-            GStreamer.StartA(u);
+            try
+            {
+                lock (_currentGstreamLock)
+                {
+                    if (_currentGstream != null)
+                    {
+                        _currentGstream.Abort();
+                        //_currentGstream = null;
+                        //GStreamer.Stop(null);
+                        Thread.Sleep(500);
+                        GStreamer.StopAll();
+                        _currentGstream = null;
+                        Thread.Sleep(500);
+                    }
+
+                    _currentGstream = GStreamer.StartA(u);
+                }
+                
+            }
+            catch(Exception ex)
+            {
+#if DEBUG
+                MessageBox.Show("Exception at Start video stream: " + ex.Message);
+#endif
+                Thread.Sleep(300);
+                _currentGstream = GStreamer.StartA(u);
+            }
+            
         }
 
         public void StopGstreamer()

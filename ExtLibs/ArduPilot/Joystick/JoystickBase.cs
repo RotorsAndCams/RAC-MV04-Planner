@@ -736,6 +736,7 @@ namespace MissionPlanner.Joystick
                                     
                                     case buttonfunction_mv04_FlightMode_option.Follow:
                                         // TODO: Switch UAV to Follow mode
+                                        Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
                                         MV04_SetAxis(MV04_AxisPair.Pitch_Pitch, MV04_AxisMode.Cam);
                                         MV04_SetAxis(MV04_AxisPair.Throttle_Zoom, MV04_AxisMode.Cam);
                                         StateHandler.CurrentSate = MV04_State.Follow;
