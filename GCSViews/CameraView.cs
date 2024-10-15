@@ -1707,6 +1707,8 @@ namespace MissionPlanner.GCSViews
 
             int SafetyMarginPercent = int.Parse(Settings.Instance["PlanCheck_SafetyMarginPercent", "10"]);
             Settings.Instance["PlanCheck_SafetyMarginPercent"] = SafetyMarginPercent.ToString();
+
+            Settings.Instance.Save();
             #endregion
             
             #region Struct creation
@@ -1747,11 +1749,12 @@ namespace MissionPlanner.GCSViews
             double available = FlightPlanAnalyzer.AvailableAh(powerInfo);
             double required = FlightPlanAnalyzer.RequiredAh(flightPlanInfo, uavInfo, SafetyMarginPercent);
             string result = available >= required ? "" : "not ";
+            double remaining = Math.Max(0, available - required);
 
             // Announce result
             Task.Run(() =>
             {
-                CustomMessageBox.Show($"Flightplan is {result}possible", "Flightplan check", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                CustomMessageBox.Show($"Flightplan is {result}possible\n\nRequired capacity: {(int)(required * 1000)}mAh\nAvailable capacity: {(int)(available * 1000)}mAh\nRemaining capacity: {(int)(remaining * 1000)}mAh", "Flightplan check", MessageBoxButtons.OK);
             });
             return;
         }

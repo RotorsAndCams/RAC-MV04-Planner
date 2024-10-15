@@ -64,16 +64,16 @@ namespace MV04.FlightPlanAnalyzer
 
         private static readonly double S_TO_H = 1.0 / H_TO_S;
 
-        private static (double AirSpeed, double Consumption)[] AirSpeedConsumptionTable =
+        /*private static (double AirSpeed, double Consumption)[] AirSpeedConsumptionTable =
         {
             // TODO: Populate AirSpeedConsumptionTable with measurements
             (10, 5),
             (20, 12)
-        };
+        };*/
         #endregion
 
         #region Methods
-        private static double AirSpeedToAh(double airSpeed)
+        /*private static double AirSpeedToAh(double airSpeed)
         {
             double slope = 0;
             for (int i = 0; i < AirSpeedConsumptionTable.Length; i++)
@@ -83,7 +83,7 @@ namespace MV04.FlightPlanAnalyzer
             slope /= AirSpeedConsumptionTable.Length;
 
             return airSpeed * slope;
-        }
+        }*/
 
         /// <summary>
         /// Calculate the available power in the UAV battery
@@ -159,10 +159,13 @@ namespace MV04.FlightPlanAnalyzer
         {
             // Check input data
             if (!IsFlightPlanInfoCorrect(flightPlanInfo)
-                || !IsUAVInfoCorrect(uavInfo))
+                || !IsUAVInfoCorrect(uavInfo)
+                || safetyMarginPercentage < 0
+                || safetyMarginPercentage > 100)
             {
                 return double.MaxValue;
             }
+            if (flightPlanInfo.NextWP == 0) flightPlanInfo.NextWP = 1; // Home WP was removed in IsFlightPlanInfoCorrect()
 
             // Filter & sort nav commands
             List<ushort> navCmdIds = new List<ushort>
@@ -213,7 +216,7 @@ namespace MV04.FlightPlanAnalyzer
                 }
             }
 
-            // Calculate & sum segment consumptions
+            // Calculate & sum segment consumptions (+ safety margin)
             return segments.Sum(s => PointsToAh(s.pos1, s.pos2, uavInfo.TravelSpeed, uavInfo.TravelConsumption, uavInfo.ClimbSpeed, uavInfo.ClimbConsumption, uavInfo.DescSpeed, uavInfo.DescConsumption)) * (1 + ((double)safetyMarginPercentage / 100));
         }
 
@@ -233,6 +236,9 @@ namespace MV04.FlightPlanAnalyzer
 
         private static bool IsFlightPlanInfoCorrect(FlightPlanInfo flightPlanInfo)
         {
+            flightPlanInfo.FlightPlan.TryRemove(0, out _);
+            if (flightPlanInfo.NextWP == 0) flightPlanInfo.NextWP = 1;
+
             return null != flightPlanInfo.FlightPlan
                 && 0 < flightPlanInfo.FlightPlan.Count
                 && 0 < flightPlanInfo.FlightPlan.Count(c => c.Value.seq == flightPlanInfo.NextWP)
