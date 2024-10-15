@@ -18,8 +18,6 @@ namespace MV04.Camera
         private const int CHANGE_WINDOW_WIDTH = 225;
         private const int CHANGE_WINDOW_HEIGHT = 360;
         private static CameraSettingsForm _instance;
-        private bool _isFunctionsDisabled = true;
-        private bool _isSettingsVisible = false;
 
         public static CameraSettingsForm Instance
         {
@@ -35,46 +33,12 @@ namespace MV04.Camera
         {
             InitializeComponent();
 
-            DisableControls();
-            HideSettings();
             this.KeyPreview = true;
 
             _isRecording = bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream));
             SetButtonStatus();
         }
 
-        private void HideSettings()
-        {
-            this.uc_CameraSettings.Visible = false;
-            this.Size = new System.Drawing.Size(Size.Width, Size.Height - (CHANGE_WINDOW_HEIGHT));
-            _isSettingsVisible = false;
-        }
-
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            if (keyData == (Keys.Control | Keys.E))
-            {
-                if (_isFunctionsDisabled)
-                {
-                    this.Size = new System.Drawing.Size(Size.Width + CHANGE_WINDOW_WIDTH, Size.Height);
-                    this.pnl_DisabledControlsByDefault.Visible = true;
-                    _isFunctionsDisabled = false;
-                }
-                else
-                {
-                    DisableControls();
-                }
-            }
-
-            return base.ProcessCmdKey(ref msg, keyData);
-        }
-
-        private void DisableControls()
-        {
-            this.Size = new System.Drawing.Size(Size.Width - CHANGE_WINDOW_WIDTH, Size.Height);
-            this.pnl_DisabledControlsByDefault.Visible = false;
-            _isFunctionsDisabled = true;
-        }
 
         private void btn_DayCamera_Click(object sender, EventArgs e)
         {
@@ -91,31 +55,45 @@ namespace MV04.Camera
             CameraHandler.Instance.DoNUC();
         }
 
-        private void btn_Reconnect_Click(object sender, EventArgs e)
+        bool isReconnecting = false;
+
+        private async void btn_Reconnect_Click(object sender, EventArgs e)
         {
-            if (event_ReconnectRequested != null)
-                event_ReconnectRequested(sender, e);
+            if (isReconnecting)
+                return;
+
+            this.btn_Reconnect.Enabled = false;
+
+            await Task.Run(() => {
+                DoReconnect();
+            });
+
+            this.btn_Reconnect.Enabled = true;
+        }
+
+        private void DoReconnect()
+        {
+            try
+            {
+                isReconnecting = true;
+                CameraHandler.Instance.StartGstreamer(CameraHandler.url);
+                CameraHandler.Instance.CameraControlConnect(
+                    IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
+                    int.Parse(SettingManager.Get(Setting.CameraControlPort)));
+
+                isReconnecting = false;
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Can not reconnect to camera: " + ex.Message);
+                isReconnecting = false;
+            }
         }
 
         public event EventHandler event_ReconnectRequested;
         public event EventHandler event_StartStopRecording;
 
-        private void btn_AdvancedSettings_Click(object sender, EventArgs e)
-        {
-            if (_isSettingsVisible)
-            {
-                HideSettings();
-                btn_AdvancedSettings.BackColor = Color.Black;
-            }
-            else
-            {
-                this.uc_CameraSettings.Visible = true;
-                this.Size = new System.Drawing.Size(Size.Width, Size.Height + CHANGE_WINDOW_HEIGHT);
-                _isSettingsVisible = true;
-                btn_AdvancedSettings.BackColor = Color.DarkGreen;
-            }
-
-        }
 
         private void btn_StartStopRecording_Click(object sender, EventArgs e)
         {
@@ -144,5 +122,6 @@ namespace MV04.Camera
             else
                 this.btn_StartStopRecording.ForeColor = Color.White;
         }
+
     }
 }

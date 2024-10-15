@@ -38,6 +38,7 @@ using System.Linq;
 using MissionPlanner.Joystick;
 using System.Net;
 using Newtonsoft.Json;
+using MissionPlanner.GCSViews;
 
 namespace MissionPlanner
 {
@@ -1158,6 +1159,13 @@ namespace MissionPlanner
 
             // save config to test we have write access
             SaveConfig();
+
+            //MessageBox.Show("Give the name");
+
+            GetUserNameForm frm = new GetUserNameForm();
+            frm.ShowDialog();
+
+
 
             
             this.Text = "Secop Planner 2" + " " + comPort.MAV.VersionString;

@@ -5,6 +5,7 @@ using MV04.Camera;
 using System;
 using System.Reflection;
 using System.Timers;
+using System.Windows.Forms;
 
 namespace MV04.SingleYaw
 {
@@ -32,7 +33,7 @@ namespace MV04.SingleYaw
         private static (short _YawRCMin, short _YawRCTrim, short _YawRCDeadzone, short _YawRCMax, bool _YawRCReversed) _YawRCParams = (1000, 1500, 20, 2000, false);
 
 
-        private static Timer _YawAdjustTimer;
+        private static System.Timers.Timer _YawAdjustTimer;
 
         private static int _YawAdjustInterval = 100; // ms
 
@@ -139,14 +140,14 @@ namespace MV04.SingleYaw
             // Create timer if needed
             if (_YawAdjustTimer == null)
             {
-                _YawAdjustTimer = new Timer();
+                _YawAdjustTimer = new System.Timers.Timer();
                 _YawAdjustTimer.AutoReset = true;
                 _YawAdjustTimer.Interval = _YawAdjustInterval;
                 _YawAdjustTimer.Elapsed += _YawAdjustTimer_Elapsed;
 
                 log.Info("New Single-Yaw timer object created");
             }
-
+            _YawAdjustTimer.Enabled = true;
             // Start timer
             _YawAdjustTimer.Start();
 
@@ -192,7 +193,7 @@ namespace MV04.SingleYaw
 
             // Set RCOverride
             MAVLink.MAV.cs.GetType().GetField($"rcoverridech{_YawRCChannel}").SetValue(MAVLink.MAV.cs, RCOverride);
-
+            
             // Log
             log.Info($"Single-Yaw correction made (RC{_YawRCChannel}={RCOverride})");
 
@@ -205,14 +206,17 @@ namespace MV04.SingleYaw
             TriggerSingleYawMessageEvent($"Single-Yaw elapsed (cameraYaw={cameraYaw}, RCChan={_YawRCChannel}, RCOut={RCOverride})");
         }
 
+
         /// <summary>
         /// Stop the yaw correction loop
         /// </summary>
         public static void StopSingleYaw()
         {
-            // Stop timer
-            _YawAdjustTimer.Stop();
 
+            // Stop timer
+            _YawAdjustTimer.Enabled = false;
+            _YawAdjustTimer.Stop();
+            _YawAdjustTimer.Close();
             // Send middle stick
             if (_IsConnected)
             {

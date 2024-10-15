@@ -303,6 +303,9 @@
     <EmbeddedResource Include="GCSViews\FlightPlanner.uk.resx">
       <DependentUpon>FlightPlanner.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\GetUserNameForm.resx">
+      <DependentUpon>GetUserNameForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\GstreamerTestForm.resx">
       <DependentUpon>GstreamerTestForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -997,6 +1000,12 @@
     <Compile Include="GCSViews\ConfigurationView\DeviceInfo.cs" />
     <Compile Include="GCSViews\ConfigurationView\DroneCANModel.cs" />
     <Compile Include="GCSViews\ConfigurationView\uitype.cs" />
+    <Compile Include="GCSViews\GetUserNameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSViews\GetUserNameForm.Designer.cs">
+      <DependentUpon>GetUserNameForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GCSViews\GstreamerTestForm.cs">
       <SubType>Form</SubType>
     </Compile>
