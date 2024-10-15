@@ -302,7 +302,8 @@ namespace MissionPlanner.GCSViews
                 {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
                 {"Feed telemetry", () => { StartFeed(); }},
                 {"Stop Feed telemetry", () => { StopFeed(); }},
-                {"Check Flightplan", async () => { CheckFlightPlan(); }},
+                {"Stop Feed telemetry", () => { StopFeed(); }},
+                {"Check Flightplan", async () => { CheckFlightPlan(); }}
             };
 
             #endregion
