@@ -148,7 +148,6 @@ namespace MissionPlanner.GCSViews
 
             //States
             SetDroneStatusValue();
-            this.Resize += CameraView_Resize;
             SetDroneLEDStates(enum_LandingLEDState.Off, enum_PositionLEDState_IR.Off, enum_PositionLEDState_RedLight.Off);
             LEDStateHandler.LedStateChanged += LEDStateHandler_LedStateChanged;
 
@@ -1154,7 +1153,17 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                if(_videoRecorder != null)
+                
+                CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
+                CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
+                pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
+
+                _droneStatusTimer.Dispose();
+                _cameraSwitchOffTimer.Dispose();
+                _feedTimer.Dispose();
+                _videoRecordTimer.Dispose();
+
+                if (_videoRecorder != null)
                 {
                     _videoRecorder.Stop();
                     _videoRecorder = null;
@@ -1162,11 +1171,10 @@ namespace MissionPlanner.GCSViews
                 
                 GC.Collect();
 
-                GStreamer.StopAll();
+                //GStreamer.StopAll();
 
-                _droneStatusTimer.Stop();
-
-                pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
+                
+                this.Dispose();
             }
             catch { }
 
@@ -1333,6 +1341,11 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+        /// <summary>
+        /// Stop camera tracking and set flag to false and set btn_Stop visibility false
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btn_StopTracking_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.StopTracking(true);
@@ -1340,27 +1353,6 @@ namespace MissionPlanner.GCSViews
             SetStopButtonVisibility();
         }
 
-        private void CameraView_Resize(object sender, EventArgs e)
-        {
-            //if (this.Size.Width < 1270)
-            //{
-            //    this.pnl_CameraScreen.Padding = new Padding(0, 60, 0, 60);
-            //    this.pnl_CameraScreen.MinimumSize = new Size(620, 360);
-            //    this.pnl_CameraScreen.Size = new Size(620, 360);
-            //}
-            //else if (this.Size.Width < 1590)
-            //{
-            //    this.pnl_CameraScreen.Padding = new Padding(0, 30, 0, 30);
-            //    this.pnl_CameraScreen.MinimumSize = new Size(960, 540);
-            //    this.pnl_CameraScreen.Size = new Size(960, 540);
-            //}
-            //else
-            //{
-            //    this.pnl_CameraScreen.Padding = new Padding(0, 0, 0, 0);
-            //    this.pnl_CameraScreen.MinimumSize = new Size(1280, 720);
-            //    this.pnl_CameraScreen.Size = new Size(1280, 720);
-            //}
-        }
 
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
         {
@@ -1508,12 +1500,16 @@ namespace MissionPlanner.GCSViews
             if (e.X <= 0 || e.Y <= 0)
                 return;
 
-            if (IsCameraTrackingModeActive)
-                return;
+            //if (IsCameraTrackingModeActive)
+            //    return;
+
+            //CameraHandler.Instance.StopTracking(true);
+            //IsCameraTrackingModeActive = false;
+            //SetStopButtonVisibility();
 
             IsCameraTrackingModeActive = true;
 
-            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y));
+            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.pb_CameraGstream.Size);
 
             //Point _trackPos = new Point(e.X, e.Y);
 
@@ -1534,7 +1530,7 @@ namespace MissionPlanner.GCSViews
             if (InvokeRequired)
             {
                 Invoke(new Action(() => {
-                    if (IsCameraTrackingModeActive)
+                    if (IsCameraTrackingModeActive && !CameraView.instance.IsDisposed)
                         btn_StopTracking.Visible = true;
                     else
                         btn_StopTracking.Visible = false;

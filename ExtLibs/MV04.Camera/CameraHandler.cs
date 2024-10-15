@@ -760,7 +760,7 @@ namespace MV04.Camera
             }
         }
 
-        public bool StartTracking(Point? trackPos)
+        public bool StartTracking(Point? trackPos, Size size = new Size())
         {
             if (IsCameraControlConnected)
             {
@@ -772,22 +772,23 @@ namespace MV04.Camera
                 // Handle default tracking pos (center)
                 Point _trackPos = trackPos ?? new Point(640, 360);
 
-                // Constrain tracking pos
-                _trackPos.X = Constrain(_trackPos.X, 0, 1280);
-                _trackPos.Y = Constrain(_trackPos.Y, 0, 720);
+                var trNP = FullSizeToTrackingSize(_trackPos, size);
 
 #if DEBUG
 
-                if (_trackPos.X > 1279)
+                if (trNP.X > 1279)
                     MessageBox.Show("Invalid tracking x: " + _trackPos.X);
 
-                if (_trackPos.Y > 1279)
+                if (trNP.Y > 719)
                     MessageBox.Show("Invalid tracking y: " + _trackPos.Y);
 
-#endif
 
-                // Start tracking
-                return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.Track/*OnPosition*/, 0) == mav_error.ok;
+                //MessageBox.Show("X: " + trNP.X + "y: " + trNP.Y);
+#endif
+                MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, trNP.X, trNP.Y, (int)TrackerMode.Enable, 0);
+                Thread.Sleep(300);
+
+                return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, trNP.X, trNP.Y, (int)TrackerMode.Track, 0) == mav_error.ok;
             }
 
             return false;
@@ -795,15 +796,8 @@ namespace MV04.Camera
 
         public bool StopTracking(bool resetToPrevMode = false)
         {
-            if (IsCameraControlConnected
-                &&
-                (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, 0, 0, (int)TrackerMode.Disable, 0) == mav_error.ok)
-            {
-                SetMode(NvSystemModes.GRR);
-                return true;
-            }
-
-            return false;
+            SetMode(NvSystemModes.GRR);
+            return true;
         }
 
         public bool Retract()
