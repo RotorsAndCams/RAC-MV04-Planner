@@ -32,6 +32,7 @@ using static IronPython.Modules._ast;
 using static MV04.Camera.MavProto;
 using Accord.Video.FFMPEG;
 using MV04.SingleYaw;
+using MV04.FlightPlanAnalyzer;
 using System.Timers;
 
 namespace MissionPlanner.GCSViews
@@ -300,7 +301,8 @@ namespace MissionPlanner.GCSViews
                 {"Stop single-yaw loop", async () => { SingleYawHandler.StopSingleYaw(); }},
                 {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
                 {"Feed telemetry", () => { StartFeed(); }},
-                {"Stop Feed telemetry", () => { StopFeed(); }}
+                {"Stop Feed telemetry", () => { StopFeed(); }},
+                {"Check Flightplan", async () => { CheckFlightPlan(); }}
             };
 
             #endregion
@@ -1710,6 +1712,138 @@ namespace MissionPlanner.GCSViews
                 this.pb_PositionIndicator.Visible = false;
 
 
+        }
+
+        /// <summary>
+        /// Determine if there is enough energy in the UAV battery to execute the uploaded flightplan
+        /// </summary>
+        private void CheckFlightPlan()
+        {
+            // Check for connection
+            if (MainV2.comPort == null
+                || MainV2.comPort.BaseStream == null
+                || !MainV2.comPort.BaseStream.IsOpen)
+            {
+                Task.Run(() =>
+                {
+                    CustomMessageBox.Show("ERROR\n\nNo connection", "Flightplan check", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                });
+                return;
+            }
+
+            // Check for flightplan
+            if (MainV2.comPort.MAV.wps == null
+                || MainV2.comPort.MAV.wps.Count == 0)
+            {
+                Task.Run(() =>
+                {
+                    CustomMessageBox.Show("ERROR\n\nNo flightplan", "Flightplan check", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                });
+                return;
+            }
+
+            // Get input info
+            #region Config read
+            double CellMaxVolts = double.Parse(Settings.Instance["PlanCheck_CellMaxVolts", "4.2"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_CellMaxVolts"] = CellMaxVolts.ToString();
+
+            double CellMinVolts = double.Parse(Settings.Instance["PlanCheck_CellMinVolts", "3.6"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_CellMinVolts"] = CellMinVolts.ToString();
+
+            int CellNum = int.Parse(Settings.Instance["PlanCheck_CellNum", "3"]);
+            Settings.Instance["PlanCheck_CellNum"] = CellNum.ToString();
+
+            double MaxAmpHours = double.Parse(Settings.Instance["PlanCheck_MaxAmpHours", "5"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_MaxAmpHours"] = MaxAmpHours.ToString();
+
+            double TravelSpeed = double.Parse(Settings.Instance["PlanCheck_TravelSpeed", "23"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_TravelSpeed"] = TravelSpeed.ToString();
+
+            double ClimbSpeed = double.Parse(Settings.Instance["PlanCheck_ClimbSpeed", "6"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_ClimbSpeed"] = ClimbSpeed.ToString();
+
+            double DescSpeed = double.Parse(Settings.Instance["PlanCheck_DescSpeed", "5"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_DescSpeed"] = DescSpeed.ToString();
+
+            double TravelConsumption = double.Parse(Settings.Instance["PlanCheck_TravelConsumption", "31"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_TravelConsumption"] = TravelConsumption.ToString();
+
+            double ClimbConsumption = double.Parse(Settings.Instance["PlanCheck_ClimbConsumption", "30"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_ClimbConsumption"] = ClimbConsumption.ToString();
+
+            double DescConsumption = double.Parse(Settings.Instance["PlanCheck_DescConsumption", "28"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_DescConsumption"] = DescConsumption.ToString();
+
+            int SafetyMarginPercent = int.Parse(Settings.Instance["PlanCheck_SafetyMarginPercent", "10"]);
+            Settings.Instance["PlanCheck_SafetyMarginPercent"] = SafetyMarginPercent.ToString();
+
+            Settings.Instance.Save();
+            #endregion
+            
+            #region Struct creation
+            FlightPlanAnalyzer.PowerInfo powerInfo = new FlightPlanAnalyzer.PowerInfo()
+            {
+                MaxVolts = CellNum * CellMaxVolts,
+                MinVolts = CellNum * CellMinVolts,
+                CurrentVolts = MainV2.comPort.MAV.cs.battery_voltage,
+                FullAmpHours = MaxAmpHours
+            };
+
+            FlightPlanAnalyzer.UAVInfo uavInfo = new FlightPlanAnalyzer.UAVInfo()
+            {
+                TravelSpeed = TravelSpeed, // m/s
+                ClimbSpeed = ClimbSpeed,
+                DescSpeed = DescSpeed,
+                TravelConsumption = TravelConsumption, // A
+                ClimbConsumption = ClimbConsumption,
+                DescConsumption = DescConsumption
+            };
+
+            FlightPlanAnalyzer.FlightPlanInfo flightPlanInfo = new FlightPlanAnalyzer.FlightPlanInfo()
+            {
+                FlightPlan = MainV2.comPort.MAV.wps,
+                NextWP = (int)MainV2.comPort.MAV.cs.wpno,
+                UAVLocation = new PointLatLngAlt(
+                    MainV2.comPort.MAV.cs.Location.Lat,
+                    MainV2.comPort.MAV.cs.Location.Lng,
+                    MainV2.comPort.MAV.cs.Location.Alt - MainV2.comPort.MAV.cs.HomeAlt),
+                HomeLocation = new PointLatLngAlt(
+                    MainV2.comPort.MAV.cs.HomeLocation.Lat,
+                    MainV2.comPort.MAV.cs.HomeLocation.Lng,
+                    0)
+            };
+            #endregion
+
+            // Get calculations
+            double available = FlightPlanAnalyzer.AvailableAh(powerInfo);
+            double required = FlightPlanAnalyzer.RequiredAh(flightPlanInfo, uavInfo, SafetyMarginPercent);
+            string result = available >= required ? "" : "not ";
+            double remaining = Math.Max(0, available - required);
+
+            // Announce result
+            Task.Run(() =>
+            {
+                CustomMessageBox.Show($"Flightplan is {result}possible\n\nRequired capacity: {(int)(required * 1000)}mAh\nAvailable capacity: {(int)(available * 1000)}mAh\nRemaining capacity: {(int)(remaining * 1000)}mAh", "Flightplan check", MessageBoxButtons.OK);
+            });
+            return;
         }
 
         #endregion

@@ -530,6 +530,10 @@
       <Project>{e12dbd68-f282-491a-be11-5e6ff21932c1}</Project>
       <Name>MV04.Camera</Name>
     </ProjectReference>
+    <ProjectReference Include="ExtLibs\MV04.FlightPlanAnalyzer\MV04.FlightPlanAnalyzer.csproj">
+      <Project>{644D7E6A-E43E-4CF1-B6AC-9974E5E93048}</Project>
+      <Name>MV04.FlightPlanAnalyzer</Name>
+    </ProjectReference>
     <ProjectReference Include="ExtLibs\MV04.Joystick\MV04.Joystick.csproj">
       <Project>{493588B5-2F58-402B-A315-DA5153DDD9CC}</Project>
       <Name>MV04.Joystick</Name>
