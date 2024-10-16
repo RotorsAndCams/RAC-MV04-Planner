@@ -1,4 +1,4 @@
-﻿namespace MV04.Settings
+﻿namespace MissionPlanner.GCSViews
 {
     partial class uc_CameraSettings
     {
@@ -60,10 +60,10 @@
             this.radioButton_AutoConnect_Yes = new System.Windows.Forms.RadioButton();
             this.lb_AutoRecord = new System.Windows.Forms.Label();
             this.comboBox_cameraStreamChannel = new System.Windows.Forms.ComboBox();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.button_Cancel = new System.Windows.Forms.Button();
             this.button_Save = new System.Windows.Forms.Button();
             this.lb_AutoStartSingleYaw = new System.Windows.Forms.Label();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.button_Cancel = new System.Windows.Forms.Button();
             this.tlp_Base.SuspendLayout();
             this.tlp_SYAutoStart.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -109,20 +109,20 @@
             this.tlp_Base.Location = new System.Drawing.Point(0, 0);
             this.tlp_Base.Name = "tlp_Base";
             this.tlp_Base.RowCount = 13;
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.69287F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.692101F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.689729F));
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.689467F));
-            this.tlp_Base.Size = new System.Drawing.Size(392, 384);
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.395222F));
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.25732F));
+            this.tlp_Base.Size = new System.Drawing.Size(400, 407);
             this.tlp_Base.TabIndex = 26;
             // 
             // tlp_SYAutoStart
@@ -133,11 +133,11 @@
             this.tlp_SYAutoStart.Controls.Add(this.rb_NoSY, 1, 0);
             this.tlp_SYAutoStart.Controls.Add(this.rb_YesSY, 0, 0);
             this.tlp_SYAutoStart.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tlp_SYAutoStart.Location = new System.Drawing.Point(153, 322);
+            this.tlp_SYAutoStart.Location = new System.Drawing.Point(153, 333);
             this.tlp_SYAutoStart.Name = "tlp_SYAutoStart";
             this.tlp_SYAutoStart.RowCount = 1;
             this.tlp_SYAutoStart.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlp_SYAutoStart.Size = new System.Drawing.Size(236, 23);
+            this.tlp_SYAutoStart.Size = new System.Drawing.Size(244, 24);
             this.tlp_SYAutoStart.TabIndex = 36;
             // 
             // rb_NoSY
@@ -172,11 +172,11 @@
             this.tableLayoutPanel1.Controls.Add(this.rb_AutoRecordNo, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.rb_AutoRecordYes, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(153, 293);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(153, 303);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(236, 23);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(244, 24);
             this.tableLayoutPanel1.TabIndex = 33;
             // 
             // rb_AutoRecordNo
@@ -213,17 +213,17 @@
             "BlackHot",
             "Color",
             "ColorInverse"});
-            this.comboBox_IrColorMode.Location = new System.Drawing.Point(153, 149);
+            this.comboBox_IrColorMode.Location = new System.Drawing.Point(153, 154);
             this.comboBox_IrColorMode.Name = "comboBox_IrColorMode";
-            this.comboBox_IrColorMode.Size = new System.Drawing.Size(236, 21);
+            this.comboBox_IrColorMode.Size = new System.Drawing.Size(244, 21);
             this.comboBox_IrColorMode.TabIndex = 15;
             // 
             // textBox_cameraControlPort
             // 
             this.textBox_cameraControlPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_cameraControlPort.Location = new System.Drawing.Point(153, 62);
+            this.textBox_cameraControlPort.Location = new System.Drawing.Point(153, 65);
             this.textBox_cameraControlPort.Name = "textBox_cameraControlPort";
-            this.textBox_cameraControlPort.Size = new System.Drawing.Size(236, 20);
+            this.textBox_cameraControlPort.Size = new System.Drawing.Size(244, 20);
             this.textBox_cameraControlPort.TabIndex = 18;
             // 
             // comboBox_coordFormat
@@ -234,9 +234,9 @@
             this.comboBox_coordFormat.Items.AddRange(new object[] {
             "WGS84",
             "MGRS"});
-            this.comboBox_coordFormat.Location = new System.Drawing.Point(153, 178);
+            this.comboBox_coordFormat.Location = new System.Drawing.Point(153, 184);
             this.comboBox_coordFormat.Name = "comboBox_coordFormat";
-            this.comboBox_coordFormat.Size = new System.Drawing.Size(236, 21);
+            this.comboBox_coordFormat.Size = new System.Drawing.Size(244, 21);
             this.comboBox_coordFormat.TabIndex = 6;
             // 
             // comboBox_altFormat
@@ -247,9 +247,9 @@
             this.comboBox_altFormat.Items.AddRange(new object[] {
             "m",
             "ft"});
-            this.comboBox_altFormat.Location = new System.Drawing.Point(153, 207);
+            this.comboBox_altFormat.Location = new System.Drawing.Point(153, 214);
             this.comboBox_altFormat.Name = "comboBox_altFormat";
-            this.comboBox_altFormat.Size = new System.Drawing.Size(236, 21);
+            this.comboBox_altFormat.Size = new System.Drawing.Size(244, 21);
             this.comboBox_altFormat.TabIndex = 7;
             // 
             // comboBox_distFormat
@@ -261,9 +261,9 @@
             "m",
             "km",
             "ft"});
-            this.comboBox_distFormat.Location = new System.Drawing.Point(153, 236);
+            this.comboBox_distFormat.Location = new System.Drawing.Point(153, 244);
             this.comboBox_distFormat.Name = "comboBox_distFormat";
-            this.comboBox_distFormat.Size = new System.Drawing.Size(236, 21);
+            this.comboBox_distFormat.Size = new System.Drawing.Size(244, 21);
             this.comboBox_distFormat.TabIndex = 8;
             // 
             // comboBox_speedFormat
@@ -275,9 +275,9 @@
             "mps",
             "kmph",
             "knots"});
-            this.comboBox_speedFormat.Location = new System.Drawing.Point(153, 265);
+            this.comboBox_speedFormat.Location = new System.Drawing.Point(153, 274);
             this.comboBox_speedFormat.Name = "comboBox_speedFormat";
-            this.comboBox_speedFormat.Size = new System.Drawing.Size(236, 21);
+            this.comboBox_speedFormat.Size = new System.Drawing.Size(244, 21);
             this.comboBox_speedFormat.TabIndex = 9;
             // 
             // label5
@@ -294,16 +294,16 @@
             // textBox_cameraIp
             // 
             this.textBox_cameraIp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_cameraIp.Location = new System.Drawing.Point(153, 4);
+            this.textBox_cameraIp.Location = new System.Drawing.Point(153, 5);
             this.textBox_cameraIp.Name = "textBox_cameraIp";
-            this.textBox_cameraIp.Size = new System.Drawing.Size(236, 20);
+            this.textBox_cameraIp.Size = new System.Drawing.Size(244, 20);
             this.textBox_cameraIp.TabIndex = 13;
             // 
             // label11
             // 
             this.label11.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(3, 124);
+            this.label11.Location = new System.Drawing.Point(3, 128);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(128, 13);
             this.label11.TabIndex = 24;
@@ -314,7 +314,7 @@
             // 
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(3, 37);
+            this.label6.Location = new System.Drawing.Point(3, 38);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(122, 13);
             this.label6.TabIndex = 11;
@@ -325,7 +325,7 @@
             // 
             this.label7.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(3, 153);
+            this.label7.Location = new System.Drawing.Point(3, 158);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(64, 13);
             this.label7.TabIndex = 14;
@@ -336,7 +336,7 @@
             // 
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(3, 269);
+            this.label4.Location = new System.Drawing.Point(3, 278);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(123, 13);
             this.label4.TabIndex = 5;
@@ -347,7 +347,7 @@
             // 
             this.label10.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(3, 95);
+            this.label10.Location = new System.Drawing.Point(3, 98);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(92, 13);
             this.label10.TabIndex = 20;
@@ -358,7 +358,7 @@
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 240);
+            this.label3.Location = new System.Drawing.Point(3, 248);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(120, 13);
             this.label3.TabIndex = 4;
@@ -369,7 +369,7 @@
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 182);
+            this.label1.Location = new System.Drawing.Point(3, 188);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(104, 13);
             this.label1.TabIndex = 2;
@@ -380,7 +380,7 @@
             // 
             this.label8.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 66);
+            this.label8.Location = new System.Drawing.Point(3, 68);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(107, 13);
             this.label8.TabIndex = 17;
@@ -391,7 +391,7 @@
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 211);
+            this.label2.Location = new System.Drawing.Point(3, 218);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(125, 13);
             this.label2.TabIndex = 3;
@@ -406,18 +406,18 @@
             this.tableLayoutPanel2.Controls.Add(this.label13, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.numericUpDown_VideoSegmentLength, 0, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(153, 119);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(153, 123);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(236, 23);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(244, 24);
             this.tableLayoutPanel2.TabIndex = 30;
             // 
             // label13
             // 
             this.label13.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(221, 5);
+            this.label13.Location = new System.Drawing.Point(229, 5);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(12, 13);
             this.label13.TabIndex = 26;
@@ -428,7 +428,7 @@
             this.numericUpDown_VideoSegmentLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.numericUpDown_VideoSegmentLength.Location = new System.Drawing.Point(3, 3);
             this.numericUpDown_VideoSegmentLength.Name = "numericUpDown_VideoSegmentLength";
-            this.numericUpDown_VideoSegmentLength.Size = new System.Drawing.Size(212, 20);
+            this.numericUpDown_VideoSegmentLength.Size = new System.Drawing.Size(220, 20);
             this.numericUpDown_VideoSegmentLength.TabIndex = 0;
             // 
             // tableLayoutPanel4
@@ -439,11 +439,11 @@
             this.tableLayoutPanel4.Controls.Add(this.radioButton_AutoConnect_No, 1, 0);
             this.tableLayoutPanel4.Controls.Add(this.radioButton_AutoConnect_Yes, 0, 0);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(153, 90);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(153, 93);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 1;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(236, 23);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(244, 24);
             this.tableLayoutPanel4.TabIndex = 31;
             // 
             // radioButton_AutoConnect_No
@@ -474,7 +474,7 @@
             // 
             this.lb_AutoRecord.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lb_AutoRecord.AutoSize = true;
-            this.lb_AutoRecord.Location = new System.Drawing.Point(3, 298);
+            this.lb_AutoRecord.Location = new System.Drawing.Point(3, 308);
             this.lb_AutoRecord.Name = "lb_AutoRecord";
             this.lb_AutoRecord.Size = new System.Drawing.Size(134, 13);
             this.lb_AutoRecord.TabIndex = 32;
@@ -488,47 +488,19 @@
             this.comboBox_cameraStreamChannel.Items.AddRange(new object[] {
             "0",
             "1"});
-            this.comboBox_cameraStreamChannel.Location = new System.Drawing.Point(153, 33);
+            this.comboBox_cameraStreamChannel.Location = new System.Drawing.Point(153, 34);
             this.comboBox_cameraStreamChannel.Name = "comboBox_cameraStreamChannel";
-            this.comboBox_cameraStreamChannel.Size = new System.Drawing.Size(236, 21);
+            this.comboBox_cameraStreamChannel.Size = new System.Drawing.Size(244, 21);
             this.comboBox_cameraStreamChannel.TabIndex = 34;
-            // 
-            // tableLayoutPanel3
-            // 
-            this.tableLayoutPanel3.ColumnCount = 2;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel3.Controls.Add(this.button_Cancel, 1, 0);
-            this.tableLayoutPanel3.Controls.Add(this.button_Save, 0, 0);
-            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(153, 351);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 1;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(236, 30);
-            this.tableLayoutPanel3.TabIndex = 29;
-            // 
-            // button_Cancel
-            // 
-            this.button_Cancel.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.button_Cancel.BackColor = System.Drawing.Color.Black;
-            this.button_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.button_Cancel.Location = new System.Drawing.Point(158, 4);
-            this.button_Cancel.Name = "button_Cancel";
-            this.button_Cancel.Size = new System.Drawing.Size(75, 22);
-            this.button_Cancel.TabIndex = 1;
-            this.button_Cancel.Text = "Reset";
-            this.button_Cancel.UseVisualStyleBackColor = false;
-            this.button_Cancel.Click += new System.EventHandler(this.button_Cancel_Click);
             // 
             // button_Save
             // 
-            this.button_Save.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.button_Save.BackColor = System.Drawing.Color.Black;
             this.button_Save.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.button_Save.Location = new System.Drawing.Point(77, 4);
+            this.button_Save.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button_Save.Location = new System.Drawing.Point(3, 3);
             this.button_Save.Name = "button_Save";
-            this.button_Save.Size = new System.Drawing.Size(75, 22);
+            this.button_Save.Size = new System.Drawing.Size(116, 35);
             this.button_Save.TabIndex = 0;
             this.button_Save.Text = "Save";
             this.button_Save.UseVisualStyleBackColor = false;
@@ -538,11 +510,39 @@
             // 
             this.lb_AutoStartSingleYaw.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lb_AutoStartSingleYaw.AutoSize = true;
-            this.lb_AutoStartSingleYaw.Location = new System.Drawing.Point(3, 327);
+            this.lb_AutoStartSingleYaw.Location = new System.Drawing.Point(3, 338);
             this.lb_AutoStartSingleYaw.Name = "lb_AutoStartSingleYaw";
             this.lb_AutoStartSingleYaw.Size = new System.Drawing.Size(101, 13);
             this.lb_AutoStartSingleYaw.TabIndex = 35;
             this.lb_AutoStartSingleYaw.Text = "AutoStartSingleYaw";
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.ColumnCount = 2;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.Controls.Add(this.button_Cancel, 1, 0);
+            this.tableLayoutPanel3.Controls.Add(this.button_Save, 0, 0);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(153, 363);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 1;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(244, 41);
+            this.tableLayoutPanel3.TabIndex = 29;
+            // 
+            // button_Cancel
+            // 
+            this.button_Cancel.BackColor = System.Drawing.Color.Black;
+            this.button_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.button_Cancel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button_Cancel.Location = new System.Drawing.Point(125, 3);
+            this.button_Cancel.Name = "button_Cancel";
+            this.button_Cancel.Size = new System.Drawing.Size(116, 35);
+            this.button_Cancel.TabIndex = 1;
+            this.button_Cancel.Text = "Reset";
+            this.button_Cancel.UseVisualStyleBackColor = false;
+            this.button_Cancel.Click += new System.EventHandler(this.button_Cancel_Click);
             // 
             // uc_CameraSettings
             // 
@@ -550,7 +550,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tlp_Base);
             this.Name = "uc_CameraSettings";
-            this.Size = new System.Drawing.Size(392, 384);
+            this.Size = new System.Drawing.Size(400, 407);
             this.tlp_Base.ResumeLayout(false);
             this.tlp_Base.PerformLayout();
             this.tlp_SYAutoStart.ResumeLayout(false);
@@ -587,9 +587,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.Button button_Save;
-        private System.Windows.Forms.Button button_Cancel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.NumericUpDown numericUpDown_VideoSegmentLength;
@@ -605,5 +603,7 @@
         private System.Windows.Forms.RadioButton rb_NoSY;
         private System.Windows.Forms.RadioButton rb_YesSY;
         private System.Windows.Forms.Label lb_AutoStartSingleYaw;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.Button button_Cancel;
     }
 }

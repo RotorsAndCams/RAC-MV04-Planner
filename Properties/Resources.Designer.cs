@@ -493,6 +493,16 @@ namespace MissionPlanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap connect_50 {
+            get {
+                object obj = ResourceManager.GetObject("connect-50", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap dark_connect_icon {
             get {
                 object obj = ResourceManager.GetObject("dark_connect_icon", resourceCulture);
@@ -576,6 +586,16 @@ namespace MissionPlanner.Properties {
         public static System.Drawing.Bitmap dark_tuningconfig_icon {
             get {
                 object obj = ResourceManager.GetObject("dark_tuningconfig_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap day_camera_50 {
+            get {
+                object obj = ResourceManager.GetObject("day-camera-50", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1361,6 +1381,16 @@ namespace MissionPlanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap more_50 {
+            get {
+                object obj = ResourceManager.GetObject("more-50", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap motion_sensor_30 {
             get {
                 object obj = ResourceManager.GetObject("motion-sensor-30", resourceCulture);
@@ -1384,6 +1414,16 @@ namespace MissionPlanner.Properties {
         public static System.Drawing.Bitmap new_3DR_04 {
             get {
                 object obj = ResourceManager.GetObject("new-3DR-04", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap night_camera_50 {
+            get {
+                object obj = ResourceManager.GetObject("night-camera-50", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

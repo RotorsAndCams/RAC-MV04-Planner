@@ -152,6 +152,9 @@
     <EmbeddedResource Include="GCSViews\CameraFullScreenForm.resx">
       <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\CameraSettingsForm.resx">
+      <DependentUpon>CameraSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\CameraView.resx">
       <DependentUpon>CameraView.cs</DependentUpon>
     </EmbeddedResource>
@@ -317,6 +320,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\SITL.uk.resx">
       <DependentUpon>SITL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\uc_CameraSettings.resx">
+      <DependentUpon>uc_CameraSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GeoRef\georefimage.uk.resx">
       <DependentUpon>georefimage.cs</DependentUpon>
@@ -880,6 +886,12 @@
     <Compile Include="GCSViews\CameraFullScreenForm.Designer.cs">
       <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GCSViews\CameraSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSViews\CameraSettingsForm.Designer.cs">
+      <DependentUpon>CameraSettingsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GCSViews\CameraView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -1011,6 +1023,12 @@
     </Compile>
     <Compile Include="GCSViews\GstreamerTestForm.Designer.cs">
       <DependentUpon>GstreamerTestForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GCSViews\uc_CameraSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GCSViews\uc_CameraSettings.Designer.cs">
+      <DependentUpon>uc_CameraSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\VideoRecorder.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -4910,6 +4928,10 @@
     <Content Include="Drivers\CubeOrangePlus.inf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="ExtLibs\MV04.Camera\Resources\day-camera-50.png" />
+    <None Include="ExtLibs\MV04.Camera\Resources\night-camera-50.png" />
+    <None Include="ExtLibs\MV04.Camera\Resources\connect-50.png" />
+    <None Include="ExtLibs\MV04.Camera\Resources\more-50.png" />
     <Content Include="mavutil.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

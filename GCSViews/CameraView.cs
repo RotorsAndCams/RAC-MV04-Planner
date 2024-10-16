@@ -72,6 +72,10 @@ namespace MissionPlanner.GCSViews
         public const int _minAllowedAltitudeValue = 50;
 
         private bool _tripSwitchedOff = false;
+        public bool TripSwitchedOff
+        {
+            get { return _tripSwitchedOff; }
+        }
 
         Image img;
         private readonly object _bgimagelock = new object();
@@ -113,6 +117,7 @@ namespace MissionPlanner.GCSViews
         public CameraView()
         {
             MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
+            _tripSwitchedOff = false;
 
             log.Info("Constructor");
             InitializeComponent();
@@ -1484,11 +1489,8 @@ namespace MissionPlanner.GCSViews
         {
             if (_tripSwitchedOff)
             {
-                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
-                _tripSwitchedOff = false;
-
+                SwitchOnTrip();
                 ReconnectCameraStreamAndControl();
-                btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
             }
             else
             {
@@ -1498,6 +1500,17 @@ namespace MissionPlanner.GCSViews
             }
 
 
+        }
+
+        public void SwitchOnTrip()
+        {
+            if (_tripSwitchedOff)
+            {
+                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
+                _tripSwitchedOff = false;
+
+                btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
+            }
         }
 
         /// <summary>

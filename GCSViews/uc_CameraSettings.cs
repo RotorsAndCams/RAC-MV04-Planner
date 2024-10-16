@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MV04.Settings;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace MV04.Settings
+namespace MissionPlanner.GCSViews
 {
     public partial class uc_CameraSettings : UserControl
     {

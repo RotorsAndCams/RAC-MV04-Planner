@@ -1,4 +1,4 @@
-﻿using MissionPlanner.Utilities;
+﻿using MV04.Camera;
 using MV04.Settings;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace MV04.Camera
+namespace MissionPlanner.GCSViews
 {
     public partial class CameraSettingsForm : Form
     {
@@ -62,6 +62,8 @@ namespace MV04.Camera
             if (isReconnecting)
                 return;
 
+            CameraView.instance.SwitchOnTrip();
+
             this.btn_Reconnect.Enabled = false;
 
             await Task.Run(() => {
@@ -82,7 +84,7 @@ namespace MV04.Camera
                     int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
                 isReconnecting = false;
-                
+
             }
             catch (Exception ex)
             {
