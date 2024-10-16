@@ -48,6 +48,15 @@ namespace MV04.FlightPlanAnalyzer
         }
 
         /// <summary>
+        /// Container for wind info
+        /// </summary>
+        public struct WindInfo
+        {
+            public double Heading;
+            public double Speed;
+        }
+
+        /// <summary>
         /// Contaner for flightplan info
         /// </summary>
         public struct FlightPlanInfo
@@ -64,27 +73,10 @@ namespace MV04.FlightPlanAnalyzer
 
         private static readonly double S_TO_H = 1.0 / H_TO_S;
 
-        /*private static (double AirSpeed, double Consumption)[] AirSpeedConsumptionTable =
-        {
-            // TODO: Populate AirSpeedConsumptionTable with measurements
-            (10, 5),
-            (20, 12)
-        };*/
+        private static double DEG_TO_RAD = Math.PI / 180.0;
         #endregion
 
         #region Methods
-        /*private static double AirSpeedToAh(double airSpeed)
-        {
-            double slope = 0;
-            for (int i = 0; i < AirSpeedConsumptionTable.Length; i++)
-            {
-                slope += AirSpeedConsumptionTable[i].Consumption / AirSpeedConsumptionTable[i].AirSpeed;
-            }
-            slope /= AirSpeedConsumptionTable.Length;
-
-            return airSpeed * slope;
-        }*/
-
         /// <summary>
         /// Calculate the available power in the UAV battery
         /// </summary>
@@ -101,34 +93,19 @@ namespace MV04.FlightPlanAnalyzer
             // TODO: Replace BatteryVoltsToAh with more precise (non-linear) function
         }
 
-        private static double GetDistance(PointLatLngAlt pos1, PointLatLngAlt pos2)
-        {
-            // Convert degrees to radians
-            double radLat1 = Math.PI * pos1.Lat / 180;
-            double radLat2 = Math.PI * pos2.Lat / 180;
-            double radLonDiff = Math.PI * (pos2.Lng - pos1.Lng) / 180;
-
-            // Haversine formula
-            double haversine = Math.Pow(Math.Sin((radLat2 - radLat1) / 2), 2) +
-                              Math.Cos(radLat1) * Math.Cos(radLat2) *
-                              Math.Pow(Math.Sin(radLonDiff / 2), 2);
-
-            // Earth's radius in meters
-            double earthRadiusMeters = 6371000; // 6371 kilometers * 1000 meters/kilometer
-
-            // Calculate distance in meters
-            double distanceMeters = 2 * earthRadiusMeters * Math.Asin(Math.Sqrt(haversine));
-
-            return distanceMeters;
-        }
-
-        private static double PointsToAh(PointLatLngAlt pos1, PointLatLngAlt pos2, double travelSpeed, double travelConsumption, double climbSpeed, double climbConsumption, double descSpeed, double descConsumption)
+        private static double PointsToAh(PointLatLngAlt pos1, PointLatLngAlt pos2, UAVInfo uavInfo, WindInfo windInfo)
         {
             // Horizontal component
-            double horizontalDist = GetDistance(pos1, pos2);                            // m
-            double horizontalTime = horizontalDist / travelSpeed;                       // s
-            double horizontalConsumption = horizontalTime * S_TO_H * travelConsumption; // Ah
-            // TODO: Include the wind in the horizontal calculation
+            double horizontalDist = pos1.GetDistance(pos2); // m
+            double horizontalTime = horizontalDist / uavInfo.TravelSpeed; // s
+
+            double heading = pos1.GetBearing(pos2);
+            double windParallel = windInfo.Speed * Math.Cos((windInfo.Heading * DEG_TO_RAD) - (heading * DEG_TO_RAD));
+            double windPerpendicular = windInfo.Speed * Math.Sin((windInfo.Heading * DEG_TO_RAD) - (heading * DEG_TO_RAD));
+            double windyTravelSpeed = Math.Sqrt(Math.Pow(uavInfo.TravelSpeed + windParallel, 2) + Math.Pow(windPerpendicular, 2));
+            double windyTravelConsumption = uavInfo.TravelConsumption * (windyTravelSpeed / uavInfo.TravelSpeed); // Ah
+            
+            double horizontalConsumption = horizontalTime * S_TO_H * windyTravelConsumption; // Ah
 
             // Vertical component
             double verticalDist = Math.Abs(pos1.Alt - pos2.Alt),    // m
@@ -136,13 +113,13 @@ namespace MV04.FlightPlanAnalyzer
                    verticalConsumption;                             // A
             if (pos1.Alt < pos2.Alt) // Climbing
             {
-                verticalTime = verticalDist / climbSpeed;                       // s
-                verticalConsumption = verticalTime * S_TO_H * climbConsumption; // Ah
+                verticalTime = verticalDist / uavInfo.ClimbSpeed;                       // s
+                verticalConsumption = verticalTime * S_TO_H * uavInfo.ClimbConsumption; // Ah
             }
             else // Descending
             {
-                verticalTime = verticalDist / descSpeed;                        // s
-                verticalConsumption = verticalTime * S_TO_H * descConsumption;  // Ah
+                verticalTime = verticalDist / uavInfo.DescSpeed;                        // s
+                verticalConsumption = verticalTime * S_TO_H * uavInfo.DescConsumption;  // Ah
             }
 
             return horizontalConsumption + verticalConsumption;
@@ -155,11 +132,12 @@ namespace MV04.FlightPlanAnalyzer
         /// <param name="uavInfo">UAV info container</param>
         /// <param name="safetyMarginPercentage">Safety margin to add to result in percentages(%)</param>
         /// <returns>Amp-hours required</returns>
-        public static double RequiredAh(FlightPlanInfo flightPlanInfo, UAVInfo uavInfo, int safetyMarginPercentage = 0)
+        public static double RequiredAh(FlightPlanInfo flightPlanInfo, UAVInfo uavInfo, WindInfo windInfo, int safetyMarginPercentage = 0)
         {
             // Check input data
             if (!IsFlightPlanInfoCorrect(flightPlanInfo)
                 || !IsUAVInfoCorrect(uavInfo)
+                || !IsWindInfoCorrect(windInfo)
                 || safetyMarginPercentage < 0
                 || safetyMarginPercentage > 100)
             {
@@ -170,8 +148,7 @@ namespace MV04.FlightPlanAnalyzer
             // Filter & sort nav commands
             List<ushort> navCmdIds = new List<ushort>
             {
-                (ushort)MAV_CMD.WAYPOINT,
-                (ushort)MAV_CMD.RETURN_TO_LAUNCH
+                (ushort)MAV_CMD.WAYPOINT
             };
 
             ushort rtlSeq = flightPlanInfo.FlightPlan.Count(c => c.Value.command == (ushort)MAV_CMD.RETURN_TO_LAUNCH) > 0 ?
@@ -182,7 +159,7 @@ namespace MV04.FlightPlanAnalyzer
             foreach (KeyValuePair<int, mavlink_mission_item_int_t> missionItem in flightPlanInfo.FlightPlan)
             {
                 if (missionItem.Value.seq >= flightPlanInfo.NextWP
-                    && missionItem.Value.seq <= rtlSeq
+                    && missionItem.Value.seq < rtlSeq // Do not include RTL
                     && navCmdIds.Contains(missionItem.Value.command))
                 {
                     nextNavOnly.Add(new MissionItem()
@@ -209,15 +186,13 @@ namespace MV04.FlightPlanAnalyzer
                         segments.Add((lastPos, thisPos));
                         lastPos = thisPos;
                         break;
-                    case MAV_CMD.RETURN_TO_LAUNCH:
-                        segments.Add((lastPos, flightPlanInfo.HomeLocation));
-                        break;
                     default: break;
                 }
             }
+            segments.Add((lastPos, flightPlanInfo.HomeLocation)); // Add RTL at the end
 
             // Calculate & sum segment consumptions (+ safety margin)
-            return segments.Sum(s => PointsToAh(s.pos1, s.pos2, uavInfo.TravelSpeed, uavInfo.TravelConsumption, uavInfo.ClimbSpeed, uavInfo.ClimbConsumption, uavInfo.DescSpeed, uavInfo.DescConsumption)) * (1 + ((double)safetyMarginPercentage / 100));
+            return segments.Sum(s => PointsToAh(s.pos1, s.pos2, uavInfo, windInfo)) * (1 + ((double)safetyMarginPercentage / 100));
         }
 
         private static bool IsPowerInfoCorrect(PowerInfo powerInfo)
@@ -258,6 +233,13 @@ namespace MV04.FlightPlanAnalyzer
                 && 0 < uavInfo.DescConsumption;
         }
 
+        private static bool IsWindInfoCorrect(WindInfo windInfo)
+        {
+            return windInfo.Heading >= 0
+                && windInfo.Heading < 360 // 360° = 0°
+                && windInfo.Speed >= 0;
+        }
+
         /// <summary>
         /// Determines if there is enough power in the UAV battery to execute the given flightplan
         /// </summary>
@@ -266,10 +248,10 @@ namespace MV04.FlightPlanAnalyzer
         /// <param name="uavInfo">UAV speed & power consumption info container</param>
         /// <param name="safetyMarginPercentage">Safety margin to add to the required power in percentages(%)</param>
         /// <returns>True, if there is enough power in the UAV battery to execute the given flightplan</returns>
-        public static bool IsFlightPlanPossible(PowerInfo powerInfo, FlightPlanInfo flightPlanInfo, UAVInfo uavInfo, int safetyMarginPercentage = 0)
+        public static bool IsFlightPlanPossible(PowerInfo powerInfo, FlightPlanInfo flightPlanInfo, UAVInfo uavInfo, WindInfo windInfo, int safetyMarginPercentage = 0)
         {
             // Calculate
-            double requiredAh = RequiredAh(flightPlanInfo, uavInfo, safetyMarginPercentage);
+            double requiredAh = RequiredAh(flightPlanInfo, uavInfo, windInfo, safetyMarginPercentage);
             double availableAh = AvailableAh(powerInfo);
 
             // Return

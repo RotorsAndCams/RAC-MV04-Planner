@@ -149,6 +149,9 @@
     <EmbeddedResource Include="Controls\Vibration.uk.resx">
       <DependentUpon>Vibration.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\WindInputForm.resx">
+      <DependentUpon>WindInputForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\CameraFullScreenForm.resx">
       <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -872,6 +875,10 @@
     </Compile>
     <Compile Include="Controls\FollowMe.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\WindInputForm.cs" />
+    <Compile Include="Controls\WindInputForm.Designer.cs">
+      <DependentUpon>WindInputForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\BitMapEventArgs.cs" />
     <Compile Include="GCSViews\CameraFullScreenForm.cs">

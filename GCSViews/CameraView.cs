@@ -34,6 +34,7 @@ using Accord.Video.FFMPEG;
 using MV04.SingleYaw;
 using MV04.FlightPlanAnalyzer;
 using System.Timers;
+using MissionPlanner.Controls;
 
 namespace MissionPlanner.GCSViews
 {
@@ -1717,7 +1718,7 @@ namespace MissionPlanner.GCSViews
         /// <summary>
         /// Determine if there is enough energy in the UAV battery to execute the uploaded flightplan
         /// </summary>
-        private void CheckFlightPlan()
+        private async void CheckFlightPlan()
         {
             // Check for connection
             if (MainV2.comPort == null
@@ -1797,7 +1798,22 @@ namespace MissionPlanner.GCSViews
 
             Settings.Instance.Save();
             #endregion
-            
+
+            #region Wind form read
+            WindInputFormData windData = new WindInputFormData()
+            {
+                WindDir = 0,
+                WindSpeed = 0
+            };
+            using (WindInputForm form = new WindInputForm(windData))
+            {
+                if (await Task.Run(() => form.ShowDialog()) == DialogResult.OK)
+                {
+                    windData = form.ReturnData;
+                }
+            }
+            #endregion
+
             #region Struct creation
             FlightPlanAnalyzer.PowerInfo powerInfo = new FlightPlanAnalyzer.PowerInfo()
             {
@@ -1830,11 +1846,17 @@ namespace MissionPlanner.GCSViews
                     MainV2.comPort.MAV.cs.HomeLocation.Lng,
                     0)
             };
+
+            FlightPlanAnalyzer.WindInfo windInfo = new FlightPlanAnalyzer.WindInfo()
+            {
+                Heading = windData.WindDir,
+                Speed = windData.WindSpeed
+            };
             #endregion
 
             // Get calculations
             double available = FlightPlanAnalyzer.AvailableAh(powerInfo);
-            double required = FlightPlanAnalyzer.RequiredAh(flightPlanInfo, uavInfo, SafetyMarginPercent);
+            double required = FlightPlanAnalyzer.RequiredAh(flightPlanInfo, uavInfo, windInfo, SafetyMarginPercent);
             string result = available >= required ? "" : "not ";
             double remaining = Math.Max(0, available - required);
 
