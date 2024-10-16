@@ -1318,13 +1318,13 @@ namespace MissionPlanner
             // Get calculations
             double available = FlightPlanAnalyzer.AvailableAh(powerInfo);
             double required = FlightPlanAnalyzer.RequiredAh(flightPlanInfo, uavInfo, windInfo, SafetyMarginPercent);
-            string result = available >= required ? "" : "not ";
+            string result = available >= required ? "" : "NOT ";
             double remaining = Math.Max(0, available - required);
 
             // Announce result
             Task.Run(() =>
             {
-                CustomMessageBox.Show($"Flightplan is {result}possible\n\nRequired capacity: {(int)(required * 1000)}mAh\nAvailable capacity: {(int)(available * 1000)}mAh\nRemaining capacity: {(int)(remaining * 1000)}mAh", "Flightplan check", MessageBoxButtons.OK);
+                CustomMessageBox.Show($"Flightplan is {result}possible", "Flightplan check", MessageBoxButtons.OK);
             });
             return;
         }
