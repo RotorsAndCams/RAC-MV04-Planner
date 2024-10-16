@@ -93,7 +93,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        public event EventHandler event_ReconnectRequested;
         public event EventHandler event_StartStopRecording;
 
 
