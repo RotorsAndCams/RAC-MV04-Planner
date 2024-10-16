@@ -303,7 +303,7 @@ namespace MissionPlanner.GCSViews
                 {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
                 {"Feed telemetry", () => { StartFeed(); }},
                 {"Stop Feed telemetry", () => { StopFeed(); }},
-                {"Check Flightplan", async () => { MainV2.CheckFlightPlan(null, new MV04StateChangeEventArgs(){NewState = MV04_State.Auto}); }}
+                {"Check Flightplan", async () => { MainV2.CheckFlightPlan(null, new MV04StateChangeEventArgs(){PreviousState = MV04_State.Manual, NewState = MV04_State.Auto}); }}
             };
 
             #endregion

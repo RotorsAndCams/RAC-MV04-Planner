@@ -1176,7 +1176,7 @@ namespace MissionPlanner
         public async static void CheckFlightPlan(object sender, MV04StateChangeEventArgs e)
         {
             // Check for Auto mode
-            if (e.NewState != MV04_State.Auto)
+            if (e.NewState != MV04_State.Auto || e.PreviousState == MV04_State.Auto)
             {
                 return;
             }
