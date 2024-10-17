@@ -54,7 +54,7 @@ namespace MV04.Settings
                     // Define settings and default values
                     _SettingCollection = new HashSet<SettingItem>
                     {
-                        new SettingItem(Setting.CameraIP, "192.168.0.203", value =>
+                        new SettingItem(Setting.CameraIP, "192.168.69.203", value =>
                             !string.IsNullOrWhiteSpace(value)
                             && value.Count(c => c == '.') == 3
                             && value.Split('.').Length == 4
