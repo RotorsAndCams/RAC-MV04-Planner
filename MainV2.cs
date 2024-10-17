@@ -39,6 +39,8 @@ using MissionPlanner.Joystick;
 using System.Net;
 using Newtonsoft.Json;
 using MissionPlanner.GCSViews;
+using MV04.State;
+using MV04.FlightPlanAnalyzer;
 
 namespace MissionPlanner
 {
@@ -1165,11 +1167,165 @@ namespace MissionPlanner
             GetUserNameForm frm = new GetUserNameForm();
             frm.ShowDialog();
 
-
-
-            
             this.Text = "Secop Planner 2" + " " + comPort.MAV.VersionString;
             this.ShowIcon = false;
+
+            StateHandler.MV04StateChange += CheckFlightPlan;
+        }
+
+        public async static void CheckFlightPlan(object sender, MV04StateChangeEventArgs ea)
+        {
+            // Check for Auto mode
+            if (ea.NewState != MV04_State.Auto || ea.PreviousState == MV04_State.Auto)
+            {
+                return;
+            }
+
+            // Check for connection
+            if (comPort == null
+                || comPort.BaseStream == null
+                || !comPort.BaseStream.IsOpen)
+            {
+                Task.Run(() =>
+                {
+                    CustomMessageBox.Show("ERROR\n\nNo connection", "Flightplan check", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                });
+                return;
+            }
+
+            // Check for flightplan
+            if (comPort.MAV.wps == null
+                || comPort.MAV.wps.Count == 0)
+            {
+                Task.Run(() =>
+                {
+                    CustomMessageBox.Show("ERROR\n\nNo flightplan", "Flightplan check", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                });
+                return;
+            }
+            
+            // Get input info
+            #region Config read
+            double CellMaxVolts = double.Parse(Settings.Instance["PlanCheck_CellMaxVolts", "4.2"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_CellMaxVolts"] = CellMaxVolts.ToString();
+
+            double CellMinVolts = double.Parse(Settings.Instance["PlanCheck_CellMinVolts", "3.6"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_CellMinVolts"] = CellMinVolts.ToString();
+
+            int CellNum = int.Parse(Settings.Instance["PlanCheck_CellNum", "3"]);
+            Settings.Instance["PlanCheck_CellNum"] = CellNum.ToString();
+
+            double MaxAmpHours = double.Parse(Settings.Instance["PlanCheck_MaxAmpHours", "5"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_MaxAmpHours"] = MaxAmpHours.ToString();
+
+            double TravelSpeed = double.Parse(Settings.Instance["PlanCheck_TravelSpeed", "23"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_TravelSpeed"] = TravelSpeed.ToString();
+
+            double ClimbSpeed = double.Parse(Settings.Instance["PlanCheck_ClimbSpeed", "6"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_ClimbSpeed"] = ClimbSpeed.ToString();
+
+            double DescSpeed = double.Parse(Settings.Instance["PlanCheck_DescSpeed", "5"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_DescSpeed"] = DescSpeed.ToString();
+
+            double TravelConsumption = double.Parse(Settings.Instance["PlanCheck_TravelConsumption", "31"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_TravelConsumption"] = TravelConsumption.ToString();
+
+            double ClimbConsumption = double.Parse(Settings.Instance["PlanCheck_ClimbConsumption", "30"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_ClimbConsumption"] = ClimbConsumption.ToString();
+
+            double DescConsumption = double.Parse(Settings.Instance["PlanCheck_DescConsumption", "28"]
+                .Replace('.', 0.1.ToString()[1])
+                .Replace(',', 0.1.ToString()[1]));
+            Settings.Instance["PlanCheck_DescConsumption"] = DescConsumption.ToString();
+
+            int SafetyMarginPercent = int.Parse(Settings.Instance["PlanCheck_SafetyMarginPercent", "10"]);
+            Settings.Instance["PlanCheck_SafetyMarginPercent"] = SafetyMarginPercent.ToString();
+
+            Settings.Instance.Save();
+            #endregion
+
+            #region Wind form read
+            WindInputFormData windData = new WindInputFormData()
+            {
+                WindDir = 0,
+                WindSpeed = 0
+            };
+            using (WindInputForm form = new WindInputForm(windData))
+            {
+                if (await Task.Run(() => form.ShowDialog()) == DialogResult.OK)
+                {
+                    windData = form.ReturnData;
+                }
+            }
+            #endregion
+
+            #region Struct creation
+            FlightPlanAnalyzer.PowerInfo powerInfo = new FlightPlanAnalyzer.PowerInfo()
+            {
+                MaxVolts = CellNum * CellMaxVolts,
+                MinVolts = CellNum * CellMinVolts,
+                CurrentVolts = comPort.MAV.cs.battery_voltage,
+                FullAmpHours = MaxAmpHours
+            };
+
+            FlightPlanAnalyzer.UAVInfo uavInfo = new FlightPlanAnalyzer.UAVInfo()
+            {
+                TravelSpeed = TravelSpeed, // m/s
+                ClimbSpeed = ClimbSpeed,
+                DescSpeed = DescSpeed,
+                TravelConsumption = TravelConsumption, // A
+                ClimbConsumption = ClimbConsumption,
+                DescConsumption = DescConsumption
+            };
+
+            FlightPlanAnalyzer.FlightPlanInfo flightPlanInfo = new FlightPlanAnalyzer.FlightPlanInfo()
+            {
+                FlightPlan = comPort.MAV.wps,
+                NextWP = (int)comPort.MAV.cs.wpno,
+                UAVLocation = new PointLatLngAlt(
+                    comPort.MAV.cs.Location.Lat,
+                    comPort.MAV.cs.Location.Lng,
+                    comPort.MAV.cs.Location.Alt - comPort.MAV.cs.HomeAlt),
+                HomeLocation = new PointLatLngAlt(
+                    comPort.MAV.cs.HomeLocation.Lat,
+                    comPort.MAV.cs.HomeLocation.Lng,
+                    0)
+            };
+
+            FlightPlanAnalyzer.WindInfo windInfo = new FlightPlanAnalyzer.WindInfo()
+            {
+                Heading = windData.WindDir,
+                Speed = windData.WindSpeed
+            };
+            #endregion
+
+            // Get calculations
+            double available = FlightPlanAnalyzer.AvailableAh(powerInfo);
+            double required = FlightPlanAnalyzer.RequiredAh(flightPlanInfo, uavInfo, windInfo, SafetyMarginPercent);
+            string result = available >= required ? "" : "NOT ";
+            double remaining = Math.Max(0, available - required);
+
+            // Announce result
+            Task.Run(() =>
+            {
+                CustomMessageBox.Show($"Flightplan is {result}possible", "Flightplan check", MessageBoxButtons.OK);
+            });
         }
 
         void cmb_sysid_Click(object sender, EventArgs e)

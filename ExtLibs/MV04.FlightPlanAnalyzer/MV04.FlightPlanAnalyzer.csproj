@@ -34,6 +34,8 @@
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,7 +53,7 @@
       <Name>MAVLink</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj">
-      <Project>{1378A66C-38E4-46F5-A05F-DC04EF7D4D16}</Project>
+      <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
       <Name>MissionPlanner.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
