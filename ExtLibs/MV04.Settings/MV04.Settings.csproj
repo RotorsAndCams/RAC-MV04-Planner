@@ -51,12 +51,6 @@
       <DependentUpon>SettingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SettingManager.cs" />
-    <Compile Include="uc_CameraSettings.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="uc_CameraSettings.Designer.cs">
-      <DependentUpon>uc_CameraSettings.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
@@ -64,9 +58,6 @@
   <ItemGroup>
     <EmbeddedResource Include="SettingForm.resx">
       <DependentUpon>SettingForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="uc_CameraSettings.resx">
-      <DependentUpon>uc_CameraSettings.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

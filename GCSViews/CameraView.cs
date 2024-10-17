@@ -73,6 +73,10 @@ namespace MissionPlanner.GCSViews
         public const int _minAllowedAltitudeValue = 50;
 
         private bool _tripSwitchedOff = false;
+        public bool TripSwitchedOff
+        {
+            get { return _tripSwitchedOff; }
+        }
 
         Image img;
         private readonly object _bgimagelock = new object();
@@ -114,6 +118,7 @@ namespace MissionPlanner.GCSViews
         public CameraView()
         {
             MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
+            _tripSwitchedOff = false;
 
             log.Info("Constructor");
             InitializeComponent();
@@ -184,11 +189,12 @@ namespace MissionPlanner.GCSViews
             this.DoubleBuffered = true;
             pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
 
-            GStreamer.onNewImage += (sender, image) =>
+            GStreamer.onNewImage += async (sender, image) =>
             {
                 try
                 {
-                    if (image == null) return;
+                    if (image == null || CameraView.instance.IsDisposed)
+                        return;
 
                     img = new Bitmap(image.Width, image.Height, 4 * image.Width,
                                 System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
@@ -198,22 +204,25 @@ namespace MissionPlanner.GCSViews
                     if (img == null) return;
 
                     if (InvokeRequired)
-                        Invoke(new Action(() => pb_CameraGstream.Invalidate()));
+                        Invoke(new Action(() => { pb_CameraGstream.Invalidate(); }));
                     else
                         pb_CameraGstream.Invalidate();
-
-                    //
-                    //Task.Factory.StartNew(() => {
-
-                        
-
-                    //});
-                    
 
                 }
                 catch (Exception ex)
                 {
-                    //MessageBox.Show("Gst error" + ex.Message);
+#if DEBUG
+                    
+                    if (reconnectingVideoStream)
+                        return;
+                    reconnectingVideoStream = true;
+                    Thread.Sleep(1000);
+                    GStreamer.StopAll();
+                    Thread.Sleep(1000);
+                    StartCameraStream();
+                    StartCameraControl();
+                    reconnectingVideoStream = false;
+#endif
                 }
             };
 
@@ -241,8 +250,8 @@ namespace MissionPlanner.GCSViews
             this.Controls.Add(lb_FollowDebugText);
             lb_FollowDebugText.BringToFront();
 
-        }
 
+        }
         Label lb_FollowDebugText;
 
 
@@ -270,7 +279,6 @@ namespace MissionPlanner.GCSViews
         /// </summary>
         private void DrawUI()
         {
-            CameraSettingsForm.Instance.event_ReconnectRequested += Form_event_ReconnectRequested;
             CameraSettingsForm.Instance.event_StartStopRecording += CameraSettings_event_StartStopRecording;
             
             // Test functions
@@ -348,6 +356,9 @@ namespace MissionPlanner.GCSViews
             PointLatLngAlt target = new PointLatLngAlt();
             _feedTimer.Interval = 10000;
             _feedTimer.Elapsed += handler = new ElapsedEventHandler(delegate (object sender, ElapsedEventArgs e) {
+
+                if (CameraView.instance.IsDisposed)
+                    return;
 
                 /*
                     Simulated copter desired positions
@@ -427,26 +438,31 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+        private object lckStart = new object();
+
         private void StartCameraControl()
         {
-            bool success = CameraHandler.Instance.CameraControlConnect(
+            bool success;
+            lock (lckStart)
+            {
+                success = CameraHandler.Instance.CameraControlConnect(
                 IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
-            bool autoStartSingleYaw = bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw));
+                bool autoStartSingleYaw = bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw));
 
-            // Auto start single-yaw loop
-            if (success && autoStartSingleYaw)
-            {
-                SingleYawHandler.StartSingleYaw(MainV2.comPort);
+                // Auto start single-yaw loop
+                if (success && autoStartSingleYaw)
+                {
+                    SingleYawHandler.StartSingleYaw(MainV2.comPort);
 
-                if (InvokeRequired)
-                    Invoke(new Action(() => SetSingleYawButton()));
-                else
-                    SetSingleYawButton();
-
-
+                    if (InvokeRequired)
+                        Invoke(new Action(() => SetSingleYawButton()));
+                    else
+                        SetSingleYawButton();
+                }
             }
+            
 
 #if DEBUG
             if (success)
@@ -1140,7 +1156,7 @@ namespace MissionPlanner.GCSViews
                 hasSysRep ? ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).fov : 60.0,
                 VideoRectangle.Width, HudElements.LineDistance);
 
-            SetStopButtonVisibility();
+            //SetStopButtonVisibility();
         }
 
         #endregion
@@ -1183,29 +1199,65 @@ namespace MissionPlanner.GCSViews
 
         }
 
+        private object _lckGstreamPaint = new object();
+
         private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
         {
             try
             {
+                if (CameraView.instance.IsDisposed)
+                    return;
+
+
                 if (img != null)
                 {
-                    lock (this._bgimagelock)
+                    lock (_lckGstreamPaint)//e.Graphics)
                     {
-                        e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
+                        if (InvokeRequired)
+                            Invoke(new Action(() => {
+                                e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
+                                OnNewFrame(img.Width, img.Height, e.Graphics);
+                            }));
+                        else
+                        {
+                            e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
+                            OnNewFrame(img.Width, img.Height, e.Graphics);
+                        }
+
+                        
                     }
 
-                    //FetchHudData();
-                    OnNewFrame(img.Width, img.Height, e.Graphics);
+                    //lock (this._bgimagelock)
+                    //{
+                    //    e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
+                    //}
+
+                    //OnNewFrame(img.Width, img.Height, e.Graphics);
                 }
+                
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{ex.Message}");
+#if DEBUG
+                //MessageBox.Show($"{"Onpaint" + ex.Message}");
+                if (reconnectingVideoStream)
+                    return;
+                reconnectingVideoStream = true;
+                Thread.Sleep(1000);
+                GStreamer.StopAll();
+                Thread.Sleep(1000);
+                StartCameraStream();
+                StartCameraControl();
+                reconnectingVideoStream = false;
+#endif
             }
         }
-
+        bool reconnectingVideoStream = false;
         private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            if (CameraView.instance.IsDisposed)
+                return;
+
             string mode = MainV2.comPort.MAV.cs.mode;
             int agl = (int)MainV2.comPort.MAV.cs.alt;
 
@@ -1253,23 +1305,6 @@ namespace MissionPlanner.GCSViews
 
         private void btn_FullScreen_Click(object sender, EventArgs e)
         {
-            //if (_cameraFullScreenForm != null)
-            //{
-            //    try
-            //    {
-            //        _cameraFullScreenForm.Show();
-            //    }
-            //    catch { }
-
-
-            //}
-            //else
-            //{
-            //    _cameraFullScreenForm = new CameraFullScreenForm();
-            //    _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
-            //    _cameraFullScreenForm.FormClosing += _cameraFullScreenForm_FormClosing;
-            //    _cameraFullScreenForm.ShowDialog();
-            //}
             _cameraFullScreenForm = new CameraFullScreenForm();
             _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
             _cameraFullScreenForm.FormClosing += _cameraFullScreenForm_FormClosing;
@@ -1298,17 +1333,6 @@ namespace MissionPlanner.GCSViews
             ReconnectCameraStreamAndControl();
         }
 
-        private void Form_event_ReconnectRequested(object sender, EventArgs e)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => ReconnectCameraStreamAndControl()));
-            }
-            else
-            {
-                ReconnectCameraStreamAndControl();
-            }
-        }
 
         private void btn_Settings_Click(object sender, EventArgs e)
         {
@@ -1396,6 +1420,9 @@ namespace MissionPlanner.GCSViews
 
         private void StateHandler_MV04StateChange(object sender, MV04StateChangeEventArgs e)
         {
+            if (CameraView.instance.IsDisposed)
+                return;
+
             //Test: Set GCS Status
             if (InvokeRequired)
             {
@@ -1429,6 +1456,9 @@ namespace MissionPlanner.GCSViews
 
         private void _droneStatustimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            if (CameraView.instance.IsDisposed)
+                return;
+
             if (InvokeRequired)
             {
                 Invoke(new Action(() => { SetDroneStatusValue(); }));
@@ -1439,6 +1469,9 @@ namespace MissionPlanner.GCSViews
 
         private void LEDStateHandler_LedStateChanged(object sender, LEDStateChangedEventArgs e)
         {
+            if (CameraView.instance.IsDisposed)
+                return;
+
             if (InvokeRequired)
             {
                 Invoke(new Action(() => { SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState_IR, e.PositionLEDState_RedLight); }));
@@ -1477,11 +1510,8 @@ namespace MissionPlanner.GCSViews
         {
             if (_tripSwitchedOff)
             {
-                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
-                _tripSwitchedOff = false;
-
+                SwitchOnTrip();
                 ReconnectCameraStreamAndControl();
-                btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
             }
             else
             {
@@ -1491,6 +1521,17 @@ namespace MissionPlanner.GCSViews
             }
 
 
+        }
+
+        public void SwitchOnTrip()
+        {
+            if (_tripSwitchedOff)
+            {
+                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
+                _tripSwitchedOff = false;
+
+                btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
+            }
         }
 
         /// <summary>
@@ -1503,25 +1544,11 @@ namespace MissionPlanner.GCSViews
             if (e.X <= 0 || e.Y <= 0)
                 return;
 
-            //if (IsCameraTrackingModeActive)
-            //    return;
-
-            //CameraHandler.Instance.StopTracking(true);
-            //IsCameraTrackingModeActive = false;
-            //SetStopButtonVisibility();
-
             IsCameraTrackingModeActive = true;
 
             var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.pb_CameraGstream.Size);
 
-            //Point _trackPos = new Point(e.X, e.Y);
-
-            //// Constrain tracking pos
-            //_trackPos.X = CameraHandler.Instance.Constrain(_trackPos.X, 0, 1280);
-            //_trackPos.Y = CameraHandler.Instance.Constrain(_trackPos.Y, 0, 720);
-
-            //MessageBox.Show("(X: " + e.X + " ," + "Y: " + e.Y + ")\n" + "(CX: " + _trackPos.X + ", " + _trackPos.Y + ")");
-
+            SetStopButtonVisibility();
         }
 
         #endregion
@@ -1530,21 +1557,24 @@ namespace MissionPlanner.GCSViews
 
         private void SetStopButtonVisibility()
         {
-            if (InvokeRequired)
+            if (!CameraView.instance.IsDisposed)
             {
-                Invoke(new Action(() => {
-                    if (IsCameraTrackingModeActive && !CameraView.instance.IsDisposed)
+                if (InvokeRequired)
+                {
+                    Invoke(new Action(() => {
+                        if (IsCameraTrackingModeActive)
+                            btn_StopTracking.Visible = true;
+                        else
+                            btn_StopTracking.Visible = false;
+                    }));
+                }
+                else
+                {
+                    if (IsCameraTrackingModeActive)
                         btn_StopTracking.Visible = true;
                     else
                         btn_StopTracking.Visible = false;
-                }));
-            }  
-            else
-            {
-                if (IsCameraTrackingModeActive)
-                    btn_StopTracking.Visible = true;
-                else
-                    btn_StopTracking.Visible = false;
+                }
             }
         }
 

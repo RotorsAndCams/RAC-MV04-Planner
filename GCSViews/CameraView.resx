@@ -844,7 +844,7 @@
     <value>cs_ColorSliderAltitude</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.9054.16469, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.9055.18093, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Parent" xml:space="preserve">
     <value>tlp_AGLContainer</value>
@@ -1129,7 +1129,7 @@
     <value>Fill</value>
   </data>
   <data name="btn_TripSwitchOnOff.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Stencil, 20.25pt</value>
+    <value>Stencil, 12pt</value>
   </data>
   <data name="btn_TripSwitchOnOff.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -1142,6 +1142,12 @@
   </data>
   <data name="btn_TripSwitchOnOff.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
+  </data>
+  <data name="btn_TripSwitchOnOff.Text" xml:space="preserve">
+    <value>Trip on off</value>
+  </data>
+  <data name="btn_TripSwitchOnOff.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>BottomCenter</value>
   </data>
   <data name="&gt;&gt;btn_TripSwitchOnOff.Name" xml:space="preserve">
     <value>btn_TripSwitchOnOff</value>

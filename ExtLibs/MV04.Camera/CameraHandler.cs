@@ -788,7 +788,7 @@ namespace MV04.Camera
                 MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, trNP.X, trNP.Y, (int)TrackerMode.Enable, 0);
                 Thread.Sleep(300);
 
-                return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, trNP.X, trNP.Y, (int)TrackerMode.Track, 0) == mav_error.ok;
+                return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, trNP.X, trNP.Y, (int)TrackerMode.TrackOnPosition, 0) == mav_error.ok;
             }
 
             return false;
