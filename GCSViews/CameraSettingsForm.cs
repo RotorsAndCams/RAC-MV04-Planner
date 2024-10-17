@@ -127,7 +127,7 @@ namespace MissionPlanner.GCSViews
         private void EmergencyStop()
         {
             bool b = MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_FLIGHTTERMINATION, 1, 0, 0, 0, 0, 0, 0);
-            MessageBox.Show("e stop: " + b);
+            MessageBox.Show(b ? "Emergency stop was succesful." : "Failed to emergency stop.");
         }
 
         private void btn_EmergencyStop_Click(object sender, EventArgs e)
