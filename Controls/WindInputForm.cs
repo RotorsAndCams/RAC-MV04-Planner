@@ -10,12 +10,6 @@ using System.Windows.Forms;
 
 namespace MissionPlanner.Controls
 {
-    public class WindInputFormData
-    {
-        public double WindDir { get; set; }
-        public double WindSpeed { get; set; }
-    }
-
     public partial class WindInputForm : Form
     {
         public WindInputFormData ReturnData { get; private set; }
@@ -40,6 +34,8 @@ namespace MissionPlanner.Controls
             }
 
             label_error.Text = "";
+
+            this.BringToFront();
         }
 
         private void button_ok_Click(object sender, EventArgs e)
@@ -56,5 +52,11 @@ namespace MissionPlanner.Controls
             this.DialogResult= DialogResult.Cancel;
             this.Close();
         }
+    }
+
+    public class WindInputFormData
+    {
+        public double WindDir { get; set; }
+        public double WindSpeed { get; set; }
     }
 }

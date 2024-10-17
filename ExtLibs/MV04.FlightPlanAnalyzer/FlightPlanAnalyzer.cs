@@ -86,7 +86,6 @@ namespace MV04.FlightPlanAnalyzer
             }
 
             return powerInfo.FullAmpHours / (powerInfo.MaxVolts - powerInfo.MinVolts) * (powerInfo.CurrentVolts - powerInfo.MinVolts);
-            // TODO: Replace BatteryVoltsToAh with more precise (non-linear) function
         }
 
         private static double PointsToAh(PointLatLngAlt pos1, PointLatLngAlt pos2, UAVInfo uavInfo, WindInfo windInfo)

@@ -1173,10 +1173,10 @@ namespace MissionPlanner
             StateHandler.MV04StateChange += CheckFlightPlan;
         }
 
-        public async static void CheckFlightPlan(object sender, MV04StateChangeEventArgs e)
+        public async static void CheckFlightPlan(object sender, MV04StateChangeEventArgs ea)
         {
             // Check for Auto mode
-            if (e.NewState != MV04_State.Auto || e.PreviousState == MV04_State.Auto)
+            if (ea.NewState != MV04_State.Auto || ea.PreviousState == MV04_State.Auto)
             {
                 return;
             }
@@ -1203,7 +1203,7 @@ namespace MissionPlanner
                 });
                 return;
             }
-
+            
             // Get input info
             #region Config read
             double CellMaxVolts = double.Parse(Settings.Instance["PlanCheck_CellMaxVolts", "4.2"]
@@ -1326,7 +1326,6 @@ namespace MissionPlanner
             {
                 CustomMessageBox.Show($"Flightplan is {result}possible", "Flightplan check", MessageBoxButtons.OK);
             });
-            return;
         }
 
         void cmb_sysid_Click(object sender, EventArgs e)

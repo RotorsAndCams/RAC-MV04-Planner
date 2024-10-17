@@ -104,10 +104,10 @@
             this.numericUpDown_dir.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.numericUpDown_dir.Location = new System.Drawing.Point(190, 12);
             this.numericUpDown_dir.Maximum = new decimal(new int[] {
-            359,
+            3599,
             0,
             0,
-            0});
+            65536});
             this.numericUpDown_dir.Name = "numericUpDown_dir";
             this.numericUpDown_dir.Size = new System.Drawing.Size(100, 26);
             this.numericUpDown_dir.TabIndex = 5;

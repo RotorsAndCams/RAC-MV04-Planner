@@ -876,7 +876,9 @@
     <Compile Include="Controls\FollowMe.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Controls\WindInputForm.cs" />
+    <Compile Include="Controls\WindInputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Controls\WindInputForm.Designer.cs">
       <DependentUpon>WindInputForm.cs</DependentUpon>
     </Compile>
