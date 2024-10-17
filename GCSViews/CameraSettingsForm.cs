@@ -124,5 +124,83 @@ namespace MissionPlanner.GCSViews
                 this.btn_StartStopRecording.ForeColor = Color.White;
         }
 
+        private void EmergencyStop()
+        {
+            bool b = MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_FLIGHTTERMINATION, 1, 0, 0, 0, 0, 0, 0);
+            MessageBox.Show("e stop: " + b);
+        }
+
+        private void btn_EmergencyStop_Click(object sender, EventArgs e)
+        {
+            EmergencyStop();
+        }
+
+        private bool buttonDown;
+        private void btn_EmergencyStop_MouseDown(object sender, MouseEventArgs e)
+        {
+            lb_StopCounter.Visible = true;
+            btn_EmergencyStop.BackColor = Color.Red;
+            var task = Task.Factory.StartNew(() => { ButtonHoldMethod(); });
+        }
+
+        private void ButtonHoldMethod()
+        {
+            int num = 3;
+            System.Threading.Thread.Sleep(1000);
+            buttonDown = true;
+            
+            do
+            {
+
+                if (InvokeRequired)
+                    Invoke(new Action(() => { lb_StopCounter.Text = "Motor stop " + num; }));
+                else
+                    lb_StopCounter.Text = "Motor stop " + num;
+
+
+                if (num <= 0)
+                {
+                    #region Ask are u sure
+
+                    DialogResult dialogResult = MessageBox.Show("The copter will stop the rotors!\nIt can cause damege to the vehicle!\n\nAre you Sure?", "Emergency stop", MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        EmergencyStop();
+                    }
+                    else if (dialogResult == DialogResult.No)
+                    {
+                        buttonDown = false;
+
+                        if(InvokeRequired)
+                            Invoke(new Action(() => { lb_StopCounter.Visible = false; }));
+                        else
+                            lb_StopCounter.Visible = false;
+
+                        break;
+                    }
+
+                    #endregion
+                }
+
+                System.Threading.Thread.Sleep(1000);
+
+                num--;
+                                
+            } while (buttonDown);
+
+            if (InvokeRequired)
+                Invoke(new Action(() => { lb_StopCounter.Text = "Motor stop " + 3; }));
+            else
+                lb_StopCounter.Text = "Motor stop " + 3;
+        }
+
+        private void btn_EmergencyStop_MouseUp(object sender, MouseEventArgs e)
+        {
+            buttonDown = false;
+            lb_StopCounter.Visible = false;
+            btn_EmergencyStop.BackColor = Color.Black;
+        }
+
+
     }
 }
