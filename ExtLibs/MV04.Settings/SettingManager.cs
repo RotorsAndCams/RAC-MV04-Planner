@@ -132,7 +132,7 @@ namespace MV04.Settings
                                 false.ToString()
                             }.Contains(value)
                             ),
-                        new SettingItem(Setting.AutoStartSingleYaw, false.ToString(), value =>
+                        new SettingItem(Setting.AutoStartSingleYaw, true.ToString(), value =>
                             !string.IsNullOrWhiteSpace(value)
                             && new List<string>(){
                                 true.ToString(),

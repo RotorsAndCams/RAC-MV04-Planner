@@ -117,9 +117,6 @@ namespace MissionPlanner.GCSViews
 
         public CameraView()
         {
-            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
-            _tripSwitchedOff = false;
-
             log.Info("Constructor");
             InitializeComponent();
             instance = this;
@@ -250,6 +247,8 @@ namespace MissionPlanner.GCSViews
             this.Controls.Add(lb_FollowDebugText);
             lb_FollowDebugText.BringToFront();
 
+
+            SetSingleYawButton();
 
         }
         Label lb_FollowDebugText;
@@ -1772,6 +1771,11 @@ namespace MissionPlanner.GCSViews
                 this.btn_StartStopSingleYaw.Text = "Stop Single Yaw";
                 this.btn_StartStopSingleYaw.BackColor = Color.DarkGreen;
             }
+        }
+
+        private void CameraView_VisibleChanged(object sender, EventArgs e)
+        {
+            SetSingleYawButton();
         }
     }
 }

@@ -41,6 +41,9 @@ using Newtonsoft.Json;
 using MissionPlanner.GCSViews;
 using MV04.State;
 using MV04.FlightPlanAnalyzer;
+using MV04.SingleYaw;
+using MV04.Settings;
+using MV04.Camera;
 
 namespace MissionPlanner
 {
@@ -405,8 +408,19 @@ namespace MissionPlanner
                     return;
                 _comPort.MavChanged -= instance.comPort_MavChanged;
                 _comPort.MavChanged += instance.comPort_MavChanged;
+                _comPort.MavChanged -= AutoStartProcesses;
+                _comPort.MavChanged += AutoStartProcesses;
                 instance.comPort_MavChanged(null, null);
             }
+        }
+
+        private static void AutoStartProcesses(object sender, EventArgs e)
+        {
+            if (bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw)))
+                SingleYawHandler.StartSingleYaw(MainV2.comPort);
+
+            if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
+                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
         }
 
         static MAVLinkInterface _comPort = new MAVLinkInterface();
@@ -1171,6 +1185,12 @@ namespace MissionPlanner
             this.ShowIcon = false;
 
             StateHandler.MV04StateChange += CheckFlightPlan;
+
+            //if (bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw)))
+            //    SingleYawHandler.StartSingleYaw(MainV2.comPort);
+
+            //if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
+            //    MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
         }
 
         public async static void CheckFlightPlan(object sender, MV04StateChangeEventArgs ea)

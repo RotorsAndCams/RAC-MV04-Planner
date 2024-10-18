@@ -427,6 +427,7 @@
             this.BackColor = System.Drawing.Color.Black;
             this.Controls.Add(this.tlp_CVBase);
             this.Name = "CameraView";
+            this.VisibleChanged += new System.EventHandler(this.CameraView_VisibleChanged);
             this.tlp_ControlsBase.ResumeLayout(false);
             this.tlp_Buttonsection2.ResumeLayout(false);
             this.tlp_InfoBase.ResumeLayout(false);

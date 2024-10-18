@@ -45,8 +45,7 @@ namespace MV04.SingleYaw
             {
                 return MAVLink != null
                     && MAVLink.BaseStream != null
-                    && MAVLink.BaseStream.IsOpen
-                    && CameraHandler.Instance.IsCameraControlConnected;
+                    && MAVLink.BaseStream.IsOpen;
             }
         }
 
