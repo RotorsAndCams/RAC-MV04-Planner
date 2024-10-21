@@ -372,7 +372,6 @@
             this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
             this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
-            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.inverted_cam_but;
             this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
             this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
             this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);

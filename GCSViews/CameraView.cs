@@ -72,7 +72,7 @@ namespace MissionPlanner.GCSViews
         public const int _maxAllowedAltitudeValue = 500;
         public const int _minAllowedAltitudeValue = 50;
 
-        private bool _tripSwitchedOff = false;
+        private bool _tripSwitchedOff = !bool.Parse(SettingManager.Get(Setting.AutoConnect));
         public bool TripSwitchedOff
         {
             get { return _tripSwitchedOff; }
@@ -140,7 +140,14 @@ namespace MissionPlanner.GCSViews
             MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
             // Connect to camera
-            StartCameraStream();
+            if (bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream)))
+            {
+                StartCameraStream();
+                
+            }
+            else
+                MessageBox.Show("Start Camera stream manually -> auto start is false");
+
             StartCameraControl();
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
             CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
@@ -186,6 +193,8 @@ namespace MissionPlanner.GCSViews
             this.DoubleBuffered = true;
             pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
 
+            #region Gstreamer stream draw
+
             GStreamer.onNewImage += async (sender, image) =>
             {
                 try
@@ -216,12 +225,18 @@ namespace MissionPlanner.GCSViews
                     Thread.Sleep(1000);
                     GStreamer.StopAll();
                     Thread.Sleep(1000);
-                    StartCameraStream();
+                    if (bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream)))
+                    {
+                        StartCameraStream();
+                    }
+                    
                     StartCameraControl();
                     reconnectingVideoStream = false;
 #endif
                 }
             };
+
+            #endregion
 
             this.FormClosing += CameraView_FormClosing;
             
@@ -249,10 +264,30 @@ namespace MissionPlanner.GCSViews
 
 
             SetSingleYawButton();
+            SetTripOnOffButton();
+
+
+
 
         }
         Label lb_FollowDebugText;
 
+
+        private void SetTripOnOffButton()
+        {
+            if (_tripSwitchedOff)
+            {
+                btn_TripSwitchOnOff.BackColor = Color.Black;
+                btn_TripSwitchOnOff.Text = "Trip is Off";
+            }
+
+            else
+            {
+                btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
+                btn_TripSwitchOnOff.Text = "Trip is On";
+            }
+                
+        }
 
         #endregion
 
@@ -1245,7 +1280,10 @@ namespace MissionPlanner.GCSViews
                 Thread.Sleep(1000);
                 GStreamer.StopAll();
                 Thread.Sleep(1000);
-                StartCameraStream();
+
+                if (bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream)))
+                    StartCameraStream();
+
                 StartCameraControl();
                 reconnectingVideoStream = false;
 #endif
@@ -1273,7 +1311,7 @@ namespace MissionPlanner.GCSViews
 
             MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, state, 0, 0, 0, 0, 0);
             _tripSwitchedOff = true;
-            btn_TripSwitchOnOff.BackColor = Color.Black;
+            SetTripOnOffButton();
         }
 
         private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
@@ -1516,7 +1554,7 @@ namespace MissionPlanner.GCSViews
             {
                 MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 0, 0, 0, 0, 0, 0);
                 _tripSwitchedOff = true;
-                btn_TripSwitchOnOff.BackColor = Color.Black;
+                SetTripOnOffButton();
             }
 
 
@@ -1524,13 +1562,13 @@ namespace MissionPlanner.GCSViews
 
         public void SwitchOnTrip()
         {
-            if (_tripSwitchedOff)
-            {
+            //if (_tripSwitchedOff)
+            //{
                 MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
                 _tripSwitchedOff = false;
 
-                btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
-            }
+            SetTripOnOffButton();
+            //}
         }
 
         /// <summary>

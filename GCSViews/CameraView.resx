@@ -844,7 +844,7 @@
     <value>cs_ColorSliderAltitude</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.9057.20937, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.9060.16797, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Parent" xml:space="preserve">
     <value>tlp_AGLContainer</value>
@@ -1144,10 +1144,7 @@
     <value>8</value>
   </data>
   <data name="btn_TripSwitchOnOff.Text" xml:space="preserve">
-    <value>Trip on off</value>
-  </data>
-  <data name="btn_TripSwitchOnOff.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>BottomCenter</value>
+    <value>Trip is Off</value>
   </data>
   <data name="&gt;&gt;btn_TripSwitchOnOff.Name" xml:space="preserve">
     <value>btn_TripSwitchOnOff</value>
