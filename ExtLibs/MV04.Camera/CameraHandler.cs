@@ -162,8 +162,9 @@ namespace MV04.Camera
         }
 
         private System.Threading.Timer RecordingTimer;
-        
-        public static string url = $"rtspsrc location=rtsp://{SettingManager.Get(Setting.CameraIP)}:554/live{SettingManager.Get(Setting.CameraStreamChannel)} latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";               //@"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+        //uridecodebin uri=udp://225.1.2.3:11024/live0 ! autovideosink
+        //url = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=25/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+        public static string url = $"uridecodebin uri=udp://225.1.2.3:11024/live{SettingManager.Get(Setting.CameraStreamChannel)} latency=0 ! video/x-raw ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";  
 
         #endregion
 
@@ -251,7 +252,7 @@ namespace MV04.Camera
                 MessageBox.Show("Invalid MavProto - CameraHandler - ctor");
             }
 #if DEBUG
-            url = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=25/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
+            //url = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=25/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 #endif
         }
 

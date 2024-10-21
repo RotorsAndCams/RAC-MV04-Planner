@@ -140,13 +140,15 @@ namespace MissionPlanner.GCSViews
             MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
             // Connect to camera
-            if (bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream)))
-            {
-                StartCameraStream();
-                
-            }
-            else
-                MessageBox.Show("Start Camera stream manually -> auto start is false");
+            //if (bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream)))
+            //{
+            //    StartCameraStream();
+
+            //}
+            //else
+            //    MessageBox.Show("Start Camera stream manually -> auto start is false");
+
+            StartCameraStream();
 
             StartCameraControl();
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
@@ -218,7 +220,7 @@ namespace MissionPlanner.GCSViews
                 catch (Exception ex)
                 {
 #if DEBUG
-                    
+
                     if (reconnectingVideoStream)
                         return;
                     reconnectingVideoStream = true;
@@ -229,7 +231,7 @@ namespace MissionPlanner.GCSViews
                     {
                         StartCameraStream();
                     }
-                    
+
                     StartCameraControl();
                     reconnectingVideoStream = false;
 #endif
@@ -267,26 +269,40 @@ namespace MissionPlanner.GCSViews
             SetTripOnOffButton();
 
 
-
-
         }
         Label lb_FollowDebugText;
 
-
         private void SetTripOnOffButton()
         {
-            if (_tripSwitchedOff)
-            {
-                btn_TripSwitchOnOff.BackColor = Color.Black;
-                btn_TripSwitchOnOff.Text = "Trip is Off";
-            }
 
+            if (InvokeRequired)
+                Invoke(new Action(() => {
+                    if (_tripSwitchedOff)
+                    {
+                        btn_TripSwitchOnOff.BackColor = Color.Black;
+                        btn_TripSwitchOnOff.Text = "Trip is Off";
+                    }
+
+                    else
+                    {
+                        btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
+                        btn_TripSwitchOnOff.Text = "Trip is On";
+                    }
+                }));
             else
             {
-                btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
-                btn_TripSwitchOnOff.Text = "Trip is On";
+                if (_tripSwitchedOff)
+                {
+                    btn_TripSwitchOnOff.BackColor = Color.Black;
+                    btn_TripSwitchOnOff.Text = "Trip is Off";
+                }
+
+                else
+                {
+                    btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
+                    btn_TripSwitchOnOff.Text = "Trip is On";
+                }
             }
-                
         }
 
         #endregion
@@ -1548,7 +1564,7 @@ namespace MissionPlanner.GCSViews
             if (_tripSwitchedOff)
             {
                 SwitchOnTrip();
-                ReconnectCameraStreamAndControl();
+                //ReconnectCameraStreamAndControl();
             }
             else
             {
