@@ -217,7 +217,15 @@ namespace MissionPlanner.GCSViews
         private MediaPlayer _mediaPlayer;
         private string videoUrl = "rtp://225.1.2.3:11024/live0";
 
-        public void StartVLC()
+        public void StartVideoStreamVLC()
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => StartVLC()));
+            else
+                StartVLC();
+        }
+
+        private void StartVLC()
         {
             var media = new Media(_libVlc, new Uri(videoUrl));
             _mediaPlayer = new MediaPlayer(_libVlc)
@@ -226,10 +234,12 @@ namespace MissionPlanner.GCSViews
             };
             vv_VLC.MediaPlayer = _mediaPlayer;
             _mediaPlayer.Fullscreen = true;
+            _mediaPlayer.EnableHardwareDecoding = true;
+            _mediaPlayer.NetworkCaching = 300;
 
-            if(panelDoubleClick == null)
+            if (panelDoubleClick == null)
             {
-                panelDoubleClick = new Panel();// this panel requires to catche double click evetns.
+                panelDoubleClick = new Panel();// panel for double click
                 vv_VLC.Controls.Add(panelDoubleClick);
                 panelDoubleClick.BringToFront();
                 panelDoubleClick.Dock = DockStyle.Fill;
@@ -245,8 +255,16 @@ namespace MissionPlanner.GCSViews
         Panel panelDoubleClick;
         public void StopVLC()
         {
-            _mediaPlayer.Stop();
-            panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
+            if (InvokeRequired)
+                Invoke(new Action(() => {
+                    _mediaPlayer.Stop();
+                    panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
+                }));
+            else
+            {
+                _mediaPlayer.Stop();
+                panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
+            }
         }
 
 
@@ -449,7 +467,7 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraStream()
         {
-            StartVLC();
+            StartVideoStreamVLC();
         }
 
         private object lckStart = new object();
