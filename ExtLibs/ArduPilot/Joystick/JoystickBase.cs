@@ -208,57 +208,21 @@ namespace MissionPlanner.Joystick
             JoyChannels[channel].axis = axis;
         }
 
-        /// <summary>
-        /// Switch the pre-defined joystick axis pairs to control either the UAV or the camera
-        /// </summary>
-        /// <param name="axisPair">UAV pitch - Camera pitch or UAV throttle - Camera zoom</param>
-        /// <param name="axisMode">UAV control or Camera control</param>
-        public void MV04_SetAxis(MV04_AxisPair axisPair, MV04_AxisMode axisMode)
+        public void MV04_SetRCChannels(MV04_JoyFlightMode mode)
         {
-            // Check for wrong joystick axis settings
-            joystickaxis axis = (joystickaxis)JoystickHandler.GetAxis(axisPair); ;
-            if (axis == joystickaxis.None)
-            {
-                string errorMsg = $"Joystick setup error - RC channels {"UAV " + Enum.GetName(typeof(MV04_AxisPair), axisPair).Replace("_", " & Cam ")} are both set to {Enum.GetName(typeof(joystickaxis), joystickaxis.None)}({(int)joystickaxis.None})";
-                CustomMessageBox.Show(errorMsg);
-                log.Info(errorMsg);
-                return;
-            }
+            // Change axes
+            JoystickHandler.MV04_RCChannelSets[mode]
+                .Where(ch => ch.RCNum >= 1
+                    && ch.RCNum <= getNumAxes()
+                    && ch.JoyAxis >= 0
+                    && ch.JoyAxis < (int)joystickaxis.UINT16_MAX)
+                .ForEach(ch =>
+                {
+                    setAxis(ch.RCNum, (joystickaxis)ch.JoyAxis);
+                });
 
-            // Apply axis switch
-            if (axisPair == MV04_AxisPair.Pitch_Pitch)
-            {
-                int UAV_Pitch_RCChannel = JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Pitch).RCChannelNo,
-                    Cam_Pitch_RCChannel = JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Pitch).RCChannelNo;
-                if (axisMode == MV04_AxisMode.UAV)
-                {
-                    setAxis(UAV_Pitch_RCChannel, axis);
-                    setAxis(Cam_Pitch_RCChannel, joystickaxis.None);
-                }
-                else // MV04_AxisMode.Cam
-                {
-                    setAxis(UAV_Pitch_RCChannel, joystickaxis.None);
-                    setAxis(Cam_Pitch_RCChannel, axis);
-                }
-            }
-            else // MV04_AxisPair.Throttle_Zoom
-            {
-                int UAV_Throttle_RCChannel = JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Throttle).RCChannelNo,
-                    Cam_Zoom_RCChannel = JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Zoom).RCChannelNo;
-                if (axisMode == MV04_AxisMode.UAV)
-                {
-                    setAxis(UAV_Throttle_RCChannel, axis);
-                    setAxis(Cam_Zoom_RCChannel, joystickaxis.None);
-                }
-                else // MV04_AxisMode.Cam
-                {
-                    setAxis(UAV_Throttle_RCChannel, joystickaxis.None);
-                    setAxis(Cam_Zoom_RCChannel, axis);
-                }
-            }
-
-            // Trigger axies changed event
-            JoystickHandler.TriggerJoystickAxiesChangedEvent(axisPair, axisMode);
+            // Notify
+            JoystickHandler.TriggerJoystickModeChangedEvent(mode);
         }
 
         public void setChannel(int channel, joystickaxis axis, bool reverse, int expo)
@@ -713,31 +677,27 @@ namespace MissionPlanner.Joystick
                                     case buttonfunction_mv04_FlightMode_option.Manual:
                                         Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
                                         CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
-                                        MV04_SetAxis(MV04_AxisPair.Pitch_Pitch, MV04_AxisMode.UAV);
-                                        MV04_SetAxis(MV04_AxisPair.Throttle_Zoom, MV04_AxisMode.UAV);
+                                        MV04_SetRCChannels(MV04_JoyFlightMode.Manual);
                                         StateHandler.CurrentSate = MV04_State.Manual;
                                         break;
                                     
                                     case buttonfunction_mv04_FlightMode_option.TapToFly:
                                         Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
                                         CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
-                                        MV04_SetAxis(MV04_AxisPair.Pitch_Pitch, MV04_AxisMode.Cam);
-                                        MV04_SetAxis(MV04_AxisPair.Throttle_Zoom, MV04_AxisMode.Cam);
+                                        MV04_SetRCChannels(MV04_JoyFlightMode.TapToFly);
                                         StateHandler.CurrentSate = MV04_State.TapToFly;
                                         break;
                                     
                                     case buttonfunction_mv04_FlightMode_option.Auto:
                                         Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Auto");
                                         CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
-                                        MV04_SetAxis(MV04_AxisPair.Pitch_Pitch, MV04_AxisMode.Cam);
-                                        MV04_SetAxis(MV04_AxisPair.Throttle_Zoom, MV04_AxisMode.Cam);
+                                        MV04_SetRCChannels(MV04_JoyFlightMode.Auto);
                                         StateHandler.CurrentSate = MV04_State.Auto;
                                         break;
                                     
                                     case buttonfunction_mv04_FlightMode_option.Follow:
                                         // TODO: Switch UAV to Follow mode
-                                        MV04_SetAxis(MV04_AxisPair.Pitch_Pitch, MV04_AxisMode.Cam);
-                                        MV04_SetAxis(MV04_AxisPair.Throttle_Zoom, MV04_AxisMode.Cam);
+                                        MV04_SetRCChannels(MV04_JoyFlightMode.Follow);
                                         StateHandler.CurrentSate = MV04_State.Follow;
                                         break;
                                     
@@ -1206,7 +1166,7 @@ namespace MissionPlanner.Joystick
         {
             this.name = name;
 
-            if (AcquireJoystick(name) == false)
+            if (!AcquireJoystick(name))
             {
                 return false;
             }
@@ -1214,30 +1174,24 @@ namespace MissionPlanner.Joystick
             // Check if some pairs of axies are set to the same value
             // UAV_Pitch <-> Cam_Pitch
             // UAV_Throttle <-> Cam_Zoom
-            if (this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Pitch).RCChannelNo) != this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Pitch).RCChannelNo)
+            /*if (this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoyAxisRole.UAV_Pitch).RCChannelNo) != this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoyAxisRole.Cam_Pitch).RCChannelNo)
                 ||
-                this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Throttle).RCChannelNo) != this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Zoom).RCChannelNo)
+                this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoyAxisRole.UAV_Throttle).RCChannelNo) != this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoyAxisRole.Cam_Zoom).RCChannelNo)
                 )
             {
-                CustomMessageBox.Show($"The following pairs of RC channels must be set to the same RC Axis!\n\n{Enum.GetName(typeof(MV04_JoystickFunction), MV04_JoystickFunction.UAV_Pitch).Replace('_', ' ')} <-> {Enum.GetName(typeof(MV04_JoystickFunction), MV04_JoystickFunction.Cam_Pitch).Replace('_', ' ')}\n{Enum.GetName(typeof(MV04_JoystickFunction), MV04_JoystickFunction.UAV_Throttle).Replace('_', ' ')} <-> {Enum.GetName(typeof(MV04_JoystickFunction), MV04_JoystickFunction.Cam_Zoom).Replace('_', ' ')}", "Joystick axis setup error");
+                CustomMessageBox.Show($"The following pairs of RC channels must be set to the same RC Axis!\n\n{Enum.GetName(typeof(MV04_JoyAxisRole), MV04_JoyAxisRole.UAV_Pitch).Replace('_', ' ')} <-> {Enum.GetName(typeof(MV04_JoyAxisRole), MV04_JoyAxisRole.Cam_Pitch).Replace('_', ' ')}\n{Enum.GetName(typeof(MV04_JoyAxisRole), MV04_JoyAxisRole.UAV_Throttle).Replace('_', ' ')} <-> {Enum.GetName(typeof(MV04_JoyAxisRole), MV04_JoyAxisRole.Cam_Zoom).Replace('_', ' ')}", "Joystick axis setup error");
                 return false;
-            }
+            }*/
 
-            // Save MV04 relevant axis settings
-            foreach (MV04_Axis axis in JoystickHandler.JoystickAxies)
-            {
-                if (axis.RCChannelNo > 0 && axis.RCChannelNo <= this.getNumAxes())
-                {
-                    axis.RCAxis = (int)this.getJoystickAxis(axis.RCChannelNo);
-                }
-            }
+            // Save joystick axes
+            // TODO: Set JoystickHandler.MV04_RCChannelSets
 
             enabled = true;
 
-            System.Threading.Thread t11 = new System.Threading.Thread(new System.Threading.ThreadStart(mainloop))
+            Thread t11 = new Thread(new ThreadStart(mainloop))
             {
                 Name = "Joystick loop",
-                Priority = System.Threading.ThreadPriority.AboveNormal,
+                Priority = ThreadPriority.AboveNormal,
                 IsBackground = true
             };
             t11.Start();
@@ -1319,20 +1273,23 @@ namespace MissionPlanner.Joystick
                         //(ushort)(((int)state.Y / 65.535) + 1000);
                     }
 
-                    int yawChannel = JoystickHandler.JoystickAxies.Single(ja => ja.Function == MV04_JoystickFunction.UAV_Yaw).RCChannelNo;
+                    int yawChannel = 4;
 
                     for (int i = 3; i <= 18; i++)
                     {
-                        if (getJoystickAxis(i) != joystickaxis.None
-                            && i != yawChannel)
+                        if (getJoystickAxis(i) != joystickaxis.None)
                         {
-                            Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo));
+                            if (i == yawChannel)
+                            {
+                                // TODO: Assign rcoverridech[i] from some single-yaw value, restore pickchannel()
+                                //Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(SingleYawHandler.???);
+                            }
+                            else
+                            {
+                                Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo));
+                            }
                         }
                     }
-
-                    // TODO: RC7 set to a constant TRIM for UAV yaw channel
-                    // (Real UAV yaw is controlled by the single-yaw loop via the CONDITION_YAW command)
-                    //Interface.MAV.cs.rcoverridech7 = Interface.MAV.param.ContainsKey("RC7_TRIM") ? (short)Math.Round(Interface.MAV.param["RC7_TRIM"].Value) : (short)1500;
 
                     // Direct assignment is faster than setting with reflection
                     /*

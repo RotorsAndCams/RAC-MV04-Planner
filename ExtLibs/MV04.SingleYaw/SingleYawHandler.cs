@@ -27,8 +27,8 @@ namespace MV04.SingleYaw
         #region Fields
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static int _YawRCChannel = 4;
-        
+        private static int _YawRCChannel = 4; // TODO: Get this from JoystickHandler?
+
         private static (short _YawRCMin, short _YawRCTrim, short _YawRCDeadzone, short _YawRCMax, bool _YawRCReversed) _YawRCParams = (1000, 1500, 20, 2000, false);
 
 
