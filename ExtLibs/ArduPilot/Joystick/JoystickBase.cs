@@ -1000,6 +1000,7 @@ namespace MissionPlanner.Joystick
 
                 case joystickaxis.ARz:
                     //working = state.ARz;
+                    working = ushort.MaxValue / 2; // Will be converted to TRIM by Expo()
                     break;
 
                 case joystickaxis.AX:

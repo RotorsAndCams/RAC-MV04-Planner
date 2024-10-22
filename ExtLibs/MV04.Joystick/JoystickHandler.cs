@@ -60,7 +60,8 @@ namespace MV04.Joystick
         UAV_Throttle,
         UAV_Yaw,
         Cam_Pitch,
-        Cam_Zoom
+        Cam_Zoom,
+        Cam_Yaw
     }
 
     public enum MV04_AxisPair
@@ -114,7 +115,8 @@ namespace MV04.Joystick
             new MV04_Axis(MV04_JoystickFunction.UAV_Throttle, 3, 0),
             new MV04_Axis(MV04_JoystickFunction.UAV_Yaw, 4, 0),
             new MV04_Axis(MV04_JoystickFunction.Cam_Pitch, 5, 0),
-            new MV04_Axis(MV04_JoystickFunction.Cam_Zoom, 6, 0)
+            new MV04_Axis(MV04_JoystickFunction.Cam_Zoom, 6, 0),
+            new MV04_Axis(MV04_JoystickFunction.Cam_Yaw, 7, 0),
         };
         #endregion
 
