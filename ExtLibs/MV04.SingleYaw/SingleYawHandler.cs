@@ -39,13 +39,22 @@ namespace MV04.SingleYaw
 
         private static int _YawAdjustTreshold = 3; // deg
 
-        private static bool _IsConnected
+        private static bool _IsMAVConnected
         {
             get
             {
                 return MAVLink != null
                     && MAVLink.BaseStream != null
                     && MAVLink.BaseStream.IsOpen;
+            }
+        }
+
+        private static bool _IsCameraConnected
+        {
+            get
+            {
+                return CameraHandler.Instance.IsCameraControlConnected
+                    && CameraHandler.Instance.IsCameraAlive;
             }
         }
 
@@ -121,8 +130,8 @@ namespace MV04.SingleYaw
             // Set MAVLinkInterface
             SingleYawHandler.MAVLink = MAVLink;
 
-            // Check for connections
-            if (!_IsConnected)
+            // Check for connection
+            if (!_IsMAVConnected)
             {
                 return;
             }
@@ -147,26 +156,26 @@ namespace MV04.SingleYaw
                 log.Info("New Single-Yaw timer object created");
             }
             _YawAdjustTimer.Enabled = true;
+            
             // Start timer
             _YawAdjustTimer.Start();
 
-            // Log timer start
+            // Notify
             log.Info($"Single-Yaw started (loop={_YawAdjustInterval}ms)");
-
             TriggerSingleYawMessageEvent("Single-Yaw started");
         }
 
         private static void _YawAdjustTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             // Check for connections
-            if (!_IsConnected)
+            if (!_IsMAVConnected)
             {
                 return;
             }
 
             // Get camera yaw
             float cameraYaw = 0; // positive is CW
-            if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.SystemReport))
+            if (_IsCameraConnected && CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.SystemReport))
             {
                 cameraYaw = ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).roll;
             }
@@ -174,12 +183,6 @@ namespace MV04.SingleYaw
             {
                 cameraYaw = TestCameraYaw;
             }
-
-            // Check if above treshold
-            /*if (Math.Abs(cameraYaw) < _YawAdjustTreshold)
-            {
-                return;
-            }*/
 
             // Calculate RCOverride
             short RCOverride = _YawRCParams._YawRCReversed ?
@@ -192,16 +195,13 @@ namespace MV04.SingleYaw
 
             // Set RCOverride
             MAVLink.MAV.cs.GetType().GetField($"rcoverridech{_YawRCChannel}").SetValue(MAVLink.MAV.cs, RCOverride);
-            
-            // Log
-            log.Info($"Single-Yaw correction made (RC{_YawRCChannel}={RCOverride})");
 
-            // Raise single-yaw command event
+            // Notify
+            log.Info($"Single-Yaw correction made (RC{_YawRCChannel}={RCOverride})");
             TriggerSingleYawCommandEvent(
                 (int)(cameraYaw * -1), // Flip to UAV frame (positive is CW)
                 _YawRCChannel,
                 RCOverride);
-
             TriggerSingleYawMessageEvent($"Single-Yaw elapsed (cameraYaw={cameraYaw}, RCChan={_YawRCChannel}, RCOut={RCOverride})");
         }
 
@@ -211,17 +211,18 @@ namespace MV04.SingleYaw
         /// </summary>
         public static void StopSingleYaw()
         {
-
             // Stop timer
             _YawAdjustTimer.Enabled = false;
             _YawAdjustTimer.Stop();
             _YawAdjustTimer.Close();
+            
             // Send middle stick
-            if (_IsConnected)
+            if (_IsMAVConnected)
             {
                 MAVLink.MAV.cs.GetType().GetField($"rcoverridech{_YawRCChannel}").SetValue(MAVLink.MAV.cs, _YawRCParams._YawRCTrim);
             }
 
+            // Notify
             log.Info("Single-Yaw stopped");
             TriggerSingleYawCommandEvent(0, _YawRCChannel, _YawRCParams._YawRCTrim);
             TriggerSingleYawMessageEvent("Single-Yaw stopped");
@@ -240,6 +241,10 @@ namespace MV04.SingleYaw
             });
         }
 
+        /// <summary>
+        /// Trigger Single-Yaw Message Event
+        /// </summary>
+        /// <param name="message">Message to pass as event argument</param>
         public static void TriggerSingleYawMessageEvent(string message)
         {
             SingleYawMessage?.Invoke(null, new SingleYawMessageEventArgs()
