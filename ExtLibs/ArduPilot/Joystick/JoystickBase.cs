@@ -211,14 +211,14 @@ namespace MissionPlanner.Joystick
         public void MV04_SetRCChannels(MV04_JoyFlightMode mode)
         {
             // Change axes
-            JoystickHandler.MV04_RCChannelSets[mode]
-                .Where(ch => ch.RCNum >= 1
-                    && ch.RCNum <= getNumAxes()
-                    && ch.JoyAxis >= 0
-                    && ch.JoyAxis < (int)joystickaxis.UINT16_MAX)
+            JoystickHandler.GetAxisSet(mode)
+                .Where(ch => ch.Key >= 1
+                    && ch.Key <= getNumAxes()
+                    && ch.Value >= 0
+                    && ch.Value < (int)joystickaxis.UINT16_MAX)
                 .ForEach(ch =>
                 {
-                    setAxis(ch.RCNum, (joystickaxis)ch.JoyAxis);
+                    setAxis(ch.Key, (joystickaxis)ch.Value);
                 });
 
             // Notify
@@ -1171,20 +1171,22 @@ namespace MissionPlanner.Joystick
                 return false;
             }
 
-            // Check if some pairs of axies are set to the same value
-            // UAV_Pitch <-> Cam_Pitch
-            // UAV_Throttle <-> Cam_Zoom
-            /*if (this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoyAxisRole.UAV_Pitch).RCChannelNo) != this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoyAxisRole.Cam_Pitch).RCChannelNo)
-                ||
-                this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoyAxisRole.UAV_Throttle).RCChannelNo) != this.getJoystickAxis(JoystickHandler.JoystickAxies.Single(x => x.Function == MV04_JoyAxisRole.Cam_Zoom).RCChannelNo)
-                )
+            // Check main (visible) RC channels
+            List<int> usedJoyAxes = new List<int>();
+            foreach (var ch in JoystickHandler.RCChannels)
             {
-                CustomMessageBox.Show($"The following pairs of RC channels must be set to the same RC Axis!\n\n{Enum.GetName(typeof(MV04_JoyAxisRole), MV04_JoyAxisRole.UAV_Pitch).Replace('_', ' ')} <-> {Enum.GetName(typeof(MV04_JoyAxisRole), MV04_JoyAxisRole.Cam_Pitch).Replace('_', ' ')}\n{Enum.GetName(typeof(MV04_JoyAxisRole), MV04_JoyAxisRole.UAV_Throttle).Replace('_', ' ')} <-> {Enum.GetName(typeof(MV04_JoyAxisRole), MV04_JoyAxisRole.Cam_Zoom).Replace('_', ' ')}", "Joystick axis setup error");
-                return false;
-            }*/
+                if (ch.Value.Show)
+                {
+                    if (getJoystickAxis(ch.Key) == joystickaxis.None            // Cannot be None
+                        || usedJoyAxes.Contains((int)getJoystickAxis(ch.Key)))  // Must be unique
+                    {
+                        return false;
+                    }
 
-            // Save joystick axes
-            // TODO: Set JoystickHandler.MV04_RCChannelSets
+                    usedJoyAxes.Add((int)getJoystickAxis(ch.Key)); // Add to used for unique check
+                    JoystickHandler.RCChannels[ch.Key].Axis = (int)getJoystickAxis(ch.Key); // Save axis
+                }
+            }
 
             enabled = true;
 
@@ -1273,21 +1275,24 @@ namespace MissionPlanner.Joystick
                         //(ushort)(((int)state.Y / 65.535) + 1000);
                     }
 
-                    int yawChannel = 4;
+                    //int yawChannel = 4;
+                    int yawChannel = JoystickHandler.RCChannels.Single(ch => ch.Value.Role == MV04_JoyRole.UAV_Yaw).Key;
 
                     for (int i = 3; i <= 18; i++)
                     {
                         if (getJoystickAxis(i) != joystickaxis.None)
                         {
+                            short rcValue = 1500;
                             if (i == yawChannel)
                             {
-                                // TODO: Assign rcoverridech[i] from some single-yaw value, restore pickchannel()
-                                //Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(SingleYawHandler.???);
+                                // TODO: Set rcValue from some single-yaw value, restore pickchannel()
+                                //rcValue = SingleYawHandler.???;
                             }
                             else
                             {
-                                Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo));
+                                rcValue = pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo);
                             }
+                            Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, rcValue);
                         }
                     }
 

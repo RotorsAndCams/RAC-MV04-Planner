@@ -72,8 +72,8 @@ namespace MissionPlanner.Joystick
 
             for (int a = 1; a <= maxaxis; a++)
             {
-                bool isMV04Channel = JoystickHandler.MV04_RCChannelNames.ContainsKey(a);
-                bool isVisible = !isMV04Channel || JoystickHandler.MV04_RCChannelNames[a].Show;
+                bool isMV04Channel = JoystickHandler.RCChannels.ContainsKey(a);
+                bool isVisible = !isMV04Channel || JoystickHandler.RCChannels[a].Show;
 
                 // Do not add if not visible
                 if (!isVisible)
@@ -82,7 +82,7 @@ namespace MissionPlanner.Joystick
                 }
 
                 string labelText = "RC" + a;
-                if (isMV04Channel) labelText += " " + JoystickHandler.MV04_RCChannelNames[a].Name;
+                if (isMV04Channel) labelText += " " + JoystickHandler.RCChannels[a].Name;
 
                 JoyChannel config = tempjoystick.getChannel(a);
                 JoystickAxis ax = new JoystickAxis() // JoystickAxis control
