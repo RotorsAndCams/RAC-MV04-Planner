@@ -207,6 +207,22 @@ namespace MV04.Camera
             }
         }
 
+        private readonly TimeSpan _LastSeenCameraTreshold = TimeSpan.FromSeconds(1);
+
+        private DateTime _LastSeenCamera = DateTime.MinValue;
+
+        /// <summary>
+        /// Returns true, if the camera has sent any reports in the last second
+        /// </summary>
+        public bool IsCameraAlive
+        {
+            get
+            {
+                return IsCameraControlConnected
+                    && _LastSeenCamera > DateTime.Now - _LastSeenCameraTreshold;
+            }
+        }
+
         /// <summary>
         /// Store Callback reports for state and drawing
         /// </summary>
@@ -483,6 +499,9 @@ namespace MV04.Camera
                     case MavReportType.Reserved:
                     default: break;
                 }
+
+                // Update camera last seen timestamp
+                _LastSeenCamera = DateTime.Now;
             }
         }
 
