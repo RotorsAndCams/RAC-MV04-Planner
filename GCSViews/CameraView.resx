@@ -844,7 +844,7 @@
     <value>cs_ColorSliderAltitude</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.9060.18759, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.9061.24280, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Parent" xml:space="preserve">
     <value>tlp_AGLContainer</value>
@@ -1314,40 +1314,31 @@
   <data name="tlp_CVBase.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
-  <data name="pb_CameraGstream.BackgroundImageLayout" type="System.Windows.Forms.ImageLayout, System.Windows.Forms">
-    <value>Center</value>
-  </data>
-  <data name="pb_CameraGstream.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+  <data name="vv_VLC.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
-  <data name="pb_CameraGstream.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
+  <data name="vv_VLC.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 3</value>
   </data>
-  <data name="pb_CameraGstream.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
+  <data name="vv_VLC.Size" type="System.Drawing.Size, System.Drawing">
+    <value>1585, 779</value>
   </data>
-  <data name="pb_CameraGstream.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>0, 0, 0, 0</value>
-  </data>
-  <data name="pb_CameraGstream.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1591, 785</value>
-  </data>
-  <data name="pb_CameraGstream.SizeMode" type="System.Windows.Forms.PictureBoxSizeMode, System.Windows.Forms">
-    <value>AutoSize</value>
-  </data>
-  <data name="pb_CameraGstream.TabIndex" type="System.Int32, mscorlib">
+  <data name="vv_VLC.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
-  <data name="&gt;&gt;pb_CameraGstream.Name" xml:space="preserve">
-    <value>pb_CameraGstream</value>
+  <data name="vv_VLC.Text" xml:space="preserve">
+    <value>videoView1</value>
   </data>
-  <data name="&gt;&gt;pb_CameraGstream.Type" xml:space="preserve">
-    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;vv_VLC.Name" xml:space="preserve">
+    <value>vv_VLC</value>
   </data>
-  <data name="&gt;&gt;pb_CameraGstream.Parent" xml:space="preserve">
+  <data name="&gt;&gt;vv_VLC.Type" xml:space="preserve">
+    <value>LibVLCSharp.WinForms.VideoView, LibVLCSharp.WinForms, Version=3.9.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;vv_VLC.Parent" xml:space="preserve">
     <value>tlp_CVBase</value>
   </data>
-  <data name="&gt;&gt;pb_CameraGstream.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;vv_VLC.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
   <data name="tlp_CVBase.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
@@ -1378,7 +1369,7 @@
     <value>0</value>
   </data>
   <data name="tlp_CVBase.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="tlp_ControlsBase" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="pb_CameraGstream" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100,Absolute,315" /&gt;&lt;Rows Styles="Percent,100,Absolute,20" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="tlp_ControlsBase" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="vv_VLC" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100,Absolute,315" /&gt;&lt;Rows Styles="Percent,100,Absolute,20" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

@@ -68,7 +68,7 @@
             this.btn_FullScreen = new System.Windows.Forms.Button();
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
-            this.pb_CameraGstream = new System.Windows.Forms.PictureBox();
+            this.vv_VLC = new LibVLCSharp.WinForms.VideoView();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
@@ -88,7 +88,7 @@
             this.tlp_AGLData.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
             this.tlp_CVBase.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb_CameraGstream)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).BeginInit();
             this.SuspendLayout();
             // 
             // tlp_ControlsBase
@@ -409,15 +409,15 @@
             // 
             resources.ApplyResources(this.tlp_CVBase, "tlp_CVBase");
             this.tlp_CVBase.Controls.Add(this.tlp_ControlsBase, 1, 0);
-            this.tlp_CVBase.Controls.Add(this.pb_CameraGstream, 0, 0);
+            this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
             this.tlp_CVBase.Name = "tlp_CVBase";
             // 
-            // pb_CameraGstream
+            // vv_VLC
             // 
-            resources.ApplyResources(this.pb_CameraGstream, "pb_CameraGstream");
-            this.pb_CameraGstream.Name = "pb_CameraGstream";
-            this.pb_CameraGstream.TabStop = false;
-            this.pb_CameraGstream.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pb_CameraGstream_MouseDoubleClick);
+            this.vv_VLC.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.vv_VLC, "vv_VLC");
+            this.vv_VLC.MediaPlayer = null;
+            this.vv_VLC.Name = "vv_VLC";
             // 
             // CameraView
             // 
@@ -452,8 +452,7 @@
             this.tlp_AGLData.PerformLayout();
             this.tlp_ButtonSection1.ResumeLayout(false);
             this.tlp_CVBase.ResumeLayout(false);
-            this.tlp_CVBase.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb_CameraGstream)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -497,7 +496,7 @@
         private System.Windows.Forms.Label lb_AltitudeValue;
         private System.Windows.Forms.Label lb_Agl;
         private System.Windows.Forms.TableLayoutPanel tlp_CVBase;
-        private System.Windows.Forms.PictureBox pb_CameraGstream;
         private System.Windows.Forms.Button btn_StartStopSingleYaw;
+        private LibVLCSharp.WinForms.VideoView vv_VLC;
     }
 }

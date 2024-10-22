@@ -35,6 +35,7 @@ using MV04.SingleYaw;
 using MV04.FlightPlanAnalyzer;
 using System.Timers;
 using MissionPlanner.Controls;
+using LibVLCSharp.Shared;
 
 namespace MissionPlanner.GCSViews
 {
@@ -139,15 +140,6 @@ namespace MissionPlanner.GCSViews
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
             MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
-            // Connect to camera
-            //if (bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream)))
-            //{
-            //    StartCameraStream();
-
-            //}
-            //else
-            //    MessageBox.Show("Start Camera stream manually -> auto start is false");
-
             StartCameraStream();
 
             StartCameraControl();
@@ -184,7 +176,7 @@ namespace MissionPlanner.GCSViews
             //timer for camera switchoff
             _cameraSwitchOffTimer = new System.Timers.Timer();
             _cameraSwitchOffTimer.Elapsed += _cameraSwitchOffTimer_Elapsed;
-            _cameraSwitchOffTimer.Interval = 30000;
+            _cameraSwitchOffTimer.Interval = 5*60000;
             _cameraSwitchOffTimer.Enabled = true;
 
             this.SetStyle(ControlStyles.AllPaintingInWmPaint |
@@ -193,60 +185,12 @@ namespace MissionPlanner.GCSViews
                 true);
 
             this.DoubleBuffered = true;
-            pb_CameraGstream.Paint += Pb_CameraGstream_Paint;
-
-            #region Gstreamer stream draw
-
-            GStreamer.onNewImage += async (sender, image) =>
-            {
-                try
-                {
-                    if (image == null || CameraView.instance.IsDisposed)
-                        return;
-
-                    img = new Bitmap(image.Width, image.Height, 4 * image.Width,
-                                System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
-                                image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
-                                    .Scan0);
-
-                    if (img == null) return;
-
-                    if (InvokeRequired)
-                        Invoke(new Action(() => { pb_CameraGstream.Invalidate(); }));
-                    else
-                        pb_CameraGstream.Invalidate();
-
-                }
-                catch (Exception ex)
-                {
-#if DEBUG
-
-                    if (reconnectingVideoStream)
-                        return;
-                    reconnectingVideoStream = true;
-                    Thread.Sleep(1000);
-                    GStreamer.StopAll();
-                    Thread.Sleep(1000);
-                    if (bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream)))
-                    {
-                        StartCameraStream();
-                    }
-
-                    StartCameraControl();
-                    reconnectingVideoStream = false;
-#endif
-                }
-            };
-
-            #endregion
 
             this.FormClosing += CameraView_FormClosing;
             
             _videoRecordTimer.Interval = 40;
             _videoRecordTimer.Elapsed += _videoRecordTimer_Tick;
             _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
-
-            pb_CameraGstream.Invalidate();
 
             bool autoRecord = bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream));
 
@@ -267,9 +211,45 @@ namespace MissionPlanner.GCSViews
 
             SetSingleYawButton();
             SetTripOnOffButton();
-
-
         }
+
+        LibVLCSharp.Shared.LibVLC _libVlc = new LibVLCSharp.Shared.LibVLC();
+        private MediaPlayer _mediaPlayer;
+        private string videoUrl = "rtp://225.1.2.3:11024/live0";
+
+        public void StartVLC()
+        {
+            var media = new Media(_libVlc, new Uri(videoUrl));
+            _mediaPlayer = new MediaPlayer(_libVlc)
+            {
+                Media = media
+            };
+            vv_VLC.MediaPlayer = _mediaPlayer;
+            _mediaPlayer.Fullscreen = true;
+
+            if(panelDoubleClick == null)
+            {
+                panelDoubleClick = new Panel();// this panel requires to catche double click evetns.
+                vv_VLC.Controls.Add(panelDoubleClick);
+                panelDoubleClick.BringToFront();
+                panelDoubleClick.Dock = DockStyle.Fill;
+                panelDoubleClick.BackColor = Color.Transparent;
+                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
+            }
+            else
+                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
+
+
+            _mediaPlayer.Play();
+        }
+        Panel panelDoubleClick;
+        public void StopVLC()
+        {
+            _mediaPlayer.Stop();
+            panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
+        }
+
+
         Label lb_FollowDebugText;
 
         private void SetTripOnOffButton()
@@ -469,23 +449,7 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraStream()
         {
-            bool success = StartGstreamerCameraStream(CameraHandler.url);
-
-            if (success)
-            {
-                FetchHudData();
-                FetchHudDataTimer.Start();
-
-#if DEBUG
-                AddToOSDDebug("Video stream started");
-#endif
-            }
-            else
-            {
-#if DEBUG
-                AddToOSDDebug("Failed start video stream");
-#endif
-            }
+            StartVLC();
         }
 
         private object lckStart = new object();
@@ -555,8 +519,8 @@ namespace MissionPlanner.GCSViews
 
         private void DoPhoto(string path = null)
         {
-            _actualCameraImage = new Bitmap(pb_CameraGstream.Width, pb_CameraGstream.Height);
-            pb_CameraGstream.DrawToBitmap(_actualCameraImage, new Rectangle(0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height));
+            _actualCameraImage = new Bitmap(vv_VLC.Width, vv_VLC.Height);
+            vv_VLC.DrawToBitmap(_actualCameraImage, new Rectangle(0, 0, vv_VLC.Width, vv_VLC.Height));
 
             if (path == null)
                 path = CameraHandler.Instance.MediaSavePath + "test" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
@@ -589,7 +553,7 @@ namespace MissionPlanner.GCSViews
                     {
                         var _actualCameraVideoImage = new Bitmap(1920, 1080);
 
-                        Invoke((MethodInvoker)delegate { pb_CameraGstream.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, 1920, 1080)); });
+                        Invoke((MethodInvoker)delegate { vv_VLC.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, 1920, 1080)); });
 
                         _videoRecorder.AddNewImage(_actualCameraVideoImage);
                     }
@@ -740,21 +704,6 @@ namespace MissionPlanner.GCSViews
             else
                 AddToOSDDebug("NV calibration failed");
 #endif
-        }
-
-        private bool StartGstreamerCameraStream(string p_url)
-        {
-            try
-            {
-                CameraHandler.Instance.StartGstreamer(p_url);
-                //GStreamer.StartA(p_url);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                CustomMessageBox.Show(ex.ToString(), Strings.ERROR);
-                return false;
-            }
         }
 
         #endregion
@@ -1225,7 +1174,6 @@ namespace MissionPlanner.GCSViews
                 
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
                 CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
-                pb_CameraGstream.Paint -= Pb_CameraGstream_Paint;
 
                 _droneStatusTimer.Dispose();
                 _cameraSwitchOffTimer.Dispose();
@@ -1249,63 +1197,6 @@ namespace MissionPlanner.GCSViews
 
         }
 
-        private object _lckGstreamPaint = new object();
-
-        private void Pb_CameraGstream_Paint(object sender, PaintEventArgs e)
-        {
-            try
-            {
-                if (CameraView.instance.IsDisposed)
-                    return;
-
-
-                if (img != null)
-                {
-                    lock (_lckGstreamPaint)//e.Graphics)
-                    {
-                        if (InvokeRequired)
-                            Invoke(new Action(() => {
-                                e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
-                                OnNewFrame(img.Width, img.Height, e.Graphics);
-                            }));
-                        else
-                        {
-                            e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
-                            OnNewFrame(img.Width, img.Height, e.Graphics);
-                        }
-
-                        
-                    }
-
-                    //lock (this._bgimagelock)
-                    //{
-                    //    e.Graphics.DrawImage(img, 0, 0, pb_CameraGstream.Width, pb_CameraGstream.Height);
-                    //}
-
-                    //OnNewFrame(img.Width, img.Height, e.Graphics);
-                }
-                
-            }
-            catch (Exception ex)
-            {
-#if DEBUG
-                //MessageBox.Show($"{"Onpaint" + ex.Message}");
-                if (reconnectingVideoStream)
-                    return;
-                reconnectingVideoStream = true;
-                Thread.Sleep(1000);
-                GStreamer.StopAll();
-                Thread.Sleep(1000);
-
-                if (bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream)))
-                    StartCameraStream();
-
-                StartCameraControl();
-                reconnectingVideoStream = false;
-#endif
-            }
-        }
-        bool reconnectingVideoStream = false;
         private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             if (CameraView.instance.IsDisposed)
@@ -1587,23 +1478,6 @@ namespace MissionPlanner.GCSViews
             //}
         }
 
-        /// <summary>
-        /// Start camera tracking
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void pb_CameraGstream_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            if (e.X <= 0 || e.Y <= 0)
-                return;
-
-            IsCameraTrackingModeActive = true;
-
-            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.pb_CameraGstream.Size);
-
-            SetStopButtonVisibility();
-        }
-
         #endregion
 
         #region Methods
@@ -1831,5 +1705,18 @@ namespace MissionPlanner.GCSViews
         {
             SetSingleYawButton();
         }
+
+        private void vv_VLC_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.X <= 0 || e.Y <= 0)
+                return;
+
+            IsCameraTrackingModeActive = true;
+
+            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.vv_VLC.Size);
+
+            SetStopButtonVisibility();
+        }
+
     }
 }

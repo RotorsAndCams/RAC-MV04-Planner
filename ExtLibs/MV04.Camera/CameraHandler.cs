@@ -162,10 +162,7 @@ namespace MV04.Camera
         }
 
         private System.Threading.Timer RecordingTimer;
-        //uridecodebin uri=udp://225.1.2.3:11024/live0 ! autovideosink
-        //url = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=25/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
-        public static string url = $"uridecodebin uri=udp://225.1.2.3:11024/live{SettingManager.Get(Setting.CameraStreamChannel)} latency=0 ! video/x-raw ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";  
-
+        
         #endregion
 
         #region Camera control Fields
@@ -251,9 +248,6 @@ namespace MV04.Camera
             {
                 MessageBox.Show("Invalid MavProto - CameraHandler - ctor");
             }
-#if DEBUG
-            //url = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=25/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
-#endif
         }
 
         #endregion
@@ -314,45 +308,7 @@ namespace MV04.Camera
 
         #region Methods
 
-        System.Threading.Thread _currentGstream = null;
-        private object _currentGstreamLock = new object();
-        public void StartGstreamer(string u)
-        {
-            try
-            {
-                lock (_currentGstreamLock)
-                {
-                    if (_currentGstream != null)
-                    {
-                        _currentGstream.Abort();
-                        //_currentGstream = null;
-                        //GStreamer.Stop(null);
-                        Thread.Sleep(500);
-                        GStreamer.StopAll();
-                        _currentGstream = null;
-                        Thread.Sleep(500);
-                    }
-
-                    _currentGstream = GStreamer.StartA(u);
-                }
-                
-            }
-            catch(Exception ex)
-            {
-#if DEBUG
-                MessageBox.Show("Exception at Start video stream: " + ex.Message);
-#endif
-                Thread.Sleep(300);
-                _currentGstream = GStreamer.StartA(u);
-            }
-            
-        }
-
-        public void StopGstreamer()
-        {
-            GStreamer.StopAll();
-        }
-
+        
         public bool HasCameraReport(MavReportType report_type)
         {
             if (CameraReports == null) CameraReports = new Dictionary<MavReportType, object>();
