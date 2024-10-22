@@ -227,12 +227,15 @@ namespace MissionPlanner.GCSViews
 
         private void StartVLC()
         {
-            var media = new Media(_libVlc, new Uri(videoUrl));
-            _mediaPlayer = new MediaPlayer(_libVlc)
-            {
-                Media = media
-            };
+
+            _mediaPlayer = new MediaPlayer(_libVlc);
+            //{
+            //    Media = media
+            //};
             vv_VLC.MediaPlayer = _mediaPlayer;
+            var media = new Media(_libVlc, new Uri(videoUrl));
+
+
             _mediaPlayer.Fullscreen = true;
             _mediaPlayer.EnableHardwareDecoding = true;
             _mediaPlayer.NetworkCaching = 300;
@@ -249,8 +252,20 @@ namespace MissionPlanner.GCSViews
             else
                 panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
 
+            vv_VLC.ThisReallyVisible();
+            vv_VLC.ChildReallyVisible();
+            _mediaPlayer.Play(media);
 
-            _mediaPlayer.Play();
+            //and for record a new one? and start recording must be handled differently must convert to other format
+
+            var vlcc = new LibVLCSharp.Shared.LibVLC();
+            var mp = new MediaPlayer(vlcc);
+            
+            var mediaaaaa = new Media(vlcc, new Uri(videoUrl));
+            mediaaaaa.AddOption(":sout=#file{dst=" + CameraHandler.Instance.MediaSavePath + "savetestTTTT" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".ts" + "}");
+            
+            mp.Play(mediaaaaa);
+
         }
         Panel panelDoubleClick;
         public void StopVLC()
@@ -395,7 +410,6 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-
         System.Timers.Timer _feedTimer = new System.Timers.Timer();
         ElapsedEventHandler handler = null;
         double followTestCounter = 0.0;
@@ -537,8 +551,8 @@ namespace MissionPlanner.GCSViews
 
         private void DoPhoto(string path = null)
         {
-            _actualCameraImage = new Bitmap(vv_VLC.Width, vv_VLC.Height);
-            vv_VLC.DrawToBitmap(_actualCameraImage, new Rectangle(0, 0, vv_VLC.Width, vv_VLC.Height));
+            _actualCameraImage = new Bitmap(vv_VLC.TopLevelControl.Width, vv_VLC.TopLevelControl.Height);
+            vv_VLC.TopLevelControl.DrawToBitmap(_actualCameraImage, new Rectangle(0, 0, vv_VLC.TopLevelControl.Width, vv_VLC.TopLevelControl.Height));
 
             if (path == null)
                 path = CameraHandler.Instance.MediaSavePath + "test" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
