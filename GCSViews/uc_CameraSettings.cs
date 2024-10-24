@@ -79,7 +79,7 @@ namespace MissionPlanner.GCSViews
             SetIfValid(returnData, Setting.AltFormat, comboBox_altFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.DistFormat, comboBox_distFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.SpeedFormat, comboBox_speedFormat.SelectedItem.ToString());
-            SetIfValid(returnData, Setting.AutoRecordVideoStream, radioButton_AutoConnect_Yes.Checked.ToString());
+            SetIfValid(returnData, Setting.AutoRecordVideoStream, rb_AutoRecordYes.Checked.ToString());
             SetIfValid(returnData, Setting.AutoStartSingleYaw, rb_YesSY.Checked.ToString());
             SetIfValid(returnData, Setting.AutoStartCameraStream, rb_AutoStartCameraStream_Yes.Checked.ToString());
 

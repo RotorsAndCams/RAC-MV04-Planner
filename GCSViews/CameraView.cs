@@ -449,18 +449,6 @@ namespace MissionPlanner.GCSViews
 
         private void DoPhoto(string path = null)
         {
-            //            _actualCameraImage = new Bitmap(vv_VLC.TopLevelControl.Width, vv_VLC.TopLevelControl.Height);
-            //            vv_VLC.TopLevelControl.DrawToBitmap(_actualCameraImage, new Rectangle(0, 0, vv_VLC.TopLevelControl.Width, vv_VLC.TopLevelControl.Height));
-
-            //            if (path == null)
-            //                path = CameraHandler.Instance.MediaSavePath + "test" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
-
-            //            if (_actualCameraImage != null)
-            //                _actualCameraImage.Save(path, ImageFormat.Jpeg);
-
-            //#if DEBUG
-            //            AddToOSDDebug("Photo taken");
-            //#endif
             Rectangle bounds = Screen.PrimaryScreen.Bounds;
             using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height))
             using (Graphics g = Graphics.FromImage(bitmap))
@@ -468,7 +456,6 @@ namespace MissionPlanner.GCSViews
                 g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
                 bitmap.Save(CameraHandler.Instance.MediaSavePath + "test" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", ImageFormat.Jpeg);
             }
-
         }
 
         private void _videoRecordSegmentTimer_Tick(object sender, EventArgs e)
