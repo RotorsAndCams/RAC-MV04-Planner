@@ -48,23 +48,15 @@ namespace MissionPlanner.GCSViews
 
         string CameraIP;
         int CameraStreamChannel;
-        new Font DefaultFont;
-        Brush DefaultBrush;
-        Rectangle VideoRectangle;
-        Graphics gr;
         HudElements HudElements = new HudElements();
-
-        System.Timers.Timer FetchHudDataTimer = new System.Timers.Timer();
 
         (int major, int minor, int build) CameraControlDLLVersion;
 
-        Random rnd = new Random();
         bool OSDDebug = true;
         string[] OSDDebugLines = new string[10];
 
         private CameraFullScreenForm _cameraFullScreenForm;
         private bool _isFPVModeActive = false;
-        public static Size Trip5Size = new Size(1920, 1200);
         public static bool IsCameraTrackingModeActive { get; set; } = false;
 
         System.Timers.Timer _droneStatusTimer;
@@ -79,12 +71,8 @@ namespace MissionPlanner.GCSViews
             get { return _tripSwitchedOff; }
         }
 
-        Image img;
-        private readonly object _bgimagelock = new object();
-
         Bitmap _actualCameraImage;
 
-        int _frameRate = 25;
         bool _recordingInProgress = false;
         int _segmentLength;
 
@@ -106,6 +94,28 @@ namespace MissionPlanner.GCSViews
 
         }
 
+        System.Timers.Timer _videoRecordSegmentTimer = new System.Timers.Timer();
+
+        private static LibVLCSharp.Shared.LibVLC _libVlc;
+        private static MediaPlayer _mediaPlayer;
+        private static Media media;
+        private static string videoUrl = "rtp://225.1.2.3:11024/live0";
+
+        LibVLCSharp.Shared.LibVLC _vlcRecord;
+        MediaPlayer _mediaPlayerRecord;
+        Media _mediaRecor;
+
+        Panel panelDoubleClick;
+        Label lb_FollowDebugText;
+
+        System.Timers.Timer _feedTimer = new System.Timers.Timer();
+        ElapsedEventHandler handler = null;
+        double followTestCounter = 0.0;
+
+        private object lckStart = new object();
+        bool _enableCrossHair = true;
+        private const int MAXBLINK = 14;
+
         #endregion
 
         #region Conversion multipliers
@@ -122,19 +132,15 @@ namespace MissionPlanner.GCSViews
             InitializeComponent();
             instance = this;
 
-            // Camera
+            #region Camera set up
+
             CameraIP = SettingManager.Get(Setting.CameraIP);
             CameraStreamChannel = int.Parse(SettingManager.Get(Setting.CameraStreamChannel));
-            FetchHudDataTimer.Interval = 100; // 10Hz
-            FetchHudDataTimer.Elapsed += (sender, eventArgs) => FetchHudData();
             CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
-
-            // Create default drawing objects
-            DefaultFont = new Font(FontFamily.GenericMonospace, this.Font.SizeInPoints * 2f);
-            DefaultBrush = new SolidBrush(Color.Red);
 
             // Snapshot & video save location
             CameraHandler.Instance.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
+
 
             // SysID for camera functions
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
@@ -143,15 +149,34 @@ namespace MissionPlanner.GCSViews
             StartCameraStream();
 
             StartCameraControl();
+
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
             CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
+
+            CameraHandler.Instance.SetEnableCrossHair(_enableCrossHair);
+
+            #endregion
+
+            #region UI config
+
 
             // Draw UI
             DrawUI();
             DisableControls();
             SetStopButtonVisibility();
+            SetSingleYawButton();
 
-            //States
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.UserPaint |
+                ControlStyles.OptimizedDoubleBuffer,
+                true);
+
+            this.DoubleBuffered = true;
+
+            #endregion
+
+            #region State handling
+
             SetDroneStatusValue();
             SetDroneLEDStates(enum_LandingLEDState.Off, enum_PositionLEDState_IR.Off, enum_PositionLEDState_RedLight.Off);
             LEDStateHandler.LedStateChanged += LEDStateHandler_LedStateChanged;
@@ -166,6 +191,10 @@ namespace MissionPlanner.GCSViews
             _droneStatusTimer.Interval = 3000;
             _droneStatusTimer.Enabled = true;
 
+            #endregion
+
+            #region altitude control set up 
+
             if((int)MainV2.comPort.MAV.cs.alt < _minAllowedAltitudeValue)
                 this.cs_ColorSliderAltitude.Value = _minAllowedAltitudeValue;
             else if((int)MainV2.comPort.MAV.cs.alt > _maxAllowedAltitudeValue)
@@ -173,33 +202,21 @@ namespace MissionPlanner.GCSViews
             else
                 this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
 
+            #endregion
+
+            #region auto TRIP switch off
+
             //timer for camera switchoff
             _cameraSwitchOffTimer = new System.Timers.Timer();
             _cameraSwitchOffTimer.Elapsed += _cameraSwitchOffTimer_Elapsed;
             _cameraSwitchOffTimer.Interval = 5*60000;
             _cameraSwitchOffTimer.Enabled = true;
+            SetTripOnOffButton();
 
-            this.SetStyle(ControlStyles.AllPaintingInWmPaint |
-                ControlStyles.UserPaint |
-                ControlStyles.OptimizedDoubleBuffer,
-                true);
+            #endregion
 
-            this.DoubleBuffered = true;
+            #region debug label
 
-            this.FormClosing += CameraView_FormClosing;
-            
-            _videoRecordTimer.Interval = 40;
-            _videoRecordTimer.Elapsed += _videoRecordTimer_Tick;
-            _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
-
-            bool autoRecord = bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream));
-
-            if (autoRecord)
-            {
-                StartRecording();
-            }
-
-            
             lb_FollowDebugText = new Label();
             lb_FollowDebugText.Text = "Debug";
             lb_FollowDebugText.ForeColor = Color.White;
@@ -208,114 +225,22 @@ namespace MissionPlanner.GCSViews
             this.Controls.Add(lb_FollowDebugText);
             lb_FollowDebugText.BringToFront();
 
+            #endregion
 
-            SetSingleYawButton();
-            SetTripOnOffButton();
-        }
+            #region recording vlc stream
 
-        LibVLCSharp.Shared.LibVLC _libVlc = new LibVLCSharp.Shared.LibVLC();
-        private MediaPlayer _mediaPlayer;
-        private string videoUrl = "rtp://225.1.2.3:11024/live0";
+            _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
+            _videoRecordSegmentTimer.Interval = _segmentLength * 1000;
+            _videoRecordSegmentTimer.Elapsed += _videoRecordSegmentTimer_Tick;
 
-        public void StartVideoStreamVLC()
-        {
-            if (InvokeRequired)
-                Invoke(new Action(() => StartVLC()));
-            else
-                StartVLC();
-        }
-
-        private void StartVLC()
-        {
-
-            _mediaPlayer = new MediaPlayer(_libVlc);
-            //{
-            //    Media = media
-            //};
-            vv_VLC.MediaPlayer = _mediaPlayer;
-            var media = new Media(_libVlc, new Uri(videoUrl));
-
-
-            _mediaPlayer.Fullscreen = true;
-            _mediaPlayer.EnableHardwareDecoding = true;
-            _mediaPlayer.NetworkCaching = 300;
-
-            if (panelDoubleClick == null)
+            if (bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream)))
             {
-                panelDoubleClick = new Panel();// panel for double click
-                vv_VLC.Controls.Add(panelDoubleClick);
-                panelDoubleClick.BringToFront();
-                panelDoubleClick.Dock = DockStyle.Fill;
-                panelDoubleClick.BackColor = Color.Transparent;
-                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
+                StartRecording();
             }
-            else
-                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
 
-            vv_VLC.ThisReallyVisible();
-            vv_VLC.ChildReallyVisible();
-            _mediaPlayer.Play(media);
+            #endregion
 
-            //and for record a new one? and start recording must be handled differently must convert to other format
-
-            var vlcc = new LibVLCSharp.Shared.LibVLC();
-            var mp = new MediaPlayer(vlcc);
-            
-            var mediaaaaa = new Media(vlcc, new Uri(videoUrl));
-            mediaaaaa.AddOption(":sout=#file{dst=" + CameraHandler.Instance.MediaSavePath + "savetestTTTT" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".ts" + "}");
-            
-            mp.Play(mediaaaaa);
-
-        }
-        Panel panelDoubleClick;
-        public void StopVLC()
-        {
-            if (InvokeRequired)
-                Invoke(new Action(() => {
-                    _mediaPlayer.Stop();
-                    panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
-                }));
-            else
-            {
-                _mediaPlayer.Stop();
-                panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
-            }
-        }
-
-
-        Label lb_FollowDebugText;
-
-        private void SetTripOnOffButton()
-        {
-
-            if (InvokeRequired)
-                Invoke(new Action(() => {
-                    if (_tripSwitchedOff)
-                    {
-                        btn_TripSwitchOnOff.BackColor = Color.Black;
-                        btn_TripSwitchOnOff.Text = "Trip is Off";
-                    }
-
-                    else
-                    {
-                        btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
-                        btn_TripSwitchOnOff.Text = "Trip is On";
-                    }
-                }));
-            else
-            {
-                if (_tripSwitchedOff)
-                {
-                    btn_TripSwitchOnOff.BackColor = Color.Black;
-                    btn_TripSwitchOnOff.Text = "Trip is Off";
-                }
-
-                else
-                {
-                    btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
-                    btn_TripSwitchOnOff.Text = "Trip is On";
-                }
-            }
+            this.FormClosing += CameraView_FormClosing;
         }
 
         #endregion
@@ -337,13 +262,8 @@ namespace MissionPlanner.GCSViews
             this.tlp_AGLContainer.Visible = false;
         }
 
-        /// <summary>
-        /// Draws UI elements
-        /// </summary>
         private void DrawUI()
         {
-            CameraSettingsForm.Instance.event_StartStopRecording += CameraSettings_event_StartStopRecording;
-            
             // Test functions
             #region Test functions
 
@@ -410,9 +330,6 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-        System.Timers.Timer _feedTimer = new System.Timers.Timer();
-        ElapsedEventHandler handler = null;
-        double followTestCounter = 0.0;
         private void StartFeed()
         {
             PointLatLngAlt target = new PointLatLngAlt();
@@ -475,16 +392,12 @@ namespace MissionPlanner.GCSViews
             _feedTimer.Stop();
         }
 
-
-
         #region CameraFunctions
 
         private void StartCameraStream()
         {
             StartVideoStreamVLC();
         }
-
-        private object lckStart = new object();
 
         private void StartCameraControl()
         {
@@ -528,23 +441,8 @@ namespace MissionPlanner.GCSViews
 
         private void ChangeCrossHair()
         {
-            SetCrosshairType(HudElements.Crosshairs == CrosshairsType.Plus ? CrosshairsType.HorizontalDivisions : CrosshairsType.Plus);
-
-#if DEBUG
-            AddToOSDDebug("Crosshairs set to " + Enum.GetName(typeof(CrosshairsType), HudElements.Crosshairs));
-#endif
-        }
-
-        /// <summary>
-        /// Set the crosshair type on the OSD
-        /// </summary>
-        /// <param name="type">Crosshair type to set</param>
-        private void SetCrosshairType(CrosshairsType type)
-        {
-            if (HudElements.Crosshairs != type)
-            {
-                HudElements.Crosshairs = type;
-            }
+            CameraHandler.Instance.SetEnableCrossHair(!_enableCrossHair);
+            _enableCrossHair = !_enableCrossHair;
         }
 
         #endregion
@@ -565,58 +463,39 @@ namespace MissionPlanner.GCSViews
 #endif
         }
 
-        object _lockImageSaveTimer = new object();
-        System.Timers.Timer _videoRecordTimer = new System.Timers.Timer();
-        private VideoRecorder _videoRecorder = new VideoRecorder();
-
-        /// <summary>
-        /// Add bitmap to the list
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _videoRecordTimer_Tick(object sender, EventArgs e)
+        private void _videoRecordSegmentTimer_Tick(object sender, EventArgs e)
         {
-            lock (_lockImageSaveTimer)
-            {
-                if (_recordingInProgress)
-                {
-
-                    try
-                    {
-                        var _actualCameraVideoImage = new Bitmap(1920, 1080);
-
-                        Invoke((MethodInvoker)delegate { vv_VLC.DrawToBitmap(_actualCameraVideoImage, new Rectangle(0, 0, 1920, 1080)); });
-
-                        _videoRecorder.AddNewImage(_actualCameraVideoImage);
-                    }
-                    catch { }
-
-
-
-                }
-                else
-                {
-                    _videoRecordTimer.Stop();
-                    _videoRecordTimer.Close();
-                }
-
-            }
+            _mediaPlayerRecord.Stop();
+            _mediaPlayerRecord.Play(_mediaRecor);
         }
 
         private void StartRecording()
         {
-            int sl = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
+            if(_vlcRecord == null)
+                _vlcRecord = new LibVLCSharp.Shared.LibVLC();
 
-            _videoRecordTimer?.Start();
-            _videoRecorder.Start();
+            if(_mediaPlayerRecord == null)
+                _mediaPlayerRecord = new MediaPlayer(_vlcRecord);
 
+            if(_mediaRecor == null)
+            {
+                _mediaRecor = new Media(_vlcRecord, new Uri(videoUrl));
+                _mediaRecor.AddOption(":sout=#file{dst=" + CameraHandler.Instance.MediaSavePath + "savetestTTTT" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".ts" + "}");
+            }
+
+            _mediaPlayerRecord.Play(_mediaRecor);
+            _videoRecordSegmentTimer?.Start();
             _recordingInProgress = true;
         }
 
-        private void StopRecording()
+        public void StopRecording()
         {
+            _videoRecordSegmentTimer?.Stop();
+
+            if(_mediaPlayerRecord != null)
+                _mediaPlayerRecord.Stop();
+
             _recordingInProgress = false;
-            _videoRecordTimer?.Stop();
         }
 
         private async Task ResetZoom()
@@ -742,242 +621,6 @@ namespace MissionPlanner.GCSViews
 
         #region Drawing
 
-        private void OnNewFrame(int width, int height, Graphics _gr)
-        {
-            // frame_buf is 1920 x 1080 x 3 long
-            // real frame is width x height
-
-            // Create drawing objects
-            
-            _gr.InterpolationMode = InterpolationMode.High;
-            _gr.SmoothingMode = SmoothingMode.HighQuality;
-            _gr.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-            _gr.CompositingQuality = CompositingQuality.HighQuality;
-            VideoRectangle = new Rectangle()
-            {
-                X = (int)Math.Round(_gr.VisibleClipBounds.X),
-                Y = (int)Math.Round(_gr.VisibleClipBounds.Y),
-                Width = (int)Math.Round(_gr.VisibleClipBounds.Width),
-                Height = (int)Math.Round(_gr.VisibleClipBounds.Height)
-            };
-
-            // Datetime
-            Rectangle Datetime = DrawText(HudElements.Time, new Point(3, 3), ContentAlignment.TopLeft, HorizontalAlignment.Left, null,null,null, _gr);
-
-            // Battery
-            Rectangle Battery = DrawText(HudElements.Battery, new Point(VideoRectangle.Width - 3, 3), ContentAlignment.TopRight, HorizontalAlignment.Right, null, null, null, _gr);
-
-            int topLeft = Datetime.Right;
-            int topStep = ((Battery.Left - topLeft) / 4) / 2;
-
-            // AGL
-            DrawText(HudElements.AGL, new Point(topLeft + topStep, 3), ContentAlignment.TopCenter, HorizontalAlignment.Left, null, null, null, _gr);
-
-            // Velocity
-            DrawText(HudElements.Velocity, new Point(topLeft + (3 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left, null, null, null, _gr);
-
-            // TGD
-            DrawText(HudElements.TGD, new Point(topLeft + (5 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Left, null, null, null, _gr);
-
-            // Signal strengths
-            DrawText(HudElements.SignalStrengths, new Point(topLeft + (7 * topStep), 3), ContentAlignment.TopCenter, HorizontalAlignment.Right, null, null, null, _gr);
-
-            // Camera info
-            DrawText(HudElements.Camera, new Point(3, Datetime.Bottom + 20), ContentAlignment.TopLeft, HorizontalAlignment.Right, null, null, null, _gr);
-
-            // Next waypoint
-            Rectangle nextWP = DrawText(HudElements.ToWaypoint, new Point(VideoRectangle.Width - 3, Battery.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right, null, null, null, _gr);
-
-            // Operator distance
-            DrawText(HudElements.FromOperator, new Point(VideoRectangle.Width - 3, nextWP.Bottom + 20), ContentAlignment.TopRight, HorizontalAlignment.Right, null, null, null, _gr);
-
-            // Coords
-            DrawText(HudElements.DroneGps, new Point(0, VideoRectangle.Height - 3), ContentAlignment.BottomLeft, HorizontalAlignment.Left, null, null, null, _gr);
-            DrawText(HudElements.TargetGps, new Point(VideoRectangle.Width - 3, VideoRectangle.Height - 3), ContentAlignment.BottomRight, HorizontalAlignment.Right, null, null, null, _gr);
-
-            #region Crosshairs
-            int lineHeight = (int)Math.Round(VideoRectangle.Height * 0.1);
-            Pen linePen = new Pen(Color.Red, 1);
-
-            if (HudElements.Crosshairs == CrosshairsType.Plus) // Plus
-            {
-                _gr.DrawLine(linePen,
-                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                    (VideoRectangle.Width / 2) + lineHeight, VideoRectangle.Height / 2);
-                _gr.DrawLine(linePen,
-                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                    VideoRectangle.Width / 2, (VideoRectangle.Height / 2) + lineHeight);
-                _gr.DrawLine(linePen,
-                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                    (VideoRectangle.Width / 2) - lineHeight, VideoRectangle.Height / 2);
-                _gr.DrawLine(linePen,
-                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                    VideoRectangle.Width / 2, (VideoRectangle.Height / 2) - lineHeight);
-            }
-            else // Horizontal
-            {
-                // Draw center ^ character
-                _gr.DrawLine(new Pen(Color.Red, 3),
-                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                    (VideoRectangle.Width / 2) - Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-                _gr.DrawLine(new Pen(Color.Red, 3),
-                    VideoRectangle.Width / 2, VideoRectangle.Height / 2,
-                    (VideoRectangle.Width / 2) + Math.Min(lineHeight / 2, HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-
-                for (int i = 1; i <= 3; i++)
-                {
-                    // Draw lines to the right
-                    _gr.DrawLine(linePen,
-                        (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) + (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-
-                    // Draw lines to the left
-                    _gr.DrawLine(linePen,
-                        (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), VideoRectangle.Height / 2,
-                        (VideoRectangle.Width / 2) - (i * HudElements.LineSpacing), (VideoRectangle.Height / 2) + lineHeight);
-                }
-
-                // Draw number under first right line
-                DrawText(HudElements.LineDistance.ToString(), new Point((VideoRectangle.Width / 2) + HudElements.LineSpacing, (VideoRectangle.Height / 2) + lineHeight + 3), ContentAlignment.TopCenter, HorizontalAlignment.Center, new Font(DefaultFont.FontFamily, this.Font.SizeInPoints, FontStyle.Regular));
-            }
-            #endregion
-
-            // OSDDebug
-            if (OSDDebug && !string.IsNullOrWhiteSpace(OSDDebugLines[0]))
-            {
-                string text = OSDDebugLines[0];
-                for (int i = 1; i < OSDDebugLines.Length; i++)
-                {
-                    if (!string.IsNullOrWhiteSpace(OSDDebugLines[i]))
-                    {
-                        text += "\n" + OSDDebugLines[i];
-                    }
-                }
-
-                DrawText(text, new Point(VideoRectangle.Width - 3, VideoRectangle.Height / 2), ContentAlignment.TopRight, HorizontalAlignment.Left, new Font(DefaultFont.FontFamily, DefaultFont.Size * 0.75f), Brushes.Lime);
-            }
-        }
-
-        /// <summary>
-        /// Pixel count for a given horizontal distance (in meters) at the camera target
-        /// </summary>
-        /// <param name="slantRange">Camera target distance in meters</param>
-        /// <param name="fovDegrees">Camera field of view in degrees</param>
-        /// <param name="fovPixels">Camera field of view in pixels (video horizontal resolution)</param>
-        /// <param name="hMeters">Desired horizontal distance for the return value</param>
-        /// <returns>Pixel count for a given horizontal distance (in meters) at the camera target</returns>
-        private int PixelsForMeters(double slantRange, double fovDegrees, int fovPixels, int hMeters = 10)
-        {
-            double fovMeters = 2.0 * slantRange * Math.Tan(MathHelper.Radians(fovDegrees / 2.0));
-            int pixelPerMeter = (int)Math.Round((double)fovPixels / fovMeters); // Use Math.Ceiling() instead?
-            return pixelPerMeter * hMeters;
-        }
-
-        /// <summary>
-        /// Draws a text on the control at a given location
-        /// </summary>
-        private Rectangle DrawText(string text, Point position, ContentAlignment rectangleAlignment = ContentAlignment.TopLeft, HorizontalAlignment textAlignment = HorizontalAlignment.Left, Font textFont = null, Brush textBrush = null, Rectangle? drawArea = null, Graphics drawGraphics = null)
-        {
-            // Null check text
-            text = text ?? "";
-
-            // Set nullables
-            textFont = textFont ?? DefaultFont;
-            textBrush = textBrush ?? DefaultBrush;
-            drawArea = drawArea ?? VideoRectangle;
-            drawGraphics = drawGraphics != null ? drawGraphics : this.CreateGraphics();
-
-            // Check position
-            if (position.X >= 0
-                && position.X <= drawArea.Value.Width
-                && position.Y >= 0
-                && position.Y <= drawArea.Value.Height)
-            {
-                // Draw text
-                StringAlignment textHorizontalAlignment = StringAlignment.Near; // Relative to top left corner
-                switch (textAlignment)
-                {
-                    case HorizontalAlignment.Center:
-                        textHorizontalAlignment = StringAlignment.Center;
-                        break;
-                    case HorizontalAlignment.Right:
-                        textHorizontalAlignment = StringAlignment.Far;
-                        break;
-                    default: // HorizontalAlignment.Left
-                        break;
-                }
-                StringFormat textFormat = new StringFormat()
-                {
-                    Alignment = textHorizontalAlignment,
-                    LineAlignment = StringAlignment.Center, // Relative to top left corner
-                    FormatFlags = StringFormatFlags.NoWrap | StringFormatFlags.NoClip
-                };
-
-                Size textSize = TextSize(text, textFont, drawGraphics);
-                switch (rectangleAlignment)
-                {
-                    case ContentAlignment.TopCenter:
-                        position.X -= textSize.Width / 2;
-                        break;
-                    case ContentAlignment.TopRight:
-                        position.X -= textSize.Width + 1;
-                        break;
-                    case ContentAlignment.MiddleLeft:
-                        position.Y -= textSize.Height / 2;
-                        break;
-                    case ContentAlignment.MiddleCenter:
-                        position.X -= textSize.Width / 2;
-                        position.Y -= textSize.Height / 2;
-                        break;
-                    case ContentAlignment.MiddleRight:
-                        position.X -= textSize.Width + 1;
-                        position.Y -= textSize.Height / 2;
-                        break;
-                    case ContentAlignment.BottomLeft:
-                        position.Y -= textSize.Height + 1;
-                        break;
-                    case ContentAlignment.BottomCenter:
-                        position.X -= textSize.Width / 2;
-                        position.Y -= textSize.Height + 1;
-                        break;
-                    case ContentAlignment.BottomRight:
-                        position.X -= textSize.Width + 1;
-                        position.Y -= textSize.Height + 1;
-                        break;
-                    default: // ContentAlignment.TopLeft
-                        break;
-                }
-                Rectangle textRectangle = new Rectangle()
-                {
-                    Size = textSize,
-                    Location = position
-                };
-
-                // Draw text on control
-                drawGraphics.DrawString(text, textFont, textBrush, textRectangle, textFormat);
-
-                // Return rectangle
-                return textRectangle;
-            }
-            else
-            {
-                return new Rectangle();
-            }
-        }
-
-        /// <summary>
-        /// Calculates the bounding rectangle size for a text
-        /// </summary>
-        private Size TextSize(string text, Font font, Graphics graphics)
-        {
-            SizeF size = graphics.MeasureString(text.Split('\n').OrderByDescending(s => s.Length).FirstOrDefault(), font);
-            return new Size()
-            {
-                Width = (int)Math.Ceiling(size.Width) + 4,
-                Height = (int)Math.Ceiling(size.Height * (text.Count(c => c == '\n') + 1))
-            };
-        }
-
         /// <summary>
         /// Add a new line to the OSD debug text
         /// </summary>
@@ -998,200 +641,6 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-        #region HUD
-
-        /// <summary>
-        /// Fetches fresh data for the overlay elements
-        /// </summary>
-        private void FetchHudData()
-        {
-            CurrentState cs = MainV2.comPort.MAV.cs;
-
-            // Date and time
-            DateTime now = DateTime.Now;
-            int utcOffset = TimeZone.CurrentTimeZone.GetUtcOffset(now).Hours;
-            HudElements.Time = $"{now.Day.ToString().PadLeft(2, '0')}{now.ToString("MMM", new CultureInfo("en-US")).ToUpperInvariant()}{now.Year}\n{now.ToString("HH:mm:ss")}\nUTC{(utcOffset >= 0 ? "+" : "")}{utcOffset}";
-
-            /// Above Ground Level
-            HudElements.AGL = "AGL";
-            switch (SettingManager.Get(Setting.AltFormat))
-            {
-                case "ft":
-                    HudElements.AGL += ((int)Math.Round(cs.alt * Meter_to_Feet)).ToString().PadLeft(4);
-                    break;
-                default: // "m"
-                    HudElements.AGL += ((int)Math.Round(cs.alt)).ToString().PadLeft(4); // cs.alt is in meters
-                    break;
-            }
-            HudElements.AGL += SettingManager.Get(Setting.AltFormat).ToUpper();
-
-            // Horizontal velocity (ground speed)
-            HudElements.Velocity = "VEL";
-            switch (SettingManager.Get(Setting.SpeedFormat))
-            {
-                case "kmph":
-                    HudElements.Velocity += ((int)Math.Round(cs.groundspeed * Mps_to_Kmph)).ToString().PadLeft(4) + "KM/H";
-                    break;
-                case "knots":
-                    HudElements.Velocity += ((int)Math.Round(cs.groundspeed * Mps_to_Knots)).ToString().PadLeft(4) + "KTS";
-                    break;
-                default: // mps
-                    HudElements.Velocity += ((int)Math.Round(cs.groundspeed)).ToString().PadLeft(4) + "M/S"; // cs.groundspeed is in m/s
-                    break;
-            }
-
-            // Target distance (slant range)
-            HudElements.TGD = "TGD";
-            bool hasGndCrsRep = CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.GndCrsReport);
-            double slantRange = hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 0;
-            switch (SettingManager.Get(Setting.DistFormat))
-            {
-                case "km":
-                    HudElements.TGD += ((int)Math.Round(slantRange * 1000)).ToString().PadLeft(5);
-                    break;
-                case "ft":
-                    HudElements.TGD += ((int)Math.Round(slantRange * Meter_to_Feet)).ToString().PadLeft(5);
-                    break;
-                default: // m
-                    HudElements.TGD += ((int)Math.Round(slantRange)).ToString().PadLeft(5);
-                    break;
-            }
-            HudElements.TGD += SettingManager.Get(Setting.DistFormat).ToUpper();
-
-            // Battery percentage
-            HudElements.Battery = "BAT"
-                + cs.battery_remaining.ToString().PadLeft(4) + "%"; // Percentage
-            //HudElements.Battery += $"\n00:{rnd.Next(0, 60).ToString().PadLeft(2, '0')}:{rnd.Next(0, 60).ToString().PadLeft(2, '0')}"; // Remaining time
-
-            // Radio & GPS signal strength
-            HudElements.SignalStrengths = "RADIO" + cs.linkqualitygcs.ToString().PadLeft(8) + "%";  // Radio signal percentage
-            string gpsStr;
-            switch (cs.gpsstatus)
-            {
-                case 0: gpsStr = "NO GPS"; break;
-                case 1: gpsStr = "NO FIX"; break;
-                case 2: gpsStr = "2D FIX"; break;
-                case 3: gpsStr = "3D FIX"; break;
-                case 4: gpsStr = "DGPS FIX"; break;
-                case 5: gpsStr = "RTK LOW"; break;
-                case 6: gpsStr = "RTK FIX"; break;
-                default: gpsStr = cs.gpsstatus.ToString(); break;
-            }
-            HudElements.SignalStrengths += "\nGPS" + gpsStr.PadLeft(11);                            // GPS signal percentage
-
-            // Operator (home) distance
-            HudElements.FromOperator = "OPERATOR";
-            switch (SettingManager.Get(Setting.DistFormat))
-            {
-                case "km":
-                    HudElements.FromOperator += ((int)Math.Round(cs.DistToHome * 1000)).ToString().PadLeft(5);
-                    break;
-                case "ft":
-                    HudElements.FromOperator += ((int)Math.Round(cs.DistToHome * Meter_to_Feet)).ToString().PadLeft(5);
-                    break;
-                default: // m
-                    HudElements.FromOperator += ((int)Math.Round(cs.DistToHome)).ToString().PadLeft(5); // cs.DistToHome is in meters
-                    break;
-            }
-            HudElements.FromOperator += SettingManager.Get(Setting.DistFormat).ToUpper();
-
-            // Next waypoint distance
-            HudElements.ToWaypoint = "WAYPOINT";
-            switch (SettingManager.Get(Setting.DistFormat))
-            {
-                case "km":
-                    HudElements.ToWaypoint += (cs.wp_dist * 1000).ToString().PadLeft(5);
-                    break;
-                case "ft":
-                    HudElements.ToWaypoint += (cs.wp_dist * Meter_to_Feet).ToString().PadLeft(5);
-                    break;
-                default: // m
-                    HudElements.ToWaypoint += cs.wp_dist.ToString().PadLeft(5); // cs.wp_dist is in meters
-                    break;
-            }
-            HudElements.ToWaypoint += SettingManager.Get(Setting.DistFormat).ToUpper();
-            TimeSpan to_wp = TimeSpan.FromSeconds(cs.tot);
-            HudElements.ToWaypoint += $"\n{to_wp.Hours.ToString().PadLeft(2, '0')}:{to_wp.Minutes.ToString().PadLeft(2, '0')}:{to_wp.Seconds.ToString().PadLeft(2, '0')}";
-
-            // Camera angles
-            bool hasSysRep = CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.SystemReport);
-            HudElements.Camera = "CAM "
-                + "PITCH"
-                + (hasSysRep ? (int)Math.Round(((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).pitch) : 0).ToString().PadLeft(5) + "°"
-                + "\nYAW"
-                + (hasSysRep ? (int)Math.Round(((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).roll) : 0).ToString().PadLeft(7) + "°";
-
-            // UAV position
-            (double lat, double lng) droneLatLng = (cs.lat, cs.lng);
-            string dronePos;
-            if (droneLatLng.lat >= -90 && droneLatLng.lat <= 90
-                &&
-                droneLatLng.lng >= -180 && droneLatLng.lng <= 180)
-            {
-                Coordinate droneCoord = new Coordinate(droneLatLng.lat, droneLatLng.lng, DateTime.Now);
-                switch (SettingManager.Get(Setting.GPSType).ToUpper())
-                {
-                    case "MGRS":
-                        dronePos = droneCoord.MGRS.ToString();
-                        break;
-                    default: // WGS84
-                        dronePos = droneCoord.UTM.ToString();
-                        break;
-                }
-
-                CameraHandler.Instance.DronePos = droneCoord; // Update CameraHandler
-            }
-            else
-            {
-                dronePos = "UNKNOWN";
-            }
-
-            HudElements.DroneGps = "UAV"
-                + SettingManager.Get(Setting.GPSType).ToUpper().PadLeft(dronePos.Length - 3)
-                + $"\n" + dronePos;
-
-            // Camera target position
-            (float lat, float lng) targetLatLng = (hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat : 0, hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon : 0);
-            string targetPos;
-            if (targetLatLng.lat >= -90 && targetLatLng.lat <= 90
-                &&
-                targetLatLng.lng >= -180 && targetLatLng.lng <= 180)
-            {
-                Coordinate targetCoord = new Coordinate(targetLatLng.lat, targetLatLng.lng, DateTime.Now);
-                switch (SettingManager.Get(Setting.GPSType).ToUpper())
-                {
-                    case "MGRS":
-                        targetPos = targetCoord.MGRS.ToString();
-                        break;
-                    default: // WGS84
-                        targetPos = targetCoord.UTM.ToString();
-                        break;
-                }
-
-                CameraHandler.Instance.TargPos = targetCoord; // Update CameraHandler
-            }
-            else
-            {
-                targetPos = "UNKNOWN";
-            }
-
-            HudElements.TargetGps = "TRG"
-                + SettingManager.Get(Setting.GPSType).ToUpper().PadLeft(targetPos.Length - 3)
-                + $"\n" + targetPos;
-
-            HudElements.LineDistance = 10;
-            // TODO: Optimize HudElements.LineDistance on the fly to make it easy to read on the screen
-
-            HudElements.LineSpacing = PixelsForMeters(
-                hasGndCrsRep ? ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsSlantRange : 100.0,
-                hasSysRep ? ((MavProto.SysReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.SystemReport]).fov : 60.0,
-                VideoRectangle.Width, HudElements.LineDistance);
-
-            //SetStopButtonVisibility();
-        }
-
-        #endregion
-
         #region EventHandlers
 
         private void Instance_event_DoPhoto(object sender, DoRecordingEventArgs e)
@@ -1203,26 +652,17 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                
+                _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
                 CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
 
                 _droneStatusTimer.Dispose();
                 _cameraSwitchOffTimer.Dispose();
                 _feedTimer.Dispose();
-                _videoRecordTimer.Dispose();
+                _videoRecordSegmentTimer.Dispose();
 
-                if (_videoRecorder != null)
-                {
-                    _videoRecorder.Stop();
-                    _videoRecorder = null;
-                }
-                
                 GC.Collect();
 
-                //GStreamer.StopAll();
-
-                
                 this.Dispose();
             }
             catch { }
@@ -1253,6 +693,7 @@ namespace MissionPlanner.GCSViews
             SetTripOnOffButton();
         }
 
+        
         private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
         {
             ChangeCrossHair();
@@ -1298,7 +739,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-
         private void btn_ResetZoom_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.ResetZoom();
@@ -1308,7 +748,6 @@ namespace MissionPlanner.GCSViews
         {
             ReconnectCameraStreamAndControl();
         }
-
 
         private void btn_Settings_Click(object sender, EventArgs e)
         {
@@ -1359,7 +798,6 @@ namespace MissionPlanner.GCSViews
 
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
         {
-            
             try
             {
                 #region test
@@ -1390,8 +828,6 @@ namespace MissionPlanner.GCSViews
             {
                 Console.WriteLine(ex.ToString());
             }
-
-
         }
 
         private void StateHandler_MV04StateChange(object sender, MV04StateChangeEventArgs e)
@@ -1399,7 +835,6 @@ namespace MissionPlanner.GCSViews
             if (CameraView.instance.IsDisposed)
                 return;
 
-            //Test: Set GCS Status
             if (InvokeRequired)
             {
                 Invoke(new Action(() => SetGCSStatus()));
@@ -1414,7 +849,6 @@ namespace MissionPlanner.GCSViews
                     MessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
                     Task.Run(() => ProvideGCSError());
                 }
-                //check van e tracking
             }
 
             if (e.NewState == MV04_State.Auto)
@@ -1425,8 +859,6 @@ namespace MissionPlanner.GCSViews
                     MessageBox.Show("No uploaded plan");
                     Task.Run(() => Blink());
                 }
-                
-                
             }
         }
 
@@ -1495,19 +927,15 @@ namespace MissionPlanner.GCSViews
                 _tripSwitchedOff = true;
                 SetTripOnOffButton();
             }
-
-
         }
 
         public void SwitchOnTrip()
         {
-            //if (_tripSwitchedOff)
-            //{
-                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
-                _tripSwitchedOff = false;
+            
+            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
+            _tripSwitchedOff = false;
 
             SetTripOnOffButton();
-            //}
         }
 
         #endregion
@@ -1637,8 +1065,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private const int MAXBLINK = 14;
-
         private async void Blink()
         {
             int _blinkCounter = 0;
@@ -1748,6 +1174,95 @@ namespace MissionPlanner.GCSViews
             var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.vv_VLC.Size);
 
             SetStopButtonVisibility();
+        }
+
+        private void StartVLC()
+        {
+            _libVlc = new LibVLCSharp.Shared.LibVLC();
+            _mediaPlayer = new MediaPlayer(_libVlc);
+            media = new Media(_libVlc, new Uri(videoUrl));
+
+            
+            _mediaPlayer.EnableHardwareDecoding = true;
+            _mediaPlayer.NetworkCaching = 300;
+
+            vv_VLC.MediaPlayer = _mediaPlayer;
+            this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
+            vv_VLC.Dock = DockStyle.Fill;
+            _mediaPlayer.Fullscreen = true;
+
+            if (panelDoubleClick == null)
+            {
+                panelDoubleClick = new Panel();// panel for double click
+                vv_VLC.Controls.Add(panelDoubleClick);
+                panelDoubleClick.BringToFront();
+                panelDoubleClick.Dock = DockStyle.Fill;
+                panelDoubleClick.BackColor = Color.Transparent;
+                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
+            }
+            else
+                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
+
+            
+            vv_VLC.ThisReallyVisible();
+            vv_VLC.ChildReallyVisible();
+            _mediaPlayer.Play(media);
+
+        }
+
+        public void StartVideoStreamVLC()
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => StartVLC()));
+            else
+                StartVLC();
+        }
+
+        public void StopVLC()
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => {
+                    _mediaPlayer.Stop();
+                    panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
+                }));
+            else
+            {
+                _mediaPlayer.Stop();
+                panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
+            }
+        }
+
+        private void SetTripOnOffButton()
+        {
+
+            if (InvokeRequired)
+                Invoke(new Action(() => {
+                    if (_tripSwitchedOff)
+                    {
+                        btn_TripSwitchOnOff.BackColor = Color.Black;
+                        btn_TripSwitchOnOff.Text = "Trip is Off";
+                    }
+
+                    else
+                    {
+                        btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
+                        btn_TripSwitchOnOff.Text = "Trip is On";
+                    }
+                }));
+            else
+            {
+                if (_tripSwitchedOff)
+                {
+                    btn_TripSwitchOnOff.BackColor = Color.Black;
+                    btn_TripSwitchOnOff.Text = "Trip is Off";
+                }
+
+                else
+                {
+                    btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
+                    btn_TripSwitchOnOff.Text = "Trip is On";
+                }
+            }
         }
 
     }

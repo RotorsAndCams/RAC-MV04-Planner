@@ -99,8 +99,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_StartStopRecording_Click(object sender, EventArgs e)
         {
-            if (event_StartStopRecording != null)
-                event_StartStopRecording(sender, e);
+            CameraView.instance.StopRecording();
         }
 
         bool _isRecording;

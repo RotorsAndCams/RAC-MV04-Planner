@@ -624,6 +624,14 @@ namespace MV04.Camera
 
         #region Camera control Methods
 
+        public void SetEnableCrossHair(bool p_Enable)
+        {
+            if (IsCameraControlConnected)
+            {
+                MavCmdSetEnableCrosshairOnIdle(CameraControl.mav_comm, CameraControl.ackCb, p_Enable);
+            }
+        }
+
         public bool SetIRColor(IRColor color)
         {
             if (IsCameraControlConnected
