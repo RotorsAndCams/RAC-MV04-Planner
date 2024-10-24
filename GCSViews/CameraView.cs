@@ -141,10 +141,11 @@ namespace MissionPlanner.GCSViews
             // Snapshot & video save location
             CameraHandler.Instance.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
 
-
             // SysID for camera functions
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
-            MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
+
+            if(MainV2.comPort != null)
+                MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
             StartCameraStream();
 
@@ -195,13 +196,16 @@ namespace MissionPlanner.GCSViews
 
             #region altitude control set up 
 
-            if((int)MainV2.comPort.MAV.cs.alt < _minAllowedAltitudeValue)
-                this.cs_ColorSliderAltitude.Value = _minAllowedAltitudeValue;
-            else if((int)MainV2.comPort.MAV.cs.alt > _maxAllowedAltitudeValue)
-                this.cs_ColorSliderAltitude.Value -= _maxAllowedAltitudeValue;
-            else
-                this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
-
+            if (MainV2.comPort != null)
+            {
+                if ((int)MainV2.comPort.MAV.cs.alt < _minAllowedAltitudeValue)
+                    this.cs_ColorSliderAltitude.Value = _minAllowedAltitudeValue;
+                else if ((int)MainV2.comPort.MAV.cs.alt > _maxAllowedAltitudeValue)
+                    this.cs_ColorSliderAltitude.Value -= _maxAllowedAltitudeValue;
+                else
+                    this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
+            }
+            
             #endregion
 
             #region auto TRIP switch off
@@ -715,12 +719,43 @@ namespace MissionPlanner.GCSViews
             this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
         }
 
+        Form _fsForm;
+
         private void btn_FullScreen_Click(object sender, EventArgs e)
         {
-            _cameraFullScreenForm = new CameraFullScreenForm();
-            _cameraFullScreenForm.VisibleChanged += FullScreenForm_VisibleChanged;
-            _cameraFullScreenForm.FormClosing += _cameraFullScreenForm_FormClosing;
-            _cameraFullScreenForm.ShowDialog();
+            if(_fsForm == null)
+            {
+                this.tlp_CVBase.Controls.Remove(this.vv_VLC);
+                _fsForm = new Form();
+                _fsForm.Controls.Add(this.vv_VLC);
+                vv_VLC.Dock = DockStyle.Fill;
+                vv_VLC.BringToFront();
+                _mediaPlayer.Fullscreen = true;
+                _fsForm.WindowState = FormWindowState.Maximized;
+
+                _fsForm.FormClosing += _fsForm_FormClosing;
+
+                _fsForm.Show();
+            }
+            else
+            {
+                _fsForm.Close();
+                _fsForm.Dispose();
+                _fsForm = null;
+            }
+            
+        }
+
+        private void _fsForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _fsForm.Controls.Remove(vv_VLC);
+            this.tlp_CVBase.Controls.Add(vv_VLC);
+            vv_VLC.Dock = DockStyle.Fill;
+            vv_VLC.BringToFront();
+            _mediaPlayer.Fullscreen = true;
+            _fsForm.FormClosing -= _fsForm_FormClosing;
+            _fsForm.Dispose();
+            _fsForm = null;
         }
 
         private void _cameraFullScreenForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -1173,11 +1208,15 @@ namespace MissionPlanner.GCSViews
 
         private void StartVLC()
         {
-            _libVlc = new LibVLCSharp.Shared.LibVLC();
-            _mediaPlayer = new MediaPlayer(_libVlc);
-            media = new Media(_libVlc, new Uri(videoUrl));
+            if (_libVlc == null)
+                _libVlc = new LibVLCSharp.Shared.LibVLC();
 
-            
+            if (_mediaPlayer == null)
+                _mediaPlayer = new MediaPlayer(_libVlc);
+
+            if (media == null)
+                media = new Media(_libVlc, new Uri(videoUrl));
+
             _mediaPlayer.EnableHardwareDecoding = true;
             _mediaPlayer.NetworkCaching = 300;
 
@@ -1185,6 +1224,7 @@ namespace MissionPlanner.GCSViews
             this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
             vv_VLC.Dock = DockStyle.Fill;
             _mediaPlayer.Fullscreen = true;
+
 
             if (panelDoubleClick == null)
             {
