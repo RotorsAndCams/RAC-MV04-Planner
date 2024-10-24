@@ -1177,14 +1177,16 @@ namespace MissionPlanner.Joystick
             {
                 if (ch.Value.Show)
                 {
-                    if (getJoystickAxis(ch.Key) == joystickaxis.None            // Cannot be None
-                        || usedJoyAxes.Contains((int)getJoystickAxis(ch.Key)))  // Must be unique
+                    joystickaxis thisAxis = getJoystickAxis(ch.Key);
+
+                    if (thisAxis == joystickaxis.None            // Cannot be None
+                        || usedJoyAxes.Contains((int)thisAxis))  // Must be unique
                     {
                         return false;
                     }
 
-                    usedJoyAxes.Add((int)getJoystickAxis(ch.Key)); // Add to used for unique check
-                    JoystickHandler.RCChannels[ch.Key].Axis = (int)getJoystickAxis(ch.Key); // Save axis
+                    usedJoyAxes.Add((int)thisAxis); // Add to used for unique check
+                    JoystickHandler.RCChannels[ch.Key].Axis = (int)thisAxis; // Save axis
                 }
             }
 
