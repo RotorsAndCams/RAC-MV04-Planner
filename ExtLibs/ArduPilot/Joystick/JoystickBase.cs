@@ -456,7 +456,7 @@ namespace MissionPlanner.Joystick
                                 //Interface.setMode("Guided");
                                 Interface.doCommand((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
 
-                                // TODO: Set camera mode for TAKEOFF
+                                // Set camera mode for TAKEOFF
                                 //CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Nadir),
 
                                 // Trigger MV04 state change event
@@ -1277,24 +1277,14 @@ namespace MissionPlanner.Joystick
                         //(ushort)(((int)state.Y / 65.535) + 1000);
                     }
 
-                    //int yawChannel = 4;
                     int yawChannel = JoystickHandler.RCChannels.Single(ch => ch.Value.Role == MV04_JoyRole.UAV_Yaw).Key;
 
                     for (int i = 3; i <= 18; i++)
                     {
-                        if (getJoystickAxis(i) != joystickaxis.None)
+                        if (getJoystickAxis(i) != joystickaxis.None
+                            && i != yawChannel)
                         {
-                            short rcValue = 1500;
-                            if (i == yawChannel)
-                            {
-                                // TODO: Set rcValue from some single-yaw value, restore pickchannel()
-                                //rcValue = SingleYawHandler.???;
-                            }
-                            else
-                            {
-                                rcValue = pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo);
-                            }
-                            Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, rcValue);
+                            Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo));
                         }
                     }
 

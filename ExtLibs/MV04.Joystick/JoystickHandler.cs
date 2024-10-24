@@ -123,7 +123,12 @@ namespace MV04.Joystick
         #endregion
 
         #region Methods
-        private static int GetAxisForJoyRole(MV04_JoyRole role)
+        public static int GetChannelForJoyRole(MV04_JoyRole role)
+        {
+            return RCChannels.Single(ch => ch.Value.Role == role).Key;
+        }
+        
+        public static int GetAxisForJoyRole(MV04_JoyRole role)
         {
             return RCChannels.Single(ch => ch.Value.Role == role).Value.Axis;
         }

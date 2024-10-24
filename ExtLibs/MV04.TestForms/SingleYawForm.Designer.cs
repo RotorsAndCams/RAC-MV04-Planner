@@ -37,6 +37,8 @@
             this.checkBox_ForceYaw = new System.Windows.Forms.CheckBox();
             this.button_SetYingleYawParams = new System.Windows.Forms.Button();
             this.textBox_Log = new System.Windows.Forms.TextBox();
+            this.comboBox_Mode = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_CameraYaw)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Kp)).BeginInit();
             this.SuspendLayout();
@@ -46,9 +48,9 @@
             this.button_SwitchSingleYaw.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.button_SwitchSingleYaw.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.button_SwitchSingleYaw.Location = new System.Drawing.Point(12, 379);
+            this.button_SwitchSingleYaw.Location = new System.Drawing.Point(173, 379);
             this.button_SwitchSingleYaw.Name = "button_SwitchSingleYaw";
-            this.button_SwitchSingleYaw.Size = new System.Drawing.Size(410, 50);
+            this.button_SwitchSingleYaw.Size = new System.Drawing.Size(249, 50);
             this.button_SwitchSingleYaw.TabIndex = 4;
             this.button_SwitchSingleYaw.Text = "Single-Yaw ON";
             this.button_SwitchSingleYaw.UseVisualStyleBackColor = true;
@@ -172,11 +174,33 @@
             this.textBox_Log.TabIndex = 16;
             this.textBox_Log.WordWrap = false;
             // 
+            // comboBox_Mode
+            // 
+            this.comboBox_Mode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_Mode.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.comboBox_Mode.FormattingEnabled = true;
+            this.comboBox_Mode.Location = new System.Drawing.Point(67, 391);
+            this.comboBox_Mode.Name = "comboBox_Mode";
+            this.comboBox_Mode.Size = new System.Drawing.Size(100, 28);
+            this.comboBox_Mode.TabIndex = 17;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.label1.Location = new System.Drawing.Point(12, 394);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(49, 20);
+            this.label1.TabIndex = 18;
+            this.label1.Text = "Mode";
+            // 
             // SingleYawForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(434, 461);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.comboBox_Mode);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.button_SetYingleYawParams);
             this.Controls.Add(this.numericUpDown_Kp);
@@ -207,5 +231,7 @@
         private System.Windows.Forms.Button button_SetYingleYawParams;
         private System.Windows.Forms.CheckBox checkBox_ForceYaw;
         private System.Windows.Forms.TextBox textBox_Log;
+        private System.Windows.Forms.ComboBox comboBox_Mode;
+        private System.Windows.Forms.Label label1;
     }
 }
