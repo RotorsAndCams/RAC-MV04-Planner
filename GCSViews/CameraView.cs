@@ -55,7 +55,6 @@ namespace MissionPlanner.GCSViews
         bool OSDDebug = true;
         string[] OSDDebugLines = new string[10];
 
-        private CameraFullScreenForm _cameraFullScreenForm;
         private bool _isFPVModeActive = false;
         public static bool IsCameraTrackingModeActive { get; set; } = false;
 
@@ -115,6 +114,7 @@ namespace MissionPlanner.GCSViews
         private object lckStart = new object();
         bool _enableCrossHair = true;
         private const int MAXBLINK = 14;
+        bool _needToResetTime = false;
 
         #endregion
 
@@ -147,19 +147,18 @@ namespace MissionPlanner.GCSViews
             if(MainV2.comPort != null)
                 MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
-            StartCameraStream();
-
-            StartCameraControl();
-
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
             CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
 
             CameraHandler.Instance.SetEnableCrossHair(_enableCrossHair);
+            CameraHandler.Instance.SetSystemTimeToCurrent();
+
+            StartCameraStream();
+            StartCameraControl();
 
             #endregion
 
             #region UI config
-
 
             // Draw UI
             DrawUI();
@@ -437,8 +436,31 @@ namespace MissionPlanner.GCSViews
 
         private void ReconnectCameraStreamAndControl()
         {
-            StartCameraStream();
-            StartCameraControl();
+            Task.Factory.StartNew(() => {
+
+
+                
+
+                if (InvokeRequired)
+                    Invoke(new Action(() => {
+                        Thread.Sleep(500);
+                        StartCameraStream();
+                        StartCameraControl();
+                        CameraHandler.Instance.SetSystemTimeToCurrent();
+                    }));
+                else
+                {
+                    Thread.Sleep(500);
+                    StartCameraStream();
+                    StartCameraControl();
+                    CameraHandler.Instance.SetSystemTimeToCurrent();
+                }
+
+
+                
+            });
+
+            
         }
 
         #region Crosshair
@@ -743,7 +765,6 @@ namespace MissionPlanner.GCSViews
                 _fsForm.Dispose();
                 _fsForm = null;
             }
-            
         }
 
         private void _fsForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -758,25 +779,10 @@ namespace MissionPlanner.GCSViews
             _fsForm = null;
         }
 
-        private void _cameraFullScreenForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (_cameraFullScreenForm != null)
-            {
-                _cameraFullScreenForm.VisibleChanged -= FullScreenForm_VisibleChanged;
-                _cameraFullScreenForm.FormClosing -= _cameraFullScreenForm_FormClosing;
-                _cameraFullScreenForm.Dispose();
-                _cameraFullScreenForm = null;
-            }
-        }
 
         private void btn_ResetZoom_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.ResetZoom();
-        }
-
-        private void FullScreenForm_VisibleChanged(object sender, EventArgs e)
-        {
-            ReconnectCameraStreamAndControl();
         }
 
         private void btn_Settings_Click(object sender, EventArgs e)
@@ -830,15 +836,15 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                #region test
-                byte systemMode = e.Report.systemMode;
+                //#region test
+                //byte systemMode = e.Report.systemMode;
 
-                byte test = e.Report.status_flags;
+                //byte test = e.Report.status_flags;
 
-                NvSystemModes stg = CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]);
+                //NvSystemModes stg = CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]);
 
-                _cameraState = stg;
-                #endregion
+                //_cameraState = stg;
+                //#endregion
 
                 string systemModeStr = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report).ToString();
 
@@ -853,6 +859,13 @@ namespace MissionPlanner.GCSViews
                     Invoke(new Action(() => { SetDroneStatusValue(); }));
                 else
                     SetDroneStatusValue();
+
+                if (_needToResetTime)
+                {
+                    CameraHandler.Instance.SetSystemTimeToCurrent();
+                    _needToResetTime = false;
+                }
+
             }
             catch (Exception ex)
             {
@@ -943,13 +956,15 @@ namespace MissionPlanner.GCSViews
         {
             this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
         }
-
+        
         private void btn_TripSwitchOnOff_Click(object sender, EventArgs e)
         {
             if (_tripSwitchedOff)
             {
                 SwitchOnTrip();
-                //ReconnectCameraStreamAndControl();
+                ReconnectCameraStreamAndControl();
+                _needToResetTime = true;
+
             }
             else
             {

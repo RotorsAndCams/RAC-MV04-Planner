@@ -624,6 +624,13 @@ namespace MV04.Camera
 
         #region Camera control Methods
 
+        public void SetSystemTimeToCurrent()
+        {
+            //epoch time
+            TimeSpan t = DateTime.Now - new DateTime(1970, 1, 1);
+            uint secondsSinceEpoch = (uint)t.TotalSeconds;
+            MavCmdUpdateSystemTime(CameraControl.mav_comm, CameraControl.ackCb, secondsSinceEpoch);
+        }
         public void SetEnableCrossHair(bool p_Enable)
         {
             if (IsCameraControlConnected)
