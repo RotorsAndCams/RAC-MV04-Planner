@@ -1,18 +1,16 @@
 ﻿using CoordinateSharp;
+using log4net;
 using MissionPlanner.Utilities;
 using MV04.Settings;
-using MV04.State;
 using NextVisionVideoControlLibrary;
-using SharpGL;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
-using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using static MV04.Camera.MavProto;
 
@@ -93,6 +91,8 @@ namespace MV04.Camera
             }
         }
 
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public static readonly int TripChannelNumber = 0;
 
         private VideoControl _VideoControl = null;
@@ -160,7 +160,7 @@ namespace MV04.Camera
             }
         }
 
-        private Timer RecordingTimer;
+        private System.Windows.Forms.Timer RecordingTimer;
         
         public static string url = $"rtspsrc location=rtsp://{SettingManager.Get(Setting.CameraIP)}:554/live{SettingManager.Get(Setting.CameraStreamChannel)} latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";               //@"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 
@@ -173,6 +173,14 @@ namespace MV04.Camera
         public int CameraControlPort { get; set; }
 
         public NvSystemModes PrevCameraMode { get; private set; }
+
+        public NvSystemModes FallbackCameraMode
+        {
+            get
+            {
+                return NvSystemModes.GRR;
+            }
+        }
 
         private MavProto _mavProto = null;
 
@@ -509,7 +517,7 @@ namespace MV04.Camera
                 case 13:
                     return NvSystemModes.Nadir;
                 default:
-                    return NvSystemModes.GRR;
+                    return FallbackCameraMode;
             }
         }
 
@@ -655,7 +663,7 @@ namespace MV04.Camera
                 // Get current camera mode
                 NvSystemModes currentMode = HasCameraReport(MavReportType.SystemReport) ?
                     SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
-                    NvSystemModes.GRR;
+                    FallbackCameraMode;
 
                 if ((mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok)
                 {
@@ -737,7 +745,7 @@ namespace MV04.Camera
                 // Save current camera mode
                 PrevCameraMode = HasCameraReport(MavReportType.SystemReport) ?
                     SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
-                    NvSystemModes.GRR;
+                    FallbackCameraMode;
 
                 // Handle default tracking pos (center)
                 Point _trackPos = trackPos ?? new Point(640, 360);
@@ -759,7 +767,13 @@ namespace MV04.Camera
                 &&
                 (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, 0, 0, (int)TrackerMode.Disable, 0) == mav_error.ok)
             {
-                SetMode(NvSystemModes.GRR);
+                if (resetToPrevMode)
+                {
+                    if (PrevCameraMode != NvSystemModes.Tracking)
+                        SetMode(PrevCameraMode);
+                    else
+                        SetMode(FallbackCameraMode);
+                }
                 return true;
             }
 
@@ -796,6 +810,20 @@ namespace MV04.Camera
             return false;
         }
 
+        public void StartGimbal(TimeSpan? timerInterval = null)
+        {
+            if (GimbalTimer.Enabled) GimbalTimer.Stop();
+
+            if (timerInterval == null) timerInterval = TimeSpan.FromMilliseconds(100); // Default gimbal update frequency is 10Hz
+            GimbalTimer.Interval = (int)Math.Round(timerInterval.Value.TotalMilliseconds);
+            GimbalTimer.Start();
+        }
+
+        private void GimbalTimer_Tick(object sender, EventArgs e)
+        {
+            MoveCamera(NextMovement.yaw, NextMovement.pitch);
+        }
+
         private bool MoveCamera(double yaw, double pitch, double groundAlt = 0)
         {
             if (IsCameraControlConnected)
@@ -815,20 +843,6 @@ namespace MV04.Camera
             }
 
             return false;
-        }
-
-        public void StartGimbal(TimeSpan? timerInterval = null)
-        {
-            if (GimbalTimer.Enabled) GimbalTimer.Stop();
-
-            if (timerInterval == null) timerInterval = TimeSpan.FromMilliseconds(100); // Default gimbal update frequency is 10Hz
-            GimbalTimer.Interval = (int)Math.Round(timerInterval.Value.TotalMilliseconds);
-            GimbalTimer.Start();
-        }
-
-        private void GimbalTimer_Tick(object sender, EventArgs e)
-        {
-            MoveCamera(NextMovement.yaw, NextMovement.pitch);
         }
 
         public void StopGimbal()
@@ -872,6 +886,22 @@ namespace MV04.Camera
             NextMovement = (yawValue, NextMovement.pitch);
         }
 
+        public void CenterCamera()
+        {
+            // Stop gimbal
+            SetCameraPitch(PitchDirection.Stop);
+            SetCameraYaw(YawDirection.Stop);
+            SetZoom(ZoomState.Stop);
+
+            // Reset zoom
+            ResetZoom();
+
+            // Center camera
+            SetMode(NvSystemModes.Stow);
+            Thread.Sleep(1000);
+            SetMode(PrevCameraMode);
+        }
+
         public bool DoBIT()
         {
             return IsCameraControlConnected
@@ -883,7 +913,6 @@ namespace MV04.Camera
             return IsCameraControlConnected
                 && (mav_error)MavCmdDoNUC(CameraControl.mav_comm, CameraControl.ackCb) == mav_error.ok;
         }
-
 
         #endregion
 
