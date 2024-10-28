@@ -443,14 +443,12 @@ namespace MissionPlanner.GCSViews
 
                 if (InvokeRequired)
                     Invoke(new Action(() => {
-                        Thread.Sleep(500);
                         StartCameraStream();
                         StartCameraControl();
                         CameraHandler.Instance.SetSystemTimeToCurrent();
                     }));
                 else
                 {
-                    Thread.Sleep(500);
                     StartCameraStream();
                     StartCameraControl();
                     CameraHandler.Instance.SetSystemTimeToCurrent();
@@ -692,26 +690,35 @@ namespace MissionPlanner.GCSViews
 
         private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+
+
             if (CameraView.instance.IsDisposed)
                 return;
 
             string mode = MainV2.comPort.MAV.cs.mode;
             int agl = (int)MainV2.comPort.MAV.cs.alt;
 
-            bool droneFlightMode = mode.ToUpper() == "GUIDED" || mode.ToUpper() == "AUTO" || mode.ToUpper() == "LOITER";
-            bool droneAGLMoreThanZero = agl > 0;
-            bool currentStateFlight = StateHandler.CurrentSate == MV04_State.Takeoff || StateHandler.CurrentSate == MV04_State.Follow || StateHandler.CurrentSate == MV04_State.Auto || StateHandler.CurrentSate == MV04_State.Manual;
+            //bool droneFlightMode = mode.ToUpper() == "GUIDED" || mode.ToUpper() == "AUTO" || mode.ToUpper() == "LOITER";
+            //bool currentStateFlight = StateHandler.CurrentSate == MV04_State.Takeoff || StateHandler.CurrentSate == MV04_State.Follow || StateHandler.CurrentSate == MV04_State.Auto || StateHandler.CurrentSate == MV04_State.Manual;
 
-            int state = 0;
-
-            if (droneAGLMoreThanZero || currentStateFlight)
+            if (agl > 5 || (agl > 15 && mode.ToUpper()=="STABILIZE" ))
             {
                 return;
             }
 
-            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, state, 0, 0, 0, 0, 0);
-            _tripSwitchedOff = true;
-            SetTripOnOffButton();
+            DialogResult dialogResult = MessageBox.Show("Need to switch off Camera to protect againts over heat ", "Camera switch off", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 0, 0, 0, 0, 0, 0);
+                _tripSwitchedOff = true;
+                SetTripOnOffButton();
+            }
+            else
+            {
+                return;
+            }
+
+            
         }
 
         
@@ -826,7 +833,11 @@ namespace MissionPlanner.GCSViews
         /// <param name="e"></param>
         private void btn_StopTracking_Click(object sender, EventArgs e)
         {
-            CameraHandler.Instance.StopTracking(true);
+            if (_isFPVModeActive)
+                CameraHandler.Instance.SetMode(NvSystemModes.Stow);
+            else
+                CameraHandler.Instance.StopTracking(true);
+
             IsCameraTrackingModeActive = false;
             SetStopButtonVisibility();
         }
@@ -836,16 +847,6 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                //#region test
-                //byte systemMode = e.Report.systemMode;
-
-                //byte test = e.Report.status_flags;
-
-                //NvSystemModes stg = CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]);
-
-                //_cameraState = stg;
-                //#endregion
-
                 string systemModeStr = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report).ToString();
 
                 //Test: Set Camera Status
