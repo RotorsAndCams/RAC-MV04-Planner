@@ -967,7 +967,7 @@ namespace MissionPlanner.GCSViews
             if (_feedTimer.Enabled)
                 StopFeed();
 
-            CameraHandler.Instance.SetMode(NvSystemModes.Stow);
+            CameraHandler.Instance.SetMode(NvSystemModes.Nadir);
         }
 
         private void Execute_Manual_Tasks()
