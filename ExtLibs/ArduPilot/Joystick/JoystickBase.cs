@@ -958,7 +958,7 @@ namespace MissionPlanner.Joystick
                     break;
 
                 case joystickaxis.ARz:
-                    //working = state.ARz;
+                    working = state.ARz;
                     break;
 
                 case joystickaxis.AX:

@@ -136,6 +136,13 @@ namespace MV04.SingleYaw
         /// </summary>
         public static void StartSingleYaw(MAVLinkInterface MAVLink, SingleYawMode mode = SingleYawMode.Master)
         {
+            // Check MAVLink
+            if (false)
+            {
+                return;
+            }
+
+            // Check selected mode
             if (mode == SingleYawMode.None)
             {
                 return;

@@ -174,6 +174,16 @@ namespace MV04.Camera
 
         public NvSystemModes PrevCameraMode { get; private set; }
 
+        public NvSystemModes CurrentCameraMode
+        {
+            get
+            {
+                return HasCameraReport(MavReportType.SystemReport) ?
+                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
+                    FallbackCameraMode;
+            }
+        }
+
         public NvSystemModes FallbackCameraMode
         {
             get
@@ -661,9 +671,7 @@ namespace MV04.Camera
             if (IsCameraControlConnected)
             {
                 // Get current camera mode
-                NvSystemModes currentMode = HasCameraReport(MavReportType.SystemReport) ?
-                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
-                    FallbackCameraMode;
+                NvSystemModes currentMode = CurrentCameraMode;
 
                 if ((mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok)
                 {
@@ -743,9 +751,7 @@ namespace MV04.Camera
             if (IsCameraControlConnected)
             {
                 // Save current camera mode
-                PrevCameraMode = HasCameraReport(MavReportType.SystemReport) ?
-                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
-                    FallbackCameraMode;
+                PrevCameraMode = CurrentCameraMode;
 
                 // Handle default tracking pos (center)
                 Point _trackPos = trackPos ?? new Point(640, 360);
@@ -884,22 +890,6 @@ namespace MV04.Camera
                     break;
             }
             NextMovement = (yawValue, NextMovement.pitch);
-        }
-
-        public void CenterCamera()
-        {
-            // Stop gimbal
-            SetCameraPitch(PitchDirection.Stop);
-            SetCameraYaw(YawDirection.Stop);
-            SetZoom(ZoomState.Stop);
-
-            // Reset zoom
-            ResetZoom();
-
-            // Center camera
-            SetMode(NvSystemModes.Stow);
-            Thread.Sleep(1000);
-            SetMode(PrevCameraMode);
         }
 
         public bool DoBIT()

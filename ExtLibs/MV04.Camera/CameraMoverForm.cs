@@ -70,10 +70,5 @@ namespace MV04.Camera
         {
             CameraHandler.Instance.SetCameraYaw(YawDirection.Left);
         }
-
-        private void button_Center_Click(object sender, EventArgs e)
-        {
-            CameraHandler.Instance.CenterCamera();
-        }
     }
 }
