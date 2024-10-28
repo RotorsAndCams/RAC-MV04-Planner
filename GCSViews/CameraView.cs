@@ -113,7 +113,7 @@ namespace MissionPlanner.GCSViews
 
         private object lckStart = new object();
         bool _enableCrossHair = true;
-        private const int MAXBLINK = 14;
+        private const int MAXBLINK = 10;
         bool _needToResetTime = false;
 
         #endregion
