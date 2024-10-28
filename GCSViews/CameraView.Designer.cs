@@ -31,13 +31,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CameraView));
             this.tlp_ControlsBase = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_Buttonsection2 = new System.Windows.Forms.TableLayoutPanel();
-            this.btn_StopTracking = new System.Windows.Forms.Button();
             this.btn_ResetZoom = new System.Windows.Forms.Button();
-            this.tlp_ButtonSection1 = new System.Windows.Forms.TableLayoutPanel();
-            this.btn_TripSwitchOnOff = new System.Windows.Forms.Button();
-            this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
-            this.btn_FullScreen = new System.Windows.Forms.Button();
-            this.btn_FPVCameraMode = new System.Windows.Forms.Button();
+            this.btn_StartStopSingleYaw = new System.Windows.Forms.Button();
+            this.btn_StopTracking = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
             this.btn_Settings = new System.Windows.Forms.Button();
@@ -66,11 +62,15 @@
             this.tlp_AGLData = new System.Windows.Forms.TableLayoutPanel();
             this.lb_AltitudeValue = new System.Windows.Forms.Label();
             this.lb_Agl = new System.Windows.Forms.Label();
+            this.tlp_ButtonSection1 = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_TripSwitchOnOff = new System.Windows.Forms.Button();
+            this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
+            this.btn_FullScreen = new System.Windows.Forms.Button();
+            this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
             this.pb_CameraGstream = new System.Windows.Forms.PictureBox();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
-            this.tlp_ButtonSection1.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
             this.pnl_SettingsPanel.SuspendLayout();
             this.pnl_DeviceState.SuspendLayout();
@@ -86,6 +86,7 @@
             this.tlp_AGLContainer.SuspendLayout();
             this.tlp_AGLIncrement.SuspendLayout();
             this.tlp_AGLData.SuspendLayout();
+            this.tlp_ButtonSection1.SuspendLayout();
             this.tlp_CVBase.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_CameraGstream)).BeginInit();
             this.SuspendLayout();
@@ -94,27 +95,18 @@
             // 
             resources.ApplyResources(this.tlp_ControlsBase, "tlp_ControlsBase");
             this.tlp_ControlsBase.Controls.Add(this.tlp_Buttonsection2, 0, 2);
-            this.tlp_ControlsBase.Controls.Add(this.tlp_ButtonSection1, 0, 1);
             this.tlp_ControlsBase.Controls.Add(this.tlp_InfoBase, 0, 0);
             this.tlp_ControlsBase.Controls.Add(this.tlp_AGLContainer, 0, 3);
+            this.tlp_ControlsBase.Controls.Add(this.tlp_ButtonSection1, 0, 1);
             this.tlp_ControlsBase.Name = "tlp_ControlsBase";
             // 
             // tlp_Buttonsection2
             // 
             resources.ApplyResources(this.tlp_Buttonsection2, "tlp_Buttonsection2");
-            this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 1, 0);
             this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 0);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_StartStopSingleYaw, 1, 0);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 1, 1);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
-            // 
-            // btn_StopTracking
-            // 
-            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
-            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
-            this.btn_StopTracking.Name = "btn_StopTracking";
-            this.btn_StopTracking.UseVisualStyleBackColor = false;
-            this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
             // 
             // btn_ResetZoom
             // 
@@ -126,53 +118,24 @@
             this.btn_ResetZoom.UseVisualStyleBackColor = false;
             this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
             // 
-            // tlp_ButtonSection1
+            // btn_StartStopSingleYaw
             // 
-            resources.ApplyResources(this.tlp_ButtonSection1, "tlp_ButtonSection1");
-            this.tlp_ButtonSection1.Controls.Add(this.btn_TripSwitchOnOff, 0, 0);
-            this.tlp_ButtonSection1.Controls.Add(this.btn_ChangeCrosshair, 1, 0);
-            this.tlp_ButtonSection1.Controls.Add(this.btn_FullScreen, 1, 1);
-            this.tlp_ButtonSection1.Controls.Add(this.btn_FPVCameraMode, 0, 1);
-            this.tlp_ButtonSection1.Name = "tlp_ButtonSection1";
+            this.btn_StartStopSingleYaw.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_StartStopSingleYaw, "btn_StartStopSingleYaw");
+            this.btn_StartStopSingleYaw.ForeColor = System.Drawing.Color.White;
+            this.btn_StartStopSingleYaw.Name = "btn_StartStopSingleYaw";
+            this.btn_StartStopSingleYaw.UseVisualStyleBackColor = false;
+            this.btn_StartStopSingleYaw.Click += new System.EventHandler(this.btn_StartStopSingleYaw_Click);
             // 
-            // btn_TripSwitchOnOff
+            // btn_StopTracking
             // 
-            this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
-            this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
-            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.inverted_cam_but;
-            this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
-            this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
-            this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
-            // 
-            // btn_ChangeCrosshair
-            // 
-            this.btn_ChangeCrosshair.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_ChangeCrosshair, "btn_ChangeCrosshair");
-            this.btn_ChangeCrosshair.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_ChangeCrosshair.Image = global::MissionPlanner.Properties.Resources.icons8_crosshair_50;
-            this.btn_ChangeCrosshair.Name = "btn_ChangeCrosshair";
-            this.btn_ChangeCrosshair.UseVisualStyleBackColor = false;
-            this.btn_ChangeCrosshair.Click += new System.EventHandler(this.btn_ChangeCrosshair_Click);
-            // 
-            // btn_FullScreen
-            // 
-            this.btn_FullScreen.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_FullScreen, "btn_FullScreen");
-            this.btn_FullScreen.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_FullScreen.Image = global::MissionPlanner.Properties.Resources.icons8_fullscreen_50;
-            this.btn_FullScreen.Name = "btn_FullScreen";
-            this.btn_FullScreen.UseVisualStyleBackColor = false;
-            this.btn_FullScreen.Click += new System.EventHandler(this.btn_FullScreen_Click);
-            // 
-            // btn_FPVCameraMode
-            // 
-            this.btn_FPVCameraMode.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_FPVCameraMode, "btn_FPVCameraMode");
-            this.btn_FPVCameraMode.ForeColor = System.Drawing.Color.White;
-            this.btn_FPVCameraMode.Name = "btn_FPVCameraMode";
-            this.btn_FPVCameraMode.UseVisualStyleBackColor = false;
-            this.btn_FPVCameraMode.Click += new System.EventHandler(this.btn_FPVCameraMode_Click);
+            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
+            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
+            this.btn_StopTracking.Name = "btn_StopTracking";
+            this.btn_StopTracking.UseVisualStyleBackColor = false;
+            this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
             // 
             // tlp_InfoBase
             // 
@@ -395,6 +358,54 @@
             this.lb_Agl.ForeColor = System.Drawing.Color.White;
             this.lb_Agl.Name = "lb_Agl";
             // 
+            // tlp_ButtonSection1
+            // 
+            resources.ApplyResources(this.tlp_ButtonSection1, "tlp_ButtonSection1");
+            this.tlp_ButtonSection1.Controls.Add(this.btn_TripSwitchOnOff, 0, 0);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_ChangeCrosshair, 1, 0);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_FullScreen, 1, 1);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_FPVCameraMode, 0, 1);
+            this.tlp_ButtonSection1.Name = "tlp_ButtonSection1";
+            // 
+            // btn_TripSwitchOnOff
+            // 
+            this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
+            this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
+            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.inverted_cam_but;
+            this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
+            this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
+            this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
+            // 
+            // btn_ChangeCrosshair
+            // 
+            this.btn_ChangeCrosshair.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_ChangeCrosshair, "btn_ChangeCrosshair");
+            this.btn_ChangeCrosshair.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_ChangeCrosshair.Image = global::MissionPlanner.Properties.Resources.icons8_crosshair_50;
+            this.btn_ChangeCrosshair.Name = "btn_ChangeCrosshair";
+            this.btn_ChangeCrosshair.UseVisualStyleBackColor = false;
+            this.btn_ChangeCrosshair.Click += new System.EventHandler(this.btn_ChangeCrosshair_Click);
+            // 
+            // btn_FullScreen
+            // 
+            this.btn_FullScreen.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_FullScreen, "btn_FullScreen");
+            this.btn_FullScreen.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_FullScreen.Image = global::MissionPlanner.Properties.Resources.icons8_fullscreen_50;
+            this.btn_FullScreen.Name = "btn_FullScreen";
+            this.btn_FullScreen.UseVisualStyleBackColor = false;
+            this.btn_FullScreen.Click += new System.EventHandler(this.btn_FullScreen_Click);
+            // 
+            // btn_FPVCameraMode
+            // 
+            this.btn_FPVCameraMode.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_FPVCameraMode, "btn_FPVCameraMode");
+            this.btn_FPVCameraMode.ForeColor = System.Drawing.Color.White;
+            this.btn_FPVCameraMode.Name = "btn_FPVCameraMode";
+            this.btn_FPVCameraMode.UseVisualStyleBackColor = false;
+            this.btn_FPVCameraMode.Click += new System.EventHandler(this.btn_FPVCameraMode_Click);
+            // 
             // tlp_CVBase
             // 
             resources.ApplyResources(this.tlp_CVBase, "tlp_CVBase");
@@ -418,7 +429,6 @@
             this.Name = "CameraView";
             this.tlp_ControlsBase.ResumeLayout(false);
             this.tlp_Buttonsection2.ResumeLayout(false);
-            this.tlp_ButtonSection1.ResumeLayout(false);
             this.tlp_InfoBase.ResumeLayout(false);
             this.pnl_SettingsPanel.ResumeLayout(false);
             this.pnl_DeviceState.ResumeLayout(false);
@@ -440,6 +450,7 @@
             this.tlp_AGLIncrement.PerformLayout();
             this.tlp_AGLData.ResumeLayout(false);
             this.tlp_AGLData.PerformLayout();
+            this.tlp_ButtonSection1.ResumeLayout(false);
             this.tlp_CVBase.ResumeLayout(false);
             this.tlp_CVBase.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pb_CameraGstream)).EndInit();
@@ -487,5 +498,6 @@
         private System.Windows.Forms.Label lb_Agl;
         private System.Windows.Forms.TableLayoutPanel tlp_CVBase;
         private System.Windows.Forms.PictureBox pb_CameraGstream;
+        private System.Windows.Forms.Button btn_StartStopSingleYaw;
     }
 }

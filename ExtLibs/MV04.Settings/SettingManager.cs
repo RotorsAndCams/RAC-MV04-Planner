@@ -22,7 +22,8 @@ namespace MV04.Settings
         AltFormat,
         DistFormat,
         SpeedFormat,
-        AutoRecordVideoStream
+        AutoRecordVideoStream,
+        AutoStartSingleYaw
     }
 
     public class SettingItem
@@ -53,7 +54,7 @@ namespace MV04.Settings
                     // Define settings and default values
                     _SettingCollection = new HashSet<SettingItem>
                     {
-                        new SettingItem(Setting.CameraIP, "192.168.0.203", value =>
+                        new SettingItem(Setting.CameraIP, "192.168.69.203", value =>
                             !string.IsNullOrWhiteSpace(value)
                             && value.Count(c => c == '.') == 3
                             && value.Split('.').Length == 4
@@ -130,7 +131,14 @@ namespace MV04.Settings
                                 true.ToString(),
                                 false.ToString()
                             }.Contains(value)
-                            )
+                            ),
+                        new SettingItem(Setting.AutoStartSingleYaw, false.ToString(), value =>
+                            !string.IsNullOrWhiteSpace(value)
+                            && new List<string>(){
+                                true.ToString(),
+                                false.ToString()
+                            }.Contains(value)
+                        ),
                     };
 
                     // Create reset backup
@@ -181,15 +189,6 @@ namespace MV04.Settings
                 toSave.Add(item.Setting, item.Value);
             }
             File.WriteAllText(FileName, toSave.ToJSON()); // create or owerwrite
-        }
-
-        public static void Save(HashSet<SettingItem> settings)
-        {
-            if (settings == null) return;
-
-            if (settings.Count == 0) return;
-
-            File.WriteAllText(FileName, settings.ToJSON());
         }
 
         /// <summary>

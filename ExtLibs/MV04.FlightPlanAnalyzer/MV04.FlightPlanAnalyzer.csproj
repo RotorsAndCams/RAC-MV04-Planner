@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2120F332-679F-466C-AEF2-524094EF0392}</ProjectGuid>
+    <ProjectGuid>{644D7E6A-E43E-4CF1-B6AC-9974E5E93048}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MV04.SingleYaw</RootNamespace>
-    <AssemblyName>MV04.SingleYaw</AssemblyName>
+    <RootNamespace>MV04.FlightPlanAnalyzer</RootNamespace>
+    <AssemblyName>MV04.FlightPlanAnalyzer</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -31,13 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
-    </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -47,38 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SingleYawHandler.cs" />
+    <Compile Include="FlightPlanAnalyzer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ArduPilot\MissionPlanner.ArduPilot.csproj">
-      <Project>{ca6345d3-7a6d-478b-a0ed-a58e50dcaa83}</Project>
-      <Name>MissionPlanner.ArduPilot</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Interfaces\Interfaces.csproj">
-      <Project>{FD4D2994-9BEA-41A1-8C51-2E02D1E8503E}</Project>
-      <Name>Interfaces</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Mavlink\MAVLink.csproj">
-      <Project>{13d2ec90-c41f-48a1-aada-859b6dc24edc}</Project>
+      <Project>{13D2EC90-C41F-48A1-AADA-859B6DC24EDC}</Project>
       <Name>MAVLink</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MV04.Camera\MV04.Camera.csproj">
-      <Project>{e12dbd68-f282-491a-be11-5e6ff21932c1}</Project>
-      <Name>MV04.Camera</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MV04.Joystick\MV04.Joystick.csproj">
-      <Project>{493588B5-2F58-402B-A315-DA5153DDD9CC}</Project>
-      <Name>MV04.Joystick</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj">
       <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
       <Name>MissionPlanner.Utilities</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

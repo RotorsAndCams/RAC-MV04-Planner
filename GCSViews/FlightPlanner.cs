@@ -5648,12 +5648,12 @@ namespace MissionPlanner.GCSViews
                 return;
             }
             /*
-Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND in the future)
- Column 2,3: Lat, lon
- Column 4: Loiter altitude
- Column 5: Break altitude (when landing from rally is implemented, this is the altitude to break out of loiter from)
- Column 6: Landing heading (also for future when landing from rally is implemented)
- Column 7: Flags (just 0 for now, also future use).
+            Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND in the future)
+            Column 2,3: Lat, lon
+            Column 4: Loiter altitude
+            Column 5: Break altitude (when landing from rally is implemented, this is the altitude to break out of loiter from)
+            Column 6: Landing heading (also for future when landing from rally is implemented)
+            Column 7: Flags (just 0 for now, also future use).
              */
 
             using (SaveFileDialog sf = new SaveFileDialog())

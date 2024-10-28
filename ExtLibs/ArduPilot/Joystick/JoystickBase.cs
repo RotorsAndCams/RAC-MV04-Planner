@@ -31,11 +31,11 @@ namespace MissionPlanner.Joystick
         string joystickconfigbutton = "joystickbuttons.xml";
         string joystickconfigaxis = "joystickaxis.xml";
 
-        // set to default midpoint
+        // set to default
         protected int hat1 = 65535/2;
         protected int hat2 = 65535/2;
-        int custom0 = 65535/2;
-        int custom1 = 65535/2;
+        int custom0/* = 65535/2*/; // Button controlled axis should be LOW by default
+        int custom1/* = 65535/2*/; // 0 will be mapped to pwm-min by Expo()
 
         //no need for finalizer...
         //~Joystick()
@@ -489,21 +489,21 @@ namespace MissionPlanner.Joystick
                                 /*
                                 Command         | Input channel
                                 ----------------+--------------
-                                Power LED       | 19
-                                IR indicator    | 30
-                                Red indcator    | 31
+                                Power LED       | 18
+                                IR indicator    | 29
+                                Red indcator    | 30
                                 */
 
                                 switch (but.buttonno)
                                 {
-                                    case 19: // Power LED
+                                    case 18: // Power LED
                                         LEDStateHandler.LandingLEDState = buttondown ? enum_LandingLEDState.On : enum_LandingLEDState.Off;
                                         break;
-                                    case 30: // IR indicator LED
-                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.IR : enum_PositionLEDState.Off;
+                                    case 29: // IR indicator LED
+                                        LEDStateHandler.PositionLEDState_IR = buttondown ? enum_PositionLEDState_IR.On : enum_PositionLEDState_IR.Off;
                                         break;
-                                    case 31: // Red indicator LED
-                                        LEDStateHandler.PositionLEDState = buttondown ? enum_PositionLEDState.RedLight : enum_PositionLEDState.Off;
+                                    case 30: // Red indicator LED
+                                        LEDStateHandler.PositionLEDState_RedLight = buttondown ? enum_PositionLEDState_RedLight.On : enum_PositionLEDState_RedLight.Off;
                                         break;
                                 }
 
@@ -698,6 +698,7 @@ namespace MissionPlanner.Joystick
                                     case buttonfunction_mv04_FlightMode_option.Follow:
                                         // TODO: Switch UAV to Follow mode
                                         MV04_SetRCChannels(MV04_JoyFlightMode.Follow);
+                                        Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
                                         StateHandler.CurrentSate = MV04_State.Follow;
                                         break;
                                     

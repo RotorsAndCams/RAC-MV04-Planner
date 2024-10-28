@@ -149,8 +149,14 @@
     <EmbeddedResource Include="Controls\Vibration.uk.resx">
       <DependentUpon>Vibration.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\WindInputForm.resx">
+      <DependentUpon>WindInputForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\CameraFullScreenForm.resx">
       <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\CameraSettingsForm.resx">
+      <DependentUpon>CameraSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\CameraView.resx">
       <DependentUpon>CameraView.cs</DependentUpon>
@@ -303,6 +309,9 @@
     <EmbeddedResource Include="GCSViews\FlightPlanner.uk.resx">
       <DependentUpon>FlightPlanner.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\GetUserNameForm.resx">
+      <DependentUpon>GetUserNameForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\GstreamerTestForm.resx">
       <DependentUpon>GstreamerTestForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -314,6 +323,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\SITL.uk.resx">
       <DependentUpon>SITL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\uc_CameraSettings.resx">
+      <DependentUpon>uc_CameraSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GeoRef\georefimage.uk.resx">
       <DependentUpon>georefimage.cs</DependentUpon>
@@ -526,6 +538,10 @@
     <ProjectReference Include="ExtLibs\MV04.Camera\MV04.Camera.csproj">
       <Project>{e12dbd68-f282-491a-be11-5e6ff21932c1}</Project>
       <Name>MV04.Camera</Name>
+    </ProjectReference>
+    <ProjectReference Include="ExtLibs\MV04.FlightPlanAnalyzer\MV04.FlightPlanAnalyzer.csproj">
+      <Project>{644D7E6A-E43E-4CF1-B6AC-9974E5E93048}</Project>
+      <Name>MV04.FlightPlanAnalyzer</Name>
     </ProjectReference>
     <ProjectReference Include="ExtLibs\MV04.Joystick\MV04.Joystick.csproj">
       <Project>{493588B5-2F58-402B-A315-DA5153DDD9CC}</Project>
@@ -866,12 +882,24 @@
     <Compile Include="Controls\FollowMe.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Controls\WindInputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\WindInputForm.Designer.cs">
+      <DependentUpon>WindInputForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GCSViews\BitMapEventArgs.cs" />
     <Compile Include="GCSViews\CameraFullScreenForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GCSViews\CameraFullScreenForm.Designer.cs">
       <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GCSViews\CameraSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSViews\CameraSettingsForm.Designer.cs">
+      <DependentUpon>CameraSettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\CameraView.cs">
       <SubType>UserControl</SubType>
@@ -993,11 +1021,23 @@
     <Compile Include="GCSViews\ConfigurationView\DeviceInfo.cs" />
     <Compile Include="GCSViews\ConfigurationView\DroneCANModel.cs" />
     <Compile Include="GCSViews\ConfigurationView\uitype.cs" />
+    <Compile Include="GCSViews\GetUserNameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSViews\GetUserNameForm.Designer.cs">
+      <DependentUpon>GetUserNameForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GCSViews\GstreamerTestForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GCSViews\GstreamerTestForm.Designer.cs">
       <DependentUpon>GstreamerTestForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GCSViews\uc_CameraSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GCSViews\uc_CameraSettings.Designer.cs">
+      <DependentUpon>uc_CameraSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\VideoRecorder.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -4897,6 +4937,10 @@
     <Content Include="Drivers\CubeOrangePlus.inf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="ExtLibs\MV04.Camera\Resources\day-camera-50.png" />
+    <None Include="ExtLibs\MV04.Camera\Resources\night-camera-50.png" />
+    <None Include="ExtLibs\MV04.Camera\Resources\connect-50.png" />
+    <None Include="ExtLibs\MV04.Camera\Resources\more-50.png" />
     <Content Include="mavutil.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

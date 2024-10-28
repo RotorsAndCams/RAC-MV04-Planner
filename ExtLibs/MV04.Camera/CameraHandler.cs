@@ -11,6 +11,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static MV04.Camera.MavProto;
 
@@ -160,7 +161,7 @@ namespace MV04.Camera
             }
         }
 
-        private System.Windows.Forms.Timer RecordingTimer;
+        private System.Threading.Timer RecordingTimer;
         
         public static string url = $"rtspsrc location=rtsp://{SettingManager.Get(Setting.CameraIP)}:554/live{SettingManager.Get(Setting.CameraStreamChannel)} latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";               //@"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 
@@ -221,6 +222,22 @@ namespace MV04.Camera
                 return
                     _IsCameraControlConnected
                     && IsValid(_mavProto);
+            }
+        }
+
+        private readonly TimeSpan _LastSeenCameraTreshold = TimeSpan.FromSeconds(1);
+
+        private DateTime _LastSeenCamera = DateTime.MinValue;
+
+        /// <summary>
+        /// Returns true, if the camera has sent any reports in the last second
+        /// </summary>
+        public bool IsCameraAlive
+        {
+            get
+            {
+                return IsCameraControlConnected
+                    && _LastSeenCamera > DateTime.Now - _LastSeenCameraTreshold;
             }
         }
 
@@ -334,9 +351,38 @@ namespace MV04.Camera
 
         #region Methods
 
+        System.Threading.Thread _currentGstream = null;
+        private object _currentGstreamLock = new object();
         public void StartGstreamer(string u)
         {
-            GStreamer.StartA(u);
+            try
+            {
+                lock (_currentGstreamLock)
+                {
+                    if (_currentGstream != null)
+                    {
+                        _currentGstream.Abort();
+                        //_currentGstream = null;
+                        //GStreamer.Stop(null);
+                        Thread.Sleep(500);
+                        GStreamer.StopAll();
+                        _currentGstream = null;
+                        Thread.Sleep(500);
+                    }
+
+                    _currentGstream = GStreamer.StartA(u);
+                }
+                
+            }
+            catch(Exception ex)
+            {
+#if DEBUG
+                MessageBox.Show("Exception at Start video stream: " + ex.Message);
+#endif
+                Thread.Sleep(300);
+                _currentGstream = GStreamer.StartA(u);
+            }
+            
         }
 
         public void StopGstreamer()
@@ -471,6 +517,9 @@ namespace MV04.Camera
                     case MavReportType.Reserved:
                     default: break;
                 }
+
+                // Update camera last seen timestamp
+                _LastSeenCamera = DateTime.Now;
             }
         }
 
@@ -746,7 +795,7 @@ namespace MV04.Camera
             }
         }
 
-        public bool StartTracking(Point? trackPos)
+        public bool StartTracking(Point? trackPos, Size size = new Size())
         {
             if (IsCameraControlConnected)
             {
@@ -756,12 +805,23 @@ namespace MV04.Camera
                 // Handle default tracking pos (center)
                 Point _trackPos = trackPos ?? new Point(640, 360);
 
-                // Constrain tracking pos
-                _trackPos.X = Constrain(_trackPos.X, 0, 1280);
-                _trackPos.Y = Constrain(_trackPos.Y, 0, 720);
+                var trNP = FullSizeToTrackingSize(_trackPos, size);
 
-                // Start tracking
-                return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, _trackPos.X, _trackPos.Y, (int)TrackerMode.Track/*OnPosition*/, 0) == mav_error.ok;
+#if DEBUG
+
+                if (trNP.X > 1279)
+                    MessageBox.Show("Invalid tracking x: " + _trackPos.X);
+
+                if (trNP.Y > 719)
+                    MessageBox.Show("Invalid tracking y: " + _trackPos.Y);
+
+
+                //MessageBox.Show("X: " + trNP.X + "y: " + trNP.Y);
+#endif
+                MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, trNP.X, trNP.Y, (int)TrackerMode.Enable, 0);
+                Thread.Sleep(300);
+
+                return (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, trNP.X, trNP.Y, (int)TrackerMode.TrackOnPosition, 0) == mav_error.ok;
             }
 
             return false;
