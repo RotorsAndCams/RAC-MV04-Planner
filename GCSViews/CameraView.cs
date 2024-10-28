@@ -156,6 +156,8 @@ namespace MissionPlanner.GCSViews
             StartCameraStream();
             StartCameraControl();
 
+            CameraHandler.Instance.SetMode(NvSystemModes.Stow); //ez kell?
+
             #endregion
 
             #region UI config
@@ -251,6 +253,8 @@ namespace MissionPlanner.GCSViews
             _feedTimer.Enabled = false;
 
             #endregion
+
+
 
             this.FormClosing += CameraView_FormClosing;
         }
@@ -878,6 +882,7 @@ namespace MissionPlanner.GCSViews
                     _needToResetTime = false;
                 }
 
+
             }
             catch (Exception ex)
             {
@@ -1388,5 +1393,26 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+        private void btn_Surveillance_Click(object sender, EventArgs e)
+        {
+            
+
+            NvSystemModes currentMode = CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport) ?
+                    CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]) :
+                    NvSystemModes.GRR;
+
+            if (currentMode == NvSystemModes.GRR)
+            {
+                //set to obs
+                CameraHandler.Instance.SetMode(NvSystemModes.Observation);
+                this.btn_Surveillance.Text = "GRR";
+            }
+            else
+            {
+                //set to grr
+                CameraHandler.Instance.SetMode(NvSystemModes.GRR);
+                this.btn_Surveillance.Text = "Observation";
+            }
+        }
     }
 }

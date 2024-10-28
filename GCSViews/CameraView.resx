@@ -125,10 +125,43 @@
     <value>2</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="btn_ResetZoom.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+  <data name="btn_Surveillance.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="btn_Surveillance.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Stencil, 14.25pt</value>
+  </data>
+  <data name="btn_Surveillance.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btn_Surveillance.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 62</value>
+  </data>
+  <data name="btn_Surveillance.Size" type="System.Drawing.Size, System.Drawing">
+    <value>145, 53</value>
+  </data>
+  <data name="btn_Surveillance.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="btn_Surveillance.Text" xml:space="preserve">
+    <value>GRR</value>
+  </data>
+  <data name="&gt;&gt;btn_Surveillance.Name" xml:space="preserve">
+    <value>btn_Surveillance</value>
+  </data>
+  <data name="&gt;&gt;btn_Surveillance.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btn_Surveillance.Parent" xml:space="preserve">
+    <value>tlp_Buttonsection2</value>
+  </data>
+  <data name="&gt;&gt;btn_Surveillance.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="btn_ResetZoom.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
   <data name="btn_ResetZoom.Font" type="System.Drawing.Font, System.Drawing">
     <value>Segoe UI, 9pt, style=Bold</value>
   </data>
@@ -157,7 +190,7 @@
     <value>tlp_Buttonsection2</value>
   </data>
   <data name="&gt;&gt;btn_ResetZoom.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="btn_StartStopSingleYaw.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -190,7 +223,7 @@
     <value>tlp_Buttonsection2</value>
   </data>
   <data name="&gt;&gt;btn_StartStopSingleYaw.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="btn_StopTracking.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -217,7 +250,7 @@
     <value>tlp_Buttonsection2</value>
   </data>
   <data name="&gt;&gt;btn_StopTracking.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="tlp_Buttonsection2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -250,7 +283,7 @@
     <value>0</value>
   </data>
   <data name="tlp_Buttonsection2.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_ResetZoom" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_StartStopSingleYaw" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_StopTracking" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,50,Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_Surveillance" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_ResetZoom" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_StartStopSingleYaw" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_StopTracking" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,50,Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="tlp_InfoBase.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
@@ -844,7 +877,7 @@
     <value>cs_ColorSliderAltitude</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.9063.26251, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ColorSlider, MissionPlanner, Version=1.3.9067.29396, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;cs_ColorSliderAltitude.Parent" xml:space="preserve">
     <value>tlp_AGLContainer</value>
