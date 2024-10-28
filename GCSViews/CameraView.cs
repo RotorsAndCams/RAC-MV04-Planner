@@ -36,6 +36,7 @@ using MV04.FlightPlanAnalyzer;
 using System.Timers;
 using MissionPlanner.Controls;
 using LibVLCSharp.Shared;
+using Accord.MachineLearning.VectorMachines.Learning;
 
 namespace MissionPlanner.GCSViews
 {
@@ -107,9 +108,8 @@ namespace MissionPlanner.GCSViews
         Panel panelDoubleClick;
         Label lb_FollowDebugText;
 
-        System.Timers.Timer _feedTimer = new System.Timers.Timer();
+        System.Timers.Timer _feedTimer;
         ElapsedEventHandler handler = null;
-        double followTestCounter = 0.0;
 
         private object lckStart = new object();
         bool _enableCrossHair = true;
@@ -243,6 +243,15 @@ namespace MissionPlanner.GCSViews
 
             #endregion
 
+            #region Follow mode
+
+            _feedTimer = new System.Timers.Timer();
+            _feedTimer.Interval = 10000;
+            _feedTimer.Elapsed += _feedTimer_Elapsed;
+            _feedTimer.Enabled = false;
+
+            #endregion
+
             this.FormClosing += CameraView_FormClosing;
         }
 
@@ -335,64 +344,66 @@ namespace MissionPlanner.GCSViews
 
         private void StartFeed()
         {
-            PointLatLngAlt target = new PointLatLngAlt();
-            _feedTimer.Interval = 10000;
-            _feedTimer.Elapsed += handler = new ElapsedEventHandler(delegate (object sender, ElapsedEventArgs e) {
+            _feedTimer.Enabled = true;
+            _feedTimer.Start();
 
-                if (CameraView.instance.IsDisposed)
-                    return;
+        }
 
-                /*
+        private void _feedTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            //Check track mode
+            if (!IsCameraTrackingModeActive)
+            {
+                MessageBox.Show("Camera is not tracking");
+                StopFeed();
+                return;
+            }
+
+            if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.GndCrsReport))
+            {
+                var target_lat = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat;
+                var target_lng = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon;
+                var target_alt = (int)MainV2.comPort.MAV.cs.alt;
+
+#if DEBUG
+
+                //debug to screen
+                if (InvokeRequired)
+                    Invoke(new Action(() => lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt));
+                else
+                    lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt;
+
+#endif
+
+                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                {
+                    alt = target_alt,
+                    lat = target_lat,                   
+                    lng = target_lng,
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                });
+            }
+
+
+            #region testdata
+
+            /*
                     Simulated copter desired positions
                     -35.3621410612455	149.164499044418	1
                     -35.3619048250147	149.166129827499	2
 
-                 */
+            */
 
-                if (!IsCameraTrackingModeActive)
-                {
-                    //camera not tracking 
-                }
+            #endregion
 
-                if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.GndCrsReport))
-                {
-                    var target_lat = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat;
-                    var target_lng = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon;
-                    var target_alt = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsAlt;
-
-#if DEBUG
-
-                    //debug to screen
-                    if (InvokeRequired)
-                        Invoke(new Action(() => lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt));
-                    else
-                        lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt;
-
-#endif
-
-                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
-                    {
-                        alt = target_alt + 30,
-                        lat = target_lat, //+ followTestCounter,                    
-                        lng = target_lng,
-                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                    });
-                    //followTestCounter += 0.001;
-                }
-                else
-                {
-                    //no report from camera
-                }
-
-
-            });
-
-            _feedTimer.Start();
         }
 
         private void StopFeed()
         {
+            
             _feedTimer.Stop();
+            _feedTimer.Enabled = false;
+            _feedTimer.Close();
         }
 
         #region CameraFunctions
@@ -876,9 +887,6 @@ namespace MissionPlanner.GCSViews
 
         private void StateHandler_MV04StateChange(object sender, MV04StateChangeEventArgs e)
         {
-            if (CameraView.instance.IsDisposed)
-                return;
-
             if (InvokeRequired)
             {
                 Invoke(new Action(() => SetGCSStatus()));
@@ -886,24 +894,88 @@ namespace MissionPlanner.GCSViews
             else
                 SetGCSStatus();
 
-            if (e.NewState == MV04_State.Follow)
+            switch (e.NewState)
             {
-                if(_cameraState != NvSystemModes.Tracking)
-                {
-                    MessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
-                    Task.Run(() => ProvideGCSError());
-                }
-            }
+                case MV04_State.Manual:
+                    Execute_Manual_Tasks();
+                    break;
+                case MV04_State.TapToFly:
+                    break;
+                case MV04_State.Auto:
+                    Execute_Auto_Tasks();
+                    break;
+                case MV04_State.Follow:
+                    Execute_Follow_Tasks();
+                    break;
+                case MV04_State.Takeoff:
+                    Execute_TakeOff_Tasks();
+                    break;
+                case MV04_State.RTL:
+                    Execute_RTL_Tasks();
+                    break;
+                case MV04_State.Land:
+                    Execute_Land_Tasks();
+                    break;
+                case MV04_State.Unknown:
+                    break;
+                default:
+                    break;
 
-            if (e.NewState == MV04_State.Auto)
-            {
-                
-                if (MainV2.comPort.MAV.wps.Values.Count <= 0)
-                {
-                    MessageBox.Show("No uploaded plan");
-                    Task.Run(() => Blink());
-                }
             }
+        }
+
+        private void Execute_Auto_Tasks()
+        {
+            if (_feedTimer.Enabled)
+                StopFeed();
+
+            if (MainV2.comPort.MAV.wps.Values.Count <= 0)
+            {
+                MessageBox.Show("No uploaded plan");
+                //Task.Run(() => Blink());
+            }
+        }
+
+        private void Execute_Follow_Tasks()
+        {
+            if (_cameraState != NvSystemModes.Tracking)
+            {
+                MessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
+                Task.Run(() => ProvideGCSError());
+            }
+            else
+            {
+                StartFeed();
+            }
+        }
+
+        private void Execute_RTL_Tasks()
+        {
+            Task.Run(() => Blink());
+        }
+
+        private void Execute_TakeOff_Tasks()
+        {
+            if (_feedTimer.Enabled)
+                StopFeed();
+
+            CameraHandler.Instance.SetMode(NvSystemModes.Stow);
+        }
+
+        private void Execute_Land_Tasks()
+        {
+            if (_feedTimer.Enabled)
+                StopFeed();
+
+            CameraHandler.Instance.SetMode(NvSystemModes.Stow);
+        }
+
+        private void Execute_Manual_Tasks()
+        {
+            if (_feedTimer.Enabled)
+                StopFeed();
+
+            CameraHandler.Instance.SetMode(NvSystemModes.GRR);
         }
 
         private void _droneStatustimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
