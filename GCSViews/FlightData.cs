@@ -460,58 +460,44 @@ namespace MissionPlanner.GCSViews
                 hud1.Dock = DockStyle.Fill;
             }
 
-            if (Settings.Instance.ContainsKey("quickViewRows"))
+            string quickCols = Settings.Instance["quickViewCols", "2"],
+                   quickRows = Settings.Instance["quickViewRows", "3"];
+            setQuickViewRowsCols(quickCols, quickRows);
+
+            string[] defaultQuickKeys =
             {
-                setQuickViewRowsCols(Settings.Instance["quickViewCols"], Settings.Instance["quickViewRows"]);
-            }
+                "alt",
+                "groundspeed",
+                "wp_dist",
+                "yaw",
+                "verticalspeed",
+                "DistToHome",
+            };
 
-            for (int f = 1; f < 30; f++)
+            for (int i = 0; i < tableLayoutPanelQuick.Controls.Count; i++)
             {
-                // load settings
-                if (Settings.Instance["quickView" + f] != null)
-                {
-                    Control[] ctls = Controls.Find("quickView" + f, true);
-                    if (ctls.Length > 0)
-                    {
-                        QuickView QV = (QuickView) ctls[0];
-                        
-                        // set description and unit
-                        string desc = Settings.Instance["quickView" + f];
-                        if (QV.Tag == null)
-                            QV.Tag = desc;
-                        QV.desc = MainV2.comPort.MAV.cs.GetNameandUnit(desc);
+                // Get field key (CurrentState field / property)
+                string fieldKey = Settings.Instance["quickView" + (i + 1), defaultQuickKeys[i]];
 
-                        // set databinding for value
-                        QV.DataBindings.Clear();
-                        try
-                        {
-                            var b = new Binding("number", bindingSourceQuickTab,
-                                Settings.Instance["quickView" + f], true);
-                            b.Format += new ConvertEventHandler(BindingTypeToNumber);
-                            b.Parse += new ConvertEventHandler(NumberToBindingType);
-
-                            QV.DataBindings.Add(b);
-                        }
-                        catch (Exception ex)
-                        {
-                            log.Debug(ex);
-                        }
-                    }
-                }
-                else
+                // Find control
+                Control[] controls = Controls.Find("quickView" + (i + 1), true);
+                if (controls.Length > 0)
                 {
-                    // if no config, update description on predefined
+                    QuickView quickView = (QuickView)controls[0];
+                    
+                    // Set description and unit
+                    if (quickView.Tag == null) quickView.Tag = fieldKey;
+                    quickView.desc = MainV2.comPort.MAV.cs.GetNameandUnit(fieldKey);
+
+                    // Set databinding for value
+                    quickView.DataBindings.Clear();
                     try
                     {
-                        Control[] ctls = Controls.Find("quickView" + f, true);
-                        if (ctls.Length > 0)
-                        {
-                            QuickView QV = (QuickView) ctls[0];
-                            string desc = QV.desc;
-                            if (QV.Tag == null)
-                                QV.Tag = desc;
-                            QV.desc = MainV2.comPort.MAV.cs.GetNameandUnit(QV.Tag.ToString());
-                        }
+                        Binding binding = new Binding("number", bindingSourceQuickTab, fieldKey, true);
+                        binding.Format += new ConvertEventHandler(BindingTypeToNumber);
+                        binding.Parse += new ConvertEventHandler(NumberToBindingType);
+
+                        quickView.DataBindings.Add(binding);
                     }
                     catch (Exception ex)
                     {
