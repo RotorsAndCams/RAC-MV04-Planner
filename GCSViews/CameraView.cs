@@ -257,6 +257,7 @@ namespace MissionPlanner.GCSViews
 
 
             this.FormClosing += CameraView_FormClosing;
+
         }
 
         #endregion

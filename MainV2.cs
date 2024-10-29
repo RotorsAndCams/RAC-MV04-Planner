@@ -44,6 +44,7 @@ using MV04.FlightPlanAnalyzer;
 using MV04.SingleYaw;
 using MV04.Settings;
 using MV04.Camera;
+using Microsoft.Scripting.Hosting.Shell;
 
 namespace MissionPlanner
 {
@@ -1145,7 +1146,7 @@ namespace MissionPlanner
 
             //if (Program.IconFile != null)
             //{
-            //    this.Icon = Icon.FromHandle(((Bitmap) Program.IconFile).GetHicon());
+            //    this.Icon = MissionPlanner.Properties.Resources.drone_takeoff;
             //}
 
             //MenuArduPilot.Image = new Bitmap(Properties.Resources._0d92fed790a3a70170e61a86db103f399a595c70,
@@ -1172,6 +1173,7 @@ namespace MissionPlanner
 
             this.Text = "Secop Planner 2" + " " + comPort.MAV.VersionString;
             this.ShowIcon = false;
+            
 
             StateHandler.MV04StateChange += CheckFlightPlan;
 
@@ -1180,7 +1182,19 @@ namespace MissionPlanner
             if (bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw)) && !SingleYawHandler.IsRunning)
                 SingleYawHandler.StartSingleYaw(MainV2.comPort);
 
+            this.ShowIcon = false;
+            //this.switchicons
+            this.ShowInTaskbar = true;
+            //SetGUI();
+
+            this.VisibleChanged += MainV2_VisibleChanged;
+
         }
+
+        private void MainV2_VisibleChanged(object sender, EventArgs e)
+        {
+        }
+
 
         private void _comPort_ParamListChanged(object sender, EventArgs e)
         {
@@ -1416,7 +1430,7 @@ namespace MissionPlanner
 
             MainMenu.BackColor = SystemColors.MenuBar;
 
-            MainMenu.BackgroundImage = displayicons.bg;
+            //MainMenu.BackgroundImage = displayicons.bg;
 
             MenuFlightData.Image = displayicons.fd;
             MenuFlightPlanner.Image = displayicons.fp;
@@ -4587,7 +4601,7 @@ namespace MissionPlanner
                     try
                     {
                         item.BackColor = Color.Transparent;
-                        item.BackgroundImage = displayicons.bg; //.BackColor = Color.Black;
+                        //item.BackgroundImage = displayicons.bg; //.BackColor = Color.Black;
                     }
                     catch
                     {
@@ -4596,6 +4610,7 @@ namespace MissionPlanner
             }
             //MainMenu.BackColor = Color.Black;
             //MainMenu.BackgroundImage = MissionPlanner.Properties.Resources.bgdark;
+            
         }
 
         private void fullScreenToolStripMenuItem_Click(object sender, EventArgs e)
