@@ -2344,6 +2344,7 @@ namespace MissionPlanner.GCSViews
             {
                 // save settings
                 Settings.Instance[((QuickView) checkbox.Tag).Name] = checkbox.Name;
+                Settings.Instance.Save();
 
                 // set description
                 string desc = checkbox.Name;
