@@ -249,17 +249,12 @@ namespace MV04.Camera
         /// <summary>
         /// Timer loop for gimbal movement commands
         /// </summary>
-        private System.Windows.Forms.Timer GimbalTimer;
+        private System.Timers.Timer GimbalTimer;
 
         /// <summary>
         /// Store the next gimbal movement
         /// </summary>
-        public (double yaw, double pitch) NextMovement { get; private set; }
-
-        /// <summary>
-        /// Store the last gimbal movement
-        /// </summary>
-        public (double yaw, double pitch) LastMovement { get; private set; }
+        public (float yaw, float pitch) NextMovement { get; private set; }
 
         /// <summary>
         /// Store the last zoom command
@@ -325,9 +320,10 @@ namespace MV04.Camera
             CameraIP = ip;
             CameraControlPort = port;
 
-            GimbalTimer = new System.Windows.Forms.Timer();
+            GimbalTimer = new System.Timers.Timer();
             GimbalTimer.Enabled = false;
-            GimbalTimer.Tick += GimbalTimer_Tick;
+            GimbalTimer.Interval = 100;
+            GimbalTimer.Elapsed += GimbalTimer_Tick;
 
             if (IsValid(_mavProto))
             {
@@ -763,7 +759,7 @@ namespace MV04.Camera
             return FullSizeToTrackingSize(fullSizePoint, new Size(1920, 1080));
         }
 
-        private double Constrain(double number, double minValue, double maxValue)
+        private float Constrain(float number, float minValue, float maxValue)
         {
             if (number < minValue)
             {
@@ -876,13 +872,13 @@ namespace MV04.Camera
             return false;
         }
 
-        public void StartGimbal(TimeSpan? timerInterval = null)
+        public void StartGimbal()
         {
-            if (GimbalTimer.Enabled) GimbalTimer.Stop();
-
-            if (timerInterval == null) timerInterval = TimeSpan.FromMilliseconds(100); // Default gimbal update frequency is 10Hz
-            GimbalTimer.Interval = (int)Math.Round(timerInterval.Value.TotalMilliseconds);
-            GimbalTimer.Start();
+            if (GimbalTimer != null)
+            {
+                GimbalTimer.Enabled = true;
+                GimbalTimer.Start();
+            }
         }
 
         private void GimbalTimer_Tick(object sender, EventArgs e)
@@ -890,7 +886,7 @@ namespace MV04.Camera
             MoveCamera(NextMovement.yaw, NextMovement.pitch);
         }
 
-        private bool MoveCamera(double yaw, double pitch, double groundAlt = 0)
+        private bool MoveCamera(float yaw, float pitch, float groundAlt = 0)
         {
             if (IsCameraControlConnected)
             {
@@ -898,14 +894,8 @@ namespace MV04.Camera
                 yaw = Constrain(yaw, -1, 1);
                 pitch = Constrain(pitch, -1, 1);
 
-                // Only send if new
-                if ((yaw != LastMovement.yaw || pitch != LastMovement.pitch)
-                    &&
-                    (mav_error)MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, (float)yaw, (float)pitch, (int)LastZoomState, (float)groundAlt) == mav_error.ok)
-                {
-                    LastMovement = (yaw, pitch);
-                    return true;
-                }
+                // Send gimbal command
+                return (mav_error)MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, yaw, pitch, (int)LastZoomState, groundAlt) == mav_error.ok;
             }
 
             return false;
@@ -913,12 +903,17 @@ namespace MV04.Camera
 
         public void StopGimbal()
         {
-            GimbalTimer.Stop();
+            if (GimbalTimer != null)
+            {
+                GimbalTimer.Stop();
+                GimbalTimer.Enabled = false;
+                GimbalTimer.Close();
+            }
         }
 
-        public void SetCameraPitch(PitchDirection direction, double speed = 1)
+        public void SetCameraPitch(PitchDirection direction, float speed = 1)
         {
-            double pitchValue;
+            float pitchValue;
             switch (direction)
             {
                 case PitchDirection.Up:
@@ -934,9 +929,9 @@ namespace MV04.Camera
             NextMovement = (NextMovement.yaw, pitchValue);
         }
 
-        public void SetCameraYaw(YawDirection direction, double speed = 1)
+        public void SetCameraYaw(YawDirection direction, float speed = 1)
         {
-            double yawValue;
+            float yawValue;
             switch (direction)
             {
                 case YawDirection.Left:

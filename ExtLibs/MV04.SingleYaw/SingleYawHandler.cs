@@ -265,7 +265,7 @@ namespace MV04.SingleYaw
                 double yawSpeed = Math.Abs(cameraYaw) / 180.0; // Map 0-180 to 0.0-1.0
 
                 // Set camera yaw
-                CameraHandler.Instance.SetCameraYaw(yawDirection, yawSpeed);
+                CameraHandler.Instance.SetCameraYaw(yawDirection, (float)yawSpeed);
 
                 // Notify
                 log.Info($"Single-Yaw correction made ({Enum.GetName(typeof(YawDirection), yawDirection)} {Math.Round(yawSpeed, 1)})");
