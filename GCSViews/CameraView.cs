@@ -103,7 +103,7 @@ namespace MissionPlanner.GCSViews
 
         LibVLCSharp.Shared.LibVLC _vlcRecord;
         MediaPlayer _mediaPlayerRecord;
-        Media _mediaRecor;
+        Media _mediaRecord;
 
         Panel panelDoubleClick;
         Label lb_FollowDebugText;
@@ -292,7 +292,7 @@ namespace MissionPlanner.GCSViews
                 {"Start stream & control", () => { StartCameraStream(); StartCameraControl(); }},
                 {"Switch crosshairs", () => { ChangeCrossHair(); }},
                 {"Do photo", () => { DoPhoto(); }},
-                {"Start recording (loop)", () => { StartRecording(); }},
+                {"Start recording", () => { StartRecording(); }},
                 {"Stop recording", () => { StopRecording(); }},
                 {"Set mode", () => { new CameraModeSelectorForm().Show(); }},
                 {"Tracker mode", () => { new TrackerPosForm().Show(); }},
@@ -500,8 +500,12 @@ namespace MissionPlanner.GCSViews
 
         private void _videoRecordSegmentTimer_Tick(object sender, EventArgs e)
         {
-            _mediaPlayerRecord.Stop();
-            _mediaPlayerRecord.Play(_mediaRecor);
+            ////_mediaPlayerRecord.Stop();
+            ////_mediaPlayerRecord.Play(_mediaRecord);
+            //StopRecording();
+            ////Thread.Sleep(300);
+            //StartRecording();
+
         }
 
         private void StartRecording()
@@ -512,13 +516,14 @@ namespace MissionPlanner.GCSViews
             if(_mediaPlayerRecord == null)
                 _mediaPlayerRecord = new MediaPlayer(_vlcRecord);
 
-            if(_mediaRecor == null)
+            if(_mediaRecord == null)
             {
-                _mediaRecor = new Media(_vlcRecord, new Uri(videoUrl));
-                _mediaRecor.AddOption(":sout=#file{dst=" + CameraHandler.Instance.MediaSavePath + "savetestTTTT" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".ts" + "}");
+                _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
+                _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
+                                        //sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=
             }
 
-            _mediaPlayerRecord.Play(_mediaRecor);
+            _mediaPlayerRecord.Play(_mediaRecord);
             _videoRecordSegmentTimer?.Start();
             _recordingInProgress = true;
         }
@@ -687,6 +692,7 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
+                StopRecording();
                 _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
                 CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
