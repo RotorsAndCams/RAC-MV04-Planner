@@ -2,6 +2,7 @@
 using MissionPlanner;
 using MissionPlanner.Utilities;
 using MV04.Camera;
+using MV04.Joystick;
 using System;
 using System.Reflection;
 using System.Timers;
@@ -9,13 +10,22 @@ using System.Windows.Forms;
 
 namespace MV04.SingleYaw
 {
+    public enum SingleYawMode
+    {
+        None,
+        Master,
+        Slave
+    }
+
     public class SingleYawCommandEventArgs: EventArgs
     {
-        public int Deg { get; set; }
+        public SingleYawMode Mode { get; set; }
 
-        public int RCChannel { get; set; }
+        public double DegError { get; set; }
 
-        public int RCOutput { get; set; }
+        public int Channel { get; set; }
+
+        public double Output { get; set; }
     }
 
     public class SingleYawMessageEventArgs: EventArgs
@@ -29,9 +39,8 @@ namespace MV04.SingleYaw
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static int _YawRCChannel = 4;
-        
-        private static (short _YawRCMin, short _YawRCTrim, short _YawRCDeadzone, short _YawRCMax, bool _YawRCReversed) _YawRCParams = (1000, 1500, 20, 2000, false);
 
+        private static (short _YawRCMin, short _YawRCTrim, short _YawRCDeadzone, short _YawRCMax, bool _YawRCReversed) _YawRCParams = (1000, 1500, 20, 2000, false);
 
         private static System.Timers.Timer _YawAdjustTimer;
 
@@ -109,6 +118,26 @@ namespace MV04.SingleYaw
             }
         }
 
+        private static SingleYawMode _CurrentMode = SingleYawMode.None;
+
+        /// <summary>
+        /// Currently running mode
+        /// </summary>
+        public static SingleYawMode CurrentMode
+        {
+            get
+            {
+                if (IsRunning)
+                    return _CurrentMode;
+                else
+                    return SingleYawMode.None;
+            }
+            private set
+            {
+                _CurrentMode = value;
+            }
+        }
+
         /// <summary>
         /// Event triggered on every Single-Yaw command sent
         /// </summary>
@@ -125,8 +154,15 @@ namespace MV04.SingleYaw
         /// <summary>
         /// Start the yaw correction loop
         /// </summary>
-        public static void StartSingleYaw(MAVLinkInterface MAVLink)
+        public static void StartSingleYaw(MAVLinkInterface MAVLink, SingleYawMode mode = SingleYawMode.Master)
         {
+            // Check selected mode
+            if (mode == SingleYawMode.None)
+            {
+                return;
+            }
+            CurrentMode = mode;
+
             // Set MAVLinkInterface
             SingleYawHandler.MAVLink = MAVLink;
 
@@ -137,6 +173,7 @@ namespace MV04.SingleYaw
             }
 
             // Get RC parameters
+            _YawRCChannel = JoystickHandler.GetChannelForJoyRole(MV04_JoyRole.UAV_Yaw); // 4
             _YawRCParams = (
                 (short)MAVLink.MAV.param[$"RC{_YawRCChannel}_MIN"].Value,
                 (short)MAVLink.MAV.param[$"RC{_YawRCChannel}_TRIM"].Value,
@@ -162,7 +199,7 @@ namespace MV04.SingleYaw
 
             // Notify
             log.Info($"Single-Yaw started (loop={_YawAdjustInterval}ms)");
-            TriggerSingleYawMessageEvent("Single-Yaw started");
+            TriggerSingleYawMessageEvent($"Single-Yaw ({Enum.GetName(typeof(SingleYawMode), mode)}) started");
         }
 
         private static void _YawAdjustTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -184,25 +221,62 @@ namespace MV04.SingleYaw
                 cameraYaw = TestCameraYaw;
             }
 
-            // Calculate RCOverride
-            short RCOverride = _YawRCParams._YawRCReversed ?
-                (short)(_YawRCParams._YawRCTrim - (ControlMulti * cameraYaw)) : // Reversed
-                (short)(_YawRCParams._YawRCTrim + (ControlMulti * cameraYaw));  // Normal
+            // Correct yaw error according to mode
+            if (CurrentMode == SingleYawMode.Master)
+            {
+                // Check if above treshold
+                /*if (Math.Abs(cameraYaw) < _YawAdjustTreshold)
+                {
+                    return;
+                }*/
 
-            // Clamp RCOverride
-            if (RCOverride < _YawRCParams._YawRCMin) RCOverride = _YawRCParams._YawRCMin;
-            if (RCOverride > _YawRCParams._YawRCMax) RCOverride = _YawRCParams._YawRCMax;
+                // Calculate RCOverride
+                short RCOverride = _YawRCParams._YawRCReversed ?
+                    (short)(_YawRCParams._YawRCTrim - (ControlMulti * cameraYaw)) : // Reversed
+                    (short)(_YawRCParams._YawRCTrim + (ControlMulti * cameraYaw));  // Normal
 
-            // Set RCOverride
-            MAVLink.MAV.cs.GetType().GetField($"rcoverridech{_YawRCChannel}").SetValue(MAVLink.MAV.cs, RCOverride);
+                // Clamp RCOverride
+                if (RCOverride < _YawRCParams._YawRCMin) RCOverride = _YawRCParams._YawRCMin;
+                if (RCOverride > _YawRCParams._YawRCMax) RCOverride = _YawRCParams._YawRCMax;
 
-            // Notify
-            log.Info($"Single-Yaw correction made (RC{_YawRCChannel}={RCOverride})");
-            TriggerSingleYawCommandEvent(
-                (int)(cameraYaw * -1), // Flip to UAV frame (positive is CW)
-                _YawRCChannel,
-                RCOverride);
-            TriggerSingleYawMessageEvent($"Single-Yaw elapsed (cameraYaw={cameraYaw}, RCChan={_YawRCChannel}, RCOut={RCOverride})");
+                // Set RCOverride
+                MAVLink.MAV.cs.GetType().GetField($"rcoverridech{_YawRCChannel}").SetValue(MAVLink.MAV.cs, RCOverride);
+
+                // Notify
+                log.Info($"Single-Yaw correction made (RC{_YawRCChannel}={RCOverride})");
+                TriggerSingleYawCommandEvent(
+                    CurrentMode,
+                    (int)(cameraYaw),
+                    _YawRCChannel,
+                    RCOverride);
+                TriggerSingleYawMessageEvent($"Single-Yaw elapsed (cameraYaw={cameraYaw}, RCChan={_YawRCChannel}, RCOut={RCOverride})");
+            }
+            else if (CurrentMode == SingleYawMode.Slave)
+            {
+                // Check if above treshold
+                /*if (Math.Abs(cameraYaw) < _YawAdjustTreshold)
+                {
+                    CameraHandler.Instance.SetCameraYaw(YawDirection.Stop, 0);
+                    return;
+                }*/
+
+                // Calculate camera yaw
+                YawDirection yawDirection = cameraYaw > 0 ? YawDirection.Left : YawDirection.Right;
+                double yawSpeed = Math.Abs(cameraYaw) / 180.0; // Map 0-180 to 0.0-1.0
+
+                // Set camera yaw
+                CameraHandler.Instance.SetCameraYaw(yawDirection, (float)yawSpeed);
+
+                // Notify
+                log.Info($"Single-Yaw correction made ({Enum.GetName(typeof(YawDirection), yawDirection)} {Math.Round(yawSpeed, 1)})");
+                TriggerSingleYawCommandEvent(
+                    CurrentMode,
+                    (int)(cameraYaw),
+                    _YawRCChannel,
+                    yawDirection == YawDirection.Right ? yawSpeed : yawSpeed * -1);
+                TriggerSingleYawMessageEvent($"Single-Yaw elapsed (Camera Yaw {Enum.GetName(typeof(YawDirection), yawDirection)} {Math.Round(yawSpeed, 1)})");
+            }
+            // SingleYawMode.None is ignored
         }
 
 
@@ -214,30 +288,43 @@ namespace MV04.SingleYaw
             // Stop timer
             _YawAdjustTimer.Enabled = false;
             _YawAdjustTimer.Stop();
-            _YawAdjustTimer.Close();
-            
-            // Send middle stick
-            if (_IsMAVConnected)
+
+            if (CurrentMode == SingleYawMode.Master)
             {
+                // Send middle stick
                 MAVLink.MAV.cs.GetType().GetField($"rcoverridech{_YawRCChannel}").SetValue(MAVLink.MAV.cs, _YawRCParams._YawRCTrim);
+
+                // Notify
+                TriggerSingleYawCommandEvent(SingleYawMode.Master, 0, _YawRCChannel, _YawRCParams._YawRCTrim);
             }
+            else if (CurrentMode == SingleYawMode.Slave)
+            {
+                // Stop gimbal
+                CameraHandler.Instance.SetCameraYaw(YawDirection.Stop, 0);
+
+                // Notify
+                TriggerSingleYawCommandEvent(SingleYawMode.Slave, 0, 0, 0);
+            }
+
+            // Reset mode
+            CurrentMode = SingleYawMode.None;
 
             // Notify
             log.Info("Single-Yaw stopped");
-            TriggerSingleYawCommandEvent(0, _YawRCChannel, _YawRCParams._YawRCTrim);
             TriggerSingleYawMessageEvent("Single-Yaw stopped");
         }
 
         /// <summary>
         /// Trigger Single-Yaw Command Event
         /// </summary>
-        public static void TriggerSingleYawCommandEvent(int deg, int rcChan, int rcOutput)
+        public static void TriggerSingleYawCommandEvent(SingleYawMode mode, double deg, int chan, double output)
         {
             SingleYawCommand?.Invoke(null, new SingleYawCommandEventArgs()
             {
-                Deg = deg,
-                RCChannel = rcChan,
-                RCOutput = rcOutput
+                Mode = mode,
+                DegError = deg,
+                Channel = chan,
+                Output = output
             });
         }
 

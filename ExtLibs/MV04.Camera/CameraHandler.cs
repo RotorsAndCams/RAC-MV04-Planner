@@ -1,16 +1,14 @@
 ﻿using CoordinateSharp;
+using log4net;
 using MissionPlanner.Utilities;
 using MV04.Settings;
-using MV04.State;
 using NextVisionVideoControlLibrary;
-using SharpGL;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
-using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -94,6 +92,8 @@ namespace MV04.Camera
             }
         }
 
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public static readonly int TripChannelNumber = 0;
 
         private VideoControl _VideoControl = null;
@@ -175,6 +175,24 @@ namespace MV04.Camera
 
         public NvSystemModes PrevCameraMode { get; private set; }
 
+        public NvSystemModes CurrentCameraMode
+        {
+            get
+            {
+                return HasCameraReport(MavReportType.SystemReport) ?
+                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
+                    FallbackCameraMode;
+            }
+        }
+
+        public NvSystemModes FallbackCameraMode
+        {
+            get
+            {
+                return NvSystemModes.GRR;
+            }
+        }
+
         private MavProto _mavProto = null;
 
         private MavProto CameraControl
@@ -231,17 +249,12 @@ namespace MV04.Camera
         /// <summary>
         /// Timer loop for gimbal movement commands
         /// </summary>
-        private System.Windows.Forms.Timer GimbalTimer;
+        private System.Timers.Timer GimbalTimer;
 
         /// <summary>
         /// Store the next gimbal movement
         /// </summary>
-        public (double yaw, double pitch) NextMovement { get; private set; }
-
-        /// <summary>
-        /// Store the last gimbal movement
-        /// </summary>
-        public (double yaw, double pitch) LastMovement { get; private set; }
+        public (float yaw, float pitch) NextMovement { get; private set; }
 
         /// <summary>
         /// Store the last zoom command
@@ -307,9 +320,10 @@ namespace MV04.Camera
             CameraIP = ip;
             CameraControlPort = port;
 
-            GimbalTimer = new System.Windows.Forms.Timer();
+            GimbalTimer = new System.Timers.Timer();
             GimbalTimer.Enabled = false;
-            GimbalTimer.Tick += GimbalTimer_Tick;
+            GimbalTimer.Interval = 100;
+            GimbalTimer.Elapsed += GimbalTimer_Tick;
 
             if (IsValid(_mavProto))
             {
@@ -558,7 +572,7 @@ namespace MV04.Camera
                 case 13:
                     return NvSystemModes.Nadir;
                 default:
-                    return NvSystemModes.GRR;
+                    return FallbackCameraMode;
             }
         }
 
@@ -702,9 +716,7 @@ namespace MV04.Camera
             if (IsCameraControlConnected)
             {
                 // Get current camera mode
-                NvSystemModes currentMode = HasCameraReport(MavReportType.SystemReport) ?
-                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
-                    NvSystemModes.GRR;
+                NvSystemModes currentMode = CurrentCameraMode;
 
                 if ((mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok)
                 {
@@ -747,7 +759,7 @@ namespace MV04.Camera
             return FullSizeToTrackingSize(fullSizePoint, new Size(1920, 1080));
         }
 
-        private double Constrain(double number, double minValue, double maxValue)
+        private float Constrain(float number, float minValue, float maxValue)
         {
             if (number < minValue)
             {
@@ -784,9 +796,7 @@ namespace MV04.Camera
             if (IsCameraControlConnected)
             {
                 // Save current camera mode
-                PrevCameraMode = HasCameraReport(MavReportType.SystemReport) ?
-                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
-                    NvSystemModes.GRR;
+                PrevCameraMode = CurrentCameraMode;
 
                 // Handle default tracking pos (center)
                 Point _trackPos = trackPos ?? new Point(640, 360);
@@ -815,8 +825,21 @@ namespace MV04.Camera
 
         public bool StopTracking(bool resetToPrevMode = false)
         {
-            SetMode(NvSystemModes.GRR);
-            return true;
+            if (IsCameraControlConnected
+                &&
+                (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, 0, 0, (int)TrackerMode.Disable, 0) == mav_error.ok)
+            {
+                if (resetToPrevMode)
+                {
+                    if (PrevCameraMode != NvSystemModes.Tracking)
+                        SetMode(PrevCameraMode);
+                    else
+                        SetMode(FallbackCameraMode);
+                }
+                return true;
+            }
+
+            return false;
         }
 
         public bool Retract()
@@ -849,34 +872,13 @@ namespace MV04.Camera
             return false;
         }
 
-        private bool MoveCamera(double yaw, double pitch, double groundAlt = 0)
+        public void StartGimbal()
         {
-            if (IsCameraControlConnected)
+            if (GimbalTimer != null)
             {
-                // Constrain inputs
-                yaw = Constrain(yaw, -1, 1);
-                pitch = Constrain(pitch, -1, 1);
-
-                // Only send if new
-                if ((yaw != LastMovement.yaw || pitch != LastMovement.pitch)
-                    &&
-                    (mav_error)MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, (float)yaw, (float)pitch, (int)LastZoomState, (float)groundAlt) == mav_error.ok)
-                {
-                    LastMovement = (yaw, pitch);
-                    return true;
-                }
+                GimbalTimer.Enabled = true;
+                GimbalTimer.Start();
             }
-
-            return false;
-        }
-
-        public void StartGimbal(TimeSpan? timerInterval = null)
-        {
-            if (GimbalTimer.Enabled) GimbalTimer.Stop();
-
-            if (timerInterval == null) timerInterval = TimeSpan.FromMilliseconds(100); // Default gimbal update frequency is 10Hz
-            GimbalTimer.Interval = (int)Math.Round(timerInterval.Value.TotalMilliseconds);
-            GimbalTimer.Start();
         }
 
         private void GimbalTimer_Tick(object sender, EventArgs e)
@@ -884,14 +886,34 @@ namespace MV04.Camera
             MoveCamera(NextMovement.yaw, NextMovement.pitch);
         }
 
-        public void StopGimbal()
+        private bool MoveCamera(float yaw, float pitch, float groundAlt = 0)
         {
-            GimbalTimer.Stop();
+            if (IsCameraControlConnected)
+            {
+                // Constrain inputs
+                yaw = Constrain(yaw, -1, 1);
+                pitch = Constrain(pitch, -1, 1);
+
+                // Send gimbal command
+                return (mav_error)MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, yaw, pitch, (int)LastZoomState, groundAlt) == mav_error.ok;
+            }
+
+            return false;
         }
 
-        public void SetCameraPitch(PitchDirection direction, double speed = 1)
+        public void StopGimbal()
         {
-            double pitchValue;
+            if (GimbalTimer != null)
+            {
+                GimbalTimer.Stop();
+                GimbalTimer.Enabled = false;
+                GimbalTimer.Close();
+            }
+        }
+
+        public void SetCameraPitch(PitchDirection direction, float speed = 1)
+        {
+            float pitchValue;
             switch (direction)
             {
                 case PitchDirection.Up:
@@ -907,9 +929,9 @@ namespace MV04.Camera
             NextMovement = (NextMovement.yaw, pitchValue);
         }
 
-        public void SetCameraYaw(YawDirection direction, double speed = 1)
+        public void SetCameraYaw(YawDirection direction, float speed = 1)
         {
-            double yawValue;
+            float yawValue;
             switch (direction)
             {
                 case YawDirection.Left:
@@ -936,7 +958,6 @@ namespace MV04.Camera
             return IsCameraControlConnected
                 && (mav_error)MavCmdDoNUC(CameraControl.mav_comm, CameraControl.ackCb) == mav_error.ok;
         }
-
 
         #endregion
 
