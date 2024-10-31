@@ -5,6 +5,7 @@ using System.Linq;
 namespace MV04.Joystick
 {
     #region Button
+
     public enum buttonfunction_mv04
     {
         MV04_SnapShot = 20,
@@ -48,120 +49,134 @@ namespace MV04.Joystick
         In,
         Out
     }
+
     #endregion
 
     #region Axis
-    
     #region Enums
-    public enum MV04_JoystickFunction
+    public enum MV04_JoyRole
     {
         UAV_Roll,
         UAV_Pitch,
         UAV_Throttle,
         UAV_Yaw,
-        Cam_Pitch,
         Cam_Zoom,
+        Cam_Pitch,
         Cam_Yaw
     }
 
-    public enum MV04_AxisPair
+    public enum MV04_JoyFlightMode
     {
-        Pitch_Pitch,
-        Throttle_Zoom
-    }
-
-    public enum MV04_AxisMode
-    {
-        UAV,
-        Cam
+        Manual,
+        Loiter,
+        TapToFly,
+        Auto,
+        Follow
     }
     #endregion
 
-    public class MV04_Axis
+    public class RCChannel
     {
-        public MV04_JoystickFunction Function { get; set; }
-        public int RCChannelNo { get; set; }
-        public int RCAxis { get; set; }
+        public MV04_JoyRole Role { get; private set; }
+        public int Axis { get; set; }
+        public string Name { get; private set; }
+        public bool Show { get; private set; }
 
-        public MV04_Axis(MV04_JoystickFunction function, int rCChannelNo, int rCAxis)
+        public RCChannel(MV04_JoyRole role, int axis, string name, bool show)
         {
-            Function = function;
-            RCChannelNo = rCChannelNo;
-            RCAxis = rCAxis;
+            Role = role;
+            Axis = axis;
+            Name = name;
+            Show = show;
         }
     }
 
-    public class JoystickAxiesChangedEventArgs: EventArgs
+    public class JoystickModeChangedEventArgs: EventArgs
     {
-        public MV04_AxisPair AxisPair { get; set; }
-        public MV04_AxisMode AxisMode { get; set; }
+        public MV04_JoyFlightMode Mode { get; set; }
 
-        public JoystickAxiesChangedEventArgs(MV04_AxisPair axisPair, MV04_AxisMode axisMode)
+        public JoystickModeChangedEventArgs(MV04_JoyFlightMode mode)
         {
-            AxisPair = axisPair;
-            AxisMode = axisMode;
+            Mode = mode;
         }
     }
 
     public static class JoystickHandler
     {
         #region Fields
-        public static event EventHandler<JoystickAxiesChangedEventArgs> JoystickAxiesChanged;
+        public static event EventHandler<JoystickModeChangedEventArgs> JoystickModeChanged;
 
-        public static HashSet<MV04_Axis> JoystickAxies = new HashSet<MV04_Axis>
+        private static int NoneAxis = 0; // joystickaxis.None
+
+        private static int VirtualAxis = 4; // joystickaxis.ARz
+
+        public static Dictionary<int, RCChannel> RCChannels = new Dictionary<int, RCChannel>
         {
-            new MV04_Axis(MV04_JoystickFunction.UAV_Roll, 1, 0),
-            new MV04_Axis(MV04_JoystickFunction.UAV_Pitch, 2, 0),
-            new MV04_Axis(MV04_JoystickFunction.UAV_Throttle, 3, 0),
-            new MV04_Axis(MV04_JoystickFunction.UAV_Yaw, 4, 0),
-            new MV04_Axis(MV04_JoystickFunction.Cam_Pitch, 5, 0),
-            new MV04_Axis(MV04_JoystickFunction.Cam_Zoom, 6, 0),
-            new MV04_Axis(MV04_JoystickFunction.Cam_Yaw, 7, 0),
+            {1, new RCChannel(MV04_JoyRole.UAV_Roll, NoneAxis, "Roll", true)},
+            {2, new RCChannel(MV04_JoyRole.UAV_Pitch, NoneAxis, "Pitch", true)},
+            {3, new RCChannel(MV04_JoyRole.UAV_Throttle, NoneAxis, "Throttle / Zoom", true)},
+            {4, new RCChannel(MV04_JoyRole.UAV_Yaw, NoneAxis, "UAV Yaw", false)},
+            {5, new RCChannel(MV04_JoyRole.Cam_Zoom, NoneAxis, "Camera Zoom", false)},
+            {6, new RCChannel(MV04_JoyRole.Cam_Pitch, NoneAxis, "Camera Pitch", false)},
+            {7, new RCChannel(MV04_JoyRole.Cam_Yaw, NoneAxis, "Yaw", true)}
         };
         #endregion
 
         #region Methods
-        /// <summary>
-        /// Trigger a JoystickAxiesChanged event with the given parameters
-        /// </summary>
-        /// <param name="axisPair">Changed axis pair</param>
-        /// <param name="axisMode">Control target set</param>
-        public static void TriggerJoystickAxiesChangedEvent(MV04_AxisPair axisPair, MV04_AxisMode axisMode)
+        public static int GetChannelForJoyRole(MV04_JoyRole role)
         {
-            if (JoystickAxiesChanged != null)
-            {
-                JoystickAxiesChanged(null, new JoystickAxiesChangedEventArgs(axisPair, axisMode));
-            }
+            return RCChannels.Single(ch => ch.Value.Role == role).Key;
+        }
+        
+        public static int GetAxisForJoyRole(MV04_JoyRole role)
+        {
+            return RCChannels.Single(ch => ch.Value.Role == role).Value.Axis;
         }
 
         /// <summary>
-        /// Return the set joystick axis for the given axis pair
+        /// Return a set of joystick axes paired to RC channels for the given mode
         /// </summary>
-        /// <param name="axisPair">Axis pair to get the set joystick axis for</param>
-        /// <returns>joystickaxis enum value as an int</returns>
-        public static int GetAxis(MV04_AxisPair axisPair)
+        public static Dictionary<int, int> GetAxisSet(MV04_JoyFlightMode mode)
         {
-            if (axisPair == MV04_AxisPair.Pitch_Pitch)
+            Dictionary<int, int> result = new Dictionary<int, int> // Manual is the default case
             {
-                if (JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Pitch).RCAxis > 0)
-                {
-                    return JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Pitch).RCAxis;
-                }
-                else //if (JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Pitch).RCAxis > 0)
-                {
-                    return JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Pitch).RCAxis;
-                }
+                {1, GetAxisForJoyRole(MV04_JoyRole.UAV_Roll)},
+                {2, GetAxisForJoyRole(MV04_JoyRole.UAV_Pitch)},
+                {3, GetAxisForJoyRole(MV04_JoyRole.UAV_Throttle)},
+                {4, VirtualAxis}, // UAV Yaw
+                {5, NoneAxis},    // Cam Pitch
+                {6, NoneAxis},    // Cam Zoom
+                {7, GetAxisForJoyRole(MV04_JoyRole.Cam_Yaw)},
+            };
+
+            switch (mode)
+            {
+                case MV04_JoyFlightMode.TapToFly:
+                case MV04_JoyFlightMode.Auto:
+                case MV04_JoyFlightMode.Follow:
+                    result[1] = NoneAxis; // UAV Roll
+                    result[2] = NoneAxis; // UAV Pitch
+                    result[3] = NoneAxis; // UAV Throttle
+                    result[5] = GetAxisForJoyRole(MV04_JoyRole.UAV_Pitch);    // Cam Pitch
+                    result[6] = GetAxisForJoyRole(MV04_JoyRole.UAV_Throttle); // Cam Zoom
+                    break;
+                case MV04_JoyFlightMode.Manual:
+                case MV04_JoyFlightMode.Loiter:
+                default:
+                    break;
             }
-            else
+
+            return result;
+        }
+
+        /// <summary>
+        /// Trigger a JoystickModeChanged event with the given parameters
+        /// </summary>
+        public static void TriggerJoystickModeChangedEvent(MV04_JoyFlightMode mode)
+        {
+            if (JoystickModeChanged != null)
             {
-                if (JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Throttle).RCAxis > 0)
-                {
-                    return JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.UAV_Throttle).RCAxis;
-                }
-                else //if (JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Zoom).RCAxis > 0)
-                {
-                    return JoystickAxies.Single(x => x.Function == MV04_JoystickFunction.Cam_Zoom).RCAxis;
-                }
+                JoystickModeChanged(null, new JoystickModeChangedEventArgs(mode));
             }
         }
         #endregion

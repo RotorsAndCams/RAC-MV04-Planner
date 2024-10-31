@@ -88,32 +88,20 @@ namespace MissionPlanner.Joystick
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.BUT_detch = new MissionPlanner.Controls.MyButton();
             this.revCH = new System.Windows.Forms.CheckBox();
             this.label13 = new System.Windows.Forms.Label();
             this.expo_ch = new System.Windows.Forms.TextBox();
-            this.ProgressBarCH = new MissionPlanner.Controls.HorizontalProgressBar();
             this.CMB_CH = new System.Windows.Forms.ComboBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.BUT_detch = new MissionPlanner.Controls.MyButton();
+            this.ProgressBarCH = new MissionPlanner.Controls.HorizontalProgressBar();
             this.SuspendLayout();
-            // 
-            // BUT_detch
-            // 
-            this.BUT_detch.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.BUT_detch.Location = new System.Drawing.Point(163, 2);
-            this.BUT_detch.Name = "BUT_detch";
-            this.BUT_detch.Size = new System.Drawing.Size(45, 23);
-            this.BUT_detch.TabIndex = 62;
-            this.BUT_detch.Text = "Auto Detect";
-            this.BUT_detch.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
-            this.BUT_detch.UseVisualStyleBackColor = true;
-            this.BUT_detch.Click += new System.EventHandler(this.BUT_detch_Click);
             // 
             // revCH
             // 
             this.revCH.AutoSize = true;
             this.revCH.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.revCH.Location = new System.Drawing.Point(406, 6);
+            this.revCH.Location = new System.Drawing.Point(432, 6);
             this.revCH.Name = "revCH";
             this.revCH.Size = new System.Drawing.Size(15, 14);
             this.revCH.TabIndex = 61;
@@ -133,27 +121,12 @@ namespace MissionPlanner.Joystick
             // expo_ch
             // 
             this.expo_ch.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.expo_ch.Location = new System.Drawing.Point(320, 7);
+            this.expo_ch.Location = new System.Drawing.Point(346, 7);
             this.expo_ch.Name = "expo_ch";
             this.expo_ch.Size = new System.Drawing.Size(80, 13);
             this.expo_ch.TabIndex = 59;
             this.expo_ch.Text = "0";
             this.expo_ch.TextChanged += new System.EventHandler(this.expo_ch_TextChanged);
-            // 
-            // ProgressBarCH
-            // 
-            this.ProgressBarCH.DrawLabel = true;
-            this.ProgressBarCH.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.ProgressBarCH.Label = null;
-            this.ProgressBarCH.Location = new System.Drawing.Point(214, 3);
-            this.ProgressBarCH.Maximum = 2200;
-            this.ProgressBarCH.maxline = 0;
-            this.ProgressBarCH.Minimum = 800;
-            this.ProgressBarCH.minline = 0;
-            this.ProgressBarCH.Name = "ProgressBarCH";
-            this.ProgressBarCH.Size = new System.Drawing.Size(100, 23);
-            this.ProgressBarCH.TabIndex = 58;
-            this.ProgressBarCH.Value = 800;
             // 
             // CMB_CH
             // 
@@ -163,7 +136,7 @@ namespace MissionPlanner.Joystick
             "X",
             "Y",
             "SL1"});
-            this.CMB_CH.Location = new System.Drawing.Point(87, 3);
+            this.CMB_CH.Location = new System.Drawing.Point(113, 3);
             this.CMB_CH.Name = "CMB_CH";
             this.CMB_CH.Size = new System.Drawing.Size(70, 21);
             this.CMB_CH.TabIndex = 57;
@@ -173,6 +146,33 @@ namespace MissionPlanner.Joystick
             // 
             this.timer1.Enabled = true;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // BUT_detch
+            // 
+            this.BUT_detch.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.BUT_detch.Location = new System.Drawing.Point(189, 2);
+            this.BUT_detch.Name = "BUT_detch";
+            this.BUT_detch.Size = new System.Drawing.Size(45, 23);
+            this.BUT_detch.TabIndex = 62;
+            this.BUT_detch.Text = "Auto Detect";
+            this.BUT_detch.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.BUT_detch.UseVisualStyleBackColor = true;
+            this.BUT_detch.Click += new System.EventHandler(this.BUT_detch_Click);
+            // 
+            // ProgressBarCH
+            // 
+            this.ProgressBarCH.DrawLabel = true;
+            this.ProgressBarCH.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.ProgressBarCH.Label = null;
+            this.ProgressBarCH.Location = new System.Drawing.Point(240, 3);
+            this.ProgressBarCH.Maximum = 2200;
+            this.ProgressBarCH.maxline = 0;
+            this.ProgressBarCH.Minimum = 800;
+            this.ProgressBarCH.minline = 0;
+            this.ProgressBarCH.Name = "ProgressBarCH";
+            this.ProgressBarCH.Size = new System.Drawing.Size(100, 23);
+            this.ProgressBarCH.TabIndex = 58;
+            this.ProgressBarCH.Value = 800;
             // 
             // JoystickAxis
             // 
@@ -185,7 +185,7 @@ namespace MissionPlanner.Joystick
             this.Controls.Add(this.ProgressBarCH);
             this.Controls.Add(this.CMB_CH);
             this.Name = "JoystickAxis";
-            this.Size = new System.Drawing.Size(427, 28);
+            this.Size = new System.Drawing.Size(450, 28);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -70,21 +70,5 @@ namespace MV04.Camera
         {
             CameraHandler.Instance.SetCameraYaw(YawDirection.Left);
         }
-
-        private void button_Center_Click(object sender, EventArgs e)
-        {
-            // Stop gimbal
-            CameraHandler.Instance.SetCameraPitch(PitchDirection.Stop);
-            CameraHandler.Instance.SetCameraYaw(YawDirection.Stop);
-            CameraHandler.Instance.SetZoom(ZoomState.Stop);
-            
-            // Reset zoom
-            CameraHandler.Instance.ResetZoom();
-
-            // Center camera
-            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Stow);
-            Thread.Sleep(100);
-            CameraHandler.Instance.SetMode(CameraHandler.Instance.PrevCameraMode);
-        }
     }
 }
