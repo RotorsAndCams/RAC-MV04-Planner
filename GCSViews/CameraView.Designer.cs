@@ -68,7 +68,8 @@
             this.btn_FullScreen = new System.Windows.Forms.Button();
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
-            this.pb_CameraGstream = new System.Windows.Forms.PictureBox();
+            this.vv_VLC = new LibVLCSharp.WinForms.VideoView();
+            this.btn_Surveillance = new System.Windows.Forms.Button();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
@@ -88,7 +89,7 @@
             this.tlp_AGLData.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
             this.tlp_CVBase.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb_CameraGstream)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).BeginInit();
             this.SuspendLayout();
             // 
             // tlp_ControlsBase
@@ -103,6 +104,7 @@
             // tlp_Buttonsection2
             // 
             resources.ApplyResources(this.tlp_Buttonsection2, "tlp_Buttonsection2");
+            this.tlp_Buttonsection2.Controls.Add(this.btn_Surveillance, 0, 1);
             this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 0);
             this.tlp_Buttonsection2.Controls.Add(this.btn_StartStopSingleYaw, 1, 0);
             this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 1, 1);
@@ -372,7 +374,6 @@
             this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
             this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
-            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.inverted_cam_but;
             this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
             this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
             this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
@@ -410,15 +411,24 @@
             // 
             resources.ApplyResources(this.tlp_CVBase, "tlp_CVBase");
             this.tlp_CVBase.Controls.Add(this.tlp_ControlsBase, 1, 0);
-            this.tlp_CVBase.Controls.Add(this.pb_CameraGstream, 0, 0);
+            this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
             this.tlp_CVBase.Name = "tlp_CVBase";
             // 
-            // pb_CameraGstream
+            // vv_VLC
             // 
-            resources.ApplyResources(this.pb_CameraGstream, "pb_CameraGstream");
-            this.pb_CameraGstream.Name = "pb_CameraGstream";
-            this.pb_CameraGstream.TabStop = false;
-            this.pb_CameraGstream.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.pb_CameraGstream_MouseDoubleClick);
+            this.vv_VLC.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.vv_VLC, "vv_VLC");
+            this.vv_VLC.MediaPlayer = null;
+            this.vv_VLC.Name = "vv_VLC";
+            // 
+            // btn_Surveillance
+            // 
+            this.btn_Surveillance.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_Surveillance, "btn_Surveillance");
+            this.btn_Surveillance.ForeColor = System.Drawing.Color.White;
+            this.btn_Surveillance.Name = "btn_Surveillance";
+            this.btn_Surveillance.UseVisualStyleBackColor = false;
+            this.btn_Surveillance.Click += new System.EventHandler(this.btn_Surveillance_Click);
             // 
             // CameraView
             // 
@@ -427,6 +437,7 @@
             this.BackColor = System.Drawing.Color.Black;
             this.Controls.Add(this.tlp_CVBase);
             this.Name = "CameraView";
+            this.VisibleChanged += new System.EventHandler(this.CameraView_VisibleChanged);
             this.tlp_ControlsBase.ResumeLayout(false);
             this.tlp_Buttonsection2.ResumeLayout(false);
             this.tlp_InfoBase.ResumeLayout(false);
@@ -452,8 +463,7 @@
             this.tlp_AGLData.PerformLayout();
             this.tlp_ButtonSection1.ResumeLayout(false);
             this.tlp_CVBase.ResumeLayout(false);
-            this.tlp_CVBase.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb_CameraGstream)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -497,7 +507,8 @@
         private System.Windows.Forms.Label lb_AltitudeValue;
         private System.Windows.Forms.Label lb_Agl;
         private System.Windows.Forms.TableLayoutPanel tlp_CVBase;
-        private System.Windows.Forms.PictureBox pb_CameraGstream;
         private System.Windows.Forms.Button btn_StartStopSingleYaw;
+        private LibVLCSharp.WinForms.VideoView vv_VLC;
+        private System.Windows.Forms.Button btn_Surveillance;
     }
 }

@@ -216,19 +216,18 @@ namespace MissionPlanner
             }
 
             if (File.Exists(Settings.GetRunningDirectory() + "logo.png"))
-                Logo = new Bitmap(Settings.GetRunningDirectory() + "logo.png");
+                Logo = MissionPlanner.Properties.Resources.drone_takeoff;
 
             if (File.Exists(Settings.GetRunningDirectory() + "logo2.png"))
-                Logo2 = new Bitmap(Settings.GetRunningDirectory() + "logo2.png");
+                Logo2 = MissionPlanner.Properties.Resources.drone_takeoff;
 
             if (File.Exists(Settings.GetRunningDirectory() + "icon.png"))
             {
-                // 128*128
-                IconFile = new Bitmap(Settings.GetRunningDirectory() + "icon.png");
+                IconFile = MissionPlanner.Properties.Resources.drone_takeoff;
             }
             else
             {
-                IconFile = MissionPlanner.Properties.Resources.mpdesktop.ToBitmap();
+                IconFile = MissionPlanner.Properties.Resources.drone_takeoff;
             }
 
             if (File.Exists(Settings.GetRunningDirectory() + "splashbg.png")) // 600*375
@@ -269,7 +268,7 @@ namespace MissionPlanner
 
             Console.WriteLine("IconFile");
             if (IconFile != null)
-                Splash.Icon = Icon.FromHandle(((Bitmap) IconFile).GetHicon());
+                Splash.Icon = Icon.FromHandle(((Bitmap)MissionPlanner.Properties.Resources.Logo_SecopPlanner2).GetHicon());
 
             string strVersion = File.Exists("version.txt")
                 ? File.ReadAllText("version.txt")
@@ -481,6 +480,14 @@ namespace MissionPlanner
             catch
             {
             }
+
+            System.Windows.Forms.NotifyIcon nf = new NotifyIcon();
+            //MissionPlanner.Properties.Resources.drone_takeoff
+            //((System.Drawing.Icon) (resources.GetObject("$this.Icon")));
+            //System.Drawing.Icon.FromHandle(bitmap.GetHicon());
+            nf.Icon = System.Drawing.Icon.FromHandle(MissionPlanner.Properties.Resources.drone_takeoff.GetHicon());
+            nf.Visible = true;
+
         }
 
         private static string SerialPort_GetDeviceName(string port)

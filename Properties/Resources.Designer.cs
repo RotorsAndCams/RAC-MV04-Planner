@@ -1401,9 +1401,9 @@ namespace MissionPlanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        public static System.Drawing.Icon mpdesktop {
+        public static System.Drawing.Icon mp_desktop {
             get {
-                object obj = ResourceManager.GetObject("mpdesktop", resourceCulture);
+                object obj = ResourceManager.GetObject("mp_desktop", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

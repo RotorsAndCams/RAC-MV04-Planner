@@ -1,13 +1,16 @@
 ﻿using CoordinateSharp;
-using log4net;
 using MissionPlanner.Utilities;
 using MV04.Settings;
+using MV04.State;
 using NextVisionVideoControlLibrary;
+using SharpGL;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -92,8 +95,6 @@ namespace MV04.Camera
             }
         }
 
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         public static readonly int TripChannelNumber = 0;
 
         private VideoControl _VideoControl = null;
@@ -162,8 +163,6 @@ namespace MV04.Camera
         }
 
         private System.Threading.Timer RecordingTimer;
-        
-        public static string url = $"rtspsrc location=rtsp://{SettingManager.Get(Setting.CameraIP)}:554/live{SettingManager.Get(Setting.CameraStreamChannel)} latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";               //@"rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! application/x-rtp ! rtph265depay ! avdec_h265 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";              //@"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=30/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
 
         #endregion
 
@@ -284,9 +283,6 @@ namespace MV04.Camera
             {
                 MessageBox.Show("Invalid MavProto - CameraHandler - ctor");
             }
-//#if DEBUG
-//            url = @"videotestsrc ! video/x-raw, width=1920, height=1080, framerate=25/1 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink";
-//#endif
         }
 
         #endregion
@@ -347,44 +343,6 @@ namespace MV04.Camera
 
         #region Methods
 
-        System.Threading.Thread _currentGstream = null;
-        private object _currentGstreamLock = new object();
-        public void StartGstreamer(string u)
-        {
-            try
-            {
-                lock (_currentGstreamLock)
-                {
-                    if (_currentGstream != null)
-                    {
-                        _currentGstream.Abort();
-                        //_currentGstream = null;
-                        //GStreamer.Stop(null);
-                        Thread.Sleep(500);
-                        GStreamer.StopAll();
-                        _currentGstream = null;
-                        Thread.Sleep(500);
-                    }
-
-                    _currentGstream = GStreamer.StartA(u);
-                }
-                
-            }
-            catch(Exception ex)
-            {
-#if DEBUG
-                MessageBox.Show("Exception at Start video stream: " + ex.Message);
-#endif
-                Thread.Sleep(300);
-                _currentGstream = GStreamer.StartA(u);
-            }
-            
-        }
-
-        public void StopGstreamer()
-        {
-            GStreamer.StopAll();
-        }
 
         public bool HasCameraReport(MavReportType report_type)
         {
@@ -656,9 +614,9 @@ namespace MV04.Camera
             //}
 
 
-            
+
             //if(event_StartVideoRecording != null)
-                
+
         }
 
         public bool StopRecording()
@@ -684,6 +642,21 @@ namespace MV04.Camera
         #endregion
 
         #region Camera control Methods
+
+        public void SetSystemTimeToCurrent()
+        {
+            //epoch time
+            TimeSpan t = DateTime.Now - new DateTime(1970, 1, 1);
+            uint secondsSinceEpoch = (uint)t.TotalSeconds;
+            MavCmdUpdateSystemTime(CameraControl.mav_comm, CameraControl.ackCb, secondsSinceEpoch);
+        }
+        public void SetEnableCrossHair(bool p_Enable)
+        {
+            if (IsCameraControlConnected)
+            {
+                MavCmdSetEnableCrosshairOnIdle(CameraControl.mav_comm, CameraControl.ackCb, p_Enable);
+            }
+        }
 
         public bool SetIRColor(IRColor color)
         {
@@ -825,21 +798,11 @@ namespace MV04.Camera
 
         public bool StopTracking(bool resetToPrevMode = false)
         {
-            if (IsCameraControlConnected
-                &&
-                (mav_error)MavCmdSetTrackingMode(CameraControl.mav_comm, CameraControl.ackCb, 0, 0, (int)TrackerMode.Disable, 0) == mav_error.ok)
-            {
-                if (resetToPrevMode)
-                {
-                    if (PrevCameraMode != NvSystemModes.Tracking)
-                        SetMode(PrevCameraMode);
-                    else
-                        SetMode(FallbackCameraMode);
-                }
-                return true;
-            }
-
-            return false;
+            if (PrevCameraMode != NvSystemModes.Tracking)
+                SetMode(PrevCameraMode);
+            else
+                SetMode(FallbackCameraMode);
+            return true;
         }
 
         public bool Retract()
@@ -872,6 +835,23 @@ namespace MV04.Camera
             return false;
         }
 
+        private bool MoveCamera(float yaw, float pitch, float groundAlt = 0)
+        {
+            if (IsCameraControlConnected)
+            {
+                // Constrain inputs
+                yaw = Constrain(yaw, -1, 1);
+                pitch = Constrain(pitch, -1, 1);
+
+                if ((mav_error)MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, yaw, pitch, (int)LastZoomState, groundAlt) == mav_error.ok)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void StartGimbal()
         {
             if (GimbalTimer != null)
@@ -884,21 +864,6 @@ namespace MV04.Camera
         private void GimbalTimer_Tick(object sender, EventArgs e)
         {
             MoveCamera(NextMovement.yaw, NextMovement.pitch);
-        }
-
-        private bool MoveCamera(float yaw, float pitch, float groundAlt = 0)
-        {
-            if (IsCameraControlConnected)
-            {
-                // Constrain inputs
-                yaw = Constrain(yaw, -1, 1);
-                pitch = Constrain(pitch, -1, 1);
-
-                // Send gimbal command
-                return (mav_error)MavCmdSetGimbal(CameraControl.mav_comm, CameraControl.ackCb, yaw, pitch, (int)LastZoomState, groundAlt) == mav_error.ok;
-            }
-
-            return false;
         }
 
         public void StopGimbal()
@@ -958,6 +923,7 @@ namespace MV04.Camera
             return IsCameraControlConnected
                 && (mav_error)MavCmdDoNUC(CameraControl.mav_comm, CameraControl.ackCb) == mav_error.ok;
         }
+
 
         #endregion
 

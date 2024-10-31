@@ -78,7 +78,8 @@ namespace MissionPlanner.GCSViews
             try
             {
                 isReconnecting = true;
-                CameraHandler.Instance.StartGstreamer(CameraHandler.url);
+                CameraView.instance.StopVLC();
+                CameraView.instance.StartVideoStreamVLC();
                 CameraHandler.Instance.CameraControlConnect(
                     IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                     int.Parse(SettingManager.Get(Setting.CameraControlPort)));
@@ -98,8 +99,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_StartStopRecording_Click(object sender, EventArgs e)
         {
-            if (event_StartStopRecording != null)
-                event_StartStopRecording(sender, e);
+            CameraView.instance.StopRecording();
         }
 
         bool _isRecording;
@@ -138,17 +138,22 @@ namespace MissionPlanner.GCSViews
         private bool buttonDown;
         private void btn_EmergencyStop_MouseDown(object sender, MouseEventArgs e)
         {
+            if (_IsDialogOpen)
+                return;
+
             lb_StopCounter.Visible = true;
             btn_EmergencyStop.BackColor = Color.Red;
             var task = Task.Factory.StartNew(() => { ButtonHoldMethod(); });
         }
 
+        private bool _IsDialogOpen = false;
+
         private void ButtonHoldMethod()
         {
             int num = 3;
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(500);
             buttonDown = true;
-            
+
             do
             {
 
@@ -162,19 +167,24 @@ namespace MissionPlanner.GCSViews
                 {
                     #region Ask are u sure
 
+                    _IsDialogOpen = true;
+
                     DialogResult dialogResult = MessageBox.Show("The copter will stop the rotors!\nIt can cause damege to the vehicle!\n\nAre you Sure?", "Emergency stop", MessageBoxButtons.YesNo);
                     if (dialogResult == DialogResult.Yes)
                     {
                         EmergencyStop();
+                        _IsDialogOpen = false;
                     }
                     else if (dialogResult == DialogResult.No)
                     {
                         buttonDown = false;
 
-                        if(InvokeRequired)
+                        if (InvokeRequired)
                             Invoke(new Action(() => { lb_StopCounter.Visible = false; }));
                         else
                             lb_StopCounter.Visible = false;
+
+                        _IsDialogOpen = false;
 
                         break;
                     }
@@ -185,7 +195,7 @@ namespace MissionPlanner.GCSViews
                 System.Threading.Thread.Sleep(1000);
 
                 num--;
-                                
+
             } while (buttonDown);
 
             if (InvokeRequired)
@@ -200,7 +210,6 @@ namespace MissionPlanner.GCSViews
             lb_StopCounter.Visible = false;
             btn_EmergencyStop.BackColor = Color.Black;
         }
-
 
     }
 }
