@@ -62,7 +62,7 @@ namespace MissionPlanner.GCSViews
             if (isReconnecting)
                 return;
 
-            CameraView.instance.SwitchOnTrip();
+            MainV2.instance.SwitchTRIPRelay(true);
 
             this.btn_Reconnect.Enabled = false;
 

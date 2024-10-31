@@ -60,16 +60,9 @@ namespace MissionPlanner.GCSViews
         public static bool IsCameraTrackingModeActive { get; set; } = false;
 
         System.Timers.Timer _droneStatusTimer;
-        System.Timers.Timer _cameraSwitchOffTimer;
 
         public const int _maxAllowedAltitudeValue = 500;
         public const int _minAllowedAltitudeValue = 50;
-
-        private bool _tripSwitchedOff = !bool.Parse(SettingManager.Get(Setting.AutoConnect));
-        public bool TripSwitchedOff
-        {
-            get { return _tripSwitchedOff; }
-        }
 
         Bitmap _actualCameraImage;
 
@@ -175,6 +168,10 @@ namespace MissionPlanner.GCSViews
 
             this.DoubleBuffered = true;
 
+            MainV2.instance.RelaySwitched += MainV2_RelaySwitched;
+
+            SetTripOnOffButton(true);
+
             #endregion
 
             #region State handling
@@ -207,17 +204,6 @@ namespace MissionPlanner.GCSViews
                     this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
             }
             
-            #endregion
-
-            #region auto TRIP switch off
-
-            //timer for camera switchoff
-            _cameraSwitchOffTimer = new System.Timers.Timer();
-            _cameraSwitchOffTimer.Elapsed += _cameraSwitchOffTimer_Elapsed;
-            _cameraSwitchOffTimer.Interval = 5*60000;
-            _cameraSwitchOffTimer.Enabled = true;
-            SetTripOnOffButton();
-
             #endregion
 
             #region debug label
@@ -699,7 +685,6 @@ namespace MissionPlanner.GCSViews
                 CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
 
                 _droneStatusTimer.Dispose();
-                _cameraSwitchOffTimer.Dispose();
                 _feedTimer.Dispose();
                 _videoRecordSegmentTimer.Dispose();
 
@@ -710,35 +695,6 @@ namespace MissionPlanner.GCSViews
             catch { }
 
         }
-
-        private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            if (CameraView.instance.IsDisposed)
-                return;
-
-            string mode = MainV2.comPort.MAV.cs.mode;
-            int agl = (int)MainV2.comPort.MAV.cs.alt;
-
-            if (agl > 5 || (agl > 15 && mode.ToUpper()=="STABILIZE" ))
-            {
-                return;
-            }
-
-            DialogResult dialogResult = MessageBox.Show("Need to switch off Camera to protect againts over heat ", "Camera switch off", MessageBoxButtons.YesNo);
-            if (dialogResult == DialogResult.Yes)
-            {
-                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 0, 0, 0, 0, 0, 0);
-                _tripSwitchedOff = true;
-                SetTripOnOffButton();
-            }
-            else
-            {
-                return;
-            }
-
-            
-        }
-
         
         private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
         {
@@ -1040,28 +996,20 @@ namespace MissionPlanner.GCSViews
         
         private void btn_TripSwitchOnOff_Click(object sender, EventArgs e)
         {
-            if (_tripSwitchedOff)
-            {
-                SwitchOnTrip();
-                ReconnectCameraStreamAndControl();
-                _needToResetTime = true;
-
-            }
-            else
-            {
-                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 0, 0, 0, 0, 0, 0);
-                _tripSwitchedOff = true;
-                SetTripOnOffButton();
-            }
+            MainV2.instance.SwitchTRIPRelay(!MainV2.instance.TRIPRelayState);
         }
 
-        public void SwitchOnTrip()
+        private void MainV2_RelaySwitched(object sender, MainV2.RelaySwitchEventArgs e)
         {
-            
-            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
-            _tripSwitchedOff = false;
-
-            SetTripOnOffButton();
+            if (e.Channel == MainV2.instance.TRIPRelayChannel)
+            {
+                if (e.State)
+                {
+                    ReconnectCameraStreamAndControl();
+                    _needToResetTime = true;
+                }
+                SetTripOnOffButton(e.State);
+            }
         }
 
         #endregion
@@ -1363,36 +1311,29 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private void SetTripOnOffButton()
+        private void SetTripOnOffButton(bool tripState)
         {
-
-            if (InvokeRequired)
-                Invoke(new Action(() => {
-                    if (_tripSwitchedOff)
-                    {
-                        btn_TripSwitchOnOff.BackColor = Color.Black;
-                        btn_TripSwitchOnOff.Text = "Trip is Off";
-                    }
-
-                    else
-                    {
-                        btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
-                        btn_TripSwitchOnOff.Text = "Trip is On";
-                    }
-                }));
-            else
+            Action setButton = () =>
             {
-                if (_tripSwitchedOff)
-                {
-                    btn_TripSwitchOnOff.BackColor = Color.Black;
-                    btn_TripSwitchOnOff.Text = "Trip is Off";
-                }
-
-                else
+                if (tripState)
                 {
                     btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
                     btn_TripSwitchOnOff.Text = "Trip is On";
                 }
+                else
+                {
+                    btn_TripSwitchOnOff.BackColor = Color.Black;
+                    btn_TripSwitchOnOff.Text = "Trip is Off";
+                }
+            };
+
+            if (InvokeRequired)
+            {
+                Invoke(setButton);
+            }
+            else
+            {
+                setButton();
             }
         }
 

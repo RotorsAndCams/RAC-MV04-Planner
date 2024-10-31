@@ -45,6 +45,7 @@ using MV04.SingleYaw;
 using MV04.Settings;
 using MV04.Camera;
 using Microsoft.Scripting.Hosting.Shell;
+using System.Timers;
 
 namespace MissionPlanner
 {
@@ -72,6 +73,12 @@ namespace MissionPlanner
             public abstract Image wizard { get; }
         }
 
+        public class RelaySwitchEventArgs : EventArgs
+        {
+            public int Channel { get; set; }
+
+            public bool State { get; set; }
+        }
 
         public class burntkermitmenuicons : menuicons
         {
@@ -566,6 +573,16 @@ namespace MissionPlanner
         public static ConnectionControl _connectionControl;
 
         public static bool TerminalTheming = true;
+
+        public event EventHandler<RelaySwitchEventArgs> RelaySwitched;
+
+        public bool TRIPRelayState { get; private set; } = bool.Parse(SettingManager.Get(Setting.AutoConnect));
+
+        public readonly int TRIPRelayChannel = 0;
+
+        private System.Timers.Timer TRIPTimer;
+
+        private readonly TimeSpan TRIPOffTime = TimeSpan.FromMinutes(5);
 
         public void updateLayout(object sender, EventArgs e)
         {
@@ -1198,11 +1215,10 @@ namespace MissionPlanner
 
         private void _comPort_ParamListChanged(object sender, EventArgs e)
         {
-            
-
             if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
-                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY, CameraHandler.TripChannelNumber, 1, 0, 0, 0, 0, 0);
-
+            {
+                SwitchTRIPRelay(true);
+            }
         }
 
         public async static void CheckFlightPlan(object sender, MV04StateChangeEventArgs ea)
@@ -1358,6 +1374,58 @@ namespace MissionPlanner
             {
                 CustomMessageBox.Show($"Flightplan is {result}possible", "Flightplan check", MessageBoxButtons.OK);
             });
+        }
+
+        public void SwitchTRIPRelay(bool state)
+        {
+            // Send command
+            comPort.doCommand((byte)comPort.sysidcurrent, (byte)comPort.compidcurrent, MAVLink.MAV_CMD.DO_SET_RELAY,
+                TRIPRelayChannel,
+                state ? 1 : 0,
+                0, 0, 0, 0, 0);
+
+            // Handle timer
+            if (TRIPTimer == null)
+            {
+                TRIPTimer = new System.Timers.Timer();
+                TRIPTimer.Elapsed += TRIPTimer_Elapsed;
+                TRIPTimer.Interval = TRIPOffTime.TotalMilliseconds;
+            }
+            TRIPTimer.Enabled = state;
+
+            // Set state
+            TRIPRelayState = state;
+
+            // Notify
+            if (RelaySwitched != null)
+            {
+                RelaySwitched(null, new RelaySwitchEventArgs()
+                {
+                    Channel = TRIPRelayChannel,
+                    State = state
+                });
+            }
+        }
+
+        private async void TRIPTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (this.IsDisposed)
+            {
+                return;
+            }
+
+            string mode = MainV2.comPort.MAV.cs.mode;
+            int agl = (int)MainV2.comPort.MAV.cs.alt;
+            if (agl > 5 || (agl > 15 && mode.ToUpper() == "STABILIZE"))
+            {
+                return;
+            }
+
+            DialogResult dialogResult = await Task<DialogResult>.Run(() => MessageBox.Show("Need to switch off Camera to protect against overheating!\n\nAllow?", "Camera switch off", MessageBoxButtons.YesNo));
+            if (dialogResult == DialogResult.Yes)
+            {
+                MainV2.instance.SwitchTRIPRelay(false);
+            }
         }
 
         void cmb_sysid_Click(object sender, EventArgs e)
