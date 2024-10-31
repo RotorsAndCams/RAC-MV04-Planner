@@ -237,6 +237,7 @@ namespace MissionPlanner.GCSViews
             _feedTimer.Interval = 10000;
             _feedTimer.Elapsed += _feedTimer_Elapsed;
             _feedTimer.Enabled = false;
+            lb_FollowDebugText.Size = new Size(lb_FollowDebugText.Width + 500, lb_FollowDebugText.Height);
 
             #endregion
 
@@ -353,24 +354,30 @@ namespace MissionPlanner.GCSViews
 
             if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.GndCrsReport))
             {
-                var target_lat = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat;
-                var target_lng = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon;
-                var target_alt = (int)MainV2.comPort.MAV.cs.alt;
+                float target_lat = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat;
+                float target_lng = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon;
+                float target_alt = (int)MainV2.comPort.MAV.cs.alt;
 
 #if DEBUG
 
                 //debug to screen
                 if (InvokeRequired)
-                    Invoke(new Action(() => lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt));
+                    Invoke(new Action(() => {
+                        lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt;
+                        lb_FollowDebugText.Refresh();
+                    }));
                 else
+                {
                     lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt;
+                    lb_FollowDebugText.Refresh();
+                }
 
 #endif
 
                 MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
                 {
                     alt = target_alt,
-                    lat = target_lat,                   
+                    lat = target_lat,
                     lng = target_lng,
                     id = (ushort)MAVLink.MAV_CMD.WAYPOINT
                 });
