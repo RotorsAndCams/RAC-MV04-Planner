@@ -14,18 +14,16 @@ namespace MV04.TestForms
             InitializeComponent();
             this.joystick = joystick;
 
-            radioButton_PitchPitch.Checked = true;
-            radioButton_UAV.Checked = true;
+            comboBox_Modes.DataSource = Enum.GetNames(typeof(MV04_JoyFlightMode));
         }
 
         private void button_Set_Click(object sender, EventArgs e)
         {
-            MV04_AxisPair axisPair = radioButton_PitchPitch.Checked ? MV04_AxisPair.Pitch_Pitch : MV04_AxisPair.Throttle_Zoom;
-            MV04_AxisMode axisMode = radioButton_UAV.Checked ? MV04_AxisMode.UAV : MV04_AxisMode.Cam;
-            
+            MV04_JoyFlightMode mode = (MV04_JoyFlightMode)comboBox_Modes.SelectedIndex;
+
             if (joystick.enabled)
             {
-                joystick.MV04_SetAxis(axisPair, axisMode);
+                joystick.MV04_SetRCChannels(mode);
             }
         }
     }

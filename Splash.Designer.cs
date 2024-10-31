@@ -1,4 +1,6 @@
-﻿namespace MissionPlanner
+﻿using System.Drawing;
+
+namespace MissionPlanner
 {
     partial class Splash
     {
@@ -39,7 +41,7 @@
             this.ClientSize = new System.Drawing.Size(582, 332);
             this.ControlBox = false;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = Icon.FromHandle(((Bitmap)MissionPlanner.Properties.Resources.Logo_SecopPlanner2).GetHicon());
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Splash";

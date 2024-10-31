@@ -938,7 +938,7 @@ mc:Ignorable=""d""
                     ctl.BackColor = BGColor;
                     ctl.ForeColor = TextColor;
                     if (Program.IconFile != null)
-                        ((Form)ctl).Icon = Icon.FromHandle(((Bitmap)Program.IconFile).GetHicon());
+                        ((Form)ctl).Icon = Icon.FromHandle(((Bitmap)MissionPlanner.Properties.Resources.Logo_SecopPlanner2).GetHicon());
                 }
                 else if (ctl.GetType() == typeof(RichTextBox))
                 {
@@ -1243,7 +1243,7 @@ mc:Ignorable=""d""
                     ctl.BackColor = BGColor;
                     ctl.ForeColor = TextColor;
                     if (Program.IconFile != null)
-                        ((Form)ctl).Icon = Icon.FromHandle(((Bitmap)Program.IconFile).GetHicon());
+                        ((Form)ctl).Icon = Icon.FromHandle(((Bitmap)MissionPlanner.Properties.Resources.Logo_SecopPlanner2).GetHicon());
                 }
                 else if (ctl.GetType() == typeof(RichTextBox))
                 {

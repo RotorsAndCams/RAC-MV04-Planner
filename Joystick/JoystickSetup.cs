@@ -72,14 +72,20 @@ namespace MissionPlanner.Joystick
 
             for (int a = 1; a <= maxaxis; a++)
             {
-                var config = tempjoystick.getChannel(a);
+                bool isMV04Channel = JoystickHandler.RCChannels.ContainsKey(a);
+                bool isVisible = !isMV04Channel || JoystickHandler.RCChannels[a].Show;
 
-                bool isMV04Channel = JoystickHandler.JoystickAxies.Count(x => x.RCChannelNo == a) > 0;
-                string labelText = isMV04Channel ?
-                    Enum.GetName(typeof(MV04_JoystickFunction), JoystickHandler.JoystickAxies.Single(x => x.RCChannelNo == a).Function).Replace('_', ' ') :
-                    "RC " + a;
+                // Do not add if not visible
+                if (!isVisible)
+                {
+                    continue;
+                }
 
-                var ax = new JoystickAxis() // JoystickAxis control
+                string labelText = "RC" + a;
+                if (isMV04Channel) labelText += " " + JoystickHandler.RCChannels[a].Name;
+
+                JoyChannel config = tempjoystick.getChannel(a);
+                JoystickAxis ax = new JoystickAxis() // JoystickAxis control
                 {
                     ChannelNo = a,
                     Label = labelText,

@@ -17,6 +17,8 @@ namespace MV04.TestForms
             _MAVLink = MAVLink;
 
             numericUpDown_Kp.Value = (decimal)SingleYawHandler.ControlMulti;
+            comboBox_Mode.DataSource = Enum.GetNames(typeof(SingleYawMode));
+            comboBox_Mode.SelectedIndex = (int)SingleYawHandler.CurrentMode;
 
             if (SingleYawHandler.IsRunning)
             {
@@ -26,16 +28,18 @@ namespace MV04.TestForms
             // Update label on Single-Yaw command event
             SingleYawHandler.SingleYawCommand += (sender, ea) =>
             {
-                if (label_LastSent.InvokeRequired)
+                label_LastSent?.BeginInvoke(new MethodInvoker(() =>
                 {
-                    label_LastSent?.BeginInvoke((MethodInvoker)(() => label_LastSent.Text = $"RC{ea.RCChannel}OVERRIDE({ea.RCOutput})"));
-                }
-                else
-                {
-                    label_LastSent.Text = $"RC{ea.RCChannel} override CamYaw={ea.Deg}, RC={ea.RCOutput}";
-                }
+                    if (ea.Mode == SingleYawMode.Master)
+                        label_LastSent.Text = $"RC{ea.Channel}Override({Math.Round(ea.Output, 1)})";
+                    else if (ea.Mode == SingleYawMode.Slave)
+                    {
+                        label_LastSent.Text = $"CameraYaw({Math.Round(ea.Output, 1)})";
+                    }
+                }));
             };
 
+            // Update textbox on Single-Yaw message event
             SingleYawHandler.SingleYawMessage += (sender, ea) => LogLine(ea.Message);
         }
 
@@ -47,7 +51,7 @@ namespace MV04.TestForms
             }
             else
             {
-                SingleYawHandler.StartSingleYaw(_MAVLink);
+                SingleYawHandler.StartSingleYaw(_MAVLink, (SingleYawMode)comboBox_Mode.SelectedIndex);
             }
 
             string buttonStr = SingleYawHandler.IsRunning ? " OFF" : " ON";
@@ -63,11 +67,7 @@ namespace MV04.TestForms
 
         public void LogLine(string line)
         {
-            if (textBox_Log.InvokeRequired)
-            {
-                textBox_Log?.BeginInvoke(new MethodInvoker(() => LogLine(line)));
-            }
-            else
+            textBox_Log?.BeginInvoke(new MethodInvoker(() =>
             {
                 if (textBox_Log.Text.Length > 0)
                 {
@@ -77,7 +77,7 @@ namespace MV04.TestForms
 
                 textBox_Log.SelectionStart = textBox_Log.TextLength;
                 textBox_Log.ScrollToCaret();
-            }
+            }));
         }
     }
 }
