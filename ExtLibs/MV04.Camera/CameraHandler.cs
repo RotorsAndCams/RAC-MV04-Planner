@@ -11,6 +11,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -162,7 +163,7 @@ namespace MV04.Camera
         }
 
         private System.Threading.Timer RecordingTimer;
-        
+
         #endregion
 
         #region Camera control Fields
@@ -172,6 +173,24 @@ namespace MV04.Camera
         public int CameraControlPort { get; set; }
 
         public NvSystemModes PrevCameraMode { get; private set; }
+
+        public NvSystemModes CurrentCameraMode
+        {
+            get
+            {
+                return HasCameraReport(MavReportType.SystemReport) ?
+                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
+                    FallbackCameraMode;
+            }
+        }
+
+        public NvSystemModes FallbackCameraMode
+        {
+            get
+            {
+                return NvSystemModes.GRR;
+            }
+        }
 
         private MavProto _mavProto = null;
 
@@ -324,7 +343,7 @@ namespace MV04.Camera
 
         #region Methods
 
-        
+
         public bool HasCameraReport(MavReportType report_type)
         {
             if (CameraReports == null) CameraReports = new Dictionary<MavReportType, object>();
@@ -511,7 +530,7 @@ namespace MV04.Camera
                 case 13:
                     return NvSystemModes.Nadir;
                 default:
-                    return NvSystemModes.GRR;
+                    return FallbackCameraMode;
             }
         }
 
@@ -595,9 +614,9 @@ namespace MV04.Camera
             //}
 
 
-            
+
             //if(event_StartVideoRecording != null)
-                
+
         }
 
         public bool StopRecording()
@@ -670,9 +689,7 @@ namespace MV04.Camera
             if (IsCameraControlConnected)
             {
                 // Get current camera mode
-                NvSystemModes currentMode = HasCameraReport(MavReportType.SystemReport) ?
-                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
-                    NvSystemModes.GRR;
+                NvSystemModes currentMode = CurrentCameraMode;
 
                 if ((mav_error)MavCmdSetSystemMode(CameraControl.mav_comm, CameraControl.ackCb, (int)mode) == mav_error.ok)
                 {
@@ -752,9 +769,7 @@ namespace MV04.Camera
             if (IsCameraControlConnected)
             {
                 // Save current camera mode
-                PrevCameraMode = HasCameraReport(MavReportType.SystemReport) ?
-                    SysReportModeToMavProtoMode((SysReport)CameraReports[MavReportType.SystemReport]) :
-                    NvSystemModes.GRR;
+                PrevCameraMode = CurrentCameraMode;
 
                 // Handle default tracking pos (center)
                 Point _trackPos = trackPos ?? new Point(640, 360);
@@ -783,7 +798,10 @@ namespace MV04.Camera
 
         public bool StopTracking(bool resetToPrevMode = false)
         {
-            SetMode(NvSystemModes.GRR);
+            if (PrevCameraMode != NvSystemModes.Tracking)
+                SetMode(PrevCameraMode);
+            else
+                SetMode(FallbackCameraMode);
             return true;
         }
 
@@ -850,7 +868,7 @@ namespace MV04.Camera
 
         public void StopGimbal()
         {
-            if(GimbalTimer != null)
+            if (GimbalTimer != null)
             {
                 GimbalTimer.Stop();
                 GimbalTimer.Enabled = false;
