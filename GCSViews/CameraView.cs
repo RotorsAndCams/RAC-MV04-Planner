@@ -712,16 +712,11 @@ namespace MissionPlanner.GCSViews
 
         private void _cameraSwitchOffTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-
-
             if (CameraView.instance.IsDisposed)
                 return;
 
             string mode = MainV2.comPort.MAV.cs.mode;
             int agl = (int)MainV2.comPort.MAV.cs.alt;
-
-            //bool droneFlightMode = mode.ToUpper() == "GUIDED" || mode.ToUpper() == "AUTO" || mode.ToUpper() == "LOITER";
-            //bool currentStateFlight = StateHandler.CurrentSate == MV04_State.Takeoff || StateHandler.CurrentSate == MV04_State.Follow || StateHandler.CurrentSate == MV04_State.Auto || StateHandler.CurrentSate == MV04_State.Manual;
 
             if (agl > 5 || (agl > 15 && mode.ToUpper()=="STABILIZE" ))
             {
