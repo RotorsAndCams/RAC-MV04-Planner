@@ -646,9 +646,13 @@ namespace MV04.Camera
         public void SetSystemTimeToCurrent()
         {
             //epoch time
-            TimeSpan t = DateTime.Now - new DateTime(1970, 1, 1);
-            uint secondsSinceEpoch = (uint)t.TotalSeconds;
-            MavCmdUpdateSystemTime(CameraControl.mav_comm, CameraControl.ackCb, secondsSinceEpoch);
+            //TimeSpan t = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            //uint secondsSinceEpoch = (uint)t.TotalSeconds;
+            //MavCmdUpdateSystemTime(CameraControl.mav_comm, CameraControl.ackCb, secondsSinceEpoch);
+
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan diff = DateTime.Now.ToUniversalTime() - origin;
+            MavCmdUpdateSystemTime(CameraControl.mav_comm, CameraControl.ackCb, (uint)Math.Floor(diff.TotalSeconds));
         }
         public void SetEnableCrossHair(bool p_Enable)
         {

@@ -300,6 +300,7 @@ namespace MissionPlanner.GCSViews
                 {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
                 {"Feed telemetry", () => { StartFeed(); }},
                 {"Stop Feed telemetry", () => { StopFeed(); }},
+                {"Sync Time", () => { CameraHandler.Instance.SetSystemTimeToCurrent(); }},
                 {"Check Flightplan", async () => { MainV2.CheckFlightPlan(null, new MV04StateChangeEventArgs(){PreviousState = MV04_State.Manual, NewState = MV04_State.Auto}); }}
             };
 
@@ -489,17 +490,17 @@ namespace MissionPlanner.GCSViews
             using (Graphics g = Graphics.FromImage(bitmap))
             {
                 g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
-                bitmap.Save(CameraHandler.Instance.MediaSavePath + "test" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", ImageFormat.Jpeg);
+                bitmap.Save(CameraHandler.Instance.MediaSavePath + "SnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", ImageFormat.Jpeg);
             }
+
+            _mediaPlayer.TakeSnapshot(0, CameraHandler.Instance.MediaSavePath + "VideoStreamSnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", (uint)vv_VLC.Bounds.Width, (uint)vv_VLC.Bounds.Height);
+
         }
 
         private void _videoRecordSegmentTimer_Tick(object sender, EventArgs e)
         {
-            ////_mediaPlayerRecord.Stop();
-            ////_mediaPlayerRecord.Play(_mediaRecord);
-            //StopRecording();
-            ////Thread.Sleep(300);
-            //StartRecording();
+            _mediaPlayerRecord.Stop();
+            StartRecording();
 
         }
 
@@ -515,7 +516,12 @@ namespace MissionPlanner.GCSViews
             {
                 _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
                 _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
-                                        //sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=
+            }
+            else
+            {
+                _mediaRecord = null;
+                _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
+                _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
             }
 
             _mediaPlayerRecord.Play(_mediaRecord);
