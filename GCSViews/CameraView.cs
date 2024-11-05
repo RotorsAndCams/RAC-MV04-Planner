@@ -293,6 +293,7 @@ namespace MissionPlanner.GCSViews
                 {"Test Gstreamer", async () => { new GstreamerTestForm().Show(); }},
                 {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
                 {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }},
+                {"Start single-yaw (Auto)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Auto); }},
                 {"Start single-yaw (Master)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Master); }},
                 {"Start single-yaw (Slave)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Slave); }},
                 {"Stop single-yaw", async () => { SingleYawHandler.StopSingleYaw(); }},
