@@ -34,7 +34,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button_CompCalib = new System.Windows.Forms.Button();
+            this.label_CompassCalib = new System.Windows.Forms.Label();
+            this.textBox_CompassCalib = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -102,6 +106,9 @@
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.textBox_CompassCalib);
+            this.groupBox2.Controls.Add(this.label_CompassCalib);
+            this.groupBox2.Controls.Add(this.button_CompCalib);
             this.groupBox2.Location = new System.Drawing.Point(13, 196);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox2.Name = "groupBox2";
@@ -110,6 +117,36 @@
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Compass Calibration";
+            // 
+            // button_CompCalib
+            // 
+            this.button_CompCalib.Location = new System.Drawing.Point(188, 35);
+            this.button_CompCalib.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button_CompCalib.Name = "button_CompCalib";
+            this.button_CompCalib.Size = new System.Drawing.Size(112, 35);
+            this.button_CompCalib.TabIndex = 4;
+            this.button_CompCalib.Text = "button1";
+            this.button_CompCalib.UseVisualStyleBackColor = true;
+            this.button_CompCalib.Click += new System.EventHandler(this.button_CompCalib_Click);
+            // 
+            // label_CompassCalib
+            // 
+            this.label_CompassCalib.AutoSize = true;
+            this.label_CompassCalib.Location = new System.Drawing.Point(249, 97);
+            this.label_CompassCalib.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_CompassCalib.Name = "label_CompassCalib";
+            this.label_CompassCalib.Size = new System.Drawing.Size(51, 20);
+            this.label_CompassCalib.TabIndex = 4;
+            this.label_CompassCalib.Text = "label4";
+            // 
+            // textBox_CompassCalib
+            // 
+            this.textBox_CompassCalib.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.textBox_CompassCalib.Location = new System.Drawing.Point(7, 91);
+            this.textBox_CompassCalib.Multiline = true;
+            this.textBox_CompassCalib.Name = "textBox_CompassCalib";
+            this.textBox_CompassCalib.Size = new System.Drawing.Size(235, 143);
+            this.textBox_CompassCalib.TabIndex = 5;
             // 
             // CalibForm
             // 
@@ -124,8 +161,11 @@
             this.Name = "CalibForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Calibration";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CalibForm_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -138,5 +178,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label_AccelCalib;
+        private System.Windows.Forms.Button button_CompCalib;
+        private System.Windows.Forms.Label label_CompassCalib;
+        private System.Windows.Forms.TextBox textBox_CompassCalib;
     }
 }
