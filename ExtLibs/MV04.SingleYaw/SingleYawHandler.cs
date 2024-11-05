@@ -6,7 +6,6 @@ using MV04.Joystick;
 using System;
 using System.Reflection;
 using System.Timers;
-using System.Windows.Forms;
 
 namespace MV04.SingleYaw
 {
@@ -14,7 +13,8 @@ namespace MV04.SingleYaw
     {
         None,
         Master,
-        Slave
+        Slave,
+        Auto
     }
 
     public class SingleYawCommandEventArgs: EventArgs
@@ -42,7 +42,7 @@ namespace MV04.SingleYaw
 
         private static (short _YawRCMin, short _YawRCTrim, short _YawRCDeadzone, short _YawRCMax, bool _YawRCReversed) _YawRCParams = (1000, 1500, 20, 2000, false);
 
-        private static System.Timers.Timer _YawAdjustTimer;
+        private static Timer _YawAdjustTimer;
 
         private static int _YawAdjustInterval = 100; // ms
 
@@ -161,7 +161,27 @@ namespace MV04.SingleYaw
             {
                 return;
             }
-            CurrentMode = mode;
+            else if (mode == SingleYawMode.Auto)
+            {
+                if ((int)MAVLink.MAV.param[$"RCMAP_YAW"].Value == JoystickHandler.GetChannelForJoyRole(MV04_JoyRole.Cam_Yaw)) // 7
+                {
+                    // Joystick is controlling the camera
+                    CurrentMode = SingleYawMode.Master;
+                }
+                else if ((int)MAVLink.MAV.param[$"RCMAP_YAW"].Value == JoystickHandler.GetChannelForJoyRole(MV04_JoyRole.UAV_Yaw)) // 4
+                {
+                    // Joystick is controlling the UAV
+                    CurrentMode = SingleYawMode.Slave;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                CurrentMode = mode;
+            }
 
             // Set MAVLinkInterface
             SingleYawHandler.MAVLink = MAVLink;
@@ -185,27 +205,26 @@ namespace MV04.SingleYaw
             // Create timer if needed
             if (_YawAdjustTimer == null)
             {
-                _YawAdjustTimer = new System.Timers.Timer();
+                _YawAdjustTimer = new Timer();
                 _YawAdjustTimer.AutoReset = true;
                 _YawAdjustTimer.Interval = _YawAdjustInterval;
                 _YawAdjustTimer.Elapsed += _YawAdjustTimer_Elapsed;
 
                 log.Info("New Single-Yaw timer object created");
             }
-            _YawAdjustTimer.Enabled = true;
             
             // Start timer
             _YawAdjustTimer.Start();
 
             // Notify
             log.Info($"Single-Yaw started (loop={_YawAdjustInterval}ms)");
-            TriggerSingleYawMessageEvent($"Single-Yaw ({Enum.GetName(typeof(SingleYawMode), mode)}) started");
+            TriggerSingleYawMessageEvent($"Single-Yaw ({Enum.GetName(typeof(SingleYawMode), CurrentMode)}) started");
         }
 
         private static void _YawAdjustTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            // Check for connections
-            if (!_IsMAVConnected)
+            // Check for connections & states
+            if (!_IsMAVConnected || CurrentMode == SingleYawMode.None)
             {
                 return;
             }
@@ -276,7 +295,6 @@ namespace MV04.SingleYaw
                     yawDirection == YawDirection.Right ? yawSpeed : yawSpeed * -1);
                 TriggerSingleYawMessageEvent($"Single-Yaw elapsed (Camera Yaw {Enum.GetName(typeof(YawDirection), yawDirection)} {Math.Round(yawSpeed, 1)})");
             }
-            // SingleYawMode.None is ignored
         }
 
 
@@ -286,7 +304,6 @@ namespace MV04.SingleYaw
         public static void StopSingleYaw()
         {
             // Stop timer
-            _YawAdjustTimer.Enabled = false;
             _YawAdjustTimer.Stop();
 
             if (CurrentMode == SingleYawMode.Master)
