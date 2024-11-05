@@ -1,4 +1,5 @@
 ﻿using DirectShowLib;
+using DirectShowLib;
 using GMap.NET;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
@@ -1575,6 +1576,11 @@ namespace MissionPlanner.GCSViews
             }
 
             MainV2.comPort.setMode(CMB_modes.Text);
+        }
+
+        private void BUT_calib_Click(object sender, EventArgs e)
+        {
+            new CalibForm().Show();
         }
 
         private void BUT_setwp_Click(object sender, EventArgs e)
