@@ -137,12 +137,15 @@ namespace MissionPlanner.Controls
             {
                 string message = Encoding.ASCII.GetString(arg.ToStructure<MAVLink.mavlink_statustext_t>().text);
 
-                Invoke((MethodInvoker)delegate
+                if (message.ToLower().Contains("calibration")) // In progress
                 {
-                    label_AccelCalib.Text = message;
-                });
+                    Invoke((MethodInvoker)delegate
+                    {
+                        label_AccelCalib.Text = message;
+                    });
+                }
 
-                if (message.ToLower().Contains("calibration successful")
+                if (message.ToLower().Contains("calibration successful") // Complete
                     || message.ToLower().Contains("calibration failed"))
                 {
                     try
