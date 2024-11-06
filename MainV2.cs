@@ -1390,6 +1390,7 @@ namespace MissionPlanner
                 TRIPTimer = new System.Timers.Timer();
                 TRIPTimer.Elapsed += TRIPTimer_Elapsed;
                 TRIPTimer.Interval = TRIPOffTime.TotalMilliseconds;
+                TRIPTimer.AutoReset = false;
             }
             TRIPTimer.Enabled = state;
 
