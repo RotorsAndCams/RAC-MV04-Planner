@@ -411,6 +411,26 @@ namespace MissionPlanner.GCSViews
 
             tabControlactions.Multiline = Settings.Instance.GetBoolean("tabControlactions_Multiline", false);
 
+            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
+            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
+            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
+            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
+            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
+            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
+            this.cs_ColorSliderAltitude.Maximum = 500;
+            this.cs_ColorSliderAltitude.Minimum = 50;
+            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
+            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
+            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
+            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
+            this.cs_ColorSliderAltitude.ThumbSize = 40;
+            this.tlp_AGLContainer.ForeColor = System.Drawing.Color.RosyBrown;
+
+            this.btn_SetAltitudeSendCommand.Dock = DockStyle.Fill;
+
+
             this.cs_ColorSliderAltitude.Scroll += Cs_ColorSliderAltitude_ValueChanged;
 
             this.cs_ColorSliderAltitude.Minimum = 50;
@@ -6313,22 +6333,41 @@ namespace MissionPlanner.GCSViews
 
         private void btn_SetAltitudeSendCommand_Click(object sender, EventArgs e)
         {
-            var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, _sliderAltitude);
+            //var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, _sliderAltitude);
 
-            Locationwp gotohere = new Locationwp();
+            //Locationwp gotohere = new Locationwp();
 
-            gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
-            gotohere.alt = (float)plla.Alt / CurrentState.multiplieralt; // back to m
-            gotohere.lat = (plla.Lat);
-            gotohere.lng = (plla.Lng);
+            //gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+            //gotohere.alt = (float)plla.Alt / CurrentState.multiplieralt; // back to m
+            //gotohere.lat = (plla.Lat);
+            //gotohere.lng = (plla.Lng);
+
+            //try
+            //{
+            //    MainV2.comPort.setGuidedModeWP(gotohere);
+            //}
+            //catch (Exception ex)
+            //{
+            //    CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+            //}
 
             try
             {
-                MainV2.comPort.setGuidedModeWP(gotohere);
+                float target_alt = (int)(cs_ColorSliderAltitude.Value / CurrentState.multiplieralt);
+                double target_lat = MainV2.comPort.MAV.cs.lat;
+                double target_lng = MainV2.comPort.MAV.cs.lng;
+
+                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                {
+                    alt = target_alt,
+                    lat = target_lat,
+                    lng = target_lng,
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                });
             }
             catch (Exception ex)
             {
-                CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+                MessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
             }
         }
     }

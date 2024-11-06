@@ -984,18 +984,31 @@ namespace MissionPlanner.GCSViews
 
         private void btn_SetAlt_Click(object sender, EventArgs e)
         {
-            var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, cs_ColorSliderAltitude.Value);
+            //var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, cs_ColorSliderAltitude.Value);
 
-            Locationwp gotohere = new Locationwp();
+            //Locationwp gotohere = new Locationwp();
 
-            gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
-            gotohere.alt = (float)plla.Alt / CurrentState.multiplieralt; // back to m
-            gotohere.lat = (plla.Lat);
-            gotohere.lng = (plla.Lng);
+            //gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+            //gotohere.alt = (float)plla.Alt / CurrentState.multiplieralt; // back to m
+            //gotohere.lat = (plla.Lat);
+            //gotohere.lng = (plla.Lng);
 
             try
             {
-                MainV2.comPort.setGuidedModeWP(gotohere);
+                //
+                //MainV2.comPort.setGuidedModeWP(gotohere);
+
+                float target_alt = (int)(cs_ColorSliderAltitude.Value / CurrentState.multiplieralt);
+                double target_lat = MainV2.comPort.MAV.cs.lat;
+                double target_lng = MainV2.comPort.MAV.cs.lng;
+
+                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                {
+                    alt = target_alt,
+                    lat = target_lat,
+                    lng = target_lng,
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                });
             }
             catch (Exception ex)
             {
@@ -1055,11 +1068,18 @@ namespace MissionPlanner.GCSViews
 
         private void SetDroneStatusValue()
         {
-            string mode = MainV2.comPort.MAV.cs.mode;
-            this.lb_DroneStatusValue.Text = mode;
+            try
+            {
+                string mode = MainV2.comPort.MAV.cs.mode;
+                this.lb_DroneStatusValue.Text = mode;
 
-            int agl = (int)MainV2.comPort.MAV.cs.alt;
-            this.lb_AltitudeValue.Text = agl.ToString() + "m";
+                int agl = (int)MainV2.comPort.MAV.cs.alt;
+                this.lb_AltitudeValue.Text = agl.ToString() + "m";
+            }
+            catch (Exception ex)
+            {
+                //log error
+            }
         }
 
         private void SetCameraStatusValue(string st)
