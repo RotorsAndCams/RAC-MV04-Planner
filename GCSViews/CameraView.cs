@@ -301,6 +301,7 @@ namespace MissionPlanner.GCSViews
                 {"Feed telemetry", () => { StartFeed(); }},
                 {"Stop Feed telemetry", () => { StopFeed(); }},
                 {"Sync Time", () => { CameraHandler.Instance.SetSystemTimeToCurrent(); }},
+                {"Set Waypoint", () => {  new Thread(() => new SetWaypointForm().ShowDialog()).Start();   /*new SetWaypointForm().Show();*/  }},
                 {"Check Flightplan", async () => { MainV2.CheckFlightPlan(null, new MV04StateChangeEventArgs(){PreviousState = MV04_State.Manual, NewState = MV04_State.Auto}); }}
             };
 
