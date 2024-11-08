@@ -412,21 +412,21 @@ namespace MissionPlanner.GCSViews
             tabControlactions.Multiline = Settings.Instance.GetBoolean("tabControlactions_Multiline", false);
 
             this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
-            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
-            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
-            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
-            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
-            this.cs_ColorSliderAltitude.Maximum = 500;
-            this.cs_ColorSliderAltitude.Minimum = 50;
-            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
-            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
-            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
-            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
-            this.cs_ColorSliderAltitude.ThumbSize = 40;
-            this.tlp_AGLContainer.ForeColor = System.Drawing.Color.RosyBrown;
+            //this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
+            //this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
+            //this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
+            //this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
+            //this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
+            //this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
+            ////this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
+            ////this.cs_ColorSliderAltitude.Maximum = 500;
+            ////this.cs_ColorSliderAltitude.Minimum = 50;
+            ////this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
+            ////this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
+            //this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
+            ////this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
+            ////this.cs_ColorSliderAltitude.ThumbSize = 40;
+            //this.tlp_AGLContainer.ForeColor = System.Drawing.Color.RosyBrown;
 
             this.btn_SetAltitudeSendCommand.Dock = DockStyle.Fill;
 
