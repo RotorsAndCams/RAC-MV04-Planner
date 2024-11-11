@@ -156,6 +156,9 @@
     <EmbeddedResource Include="Controls\WindInputForm.resx">
       <DependentUpon>WindInputForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\YesNoForm.resx">
+      <DependentUpon>YesNoForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\CameraFullScreenForm.resx">
       <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -903,6 +906,12 @@
     </Compile>
     <Compile Include="Controls\WindInputForm.Designer.cs">
       <DependentUpon>WindInputForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\YesNoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\YesNoForm.Designer.cs">
+      <DependentUpon>YesNoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\BitMapEventArgs.cs" />
     <Compile Include="GCSViews\CameraFullScreenForm.cs">
