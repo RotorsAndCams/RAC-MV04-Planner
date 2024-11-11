@@ -211,18 +211,18 @@ namespace MissionPlanner.Joystick
         public void MV04_SetRCChannels(MV04_JoyFlightMode mode)
         {
             // Change axes
-            JoystickHandler.GetAxisSet(mode)
-                .Where(ch => ch.Key >= 1
-                    && ch.Key <= getNumAxes()
-                    && ch.Value >= 0
-                    && ch.Value < (int)joystickaxis.UINT16_MAX)
-                .ForEach(ch =>
-                {
-                    setAxis(ch.Key, (joystickaxis)ch.Value);
-                });
+            //JoystickHandler.GetAxisSet(mode)
+            //    .Where(ch => ch.Key >= 1
+            //        && ch.Key <= getNumAxes()
+            //        && ch.Value >= 0
+            //        && ch.Value < (int)joystickaxis.UINT16_MAX)
+            //    .ForEach(ch =>
+            //    {
+            //        setAxis(ch.Key, (joystickaxis)ch.Value);
+            //    });
 
             // Notify
-            JoystickHandler.TriggerJoystickModeChangedEvent(mode);
+            //JoystickHandler.TriggerJoystickModeChangedEvent(mode);
         }
 
         public void setChannel(int channel, joystickaxis axis, bool reverse, int expo)
@@ -676,20 +676,20 @@ namespace MissionPlanner.Joystick
                                 {
                                     case buttonfunction_mv04_FlightMode_option.Manual:
                                         Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
-                                        CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                        //CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                         MV04_SetRCChannels(MV04_JoyFlightMode.Manual);
                                         StateHandler.CurrentSate = MV04_State.Manual;
                                         break;
                                     
                                     case buttonfunction_mv04_FlightMode_option.TapToFly:
                                         Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
-                                        CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                        //CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                         MV04_SetRCChannels(MV04_JoyFlightMode.TapToFly);
                                         StateHandler.CurrentSate = MV04_State.TapToFly;
                                         break;
                                     
                                     case buttonfunction_mv04_FlightMode_option.Auto:
-                                        Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Auto");
+                                        Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "AUTO");
                                         CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                         MV04_SetRCChannels(MV04_JoyFlightMode.Auto);
                                         StateHandler.CurrentSate = MV04_State.Auto;

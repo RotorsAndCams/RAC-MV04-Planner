@@ -379,7 +379,7 @@ namespace MissionPlanner.GCSViews
 
                 MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
                 {
-                    alt = target_alt,
+                    alt = target_alt + 10,
                     lat = target_lat,
                     lng = target_lng,
                     id = (ushort)MAVLink.MAV_CMD.WAYPOINT
@@ -1000,8 +1000,8 @@ namespace MissionPlanner.GCSViews
                 //MainV2.comPort.setGuidedModeWP(gotohere);
 
                 float target_alt = (int)(cs_ColorSliderAltitude.Value / CurrentState.multiplieralt);
-                double target_lat = MainV2.comPort.MAV.cs.lat;
-                double target_lng = MainV2.comPort.MAV.cs.lng;
+                float target_lat = (float)MainV2.comPort.MAV.cs.lat;
+                float target_lng = (float)MainV2.comPort.MAV.cs.lng;
 
                 MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
                 {

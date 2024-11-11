@@ -2816,14 +2816,26 @@ namespace MissionPlanner.GCSViews
 
             MainV2.comPort.MAV.GuidedMode.z = intalt / CurrentState.multiplieralt;
 
-            if (MainV2.comPort.MAV.cs.mode == "Guided")
+            if (MainV2.comPort.MAV.cs.mode.ToLower() == "guided")
             {
+                MessageBox.Show("lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 +
+                    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + " alt: " +
+                    MainV2.comPort.MAV.GuidedMode.z);
+
                 MainV2.comPort.setGuidedModeWP(new Locationwp
                 {
                     alt = MainV2.comPort.MAV.GuidedMode.z,
                     lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
                     lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
                 });
+
+                //MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                //{
+                //    alt = MainV2.comPort.MAV.GuidedMode.z,
+                //    lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,          
+                //    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
+                //    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                //});
             }
         }
 
@@ -5122,7 +5134,7 @@ namespace MissionPlanner.GCSViews
                 }
                 takeoffAlt = float.Parse(Settings.Instance["takeoff_alt"], CultureInfo.InvariantCulture);
 
-                //MainV2.comPort.setMode("GUIDED");
+                MainV2.comPort.setMode("GUIDED");
 
                 try
                 {
@@ -5130,7 +5142,7 @@ namespace MissionPlanner.GCSViews
                         MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
 
                     // Trigger MV04 state change event
-                    StateHandler.CurrentSate = MV04_State.Takeoff;
+                    //StateHandler.CurrentSate = MV04_State.Takeoff;
                 }
                 catch
                 {
@@ -6354,13 +6366,13 @@ namespace MissionPlanner.GCSViews
             try
             {
                 float target_alt = (int)(cs_ColorSliderAltitude.Value / CurrentState.multiplieralt);
-                double target_lat = MainV2.comPort.MAV.cs.lat;
-                double target_lng = MainV2.comPort.MAV.cs.lng;
+                float target_lat = (float)MainV2.comPort.MAV.cs.lat;
+                float target_lng = (float)MainV2.comPort.MAV.cs.lng;
 
                 MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
                 {
                     alt = target_alt,
-                    lat = target_lat,
+                    lat = target_lat,          
                     lng = target_lng,
                     id = (ushort)MAVLink.MAV_CMD.WAYPOINT
                 });
