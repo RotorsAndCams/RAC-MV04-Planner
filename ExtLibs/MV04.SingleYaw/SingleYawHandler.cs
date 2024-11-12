@@ -44,7 +44,7 @@ namespace MV04.SingleYaw
 
         private static Timer _YawAdjustTimer;
 
-        private static int _YawAdjustInterval = 100; // ms
+        private static int _YawAdjustInterval = 500; // ms
 
         private static int _YawAdjustTreshold = 3; // deg
 
@@ -209,6 +209,7 @@ namespace MV04.SingleYaw
                 _YawAdjustTimer.AutoReset = true;
                 _YawAdjustTimer.Interval = _YawAdjustInterval;
                 _YawAdjustTimer.Elapsed += _YawAdjustTimer_Elapsed;
+                _YawAdjustTimer.Enabled = true;
 
                 log.Info("New Single-Yaw timer object created");
             }
@@ -305,6 +306,7 @@ namespace MV04.SingleYaw
         {
             // Stop timer
             _YawAdjustTimer.Stop();
+            _YawAdjustTimer.Enabled = false;
 
             if (CurrentMode == SingleYawMode.Master)
             {

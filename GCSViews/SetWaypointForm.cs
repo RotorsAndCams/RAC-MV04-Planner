@@ -1,5 +1,6 @@
 ﻿using MissionPlanner.ArduPilot;
 using MissionPlanner.Utilities;
+using MV04.SingleYaw;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static MissionPlanner.Utilities.LTM;
 
 namespace MissionPlanner.GCSViews
 {
@@ -44,6 +46,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_Solution1_Click(object sender, EventArgs e)
         {
+            SingleYawHandler.StopSingleYaw();
             ReadCoordinate();
 
             MainV2.comPort.setGuidedModeWP(new Locationwp
@@ -52,10 +55,12 @@ namespace MissionPlanner.GCSViews
                 lat = _Lat,//MainV2.comPort.MAV.GuidedMode.x / 1e7,
                 lng = _Lon//MainV2.comPort.MAV.GuidedMode.y / 1e7
             });
+            SingleYawHandler.StartSingleYaw(MainV2.comPort);
         }
 
         private void btn_Solution2_Click(object sender, EventArgs e)
         {
+            SingleYawHandler.StopSingleYaw();
             ReadCoordinate();
 
             MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
@@ -65,6 +70,7 @@ namespace MissionPlanner.GCSViews
                 lng = _Lon,
                 id = (ushort)MAVLink.MAV_CMD.WAYPOINT
             });
+            SingleYawHandler.StartSingleYaw(MainV2.comPort);
         }
 
         private void btn_Solution3_Click(object sender, EventArgs e)
@@ -134,11 +140,6 @@ namespace MissionPlanner.GCSViews
         {
             ReadCoordinate();
 
-            //MainV2.comPort.MAV.GuidedMode.
-
-            
-
-
             MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
             {
                 alt = (float)_Alt + 10,
@@ -146,6 +147,10 @@ namespace MissionPlanner.GCSViews
                 lng = (float)_Lon,
                 id = (ushort)MAVLink.MAV_CMD.WAYPOINT
             });
+
+            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.MISSION_START, 0,
+                        0, 0, 0, 0, 0, 0);
+
         }
 
         private void btn_Go2_Click(object sender, EventArgs e)
@@ -287,21 +292,170 @@ namespace MissionPlanner.GCSViews
 
         private void button5_Click_1(object sender, EventArgs e)
         {
+            ReadCoordinate();
+
             Locationwp gotohere = new Locationwp();
 
             gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
             gotohere.alt = _Alt; // back to m
             gotohere.lat = _Lat;
             gotohere.lng = _Lon;
-            MessageBox.Show("lat: " + _Lat + " long: " + _Lon + " alt: " + _Alt);
-            try
+
+            MainV2.comPort.MAV.wps[0] = gotohere;
+
+            MainV2.comPort.setGuidedModeWP(gotohere, true);
+        }
+
+        private void btn_MavWPSet_Click(object sender, EventArgs e)
+        {
+
+            ReadCoordinate();
+
+            byte sysid = (byte)MainV2.comPort.sysidcurrent;
+            byte compid = (byte)MainV2.comPort.compidcurrent;
+
+            Locationwp gotohere = new Locationwp();
+
+            gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+            gotohere.alt = (float)_Alt;
+            gotohere.lat = (float)_Lat;
+            gotohere.lng = (float)_Lon;
+
+            MainV2.comPort.setGuidedModeWP(gotohere, true);
+
+            var tsk = MainV2.comPort.setWPCurrentAsync(sysid, compid, (ushort)MAVLink.MAV_CMD.WAYPOINT).GetAwaiter();
+        }
+
+        private void btn_Timing_Click(object sender, EventArgs e)
+        {
+            SingleYawHandler.StopSingleYaw();
+
+            byte sysid = (byte)MainV2.comPort.sysidcurrent;
+            byte compid = (byte)MainV2.comPort.compidcurrent;
+            MainV2.comPort.setMode(sysid, compid, "GUIDED");
+
+            ReadCoordinate();
+
+
+            for (int i = 0; i < 2; ++i)
             {
-                MainV2.comPort.setGuidedModeWP(gotohere);
+                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                {
+                    alt = (float)_Alt + 10,
+                    lat = (float)_Lat, //+ followTestCounter,                    
+                    lng = (float)_Lon,
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                });
             }
-            catch (Exception ex)
+            System.Threading.Thread.Sleep(500);
+
+            for (int i = 0; i < 2; ++i)
             {
-                CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                {
+                    alt = (float)_Alt + 10,
+                    lat = (float)_Lat, //+ followTestCounter,                    
+                    lng = (float)_Lon,
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                });
             }
+
+            SingleYawHandler.StartSingleYaw(MainV2.comPort);
+        }
+
+        private void btn_NotWP_Click(object sender, EventArgs e)
+        {
+            ReadCoordinate();
+
+            MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+            {
+                alt = (float)_Alt + 10,
+                lat = (float)_Lat,                   
+                lng = (float)_Lon,
+                id = (ushort)MAVLink.MAV_CMD.OVERRIDE_GOTO
+            });
+
+            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.OVERRIDE_GOTO, 0,
+                        0, 0, 0, 0, 0, 0);
+        }
+
+        private void btn_MS_Click(object sender, EventArgs e)
+        {
+            ReadCoordinate();
+            //MainV2.comPort.MAV.GuidedMode.x = (int)(_Lat * 1e7);
+            //MainV2.comPort.MAV.GuidedMode.y = (int)(_Lon * 1e7);
+            //MainV2.comPort.MAV.GuidedMode.x = _Alt;
+
+            Locationwp gotohere = new Locationwp();
+
+            gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+            gotohere.alt = _Alt; // back to m
+            gotohere.lat = _Lat;
+            gotohere.lng = _Lon;
+
+            MainV2.comPort.MAV.wps[0] = gotohere;
+
+            MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+            {
+                alt = (float)_Alt + 10,
+                lat = (float)_Lat,
+                lng = (float)_Lon,
+                id = (ushort)MAVLink.MAV_CMD.MISSION_START
+            });
+
+            MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.MISSION_START, _Lat,
+                        _Lon, _Alt, 0, 0, 0, 0);
+        }
+
+        private void btn_SetWPCurrentAsync_Click(object sender, EventArgs e)
+        {
+            ReadCoordinate();
+
+            MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+            {
+                alt = (float)_Alt + 10,
+                lat = (float)_Lat,
+                lng = (float)_Lon,
+                id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+            });
+
+            MainV2.comPort.setWPCurrentAsync((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, (ushort)MAVLink.MAV_CMD.WAYPOINT).GetAwaiter();
+        }
+
+        private void btn_ModIData_Click(object sender, EventArgs e)
+        {
+            ReadCoordinate();
+            MainV2.comPort.MAV.GuidedMode.x = (int)(_Lat * 1e7);
+            MainV2.comPort.MAV.GuidedMode.y = (int)(_Lon * 1e7);
+            MainV2.comPort.MAV.GuidedMode.x = _Alt;
+
+            MainV2.comPort.setGuidedModeWP(new Locationwp
+            {
+                alt = MainV2.comPort.MAV.GuidedMode.z,
+                lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
+            });
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            ReadCoordinate();
+
+            SingleYawHandler.StopSingleYaw();
+
+            System.Threading.Thread.Sleep(300);
+
+            MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+            {
+                alt = (float)_Alt + 10,
+                lat = (float)_Lat,
+                lng = (float)_Lon,
+                id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+            });
+
+            System.Threading.Thread.Sleep(300);
+
+            SingleYawHandler.StartSingleYaw(MainV2.comPort);
         }
     }
 }

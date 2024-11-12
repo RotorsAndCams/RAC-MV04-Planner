@@ -33,6 +33,7 @@ using LogAnalyzer = MissionPlanner.Utilities.LogAnalyzer;
 using TableLayoutPanelCellPosition = System.Windows.Forms.TableLayoutPanelCellPosition;
 using UnauthorizedAccessException = System.UnauthorizedAccessException;
 using MV04.State;
+using MV04.SingleYaw;
 
 // written by michael oborne
 
@@ -2788,6 +2789,8 @@ namespace MissionPlanner.GCSViews
 
         private void flyToHereAltToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SingleYawHandler.StopSingleYaw();
+
             string alt = "100";
 
             if (MainV2.comPort.MAV.cs.firmware == Firmwares.ArduCopter2)
@@ -2818,9 +2821,9 @@ namespace MissionPlanner.GCSViews
 
             if (MainV2.comPort.MAV.cs.mode.ToLower() == "guided")
             {
-                MessageBox.Show("lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 +
-                    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + " alt: " +
-                    MainV2.comPort.MAV.GuidedMode.z);
+                //MessageBox.Show("lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 +
+                //    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + " alt: " +
+                //    MainV2.comPort.MAV.GuidedMode.z);
 
                 MainV2.comPort.setGuidedModeWP(new Locationwp
                 {
@@ -2837,6 +2840,8 @@ namespace MissionPlanner.GCSViews
                 //    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
                 //});
             }
+
+            SingleYawHandler.StartSingleYaw(MainV2.comPort);
         }
 
         private void gimbalTrackbar_Scroll(object sender, EventArgs e)
@@ -2992,7 +2997,11 @@ namespace MissionPlanner.GCSViews
 
             try
             {
+                SingleYawHandler.StopSingleYaw();
+
                 MainV2.comPort.setGuidedModeWP(gotohere);
+
+                SingleYawHandler.StartSingleYaw(MainV2.comPort);
             }
             catch (Exception ex)
             {

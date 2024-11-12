@@ -377,6 +377,10 @@ namespace MissionPlanner.GCSViews
 
 #endif
 
+                SingleYawHandler.StopSingleYaw();
+
+                Thread.Sleep(100);
+
                 MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
                 {
                     alt = target_alt + 10,
@@ -384,6 +388,8 @@ namespace MissionPlanner.GCSViews
                     lng = target_lng,
                     id = (ushort)MAVLink.MAV_CMD.WAYPOINT
                 });
+
+                SingleYawHandler.StartSingleYaw(MainV2.comPort);
             }
 
 
