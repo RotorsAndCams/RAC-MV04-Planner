@@ -5322,6 +5322,16 @@ namespace MissionPlanner.GCSViews
             writeKML();
 
             MainMap_OnMapZoomChanged();
+
+            AlertOnUnknownMissionItem();
+        }
+
+        private void AlertOnUnknownMissionItem()
+        {
+            if (Commands.Rows.Cast<DataGridViewRow>().Any(row => (row.Cells[Command.Index] as DataGridViewComboBoxCell).Value.ToString() == "UNKNOWN"))
+            {
+                CustomMessageBox.Show("The loaded flightplan contains UNKNOWN items.\n\nExecuting these items can result in unpredictable behavior.", Strings.Warning, CustomMessageBox.MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private Dictionary<string, string[]> readCMDXML()
