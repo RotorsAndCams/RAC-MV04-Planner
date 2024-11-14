@@ -4324,12 +4324,12 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             {
                 gotohere.id = (ushort) MAV_CMD.WAYPOINT;
 
-                if (setguidedmode)
-                {
-                    // fix for followme change
-                    if (MAVlist[sysid, compid].cs.mode.ToUpper() != "GUIDED")
-                        setMode(sysid, compid, "GUIDED");
-                }
+                //if (setguidedmode)
+                //{
+                //    // fix for followme change
+                //    if (MAVlist[sysid, compid].cs.mode.ToUpper() != "GUIDED")
+                //        setMode(sysid, compid, "GUIDED");
+                //}
 
                 log.InfoFormat("setGuidedModeWP {0}:{1} lat {2} lng {3} alt {4}", sysid, compid, gotohere.lat,
                     gotohere.lng, gotohere.alt);

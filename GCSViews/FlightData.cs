@@ -2995,6 +2995,10 @@ namespace MissionPlanner.GCSViews
             gotohere.lat = (MouseDownStart.Lat);
             gotohere.lng = (MouseDownStart.Lng);
 
+            MainV2.comPort.MAV.GuidedMode.x = (int)(MouseDownStart.Lat *1e7);
+            MainV2.comPort.MAV.GuidedMode.y = (int)(MouseDownStart.Lng *1e7);
+
+
             try
             {
                 SingleYawHandler.StopSingleYaw();

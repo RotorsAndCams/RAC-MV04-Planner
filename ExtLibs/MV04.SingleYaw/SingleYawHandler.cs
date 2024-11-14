@@ -305,8 +305,12 @@ namespace MV04.SingleYaw
         public static void StopSingleYaw()
         {
             // Stop timer
-            _YawAdjustTimer.Stop();
-            _YawAdjustTimer.Enabled = false;
+            if(_YawAdjustTimer != null)
+            {
+                _YawAdjustTimer.Stop();
+                _YawAdjustTimer.Enabled = false;
+            }
+            
 
             if (CurrentMode == SingleYawMode.Master)
             {
