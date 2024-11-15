@@ -71,7 +71,7 @@ namespace MissionPlanner.GCSViews
 
         string _tempPath = "";
         int _fileCount = 0;
-        NvSystemModes _cameraState;
+        NvSystemModes _cameraState = NvSystemModes.Stow;
 
         public float SlantRange
         {
@@ -149,7 +149,7 @@ namespace MissionPlanner.GCSViews
             StartCameraStream();
             StartCameraControl();
 
-            CameraHandler.Instance.SetMode(NvSystemModes.Stow); //ez kell?
+            CameraHandler.Instance.SetMode(NvSystemModes.Stow);
 
             #endregion
 
@@ -234,7 +234,7 @@ namespace MissionPlanner.GCSViews
             #region Follow mode
 
             _feedTimer = new System.Timers.Timer();
-            _feedTimer.Interval = 10000;
+            _feedTimer.Interval = 1000 * 5;
             _feedTimer.Elapsed += _feedTimer_Elapsed;
             _feedTimer.Enabled = false;
             lb_FollowDebugText.Size = new Size(lb_FollowDebugText.Width + 500, lb_FollowDebugText.Height);
@@ -340,6 +340,7 @@ namespace MissionPlanner.GCSViews
 
         private void StartFeed()
         {
+            MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "GUIDED");
             _feedTimer.Enabled = true;
             _feedTimer.Start();
 
@@ -348,7 +349,7 @@ namespace MissionPlanner.GCSViews
         private void _feedTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             //Check track mode
-            if (!IsCameraTrackingModeActive)
+            if (!IsCameraTrackingModeActive || _cameraState != NvSystemModes.Tracking)
             {
                 MessageBox.Show("Camera is not tracking");
                 StopFeed();
@@ -381,13 +382,27 @@ namespace MissionPlanner.GCSViews
 
                 Thread.Sleep(100);
 
-                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                for (int i = 0; i <= 50; i++)
                 {
-                    alt = target_alt + 10,
-                    lat = target_lat,
-                    lng = target_lng,
-                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                });
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                    {
+                        alt = target_alt + 10,
+                        lat = target_lat,
+                        lng = target_lng,
+                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                    });
+                }
+                for (int i = 0; i <= 50; i++)
+                {
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                    {
+                        alt = target_alt + 10,
+                        lat = target_lat - 0.0002,
+                        lng = target_lng - 0.0002,
+                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                    });
+                }
+
 
                 SingleYawHandler.StartSingleYaw(MainV2.comPort);
             }
@@ -806,7 +821,9 @@ namespace MissionPlanner.GCSViews
         {
             if (_isFPVModeActive)
             {
-                CameraHandler.Instance.SetMode(CameraHandler.Instance.PrevCameraMode);
+                //CameraHandler.Instance.SetMode(CameraHandler.Instance.PrevCameraMode);
+
+                CameraHandler.Instance.SetMode(NvSystemModes.Observation);
 
                 _isFPVModeActive = false;
                 btn_FPVCameraMode.BackColor = Color.Black;
@@ -842,6 +859,12 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
+                try
+                {
+                    _cameraState = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report);
+                }
+                catch { }
+
                 string systemModeStr = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report).ToString();
 
                 //Test: Set Camera Status
@@ -960,7 +983,7 @@ namespace MissionPlanner.GCSViews
             if (_feedTimer.Enabled)
                 StopFeed();
 
-            CameraHandler.Instance.SetMode(NvSystemModes.GRR);
+            //CameraHandler.Instance.SetMode(NvSystemModes.GRR);
         }
 
         private void _droneStatustimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -1398,6 +1421,11 @@ namespace MissionPlanner.GCSViews
                 CameraHandler.Instance.SetMode(NvSystemModes.GRR);
                 this.btn_Surveillance.Text = "Observation";
             }
+        }
+
+        private void btn_NUC_Click(object sender, EventArgs e)
+        {
+            CameraHandler.Instance.DoNUC();
         }
     }
 }

@@ -406,7 +406,7 @@ namespace MissionPlanner.Joystick
                                             StateHandler.CurrentSate = MV04_State.Land;
                                             break;
                                         default:
-                                            CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                            //CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             StateHandler.CurrentSate = MV04_State.Unknown;
                                             break;
                                     }
@@ -681,20 +681,34 @@ namespace MissionPlanner.Joystick
                                         MV04_SetRCChannels(MV04_JoyFlightMode.Manual);
                                         if (Interface.MAV.cs.mode.ToLower() != "loiter")
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
-                                        //CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                         
                                         StateHandler.CurrentSate = MV04_State.Manual;
                                         break;
                                     
                                     case buttonfunction_mv04_FlightMode_option.TapToFly:
-                                        MV04_SetRCChannels(MV04_JoyFlightMode.TapToFly);
-                                        if (Interface.MAV.cs.mode.ToLower() != "guided")
-                                            Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
 
-                                        //CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                        #region Tap2Fly
+
+                                        MV04_SetRCChannels(MV04_JoyFlightMode.TapToFly);
 
                                         
+                                        //if (Interface.MAV.cs.mode.ToLower() != "guided")
+                                        //    Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
+                                        //Thread.Sleep(100);
+
+
+                                        var custom_mode = (Interface.MAV.cs.sensors_enabled.motor_control && Interface.MAV.cs.sensors_enabled.seen) ? 1u : 0u;
+                                        var set_mode = new MAVLink.mavlink_set_mode_t() { custom_mode = custom_mode, target_system = (byte)Interface.sysidcurrent };
+
+                                        Interface.translateMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED", ref set_mode);
+
+                                        Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent,
+                                            set_mode, MAV_MODE_FLAG.GUIDED_ENABLED);
+
                                         StateHandler.CurrentSate = MV04_State.TapToFly;
+
+                                        #endregion
+
                                         break;
                                     
                                     case buttonfunction_mv04_FlightMode_option.Auto:

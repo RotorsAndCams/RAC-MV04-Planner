@@ -188,7 +188,7 @@ namespace MV04.Camera
         {
             get
             {
-                return NvSystemModes.GRR;
+                return NvSystemModes.Stow;
             }
         }
 
@@ -802,10 +802,12 @@ namespace MV04.Camera
 
         public bool StopTracking(bool resetToPrevMode = false)
         {
-            if (PrevCameraMode != NvSystemModes.Tracking)
-                SetMode(PrevCameraMode);
-            else
-                SetMode(FallbackCameraMode);
+            ////if (PrevCameraMode != NvSystemModes.Tracking)
+            //    SetMode(PrevCameraMode);
+            //else
+            //    SetMode(FallbackCameraMode);
+            //return true;
+            SetMode(NvSystemModes.Observation);
             return true;
         }
 

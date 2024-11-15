@@ -34,9 +34,9 @@
             this.btn_DayCamera = new System.Windows.Forms.Button();
             this.btn_Reconnect = new System.Windows.Forms.Button();
             this.btn_NightCamera = new System.Windows.Forms.Button();
-            this.tlp_Base = new System.Windows.Forms.TableLayoutPanel();
             this.btn_EmergencyStop = new System.Windows.Forms.Button();
             this.lb_StopCounter = new System.Windows.Forms.Label();
+            this.tlp_Base = new System.Windows.Forms.TableLayoutPanel();
             this.uc_CameraSettings = new MissionPlanner.GCSViews.uc_CameraSettings();
             this.tlp_Buttons.SuspendLayout();
             this.tlp_Base.SuspendLayout();
@@ -47,25 +47,26 @@
             this.btn_NUC.BackColor = System.Drawing.Color.Black;
             this.btn_NUC.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btn_NUC.ForeColor = System.Drawing.Color.White;
-            this.btn_NUC.Location = new System.Drawing.Point(3, 95);
+            this.btn_NUC.Location = new System.Drawing.Point(3, 187);
             this.btn_NUC.Name = "btn_NUC";
             this.btn_NUC.Size = new System.Drawing.Size(142, 86);
             this.btn_NUC.TabIndex = 4;
             this.btn_NUC.Text = "NUC";
             this.btn_NUC.UseVisualStyleBackColor = false;
+            this.btn_NUC.Visible = false;
             this.btn_NUC.Click += new System.EventHandler(this.btn_NUC_Click);
             // 
             // tlp_Buttons
             // 
             this.tlp_Buttons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tlp_Buttons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlp_Buttons.Controls.Add(this.btn_StartStopRecording, 0, 2);
             this.tlp_Buttons.Controls.Add(this.btn_DayCamera, 0, 0);
             this.tlp_Buttons.Controls.Add(this.btn_Reconnect, 1, 1);
             this.tlp_Buttons.Controls.Add(this.btn_NightCamera, 1, 0);
-            this.tlp_Buttons.Controls.Add(this.btn_NUC, 0, 1);
             this.tlp_Buttons.Controls.Add(this.btn_EmergencyStop, 1, 4);
             this.tlp_Buttons.Controls.Add(this.lb_StopCounter, 1, 3);
+            this.tlp_Buttons.Controls.Add(this.btn_StartStopRecording, 0, 1);
+            this.tlp_Buttons.Controls.Add(this.btn_NUC, 0, 2);
             this.tlp_Buttons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlp_Buttons.ForeColor = System.Drawing.Color.White;
             this.tlp_Buttons.Location = new System.Drawing.Point(3, 3);
@@ -85,7 +86,7 @@
             this.btn_StartStopRecording.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.btn_StartStopRecording.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btn_StartStopRecording.ForeColor = System.Drawing.Color.White;
-            this.btn_StartStopRecording.Location = new System.Drawing.Point(3, 187);
+            this.btn_StartStopRecording.Location = new System.Drawing.Point(3, 95);
             this.btn_StartStopRecording.Name = "btn_StartStopRecording";
             this.btn_StartStopRecording.Size = new System.Drawing.Size(142, 86);
             this.btn_StartStopRecording.TabIndex = 0;
@@ -141,21 +142,6 @@
             this.btn_NightCamera.UseVisualStyleBackColor = false;
             this.btn_NightCamera.Click += new System.EventHandler(this.btn_NightCamera_Click);
             // 
-            // tlp_Base
-            // 
-            this.tlp_Base.ColumnCount = 2;
-            this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlp_Base.Controls.Add(this.uc_CameraSettings, 1, 0);
-            this.tlp_Base.Controls.Add(this.tlp_Buttons, 0, 0);
-            this.tlp_Base.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tlp_Base.Location = new System.Drawing.Point(0, 0);
-            this.tlp_Base.Name = "tlp_Base";
-            this.tlp_Base.RowCount = 1;
-            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlp_Base.Size = new System.Drawing.Size(605, 466);
-            this.tlp_Base.TabIndex = 2;
-            // 
             // btn_EmergencyStop
             // 
             this.btn_EmergencyStop.BackColor = System.Drawing.Color.Black;
@@ -184,6 +170,21 @@
             this.lb_StopCounter.Text = "Motor stop 3";
             this.lb_StopCounter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lb_StopCounter.Visible = false;
+            // 
+            // tlp_Base
+            // 
+            this.tlp_Base.ColumnCount = 2;
+            this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tlp_Base.Controls.Add(this.uc_CameraSettings, 1, 0);
+            this.tlp_Base.Controls.Add(this.tlp_Buttons, 0, 0);
+            this.tlp_Base.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlp_Base.Location = new System.Drawing.Point(0, 0);
+            this.tlp_Base.Name = "tlp_Base";
+            this.tlp_Base.RowCount = 1;
+            this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tlp_Base.Size = new System.Drawing.Size(605, 466);
+            this.tlp_Base.TabIndex = 2;
             // 
             // uc_CameraSettings
             // 

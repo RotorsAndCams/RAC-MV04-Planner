@@ -34,6 +34,8 @@ using TableLayoutPanelCellPosition = System.Windows.Forms.TableLayoutPanelCellPo
 using UnauthorizedAccessException = System.UnauthorizedAccessException;
 using MV04.State;
 using MV04.SingleYaw;
+using IronPython.Modules;
+using static MAVLink;
 
 // written by michael oborne
 
@@ -2824,21 +2826,35 @@ namespace MissionPlanner.GCSViews
                 //MessageBox.Show("lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 +
                 //    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + " alt: " +
                 //    MainV2.comPort.MAV.GuidedMode.z);
-
+                MainV2.comPort.ShowInfo = true;
                 MainV2.comPort.setGuidedModeWP(new Locationwp
                 {
                     alt = MainV2.comPort.MAV.GuidedMode.z,
                     lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
                     lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
                 });
-
-                //MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
-                //{
-                //    alt = MainV2.comPort.MAV.GuidedMode.z,
-                //    lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,          
-                //    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
-                //    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                //});
+                MainV2.comPort.ShowInfo = true;
+                for (int i = 0; i <= 5; i++)
+                {
+                    MainV2.comPort.setGuidedModeWP(new Locationwp
+                    {
+                        alt = MainV2.comPort.MAV.GuidedMode.z,
+                        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
+                    });
+                }
+                MainV2.comPort.ShowInfo = true;
+                for (int i = 0; i <= 5; i++) 
+                {
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                    {
+                        alt = MainV2.comPort.MAV.GuidedMode.z,
+                        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
+                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                    });
+                }
+                    
             }
 
             SingleYawHandler.StartSingleYaw(MainV2.comPort);
@@ -2979,7 +2995,11 @@ namespace MissionPlanner.GCSViews
                 flyToHereAltToolStripMenuItem_Click(null, null);
 
                 if (MainV2.comPort.MAV.GuidedMode.z == 0f)
+                {
+                    CustomMessageBox.Show("Zero alt value -> will not fly to position");
                     return;
+                }
+                    
             }
 
             if (MouseDownStart.Lat == 0.0 || MouseDownStart.Lng == 0.0)
@@ -2994,6 +3014,9 @@ namespace MissionPlanner.GCSViews
             gotohere.alt = MainV2.comPort.MAV.GuidedMode.z; // back to m
             gotohere.lat = (MouseDownStart.Lat);
             gotohere.lng = (MouseDownStart.Lng);
+            gotohere.frame = MainV2.comPort.MAV.GuidedMode.frame;
+
+            MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
 
             MainV2.comPort.MAV.GuidedMode.x = (int)(MouseDownStart.Lat *1e7);
             MainV2.comPort.MAV.GuidedMode.y = (int)(MouseDownStart.Lng *1e7);
@@ -3001,11 +3024,42 @@ namespace MissionPlanner.GCSViews
 
             try
             {
+                //MainV2.comPort.setWP(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, gotohere, (ushort)MAVLink.MAV_CMD.WAYPOINT, MAVLink.MAV_FRAME.GLOBAL_INT);
+                //MainV2.comPort.setWP(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, gotohere, (ushort)MAVLink.MAV_CMD.WAYPOINT, MAVLink.MAV_FRAME.GLOBAL_INT);
+
+                //MainV2.comPort.setWPACK();
+                //MainV2.comPort.setWPCurrent(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, 0);
+
                 SingleYawHandler.StopSingleYaw();
 
-                MainV2.comPort.setGuidedModeWP(gotohere);
+                //gotohere.lat -= -0.0001;
+                //gotohere.lng -= -0.0001;
+                MainV2.comPort.ShowInfo = true;
+                for (int i = 0; i <= 10; i++)
+                {
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere, false);
+                }
 
+                CustomMessageBox.Show("after multiple sendings, gotohere = id: " + gotohere.id + " alt: " + gotohere.alt + " lat: " + gotohere.lat + " lng: " + gotohere.lng + " frame: " + gotohere.frame);
+
+                //for (int i = 0; i <= 100; i++)
+                //{
+                //    MainV2.comPort.setPositionTargetGlobalInt(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, true, true, false, false,
+                //    MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT_INT,
+                //    MainV2.comPort.MAV.GuidedMode.x / 1e7, MainV2.comPort.MAV.GuidedMode.y / 1e7, MainV2.comPort.MAV.GuidedMode.z, Vector3.Zero.x, Vector3.Zero.y, Vector3.Zero.z, 0, 0);
+                //}
+
+                //for (int i = 0; i <= 100; i++)
+                //{
+                //    MainV2.comPort.setPositionTargetGlobalInt(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, true, true, false, false,
+                //    MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT_INT,
+                //    gotohere.lat, gotohere.lng, (30 / CurrentState.multiplieralt), Vector3.Zero.x, Vector3.Zero.y, Vector3.Zero.z, 0, 0);
+                //}
                 SingleYawHandler.StartSingleYaw(MainV2.comPort);
+
+                //legyen egy parancs ami direkt float-ot küld ki locwpként
+
+
             }
             catch (Exception ex)
             {
