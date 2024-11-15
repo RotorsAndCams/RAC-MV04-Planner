@@ -4317,7 +4317,17 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
         public void setGuidedModeWP(byte sysid, byte compid, Locationwp gotohere, bool setguidedmode = true)
         {
             if (gotohere.alt == 0 || gotohere.lat == 0 || gotohere.lng == 0)
+            {
+                bool a = gotohere.alt == 0;
+                bool b = gotohere.lat == 0;
+                bool c = gotohere.lng == 0;
+                CustomMessageBox.Show(
+                    "not sending becaouse: gotohere.alt == 0 -> " + a +
+                    "gotohere.lat == 0 - " + b +
+                    "gotohere.lng == 0 - " + c);
                 return;
+            }
+                
 
             giveComport = true;
 
