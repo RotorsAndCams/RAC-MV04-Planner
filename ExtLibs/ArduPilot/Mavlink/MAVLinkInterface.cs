@@ -4313,10 +4313,21 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             setGuidedModeWP(MAV.sysid, MAV.compid, gotohere, setguidedmode);
         }
 
+        public bool ShowInfo = true;
         public void setGuidedModeWP(byte sysid, byte compid, Locationwp gotohere, bool setguidedmode = true)
         {
             if (gotohere.alt == 0 || gotohere.lat == 0 || gotohere.lng == 0)
+            {
+                bool a = gotohere.alt == 0;
+                bool b = gotohere.lat == 0;
+                bool c = gotohere.lng == 0;
+                CustomMessageBox.Show(
+                    "not sending becaouse: gotohere.alt == 0 -> " + a +
+                    "gotohere.lat == 0 - " + b +
+                    "gotohere.lng == 0 - " + c);
                 return;
+            }
+                
 
             giveComport = true;
 
@@ -4324,20 +4335,26 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             {
                 gotohere.id = (ushort) MAV_CMD.WAYPOINT;
 
-                if (setguidedmode)
-                {
-                    // fix for followme change
-                    if (MAVlist[sysid, compid].cs.mode.ToUpper() != "GUIDED")
-                        setMode(sysid, compid, "GUIDED");
-                }
+                //if (setguidedmode)
+                //{
+                //    // fix for followme change
+                //    if (MAVlist[sysid, compid].cs.mode.ToUpper() != "GUIDED")
+                //        setMode(sysid, compid, "GUIDED");
+                //}
 
                 log.InfoFormat("setGuidedModeWP {0}:{1} lat {2} lng {3} alt {4}", sysid, compid, gotohere.lat,
                     gotohere.lng, gotohere.alt);
 
-                if (MAVlist[sysid, compid].cs.firmware == Firmwares.ArduPlane)
+                if (MAVlist[sysid, compid].cs.firmware == Firmwares.ArduPlane /* || MAVlist[sysid, compid].cs.firmware == Firmwares.ArduCopter2*/)
                 {
                     MAV_MISSION_RESULT ans = setWP(sysid, compid, gotohere, 0, MAV_FRAME.GLOBAL_RELATIVE_ALT, (byte) 2);
 
+                    //if (ShowInfo)
+                    //{
+                    //    CustomMessageBox.Show(ans.ToString());
+                    //    ShowInfo = false;
+                    //}
+                    
                     if (ans != MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED)
                     {
                         giveComport = false;

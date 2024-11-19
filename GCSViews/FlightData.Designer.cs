@@ -61,6 +61,7 @@ namespace MissionPlanner.GCSViews
             this.CMB_modes = new System.Windows.Forms.ComboBox();
             this.BUT_quickauto = new MissionPlanner.Controls.MyButton();
             this.BUT_setmode = new MissionPlanner.Controls.MyButton();
+            this.BUT_calib = new MissionPlanner.Controls.MyButton();
             this.tabPagemessages = new System.Windows.Forms.TabPage();
             this.txt_messagebox = new System.Windows.Forms.TextBox();
             this.tabActionsSimple = new System.Windows.Forms.TabPage();
@@ -651,6 +652,7 @@ namespace MissionPlanner.GCSViews
             this.tableLayoutPanel1.Controls.Add(this.CMB_modes, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.BUT_quickauto, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.BUT_setmode, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.BUT_calib, 1, 4);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             // 
             // BUT_SendMSG
@@ -964,6 +966,18 @@ namespace MissionPlanner.GCSViews
             this.toolTip1.SetToolTip(this.BUT_setmode, resources.GetString("BUT_setmode.ToolTip"));
             this.BUT_setmode.UseVisualStyleBackColor = true;
             this.BUT_setmode.Click += new System.EventHandler(this.BUT_setmode_Click);
+            // 
+            // BUT_calib
+            // 
+            this.BUT_calib.ColorMouseDown = System.Drawing.Color.Empty;
+            this.BUT_calib.ColorMouseOver = System.Drawing.Color.Empty;
+            this.BUT_calib.ColorNotEnabled = System.Drawing.Color.Empty;
+            this.BUT_calib.Text = "Calibration";
+            this.BUT_calib.Name = "BUT_calib";
+            this.BUT_calib.Dock = DockStyle.Fill;
+            this.BUT_calib.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.BUT_calib.UseVisualStyleBackColor = true;
+            this.BUT_calib.Click += new System.EventHandler(this.BUT_calib_Click);
             // 
             // tabPagemessages
             // 
@@ -2900,6 +2914,7 @@ namespace MissionPlanner.GCSViews
         public System.Windows.Forms.TabPage tabTLogs;
         private System.Windows.Forms.ComboBox CMB_modes;
         private Controls.MyButton BUT_setmode;
+        private Controls.MyButton BUT_calib;
         private System.Windows.Forms.ComboBox CMB_setwp;
         private Controls.MyButton BUT_setwp;
         private Controls.MyButton BUT_quickmanual;
