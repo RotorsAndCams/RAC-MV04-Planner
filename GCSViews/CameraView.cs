@@ -367,12 +367,12 @@ namespace MissionPlanner.GCSViews
                 //debug to screen
                 if (InvokeRequired)
                     Invoke(new Action(() => {
-                        lb_FollowDebugText.Text = " ALT: " + MainV2.comPort.MAV.GuidedMode.z;
+                        lb_FollowDebugText.Text = "sendALT: " + MainV2.comPort.MAV.GuidedMode.z + " cs.alt: " + MainV2.comPort.MAV.cs.alt;
                         lb_FollowDebugText.Refresh();
                     }));
                 else
                 {
-                    lb_FollowDebugText.Text = "ALT: " + MainV2.comPort.MAV.GuidedMode.z;
+                    lb_FollowDebugText.Text = "sendALT: " + MainV2.comPort.MAV.GuidedMode.z + " cs.alt: " + MainV2.comPort.MAV.cs.alt;
                     lb_FollowDebugText.Refresh();
                 }
 
@@ -860,6 +860,11 @@ namespace MissionPlanner.GCSViews
                 try
                 {
                     _cameraState = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report);
+                    
+                    if((int)MainV2.comPort.MAV.cs.alt < 5)
+                    {
+                        CameraHandler.Instance.SetMode(NvSystemModes.Stow);
+                    }
                 }
                 catch { }
 
@@ -894,11 +899,9 @@ namespace MissionPlanner.GCSViews
         private void StateHandler_MV04StateChange(object sender, MV04StateChangeEventArgs e)
         {
             if (InvokeRequired)
-            {
-                Invoke(new Action(() => SetGCSStatus()));
-            }
+                Invoke(new Action(() => ReportStatusError()));
             else
-                SetGCSStatus();
+                ReportStatusError();
 
             switch (e.NewState)
             {
@@ -937,7 +940,7 @@ namespace MissionPlanner.GCSViews
 
             if (MainV2.comPort.MAV.wps.Values.Count <= 0)
             {
-                MessageBox.Show("No uploaded plan");
+                CustomMessageBox.Show("No uploaded plan");
                 //Task.Run(() => Blink());
             }
         }
@@ -946,7 +949,7 @@ namespace MissionPlanner.GCSViews
         {
             if (_cameraState != NvSystemModes.Tracking)
             {
-                MessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
+                CustomMessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
                 Task.Run(() => ProvideGCSError());
             }
             else
@@ -1162,7 +1165,7 @@ namespace MissionPlanner.GCSViews
             this.lb_CameraStatusValue.Text = st;
         }
 
-        private void SetGCSStatus()
+        private void ReportStatusError()
         {
             this.lb_GCSSelectedStateValue.Text = StateHandler.CurrentSate.ToString();
 
@@ -1177,7 +1180,7 @@ namespace MissionPlanner.GCSViews
             if (!CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport) /* || MainV2.comPort.MAV.cs.mode ==  ||*/)
             {
                 Task.Run(() => ProvideCameraError());
-                MessageBox.Show("Camera no communication");
+                lb_CameraStatusValue.Text = "Error";
                 return;
             }
 
@@ -1186,30 +1189,18 @@ namespace MissionPlanner.GCSViews
             switch (StateHandler.CurrentSate)
             {
                 case MV04_State.Manual:
-                    if (cameraMode != NvSystemModes.GRR)
-                    {
-                        Task.Run(() => ProvideCameraError());
-                    }
                     if(  MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
                     {
                         Task.Run(() => ProvideDroneError());
                     }
                     break;
                 case MV04_State.TapToFly:
-                    if (cameraMode != NvSystemModes.GRR)
-                    {
-                        Task.Run(() => ProvideCameraError());
-                    }
-                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "AUTO")
+                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "GUIDED")
                     {
                         Task.Run(() => ProvideDroneError());
                     }
                     break;
                 case MV04_State.Auto:
-                    if (cameraMode != NvSystemModes.GRR)
-                    {
-                        Task.Run(() => ProvideCameraError());
-                    }
                     if (MainV2.comPort.MAV.cs.mode.ToUpper() != "AUTO")
                     {
                         Task.Run(() => ProvideDroneError());
@@ -1220,7 +1211,7 @@ namespace MissionPlanner.GCSViews
                     {
                         Task.Run(() => ProvideCameraError());
                     }
-                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "FOLLOW")
+                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "GUIDED")
                     {
                         Task.Run(() => ProvideDroneError());
                     }
@@ -1230,10 +1221,6 @@ namespace MissionPlanner.GCSViews
                     {
                         Task.Run(() => ProvideCameraError());
                     }
-                    //if (MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
-                    //{
-                    //    Task.Run(() => ProvideDroneError());
-                    //}
                     break;
                 case MV04_State.Takeoff:
                     break;
