@@ -44,7 +44,7 @@ namespace MV04.SingleYaw
 
         private static Timer _YawAdjustTimer;
 
-        private static int _YawAdjustInterval = 500; // ms
+        private static int _YawAdjustInterval = 100; // ms
 
         private static int _YawAdjustTreshold = 3; // deg
 
