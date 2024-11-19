@@ -584,6 +584,8 @@ namespace MissionPlanner
 
         private readonly TimeSpan TRIPOffTime = TimeSpan.FromMinutes(5);
 
+        private YesNoForm TRIPOffMessageBox = null;
+
         public void updateLayout(object sender, EventArgs e)
         {
             MenuSimulation.Visible = DisplayConfiguration.displaySimulation;
@@ -1407,7 +1409,7 @@ namespace MissionPlanner
             }
         }
 
-        private async void TRIPTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void TRIPTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (this.IsDisposed)
             {
@@ -1421,8 +1423,23 @@ namespace MissionPlanner
                 return;
             }
 
-            DialogResult dialogResult = await Task<DialogResult>.Run(() => MessageBox.Show("Need to switch off Camera to protect against overheating!\n\nAllow?", "Camera switch off", MessageBoxButtons.YesNo));
-            if (dialogResult == DialogResult.Yes)
+            // Close if open
+            if (TRIPOffMessageBox != null)
+            {
+                if (TRIPOffMessageBox.InvokeRequired)
+                {
+                    TRIPOffMessageBox.Invoke((MethodInvoker)delegate { TRIPOffMessageBox.Close(); });
+                }
+                else
+                {
+                    TRIPOffMessageBox.Close();
+                }
+                TRIPOffMessageBox = null;
+            }
+
+            // Open new
+            TRIPOffMessageBox = new YesNoForm("Need to switch off Camera to protect against overheating!\n\nAllow?", "Camera switch off");
+            if (TRIPOffMessageBox.ShowDialog() == DialogResult.Yes)
             {
                 MainV2.instance.SwitchTRIPRelay(false);
             }
@@ -3199,6 +3216,34 @@ namespace MissionPlanner
             SerialThreadrunner.Set();
         }
 
+        private void DoCameraViewInit()
+        {
+            if ((bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream))))
+            {
+                Task.Run(() => {
+                    try
+                    {
+                        if (InvokeRequired)
+                            Invoke(new Action(() => {
+                                MainSwitcher.Screen nextscreen = MyView.screens.Single(s => s.Name == "CameraView");
+
+                                if (nextscreen.Control == null || nextscreen.Control.IsDisposed)
+                                    MyView.CreateControl(nextscreen);
+                            }));
+                        else
+                        {
+                            MainSwitcher.Screen nextscreen = MyView.screens.Single(s => s.Name == "CameraView");
+
+                            if (nextscreen.Control == null || nextscreen.Control.IsDisposed)
+                                MyView.CreateControl(nextscreen);
+                        }
+                    }
+                    catch { }
+                    
+                });
+
+            }
+        }
         protected override void OnLoad(EventArgs e)
         {
             // check if its defined, and force to show it if not known about
@@ -3218,6 +3263,7 @@ namespace MissionPlanner
             MyView.AddScreen(new MainSwitcher.Screen("FlightData", FlightData, true));
             MyView.AddScreen(new MainSwitcher.Screen("FlightPlanner", FlightPlanner, true));
             MyView.AddScreen(new MainSwitcher.Screen("CameraView", typeof(GCSViews.CameraView), true));
+            //DoCameraViewInit();
             MyView.AddScreen(new MainSwitcher.Screen("HWConfig", typeof(GCSViews.InitialSetup), false));
             MyView.AddScreen(new MainSwitcher.Screen("SWConfig", typeof(GCSViews.SoftwareConfig), false));
             MyView.AddScreen(new MainSwitcher.Screen("Simulation", Simulation, true));

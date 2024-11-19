@@ -65,7 +65,7 @@ namespace MissionPlanner.Controls
             ShowScreen(current.Name);
         }
 
-        void CreateControl(Screen current)
+        public void CreateControl(Screen current)
         {
             Type type = current.Type;
 
