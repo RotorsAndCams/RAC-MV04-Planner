@@ -84,6 +84,9 @@
     <EmbeddedResource Include="Controls\AuthKeys.uk.resx">
       <DependentUpon>AuthKeys.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\CalibForm.resx">
+      <DependentUpon>CalibForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ConnectionControl.uk.resx">
       <DependentUpon>ConnectionControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -781,6 +784,12 @@
   <ItemGroup>
     <Compile Include="Antenna\TrackerGeneric.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="Controls\CalibForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\CalibForm.Designer.cs">
+      <DependentUpon>CalibForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ColorSlider.cs">
       <SubType>Component</SubType>
     </Compile>
