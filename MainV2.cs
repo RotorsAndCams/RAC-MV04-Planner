@@ -584,6 +584,8 @@ namespace MissionPlanner
 
         private readonly TimeSpan TRIPOffTime = TimeSpan.FromMinutes(5);
 
+        private YesNoForm TRIPOffMessageBox = null;
+
         public void updateLayout(object sender, EventArgs e)
         {
             MenuSimulation.Visible = DisplayConfiguration.displaySimulation;
@@ -1407,7 +1409,7 @@ namespace MissionPlanner
             }
         }
 
-        private async void TRIPTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void TRIPTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (this.IsDisposed)
             {
@@ -1421,8 +1423,23 @@ namespace MissionPlanner
                 return;
             }
 
-            DialogResult dialogResult = await Task<DialogResult>.Run(() => MessageBox.Show("Need to switch off Camera to protect against overheating!\n\nAllow?", "Camera switch off", MessageBoxButtons.YesNo));
-            if (dialogResult == DialogResult.Yes)
+            // Close if open
+            if (TRIPOffMessageBox != null)
+            {
+                if (TRIPOffMessageBox.InvokeRequired)
+                {
+                    TRIPOffMessageBox.Invoke((MethodInvoker)delegate { TRIPOffMessageBox.Close(); });
+                }
+                else
+                {
+                    TRIPOffMessageBox.Close();
+                }
+                TRIPOffMessageBox = null;
+            }
+
+            // Open new
+            TRIPOffMessageBox = new YesNoForm("Need to switch off Camera to protect against overheating!\n\nAllow?", "Camera switch off");
+            if (TRIPOffMessageBox.ShowDialog() == DialogResult.Yes)
             {
                 MainV2.instance.SwitchTRIPRelay(false);
             }
