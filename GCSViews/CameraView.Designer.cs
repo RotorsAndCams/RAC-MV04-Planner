@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CameraView));
             this.tlp_ControlsBase = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_Buttonsection2 = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_Surveillance = new System.Windows.Forms.Button();
             this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.btn_StartStopSingleYaw = new System.Windows.Forms.Button();
             this.btn_StopTracking = new System.Windows.Forms.Button();
@@ -69,7 +70,7 @@
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
             this.vv_VLC = new LibVLCSharp.WinForms.VideoView();
-            this.btn_Surveillance = new System.Windows.Forms.Button();
+            this.btn_NUC = new System.Windows.Forms.Button();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
@@ -104,11 +105,21 @@
             // tlp_Buttonsection2
             // 
             resources.ApplyResources(this.tlp_Buttonsection2, "tlp_Buttonsection2");
+            this.tlp_Buttonsection2.Controls.Add(this.btn_NUC, 0, 2);
             this.tlp_Buttonsection2.Controls.Add(this.btn_Surveillance, 0, 1);
             this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 0);
             this.tlp_Buttonsection2.Controls.Add(this.btn_StartStopSingleYaw, 1, 0);
             this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 1, 1);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
+            // 
+            // btn_Surveillance
+            // 
+            this.btn_Surveillance.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_Surveillance, "btn_Surveillance");
+            this.btn_Surveillance.ForeColor = System.Drawing.Color.White;
+            this.btn_Surveillance.Name = "btn_Surveillance";
+            this.btn_Surveillance.UseVisualStyleBackColor = false;
+            this.btn_Surveillance.Click += new System.EventHandler(this.btn_Surveillance_Click);
             // 
             // btn_ResetZoom
             // 
@@ -421,14 +432,14 @@
             this.vv_VLC.MediaPlayer = null;
             this.vv_VLC.Name = "vv_VLC";
             // 
-            // btn_Surveillance
+            // btn_NUC
             // 
-            this.btn_Surveillance.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_Surveillance, "btn_Surveillance");
-            this.btn_Surveillance.ForeColor = System.Drawing.Color.White;
-            this.btn_Surveillance.Name = "btn_Surveillance";
-            this.btn_Surveillance.UseVisualStyleBackColor = false;
-            this.btn_Surveillance.Click += new System.EventHandler(this.btn_Surveillance_Click);
+            this.btn_NUC.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_NUC, "btn_NUC");
+            this.btn_NUC.ForeColor = System.Drawing.Color.White;
+            this.btn_NUC.Name = "btn_NUC";
+            this.btn_NUC.UseVisualStyleBackColor = false;
+            this.btn_NUC.Click += new System.EventHandler(this.btn_NUC_Click);
             // 
             // CameraView
             // 
@@ -510,5 +521,6 @@
         private System.Windows.Forms.Button btn_StartStopSingleYaw;
         private LibVLCSharp.WinForms.VideoView vv_VLC;
         private System.Windows.Forms.Button btn_Surveillance;
+        private System.Windows.Forms.Button btn_NUC;
     }
 }

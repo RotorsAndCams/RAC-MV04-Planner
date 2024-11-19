@@ -84,6 +84,9 @@
     <EmbeddedResource Include="Controls\AuthKeys.uk.resx">
       <DependentUpon>AuthKeys.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\CalibForm.resx">
+      <DependentUpon>CalibForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ConnectionControl.uk.resx">
       <DependentUpon>ConnectionControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -155,6 +158,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\WindInputForm.resx">
       <DependentUpon>WindInputForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\YesNoForm.resx">
+      <DependentUpon>YesNoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\CameraFullScreenForm.resx">
       <DependentUpon>CameraFullScreenForm.cs</DependentUpon>
@@ -324,6 +330,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\InitialSetup.uk.resx">
       <DependentUpon>InitialSetup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\SetWaypointForm.resx">
+      <DependentUpon>SetWaypointForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\SITL.uk.resx">
       <DependentUpon>SITL.cs</DependentUpon>
@@ -778,6 +787,12 @@
   <ItemGroup>
     <Compile Include="Antenna\TrackerGeneric.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="Controls\CalibForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\CalibForm.Designer.cs">
+      <DependentUpon>CalibForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ColorSlider.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -903,6 +918,12 @@
     </Compile>
     <Compile Include="Controls\WindInputForm.Designer.cs">
       <DependentUpon>WindInputForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\YesNoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\YesNoForm.Designer.cs">
+      <DependentUpon>YesNoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\BitMapEventArgs.cs" />
     <Compile Include="GCSViews\CameraFullScreenForm.cs">
@@ -1048,6 +1069,12 @@
     </Compile>
     <Compile Include="GCSViews\GstreamerTestForm.Designer.cs">
       <DependentUpon>GstreamerTestForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GCSViews\SetWaypointForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSViews\SetWaypointForm.Designer.cs">
+      <DependentUpon>SetWaypointForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\uc_CameraSettings.cs">
       <SubType>UserControl</SubType>

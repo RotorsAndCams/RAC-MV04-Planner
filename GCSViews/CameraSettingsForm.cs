@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -18,6 +19,12 @@ namespace MissionPlanner.GCSViews
         private const int CHANGE_WINDOW_WIDTH = 225;
         private const int CHANGE_WINDOW_HEIGHT = 360;
         private static CameraSettingsForm _instance;
+        bool isReconnecting = false;
+        private bool buttonDown;
+        public event EventHandler event_StartStopRecording;
+        bool _isRecording;
+        private CancellationTokenSource EmergencyStopTaskCTS;
+        private bool _IsDialogOpen = false;
 
         public static CameraSettingsForm Instance
         {
@@ -39,7 +46,6 @@ namespace MissionPlanner.GCSViews
             SetButtonStatus();
         }
 
-
         private void btn_DayCamera_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.SetImageSensor(false); //Set to Day camera
@@ -54,8 +60,6 @@ namespace MissionPlanner.GCSViews
         {
             CameraHandler.Instance.DoNUC();
         }
-
-        bool isReconnecting = false;
 
         private async void btn_Reconnect_Click(object sender, EventArgs e)
         {
@@ -85,7 +89,6 @@ namespace MissionPlanner.GCSViews
                     int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
                 isReconnecting = false;
-
             }
             catch (Exception ex)
             {
@@ -94,15 +97,10 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        public event EventHandler event_StartStopRecording;
-
-
         private void btn_StartStopRecording_Click(object sender, EventArgs e)
         {
             CameraView.instance.StopRecording();
         }
-
-        bool _isRecording;
 
         public void SetRecordingStatus(bool status)
         {
@@ -130,12 +128,6 @@ namespace MissionPlanner.GCSViews
             MessageBox.Show(b ? "Emergency stop was succesful." : "Failed to emergency stop.");
         }
 
-        private void btn_EmergencyStop_Click(object sender, EventArgs e)
-        {
-            EmergencyStop();
-        }
-
-        private bool buttonDown;
         private void btn_EmergencyStop_MouseDown(object sender, MouseEventArgs e)
         {
             if (_IsDialogOpen)
@@ -143,10 +135,10 @@ namespace MissionPlanner.GCSViews
 
             lb_StopCounter.Visible = true;
             btn_EmergencyStop.BackColor = Color.Red;
-            var task = Task.Factory.StartNew(() => { ButtonHoldMethod(); });
-        }
 
-        private bool _IsDialogOpen = false;
+            EmergencyStopTaskCTS = new CancellationTokenSource();
+            Task.Factory.StartNew(() => { ButtonHoldMethod(); }, EmergencyStopTaskCTS.Token);
+        }
 
         private void ButtonHoldMethod()
         {
@@ -156,12 +148,15 @@ namespace MissionPlanner.GCSViews
 
             do
             {
+                if (EmergencyStopTaskCTS.Token.IsCancellationRequested)
+                {
+                    return;
+                }
 
                 if (InvokeRequired)
                     Invoke(new Action(() => { lb_StopCounter.Text = "Motor stop " + num; }));
                 else
                     lb_StopCounter.Text = "Motor stop " + num;
-
 
                 if (num <= 0)
                 {
@@ -209,7 +204,7 @@ namespace MissionPlanner.GCSViews
             buttonDown = false;
             lb_StopCounter.Visible = false;
             btn_EmergencyStop.BackColor = Color.Black;
+            EmergencyStopTaskCTS.Cancel();
         }
-
     }
 }
