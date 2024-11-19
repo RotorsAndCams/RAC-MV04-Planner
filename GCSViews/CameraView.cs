@@ -37,6 +37,7 @@ using System.Timers;
 using MissionPlanner.Controls;
 using LibVLCSharp.Shared;
 using Accord.MachineLearning.VectorMachines.Learning;
+using static MAVLink;
 
 namespace MissionPlanner.GCSViews
 {
@@ -71,7 +72,7 @@ namespace MissionPlanner.GCSViews
 
         string _tempPath = "";
         int _fileCount = 0;
-        NvSystemModes _cameraState;
+        NvSystemModes _cameraState = NvSystemModes.Stow;
 
         public float SlantRange
         {
@@ -149,7 +150,7 @@ namespace MissionPlanner.GCSViews
             StartCameraStream();
             StartCameraControl();
 
-            CameraHandler.Instance.SetMode(NvSystemModes.Stow); //ez kell?
+            CameraHandler.Instance.SetMode(NvSystemModes.Stow);
 
             #endregion
 
@@ -234,7 +235,7 @@ namespace MissionPlanner.GCSViews
             #region Follow mode
 
             _feedTimer = new System.Timers.Timer();
-            _feedTimer.Interval = 10000;
+            _feedTimer.Interval = 1000 * 5;
             _feedTimer.Elapsed += _feedTimer_Elapsed;
             _feedTimer.Enabled = false;
             lb_FollowDebugText.Size = new Size(lb_FollowDebugText.Width + 500, lb_FollowDebugText.Height);
@@ -300,6 +301,8 @@ namespace MissionPlanner.GCSViews
                 {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
                 {"Feed telemetry", () => { StartFeed(); }},
                 {"Stop Feed telemetry", () => { StopFeed(); }},
+                {"Sync Time", () => { CameraHandler.Instance.SetSystemTimeToCurrent(); }},
+                {"Set Waypoint", () => {  new Thread(() => new SetWaypointForm().ShowDialog()).Start();   /*new SetWaypointForm().Show();*/  }},
                 {"Check Flightplan", async () => { MainV2.CheckFlightPlan(null, new MV04StateChangeEventArgs(){PreviousState = MV04_State.Manual, NewState = MV04_State.Auto}); }}
             };
 
@@ -338,15 +341,15 @@ namespace MissionPlanner.GCSViews
 
         private void StartFeed()
         {
+            MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "GUIDED");
             _feedTimer.Enabled = true;
             _feedTimer.Start();
-
         }
 
         private void _feedTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             //Check track mode
-            if (!IsCameraTrackingModeActive)
+            if (!IsCameraTrackingModeActive || _cameraState != NvSystemModes.Tracking)
             {
                 MessageBox.Show("Camera is not tracking");
                 StopFeed();
@@ -364,24 +367,42 @@ namespace MissionPlanner.GCSViews
                 //debug to screen
                 if (InvokeRequired)
                     Invoke(new Action(() => {
-                        lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt;
+                        lb_FollowDebugText.Text = "sendALT: " + MainV2.comPort.MAV.GuidedMode.z + " cs.alt: " + MainV2.comPort.MAV.cs.alt;
                         lb_FollowDebugText.Refresh();
                     }));
                 else
                 {
-                    lb_FollowDebugText.Text = "Target pos -> lat: " + target_lat + " lng: " + target_lng + " alt: " + target_alt;
+                    lb_FollowDebugText.Text = "sendALT: " + MainV2.comPort.MAV.GuidedMode.z + " cs.alt: " + MainV2.comPort.MAV.cs.alt;
                     lb_FollowDebugText.Refresh();
                 }
 
 #endif
 
-                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                //MainV2.comPort.MAV.GuidedMode.z = target_alt / CurrentState.multiplieralt;
+                
+                if (MainV2.comPort.MAV.GuidedMode.z < 10)
+                    MainV2.comPort.MAV.GuidedMode.z = 10 / CurrentState.multiplieralt;
+
+                MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
+                MainV2.comPort.MAV.GuidedMode.x = (int)((target_lat - 0.0002) * 1e7);
+                MainV2.comPort.MAV.GuidedMode.y = (int)((target_lng - 0.0002) * 1e7);
+
+                try
                 {
-                    alt = target_alt,
-                    lat = target_lat,
-                    lng = target_lng,
-                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                });
+                    //MainV2.comPort.ShowInfo = true;
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                    {
+                        alt = MainV2.comPort.MAV.GuidedMode.z,
+                        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
+                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                    });
+
+                }
+                catch (Exception ex)
+                {
+                    CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+                }
             }
 
 
@@ -489,17 +510,17 @@ namespace MissionPlanner.GCSViews
             using (Graphics g = Graphics.FromImage(bitmap))
             {
                 g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
-                bitmap.Save(CameraHandler.Instance.MediaSavePath + "test" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", ImageFormat.Jpeg);
+                bitmap.Save(CameraHandler.Instance.MediaSavePath + "SnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", ImageFormat.Jpeg);
             }
+
+            _mediaPlayer.TakeSnapshot(0, CameraHandler.Instance.MediaSavePath + "VideoStreamSnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", (uint)vv_VLC.Bounds.Width, (uint)vv_VLC.Bounds.Height);
+
         }
 
         private void _videoRecordSegmentTimer_Tick(object sender, EventArgs e)
         {
-            ////_mediaPlayerRecord.Stop();
-            ////_mediaPlayerRecord.Play(_mediaRecord);
-            //StopRecording();
-            ////Thread.Sleep(300);
-            //StartRecording();
+            _mediaPlayerRecord.Stop();
+            StartRecording();
 
         }
 
@@ -515,7 +536,12 @@ namespace MissionPlanner.GCSViews
             {
                 _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
                 _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
-                                        //sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=
+            }
+            else
+            {
+                _mediaRecord = null;
+                _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
+                _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
             }
 
             _mediaPlayerRecord.Play(_mediaRecord);
@@ -793,7 +819,9 @@ namespace MissionPlanner.GCSViews
         {
             if (_isFPVModeActive)
             {
-                CameraHandler.Instance.SetMode(CameraHandler.Instance.PrevCameraMode);
+                //CameraHandler.Instance.SetMode(CameraHandler.Instance.PrevCameraMode);
+
+                CameraHandler.Instance.SetMode(NvSystemModes.Observation);
 
                 _isFPVModeActive = false;
                 btn_FPVCameraMode.BackColor = Color.Black;
@@ -829,6 +857,17 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
+                try
+                {
+                    _cameraState = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report);
+                    
+                    if((int)MainV2.comPort.MAV.cs.alt < 5)
+                    {
+                        CameraHandler.Instance.SetMode(NvSystemModes.Stow);
+                    }
+                }
+                catch { }
+
                 string systemModeStr = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report).ToString();
 
                 //Test: Set Camera Status
@@ -860,11 +899,9 @@ namespace MissionPlanner.GCSViews
         private void StateHandler_MV04StateChange(object sender, MV04StateChangeEventArgs e)
         {
             if (InvokeRequired)
-            {
-                Invoke(new Action(() => SetGCSStatus()));
-            }
+                Invoke(new Action(() => ReportStatusError()));
             else
-                SetGCSStatus();
+                ReportStatusError();
 
             switch (e.NewState)
             {
@@ -903,7 +940,7 @@ namespace MissionPlanner.GCSViews
 
             if (MainV2.comPort.MAV.wps.Values.Count <= 0)
             {
-                MessageBox.Show("No uploaded plan");
+                CustomMessageBox.Show("No uploaded plan");
                 //Task.Run(() => Blink());
             }
         }
@@ -912,7 +949,7 @@ namespace MissionPlanner.GCSViews
         {
             if (_cameraState != NvSystemModes.Tracking)
             {
-                MessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
+                CustomMessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
                 Task.Run(() => ProvideGCSError());
             }
             else
@@ -947,7 +984,7 @@ namespace MissionPlanner.GCSViews
             if (_feedTimer.Enabled)
                 StopFeed();
 
-            CameraHandler.Instance.SetMode(NvSystemModes.GRR);
+            //CameraHandler.Instance.SetMode(NvSystemModes.GRR);
         }
 
         private void _droneStatustimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -978,22 +1015,82 @@ namespace MissionPlanner.GCSViews
 
         private void btn_SetAlt_Click(object sender, EventArgs e)
         {
-            var plla = new PointLatLngAlt(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng, cs_ColorSliderAltitude.Value);
+            //try
+            //{
+            //    //
+            //    //MainV2.comPort.setGuidedModeWP(gotohere);
+
+            //    float target_alt = (int)(cs_ColorSliderAltitude.Value / CurrentState.multiplieralt);
+            //    float target_lat = (float)MainV2.comPort.MAV.cs.lat;
+            //    float target_lng = (float)MainV2.comPort.MAV.cs.lng;
+
+            //    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+            //    {
+            //        alt = target_alt,
+            //        lat = target_lat,
+            //        lng = target_lng,
+            //        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+            //    });
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+            //}
 
             Locationwp gotohere = new Locationwp();
 
             gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
-            gotohere.alt = (float)plla.Alt / CurrentState.multiplieralt; // back to m
-            gotohere.lat = (plla.Lat);
-            gotohere.lng = (plla.Lng);
+
+            MainV2.comPort.MAV.GuidedMode.z = cs_ColorSliderAltitude.Value / CurrentState.multiplieralt;
+
+            if (MainV2.comPort.MAV.GuidedMode.z < 10)
+                MainV2.comPort.MAV.GuidedMode.z = 10 / CurrentState.multiplieralt;
+
+            gotohere.alt = MainV2.comPort.MAV.GuidedMode.z; // back to m
+            gotohere.lat = MainV2.comPort.MAV.GuidedMode.x;
+            gotohere.lng = MainV2.comPort.MAV.GuidedMode.y;
+            gotohere.frame = MainV2.comPort.MAV.GuidedMode.frame;
+
+            MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
 
             try
             {
-                MainV2.comPort.setGuidedModeWP(gotohere);
+                MainV2.comPort.ShowInfo = true;
+                MainV2.comPort.setGuidedModeWP(new Locationwp
+                {
+                    alt = MainV2.comPort.MAV.GuidedMode.z,
+                    lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
+                });
+                MainV2.comPort.ShowInfo = true;
+                for (int i = 0; i <= 5; i++)
+                {
+                    MainV2.comPort.setGuidedModeWP(new Locationwp
+                    {
+                        alt = MainV2.comPort.MAV.GuidedMode.z,
+                        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
+                    });
+                }
+                MainV2.comPort.ShowInfo = true;
+                for (int i = 0; i <= 5; i++)
+                {
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                    {
+                        alt = MainV2.comPort.MAV.GuidedMode.z,
+                        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
+                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                    });
+                }
+
+                //CustomMessageBox.Show("after multiple sendings, gotohere = id: " + gotohere.id + " alt: " + gotohere.alt + " lat: " + gotohere.lat + " lng: " + gotohere.lng + " frame: " + gotohere.frame);
+
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+                CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
             }
         }
 
@@ -1049,11 +1146,18 @@ namespace MissionPlanner.GCSViews
 
         private void SetDroneStatusValue()
         {
-            string mode = MainV2.comPort.MAV.cs.mode;
-            this.lb_DroneStatusValue.Text = mode;
+            try
+            {
+                string mode = MainV2.comPort.MAV.cs.mode;
+                this.lb_DroneStatusValue.Text = mode;
 
-            int agl = (int)MainV2.comPort.MAV.cs.alt;
-            this.lb_AltitudeValue.Text = agl.ToString() + "m";
+                int agl = (int)MainV2.comPort.MAV.cs.alt;
+                this.lb_AltitudeValue.Text = agl.ToString() + "m";
+            }
+            catch (Exception ex)
+            {
+                //log error
+            }
         }
 
         private void SetCameraStatusValue(string st)
@@ -1061,7 +1165,7 @@ namespace MissionPlanner.GCSViews
             this.lb_CameraStatusValue.Text = st;
         }
 
-        private void SetGCSStatus()
+        private void ReportStatusError()
         {
             this.lb_GCSSelectedStateValue.Text = StateHandler.CurrentSate.ToString();
 
@@ -1076,7 +1180,7 @@ namespace MissionPlanner.GCSViews
             if (!CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport) /* || MainV2.comPort.MAV.cs.mode ==  ||*/)
             {
                 Task.Run(() => ProvideCameraError());
-                MessageBox.Show("Camera no communication");
+                lb_CameraStatusValue.Text = "Error";
                 return;
             }
 
@@ -1085,30 +1189,18 @@ namespace MissionPlanner.GCSViews
             switch (StateHandler.CurrentSate)
             {
                 case MV04_State.Manual:
-                    if (cameraMode != NvSystemModes.GRR)
-                    {
-                        Task.Run(() => ProvideCameraError());
-                    }
                     if(  MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
                     {
                         Task.Run(() => ProvideDroneError());
                     }
                     break;
                 case MV04_State.TapToFly:
-                    if (cameraMode != NvSystemModes.GRR)
-                    {
-                        Task.Run(() => ProvideCameraError());
-                    }
-                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "AUTO")
+                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "GUIDED")
                     {
                         Task.Run(() => ProvideDroneError());
                     }
                     break;
                 case MV04_State.Auto:
-                    if (cameraMode != NvSystemModes.GRR)
-                    {
-                        Task.Run(() => ProvideCameraError());
-                    }
                     if (MainV2.comPort.MAV.cs.mode.ToUpper() != "AUTO")
                     {
                         Task.Run(() => ProvideDroneError());
@@ -1119,7 +1211,7 @@ namespace MissionPlanner.GCSViews
                     {
                         Task.Run(() => ProvideCameraError());
                     }
-                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "FOLLOW")
+                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "GUIDED")
                     {
                         Task.Run(() => ProvideDroneError());
                     }
@@ -1129,10 +1221,6 @@ namespace MissionPlanner.GCSViews
                     {
                         Task.Run(() => ProvideCameraError());
                     }
-                    //if (MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
-                    //{
-                    //    Task.Run(() => ProvideDroneError());
-                    //}
                     break;
                 case MV04_State.Takeoff:
                     break;
@@ -1365,6 +1453,11 @@ namespace MissionPlanner.GCSViews
                 CameraHandler.Instance.SetMode(NvSystemModes.GRR);
                 this.btn_Surveillance.Text = "Observation";
             }
+        }
+
+        private void btn_NUC_Click(object sender, EventArgs e)
+        {
+            CameraHandler.Instance.DoNUC();
         }
     }
 }

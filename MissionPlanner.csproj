@@ -325,6 +325,9 @@
     <EmbeddedResource Include="GCSViews\InitialSetup.uk.resx">
       <DependentUpon>InitialSetup.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\SetWaypointForm.resx">
+      <DependentUpon>SetWaypointForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\SITL.uk.resx">
       <DependentUpon>SITL.cs</DependentUpon>
     </EmbeddedResource>
@@ -1048,6 +1051,12 @@
     </Compile>
     <Compile Include="GCSViews\GstreamerTestForm.Designer.cs">
       <DependentUpon>GstreamerTestForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GCSViews\SetWaypointForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GCSViews\SetWaypointForm.Designer.cs">
+      <DependentUpon>SetWaypointForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\uc_CameraSettings.cs">
       <SubType>UserControl</SubType>
