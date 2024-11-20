@@ -882,6 +882,11 @@ namespace MissionPlanner.GCSViews
                 else
                     SetDroneStatusValue();
 
+                if (InvokeRequired)
+                    Invoke(new Action(() => { SetGCSStatusValue(); }));
+                else
+                    SetGCSStatusValue();
+
                 if (_needToResetTime)
                 {
                     CameraHandler.Instance.SetSystemTimeToCurrent();
@@ -908,7 +913,7 @@ namespace MissionPlanner.GCSViews
                 case MV04_State.Manual:
                     Execute_Manual_Tasks();
                     break;
-                case MV04_State.TapToFly:
+                case MV04_State.TapToFly:   
                     break;
                 case MV04_State.Auto:
                     Execute_Auto_Tasks();
@@ -941,7 +946,6 @@ namespace MissionPlanner.GCSViews
             if (MainV2.comPort.MAV.wps.Values.Count <= 0)
             {
                 CustomMessageBox.Show("No uploaded plan");
-                //Task.Run(() => Blink());
             }
         }
 
@@ -984,7 +988,6 @@ namespace MissionPlanner.GCSViews
             if (_feedTimer.Enabled)
                 StopFeed();
 
-            //CameraHandler.Instance.SetMode(NvSystemModes.GRR);
         }
 
         private void _droneStatustimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -993,11 +996,14 @@ namespace MissionPlanner.GCSViews
                 return;
 
             if (InvokeRequired)
-            {
                 Invoke(new Action(() => { SetDroneStatusValue(); }));
-            }
             else
                 SetDroneStatusValue();
+
+            if (InvokeRequired)
+                Invoke(new Action(() => { SetGCSStatusValue(); }));
+            else
+                SetGCSStatusValue();
         }
 
         private void LEDStateHandler_LedStateChanged(object sender, LEDStateChangedEventArgs e)
@@ -1163,6 +1169,43 @@ namespace MissionPlanner.GCSViews
         private void SetCameraStatusValue(string st)
         {
             this.lb_CameraStatusValue.Text = st;
+        }
+
+        private void SetGCSStatusValue()
+        {
+            switch (StateHandler.CurrentSate)
+            {
+                case MV04_State.Manual:
+                    lb_GCSSelectedStateValue.Text = "Loiter";
+                    break;
+                case MV04_State.TapToFly:
+                    lb_GCSSelectedStateValue.Text = "Tap2Fly";
+                    break;
+                case MV04_State.Auto:
+                    lb_GCSSelectedStateValue.Text = "Auto";
+                    break;
+                case MV04_State.Follow:
+                    lb_GCSSelectedStateValue.Text = "Follow";
+                    break;
+                case MV04_State.RTL:
+                    lb_GCSSelectedStateValue.Text = "RTL";
+                    break;
+                case MV04_State.Land:
+                    lb_GCSSelectedStateValue.Text = "Land";
+                    break;
+                case MV04_State.Takeoff:
+                    lb_GCSSelectedStateValue.Text = "TakeOff";
+                    break;
+                case MV04_State.FPV:
+                    lb_GCSSelectedStateValue.Text = "FPV";
+                    break;
+                case MV04_State.Unknown:
+                    lb_GCSSelectedStateValue.Text = "Unknown";
+                    break;
+                default:
+                    break;
+
+            }
         }
 
         private void ReportStatusError()
