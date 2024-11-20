@@ -1030,16 +1030,16 @@
     <value>True</value>
   </data>
   <data name="lb_AltitudeValue.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Stencil, 20.25pt</value>
+    <value>Stencil, 12pt</value>
   </data>
   <data name="lb_AltitudeValue.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="lb_AltitudeValue.Location" type="System.Drawing.Point, System.Drawing">
-    <value>24, 19</value>
+    <value>43, 19</value>
   </data>
   <data name="lb_AltitudeValue.Size" type="System.Drawing.Size, System.Drawing">
-    <value>90, 20</value>
+    <value>53, 19</value>
   </data>
   <data name="lb_AltitudeValue.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -1066,16 +1066,16 @@
     <value>True</value>
   </data>
   <data name="lb_Agl.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Stencil, 20.25pt</value>
+    <value>Stencil, 12pt</value>
   </data>
   <data name="lb_Agl.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="lb_Agl.Location" type="System.Drawing.Point, System.Drawing">
-    <value>38, 0</value>
+    <value>50, 0</value>
   </data>
   <data name="lb_Agl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>62, 19</value>
+    <value>38, 19</value>
   </data>
   <data name="lb_Agl.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>

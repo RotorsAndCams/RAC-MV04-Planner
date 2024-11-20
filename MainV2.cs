@@ -1187,6 +1187,8 @@ namespace MissionPlanner
 
             //MessageBox.Show("Give the name");
 
+            
+
             GetUserNameForm frm = new GetUserNameForm();
             frm.ShowDialog();
 
@@ -1198,18 +1200,32 @@ namespace MissionPlanner
 
             _comPort.ParamListChanged += _comPort_ParamListChanged;
 
+            
             if (bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw)) && !SingleYawHandler.IsRunning)
                 SingleYawHandler.StartSingleYaw(MainV2.comPort);
 
             this.ShowIcon = false;
             //this.switchicons
-            this.ShowInTaskbar = true;
+            //this.ShowInTaskbar = true;
             //SetGUI();
 
             this.VisibleChanged += MainV2_VisibleChanged;
 
+            if(frm.UserName == "devmode")
+            {
+                CustomMessageBox.Show("Running in devmode");
+            }
+            else
+            {
+                devmode = true;
+                //hide not used gui elements
+                //this.menuconf
+                //this.MainMenu.
+                this.MenuInitConfig.Visible = false;
+                this.MenuConfigTune.Visible = false;
+            }
         }
-
+        public bool devmode = false;
         private void MainV2_VisibleChanged(object sender, EventArgs e)
         {
         }
@@ -3220,7 +3236,8 @@ namespace MissionPlanner
         {
             if ((bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream))))
             {
-                Task.Run(() => {
+                new Thread(() => 
+                {
                     try
                     {
                         if (InvokeRequired)
@@ -3239,9 +3256,7 @@ namespace MissionPlanner
                         }
                     }
                     catch { }
-                    
                 });
-
             }
         }
         protected override void OnLoad(EventArgs e)
