@@ -330,6 +330,22 @@ namespace MissionPlanner.GCSViews
                 CustomMessageBox.Show("Please fix your default alt value");
                 TXT_DefaultAlt.Text = (50 * CurrentState.multiplieralt).ToString("0");
             }
+
+            // Add extra PARAM setter controls
+            string[] extraParams =
+            {
+                "RTL_ALT",
+                "FENCE_ALT_MAX"
+            };
+
+            flowLayoutPanel2.Controls.Clear();
+            if (extraParams.Length > 0)
+            {
+                for (int i = 0; i < extraParams.Length; i++)
+                {
+                    flowLayoutPanel2.Controls.Add(new ParamSet(MainV2.comPort, extraParams[i].ToUpper()));
+                }
+            }
         }
 
         public void Deactivate()

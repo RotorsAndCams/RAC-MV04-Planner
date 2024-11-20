@@ -117,6 +117,9 @@
     <EmbeddedResource Include="Controls\MovingBase.uk.resx">
       <DependentUpon>MovingBase.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ParamSet.resx">
+      <DependentUpon>ParamSet.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\PrearmStatus.resx">
       <DependentUpon>PrearmStatus.cs</DependentUpon>
     </EmbeddedResource>
@@ -828,6 +831,12 @@
     </Compile>
     <Compile Include="Controls\MavCommandSelection.Designer.cs">
       <DependentUpon>MavCommandSelection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ParamSet.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ParamSet.Designer.cs">
+      <DependentUpon>ParamSet.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\PrearmStatus.cs">
       <SubType>Form</SubType>
