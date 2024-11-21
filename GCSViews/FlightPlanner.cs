@@ -332,18 +332,37 @@ namespace MissionPlanner.GCSViews
             }
 
             // Add extra PARAM setter controls
-            string[] extraParams =
+            for (int i = flowLayoutPanel1.Controls.Count - 1; i >= 0; i--) // Remove old controls
             {
-                "RTL_ALT",
-                "FENCE_ALT_MAX"
-            };
-
-            flowLayoutPanel2.Controls.Clear();
-            if (extraParams.Length > 0)
-            {
-                for (int i = 0; i < extraParams.Length; i++)
+                if (flowLayoutPanel1.Controls[i] is ParamSet)
                 {
-                    flowLayoutPanel2.Controls.Add(new ParamSet(MainV2.comPort, extraParams[i].ToUpper()));
+                    flowLayoutPanel1.Controls.RemoveAt(i);
+                }
+            }
+
+            List<(string name, double min, double max)> defaultParamSetters = new List<(string, double, double)>
+            {
+                ("RTL_ALT", 30000, 1000000), // cm
+                ("FENCE_ALT_MAX", 10, 1000) // m
+            };
+            foreach ((string name, double min, double max) item in defaultParamSetters) // Add defaults
+            {
+                if (!Settings.Instance.GetList("PlannerExtraParams").Contains(item.name))
+                {
+                    Settings.Instance.AppendList("PlannerExtraParams", item.name);
+                }
+            }
+
+            foreach (string item in Settings.Instance.GetList("PlannerExtraParams")) // Add controls
+            {
+                if (defaultParamSetters.Count(p => p.name == item) > 0) // Defaults have min & max
+                {
+                    (string name, double min, double max) param = defaultParamSetters.Single(p => p.name == item);
+                    flowLayoutPanel1.Controls.Add(new ParamSet(MainV2.comPort, item.ToUpper(), param.min, param.max));
+                }
+                else
+                {
+                    flowLayoutPanel1.Controls.Add(new ParamSet(MainV2.comPort, item.ToUpper()));
                 }
             }
         }
