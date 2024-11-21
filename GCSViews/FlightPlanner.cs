@@ -353,7 +353,7 @@ namespace MissionPlanner.GCSViews
                 }
             }
 
-            foreach (string item in Settings.Instance.GetList("PlannerExtraParams")) // Add controls
+            foreach (string item in Settings.Instance.GetList("PlannerExtraParams").Distinct()) // Add controls
             {
                 if (defaultParamSetters.Count(p => p.name == item) > 0) // Defaults have min & max
                 {
