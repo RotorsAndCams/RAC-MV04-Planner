@@ -563,6 +563,36 @@ namespace MissionPlanner.GCSViews
             }
 
             hud1.doResize();
+
+            if (!MainV2.instance.devmode)
+            {
+                CullControls();
+            }
+        }
+
+        private void CullControls()
+        {
+            #region Actions tab elements
+            int rowHeight = tableLayoutPanel1.Height / tableLayoutPanel1.RowCount;
+            tableLayoutPanel1.Controls.Clear();
+            tableLayoutPanel1.RowCount = 1;
+            tableLayoutPanel1.Height = rowHeight;
+            tableLayoutPanel1.Controls.Add(BUT_calib, 0, 0);
+            tableLayoutPanel1.Controls.Add(BUT_joystick, 1, 0);
+            tableLayoutPanel1.Controls.Add(BUT_clear_track, 2, 0);
+            tableLayoutPanel1.Controls.Add(BUT_quickrtl, 3, 0);
+            #endregion
+
+            #region Full tabs
+            tabControlactions.Controls.Remove(tabActionsSimple);
+            tabControlactions.Controls.Remove(tabServo);
+            tabControlactions.Controls.Remove(tabAuxFunction);
+            tabControlactions.Controls.Remove(tabScripts);
+            tabControlactions.Controls.Remove(tabPayload);
+            contextMenuStripactionstab.Items.Remove(customizeToolStripMenuItem);
+            #endregion
+
+            // TODO: Remove any other controls here
         }
 
         public void BUT_playlog_Click(object sender, EventArgs e)
