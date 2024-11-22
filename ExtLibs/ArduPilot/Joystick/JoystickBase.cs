@@ -55,6 +55,8 @@ namespace MissionPlanner.Joystick
             get { return _Interface(); }
         }
 
+        private bool _IgnoreArm = true; // Only allow ARM if Safe was first
+
         public JoystickBase(Func<MAVLinkInterface> currentInterface)
         {
             this._Interface = currentInterface;
@@ -434,17 +436,20 @@ namespace MissionPlanner.Joystick
                         break;
 
                     case buttonfunction.Arm:
-                        _context.Send( delegate
+                        if (!_IgnoreArm) // Safety first
                         {
-                            try
+                            _context.Send(delegate
                             {
-                                Interface.doARM((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,true);
-                            }
-                            catch
-                            {
-                                CustomMessageBox.Show("Failed to Arm");
-                            }
-                        }, null);
+                                try
+                                {
+                                    Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
+                                }
+                                catch
+                                {
+                                    CustomMessageBox.Show("Failed to Arm");
+                                }
+                            }, null);
+                        }
                         break;
                     case buttonfunction.TakeOff:
                         _context.Send( delegate
@@ -477,6 +482,7 @@ namespace MissionPlanner.Joystick
                             try
                             {
                                 Interface.doARM((byte)Interface.sysidcurrent,(byte)Interface.compidcurrent,false);
+                                _IgnoreArm = false; // Allow ARM
                             }
                             catch
                             {
@@ -767,12 +773,16 @@ namespace MissionPlanner.Joystick
                                         Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
                                         Thread.Sleep(100); // Give time for the previos message to go through
                                         Interface.doSafety((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
+                                        _IgnoreArm = false; // Allow ARM
                                         break;
                                     case buttonfunction_mv04_Arm_option.Armed:
-                                        // Safety off, arm
-                                        Interface.doSafety((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
-                                        Thread.Sleep(100); // Give time for the previos message to go through
-                                        Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
+                                        if (!_IgnoreArm) // Safety first
+                                        {
+                                            // Safety off, arm
+                                            Interface.doSafety((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, false);
+                                            Thread.Sleep(100); // Give time for the previos message to go through
+                                            Interface.doARM((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, true);
+                                        }
                                         break;
                                     default: break;
                                 }
@@ -1221,6 +1231,7 @@ namespace MissionPlanner.Joystick
             }
 
             enabled = true;
+            _IgnoreArm = true; // Reset Safety Switch check on each Enable
 
             Thread t11 = new Thread(new ThreadStart(mainloop))
             {
