@@ -590,6 +590,7 @@ namespace MissionPlanner.GCSViews
             tabControlactions.Controls.Remove(tabScripts);
             tabControlactions.Controls.Remove(tabPayload);
             contextMenuStripactionstab.Items.Remove(customizeToolStripMenuItem);
+            Settings.Instance.Remove("tabcontrolactions");
             #endregion
 
             // TODO: Remove any other controls here
