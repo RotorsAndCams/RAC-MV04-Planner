@@ -582,7 +582,7 @@ namespace MissionPlanner
 
         private System.Timers.Timer TRIPTimer;
 
-        private readonly TimeSpan TRIPOffTime = TimeSpan.FromMinutes(5);
+        private readonly TimeSpan TRIPOffTime = TimeSpan.FromMinutes(1);
 
         private YesNoForm TRIPOffMessageBox = null;
 
@@ -1187,6 +1187,8 @@ namespace MissionPlanner
 
             //MessageBox.Show("Give the name");
 
+            
+
             GetUserNameForm frm = new GetUserNameForm();
             frm.ShowDialog();
 
@@ -1198,6 +1200,7 @@ namespace MissionPlanner
 
             _comPort.ParamListChanged += _comPort_ParamListChanged;
 
+            
             if (bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw)) && !SingleYawHandler.IsRunning)
                 SingleYawHandler.StartSingleYaw(MainV2.comPort);
 
@@ -1208,8 +1211,18 @@ namespace MissionPlanner
 
             this.VisibleChanged += MainV2_VisibleChanged;
 
+            if(frm.UserName == "devmode")
+            {
+                devmode = true;
+                CustomMessageBox.Show("Running in devmode");
+            }
+            else
+            {
+                this.MenuInitConfig.Visible = false;
+                this.MenuConfigTune.Visible = false;
+            }
         }
-
+        public bool devmode = false;
         private void MainV2_VisibleChanged(object sender, EventArgs e)
         {
         }
@@ -1442,6 +1455,38 @@ namespace MissionPlanner
             if (TRIPOffMessageBox.ShowDialog() == DialogResult.Yes)
             {
                 MainV2.instance.SwitchTRIPRelay(false);
+                //log switched of
+                SaveTripOverHeatInfo("Trip switched off to prevent overheat");
+            }
+            else
+            {
+                //trip overheat ignored datetime.now
+                SaveTripOverHeatInfo("Trip overheat ignored");
+            }
+        }
+
+        private const string PilotDataFileName = "TripOverHeatLog.json";
+
+        private void SaveTripOverHeatInfo(string info)
+        {
+            try
+            {
+                var fileToWrite = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + PilotDataFileName;
+
+                var lst = new List<string>();
+
+                if (File.Exists(fileToWrite))
+                    lst = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(fileToWrite));
+
+                lst.Add(info + " - " + DateTime.Now.ToString("yyyyMMddHHmmss"));
+
+                File.WriteAllText(fileToWrite, lst.ToJSON());
+            }
+            catch (Exception ex)
+            {
+                //continue normal run
+                CustomMessageBox.Show("Error at write trip heat log");
+                this.Close();
             }
         }
 
@@ -3220,7 +3265,8 @@ namespace MissionPlanner
         {
             if ((bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream))))
             {
-                Task.Run(() => {
+                new Thread(() => 
+                {
                     try
                     {
                         if (InvokeRequired)
@@ -3239,9 +3285,7 @@ namespace MissionPlanner
                         }
                     }
                     catch { }
-                    
                 });
-
             }
         }
         protected override void OnLoad(EventArgs e)

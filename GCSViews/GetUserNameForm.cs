@@ -56,8 +56,11 @@ namespace MissionPlanner.GCSViews
                 CustomMessageBox.Show("Enter a valid name");
                 return false;
             }
+            UserName = this.tb_Name.Text;
             return true;
         }
+
+        public string UserName = "";
 
         /// <summary>
         /// Read and save to json file the log info based on 
