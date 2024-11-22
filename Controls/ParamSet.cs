@@ -55,7 +55,7 @@ namespace MissionPlanner.Controls
                 toolTip_ValueLimits.SetToolTip(this, $"{numericUpDown_SetValue.Minimum}-{numericUpDown_SetValue.Maximum} {unit}");
 
                 RefreshCurrentValue();
-                numericUpDown_SetValue.Value = (decimal)MAVLink.MAV.param[ParamName].Value;
+                numericUpDown_SetValue.Value = (decimal)Constrain(MAVLink.MAV.param[ParamName].Value, (double)numericUpDown_SetValue.Minimum, (double)numericUpDown_SetValue.Maximum);
 
                 // Resize if name is too long
                 if (label_ParamName.Text.Length > 15)
@@ -77,6 +77,13 @@ namespace MissionPlanner.Controls
         private string AddThousandSeparator(string number)
         {
             return string.Format("{0:N0}", long.Parse(number)).Replace(",", " ");
+        }
+
+        private double Constrain(double value, double min, double max)
+        {
+            if (value < min) return min;
+            if (value > max) return max;
+            return value;
         }
 
         private void button_SetParam_Click(object sender, EventArgs e)
