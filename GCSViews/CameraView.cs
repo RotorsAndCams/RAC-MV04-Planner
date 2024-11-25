@@ -356,6 +356,13 @@ namespace MissionPlanner.GCSViews
                 return;
             }
 
+            if (!MainV2.comPort.MAV.cs.connected || MainV2.comPort.MAV.cs.failsafe)
+            {
+                MessageBox.Show("not connected - follow stop");
+                StopFeed();
+                return;
+            }
+
             if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.GndCrsReport))
             {
                 float target_lat = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat;
