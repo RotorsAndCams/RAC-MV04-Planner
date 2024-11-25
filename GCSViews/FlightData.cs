@@ -5198,29 +5198,16 @@ namespace MissionPlanner.GCSViews
 
         private void takeOffToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (MainV2.comPort.BaseStream.IsOpen)
+            if (MainV2.comPort.BaseStream != null && MainV2.comPort.BaseStream.IsOpen)
             {
-                float takeoffAlt = 10;
-                if (!Settings.Instance.ContainsKey("takeoff_alt"))
-                {
-                    string takeoffAltStr = takeoffAlt.ToString(CultureInfo.InvariantCulture);
-                    if (InputBox.Show("Enter Alt", "Enter Takeoff Alt", ref takeoffAltStr) == DialogResult.OK)
-                    {
-                        takeoffAlt = float.Parse(takeoffAltStr, CultureInfo.InvariantCulture);
-                    }
-                    Settings.Instance["takeoff_alt"] = takeoffAltStr;
-                }
-                takeoffAlt = float.Parse(Settings.Instance["takeoff_alt"], CultureInfo.InvariantCulture);
-
-                MainV2.comPort.setMode("GUIDED");
-
                 try
                 {
-                    MainV2.comPort.doCommand((byte) MainV2.comPort.sysidcurrent, (byte) MainV2.comPort.compidcurrent,
-                        MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
-
-                    // Trigger MV04 state change event
-                    //StateHandler.CurrentSate = MV04_State.Takeoff;
+                    float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
+                    Settings.Instance["takeoff_alt"] = takeoffAlt.ToString(CultureInfo.InvariantCulture);
+                    
+                    MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, takeoffAlt);
+                    
+                    StateHandler.CurrentSate = MV04_State.Takeoff;
                 }
                 catch
                 {

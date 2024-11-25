@@ -6435,18 +6435,8 @@ namespace MissionPlanner.GCSViews
         public void takeoffToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // altitude
-            string alt = "10";
-
-            if (DialogResult.Cancel == InputBox.Show("Altitude", "Please enter your takeoff altitude", ref alt))
-                return;
-
-            int alti = -1;
-
-            if (!int.TryParse(alt, out alti))
-            {
-                MessageBox.Show("Bad Alt");
-                return;
-            }
+            float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
+            Settings.Instance["takeoff_alt"] = takeoffAlt.ToString(CultureInfo.InvariantCulture);
 
             // take off pitch
             int topi = 0;
@@ -6472,7 +6462,7 @@ namespace MissionPlanner.GCSViews
 
             Commands.Rows[selectedrow].Cells[Param1.Index].Value = topi;
 
-            Commands.Rows[selectedrow].Cells[Alt.Index].Value = alti;
+            Commands.Rows[selectedrow].Cells[Alt.Index].Value = (int)Math.Round(takeoffAlt);
 
             ChangeColumnHeader(MAVLink.MAV_CMD.TAKEOFF.ToString());
 
