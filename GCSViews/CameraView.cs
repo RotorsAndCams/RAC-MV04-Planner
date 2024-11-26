@@ -356,6 +356,13 @@ namespace MissionPlanner.GCSViews
                 return;
             }
 
+            if (!MainV2.comPort.MAV.cs.connected || MainV2.comPort.MAV.cs.failsafe)
+            {
+                MessageBox.Show("not connected - follow stop");
+                StopFeed();
+                return;
+            }
+
             if (CameraHandler.Instance.HasCameraReport(MavProto.MavReportType.GndCrsReport))
             {
                 float target_lat = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLat;
@@ -1457,12 +1464,12 @@ namespace MissionPlanner.GCSViews
                 if (tripState)
                 {
                     btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
-                    btn_TripSwitchOnOff.Text = "Trip is On";
+                    btn_TripSwitchOnOff.Text = "Camera is On";
                 }
                 else
                 {
                     btn_TripSwitchOnOff.BackColor = Color.Black;
-                    btn_TripSwitchOnOff.Text = "Trip is Off";
+                    btn_TripSwitchOnOff.Text = "Camera is Off";
                 }
             };
 

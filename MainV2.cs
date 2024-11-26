@@ -1269,23 +1269,15 @@ namespace MissionPlanner
             
             // Get input info
             #region Config read
-            double CellMaxVolts = double.Parse(Settings.Instance["PlanCheck_CellMaxVolts", "4.2"]
+            double MaxVolts = double.Parse(Settings.Instance["PlanCheck_MaxVolts", "25.2"] // 6x4.2
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
-            Settings.Instance["PlanCheck_CellMaxVolts"] = CellMaxVolts.ToString();
+            Settings.Instance["PlanCheck_MaxVolts"] = MaxVolts.ToString();
 
-            double CellMinVolts = double.Parse(Settings.Instance["PlanCheck_CellMinVolts", "3.6"]
+            double MinVolts = double.Parse(Settings.Instance["PlanCheck_MinVolts", "21.6"] // 6x3.6
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
-            Settings.Instance["PlanCheck_CellMinVolts"] = CellMinVolts.ToString();
-
-            int CellNum = int.Parse(Settings.Instance["PlanCheck_CellNum", "3"]);
-            Settings.Instance["PlanCheck_CellNum"] = CellNum.ToString();
-
-            double MaxAmpHours = double.Parse(Settings.Instance["PlanCheck_MaxAmpHours", "5"]
-                .Replace('.', 0.1.ToString()[1])
-                .Replace(',', 0.1.ToString()[1]));
-            Settings.Instance["PlanCheck_MaxAmpHours"] = MaxAmpHours.ToString();
+            Settings.Instance["PlanCheck_MinVolts"] = MaxVolts.ToString();
 
             double TravelSpeed = double.Parse(Settings.Instance["PlanCheck_TravelSpeed", "23"]
                 .Replace('.', 0.1.ToString()[1])
@@ -1317,10 +1309,22 @@ namespace MissionPlanner
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_DescConsumption"] = DescConsumption.ToString();
 
-            int SafetyMarginPercent = int.Parse(Settings.Instance["PlanCheck_SafetyMarginPercent", "10"]);
+            int SafetyMarginPercent = int.Parse(Settings.Instance["PlanCheck_SafetyMarginPercent", "0"]);
             Settings.Instance["PlanCheck_SafetyMarginPercent"] = SafetyMarginPercent.ToString();
 
             Settings.Instance.Save();
+            #endregion
+
+            #region Param read
+            double param_MaxAmpHours = comPort.MAV.param["BATT_CAPACITY"].Value; // mAh
+            double MaxAmpHours = param_MaxAmpHours < 0 + double.Epsilon ? 36 : param_MaxAmpHours / 1000; // Ah
+
+            double param_lowMah = comPort.MAV.param["BATT_LOW_MAH"].Value; // mAh
+            double lowMah = param_lowMah < 0 + double.Epsilon ? MaxAmpHours * 1000 : param_lowMah; // mAh
+            double param_crtMah = comPort.MAV.param["BATT_CRT_MAH"].Value; // mAh
+            double crtMah = param_crtMah < 0 + double.Epsilon ? MaxAmpHours * 1000 : param_crtMah; // mAh
+            double MinAmpHours = Math.Min(lowMah, crtMah) / 1000; // Smallest that is not 0, Ah
+            // Considering both BATT_LOW_MAH and BATT_CRT_MAH for future-proof-ness
             #endregion
 
             #region Wind form read
@@ -1341,10 +1345,11 @@ namespace MissionPlanner
             #region Struct creation
             FlightPlanAnalyzer.PowerInfo powerInfo = new FlightPlanAnalyzer.PowerInfo()
             {
-                MaxVolts = CellNum * CellMaxVolts,
-                MinVolts = CellNum * CellMinVolts,
+                MaxVolts = MaxVolts,
+                MinVolts = MinVolts,
                 CurrentVolts = comPort.MAV.cs.battery_voltage,
-                FullAmpHours = MaxAmpHours
+                MaxAmpHours = MaxAmpHours,
+                MinAmpHours = MinAmpHours
             };
 
             FlightPlanAnalyzer.UAVInfo uavInfo = new FlightPlanAnalyzer.UAVInfo()
@@ -1456,16 +1461,16 @@ namespace MissionPlanner
             {
                 MainV2.instance.SwitchTRIPRelay(false);
                 //log switched of
-                SaveTripOverHeatInfo("Trip switched off to prevent overheat");
+                SaveTripOverHeatInfo("Camera switched off to prevent overheat");
             }
             else
             {
-                //trip overheat ignored datetime.now
-                SaveTripOverHeatInfo("Trip overheat ignored");
+                //camera overheat ignored datetime.now
+                SaveTripOverHeatInfo("Camera overheat ignored");
             }
         }
 
-        private const string PilotDataFileName = "TripOverHeatLog.json";
+        private const string PilotDataFileName = "CameraOverHeatLog.json";
 
         private void SaveTripOverHeatInfo(string info)
         {
@@ -1485,7 +1490,7 @@ namespace MissionPlanner
             catch (Exception ex)
             {
                 //continue normal run
-                CustomMessageBox.Show("Error at write trip heat log");
+                CustomMessageBox.Show("Error at write camera heat log");
                 this.Close();
             }
         }

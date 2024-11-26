@@ -151,12 +151,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)FFmpeg.AutoGen.dll" "$(TargetDir)" /y
-xcopy "$(ProjectDir)FFMpeg\*" "$(TargetDir)FFMpeg\" /y /i
-xcopy "$(ProjectDir)MavLinkDLL.dll" "$(TargetDir)" /y
-
-xcopy "$(ProjectDir)FFmpeg.AutoGen.dll" "$(SolutionDir)$(OutDir)net461\" /y
-xcopy "$(ProjectDir)FFMpeg\*" "$(SolutionDir)$(OutDir)net461\FFMpeg\" /y /i
-xcopy "$(ProjectDir)MavLinkDLL.dll" "$(SolutionDir)$(OutDir)net461\" /y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)MavLinkDLL.dll" "$(SolutionDir)$(OutDir)net461\" /f /y /v</PostBuildEvent>
   </PropertyGroup>
 </Project>
