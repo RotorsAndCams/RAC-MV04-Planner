@@ -342,7 +342,7 @@ namespace MissionPlanner.GCSViews
 
             flowLayoutPanel1.Controls.AddRange(new ParamSet[] // Add controls
             {
-                new ParamSet(MainV2.comPort, "RTL_ALT", "RTL Altitude", 30000, 1000000),
+                new ParamSet(MainV2.comPort, "RTL_ALT", "RTL altitude", 30, 1000),
                 new ParamSet(MainV2.comPort, "FENCE_ALT_MAX", "Fence maximum altitude", 10, 1000),
             });
         }
