@@ -1269,23 +1269,15 @@ namespace MissionPlanner
             
             // Get input info
             #region Config read
-            double CellMaxVolts = double.Parse(Settings.Instance["PlanCheck_CellMaxVolts", "4.2"]
+            double MaxVolts = double.Parse(Settings.Instance["PlanCheck_MaxVolts", "25.2"] // 6x4.2
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
-            Settings.Instance["PlanCheck_CellMaxVolts"] = CellMaxVolts.ToString();
+            Settings.Instance["PlanCheck_MaxVolts"] = MaxVolts.ToString();
 
-            double CellMinVolts = double.Parse(Settings.Instance["PlanCheck_CellMinVolts", "3.6"]
+            double MinVolts = double.Parse(Settings.Instance["PlanCheck_MinVolts", "21.6"] // 6x3.6
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
-            Settings.Instance["PlanCheck_CellMinVolts"] = CellMinVolts.ToString();
-
-            int CellNum = int.Parse(Settings.Instance["PlanCheck_CellNum", "3"]);
-            Settings.Instance["PlanCheck_CellNum"] = CellNum.ToString();
-
-            double MaxAmpHours = double.Parse(Settings.Instance["PlanCheck_MaxAmpHours", "5"]
-                .Replace('.', 0.1.ToString()[1])
-                .Replace(',', 0.1.ToString()[1]));
-            Settings.Instance["PlanCheck_MaxAmpHours"] = MaxAmpHours.ToString();
+            Settings.Instance["PlanCheck_MinVolts"] = MaxVolts.ToString();
 
             double TravelSpeed = double.Parse(Settings.Instance["PlanCheck_TravelSpeed", "23"]
                 .Replace('.', 0.1.ToString()[1])
@@ -1353,8 +1345,8 @@ namespace MissionPlanner
             #region Struct creation
             FlightPlanAnalyzer.PowerInfo powerInfo = new FlightPlanAnalyzer.PowerInfo()
             {
-                MaxVolts = CellNum * CellMaxVolts,
-                MinVolts = CellNum * CellMinVolts,
+                MaxVolts = MaxVolts,
+                MinVolts = MinVolts,
                 CurrentVolts = comPort.MAV.cs.battery_voltage,
                 MaxAmpHours = MaxAmpHours,
                 MinAmpHours = MinAmpHours
