@@ -2877,7 +2877,7 @@ namespace MissionPlanner.GCSViews
                     id = (ushort)MAVLink.MAV_CMD.WAYPOINT
                 };
 
-                for (int i = 0; i <= 50; i++)
+                for (int i = 0; i <= 5; i++)
                 {
                     MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, wp);
                 }
@@ -3089,7 +3089,7 @@ namespace MissionPlanner.GCSViews
                     id = (ushort)MAVLink.MAV_CMD.WAYPOINT
                 };
 
-                for (int i = 0; i <= 50; i++)
+                for (int i = 0; i <= 5; i++)
                 {
                     MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, wp);
                 }
