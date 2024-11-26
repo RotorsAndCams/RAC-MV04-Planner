@@ -110,7 +110,6 @@
             this.numericUpDown_SetValue.Name = "numericUpDown_SetValue";
             this.numericUpDown_SetValue.Size = new System.Drawing.Size(70, 20);
             this.numericUpDown_SetValue.TabIndex = 5;
-            this.numericUpDown_SetValue.ThousandsSeparator = true;
             // 
             // button_SetParam
             // 
