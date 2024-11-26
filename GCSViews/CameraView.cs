@@ -1464,12 +1464,12 @@ namespace MissionPlanner.GCSViews
                 if (tripState)
                 {
                     btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
-                    btn_TripSwitchOnOff.Text = "Trip is On";
+                    btn_TripSwitchOnOff.Text = "Camera is On";
                 }
                 else
                 {
                     btn_TripSwitchOnOff.BackColor = Color.Black;
-                    btn_TripSwitchOnOff.Text = "Trip is Off";
+                    btn_TripSwitchOnOff.Text = "Camera is Off";
                 }
             };
 
