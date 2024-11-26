@@ -1456,16 +1456,16 @@ namespace MissionPlanner
             {
                 MainV2.instance.SwitchTRIPRelay(false);
                 //log switched of
-                SaveTripOverHeatInfo("Trip switched off to prevent overheat");
+                SaveTripOverHeatInfo("Camera switched off to prevent overheat");
             }
             else
             {
-                //trip overheat ignored datetime.now
-                SaveTripOverHeatInfo("Trip overheat ignored");
+                //camera overheat ignored datetime.now
+                SaveTripOverHeatInfo("Camera overheat ignored");
             }
         }
 
-        private const string PilotDataFileName = "TripOverHeatLog.json";
+        private const string PilotDataFileName = "CameraOverHeatLog.json";
 
         private void SaveTripOverHeatInfo(string info)
         {
@@ -1485,7 +1485,7 @@ namespace MissionPlanner
             catch (Exception ex)
             {
                 //continue normal run
-                CustomMessageBox.Show("Error at write trip heat log");
+                CustomMessageBox.Show("Error at write camera heat log");
                 this.Close();
             }
         }
