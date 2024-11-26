@@ -19,7 +19,7 @@ namespace MissionPlanner.Controls
 
         public string ParamName { get; private set; }
 
-        public ParamSet(MAVLinkInterface MAVLink, string paramName, double minValue = double.MinValue, double maxValue = double.MaxValue)
+        public ParamSet(MAVLinkInterface MAVLink, string paramName, string displayName, double minValue = double.MinValue, double maxValue = double.MaxValue)
         {
             InitializeComponent();
 
@@ -45,7 +45,7 @@ namespace MissionPlanner.Controls
             {
                 // Fill out controls
                 string unit = ParameterMetaDataRepository.GetParameterMetaData(ParamName, ParameterMetaDataConstants.Units, MainV2.comPort.MAV.cs.firmware.ToString());
-                label_ParamName.Text = $"{ParamName} ({unit})";
+                label_ParamName.Text = $"{displayName} ({unit})";
 
                 double min = 0, max = 0;
                 ParameterMetaDataRepository.GetParameterRange(ParamName, ref min, ref max, MainV2.comPort.MAV.cs.firmware.ToString());

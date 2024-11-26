@@ -340,31 +340,11 @@ namespace MissionPlanner.GCSViews
                 }
             }
 
-            List<(string name, double min, double max)> defaultParamSetters = new List<(string, double, double)>
+            flowLayoutPanel1.Controls.AddRange(new ParamSet[] // Add controls
             {
-                ("RTL_ALT", 30000, 1000000), // cm
-                ("FENCE_ALT_MAX", 10, 1000) // m
-            };
-            foreach ((string name, double min, double max) item in defaultParamSetters) // Add defaults
-            {
-                if (!Settings.Instance.GetList("PlannerExtraParams").Contains(item.name))
-                {
-                    Settings.Instance.AppendList("PlannerExtraParams", item.name);
-                }
-            }
-
-            foreach (string item in Settings.Instance.GetList("PlannerExtraParams").Distinct()) // Add controls
-            {
-                if (defaultParamSetters.Count(p => p.name == item) > 0) // Defaults have min & max
-                {
-                    (string name, double min, double max) param = defaultParamSetters.Single(p => p.name == item);
-                    flowLayoutPanel1.Controls.Add(new ParamSet(MainV2.comPort, item.ToUpper(), param.min, param.max));
-                }
-                else
-                {
-                    flowLayoutPanel1.Controls.Add(new ParamSet(MainV2.comPort, item.ToUpper()));
-                }
-            }
+                new ParamSet(MainV2.comPort, "RTL_ALT", "RTL Altitude", 30000, 1000000),
+                new ParamSet(MainV2.comPort, "FENCE_ALT_MAX", "Fence maximum altitude", 10, 1000),
+            });
         }
 
         public void Deactivate()
