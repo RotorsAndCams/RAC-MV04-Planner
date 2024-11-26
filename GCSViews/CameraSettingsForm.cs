@@ -158,7 +158,7 @@ namespace MissionPlanner.GCSViews
                 else
                     lb_StopCounter.Text = "Motor stop " + num;
 
-                if (num <= 0)
+                if (num <= 0 && !_IsDialogOpen)
                 {
                     #region Ask are u sure
 
