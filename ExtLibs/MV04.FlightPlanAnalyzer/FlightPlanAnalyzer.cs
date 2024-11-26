@@ -27,7 +27,8 @@ namespace MV04.FlightPlanAnalyzer
             public double CurrentVolts;
             public double MaxVolts;
             public double MinVolts;
-            public double FullAmpHours;
+            public double MaxAmpHours;
+            public double MinAmpHours;
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace MV04.FlightPlanAnalyzer
                 return 0;
             }
 
-            return powerInfo.FullAmpHours / (powerInfo.MaxVolts - powerInfo.MinVolts) * (powerInfo.CurrentVolts - powerInfo.MinVolts);
+            return (powerInfo.MaxAmpHours / (powerInfo.MaxVolts - powerInfo.MinVolts) * (powerInfo.CurrentVolts - powerInfo.MinVolts)) - powerInfo.MinAmpHours;
         }
 
         private static double PointsToAh(PointLatLngAlt pos1, PointLatLngAlt pos2, UAVInfo uavInfo, WindInfo windInfo)
@@ -195,7 +196,9 @@ namespace MV04.FlightPlanAnalyzer
             return 0 < powerInfo.MinVolts
                 && powerInfo.MinVolts <= powerInfo.CurrentVolts + 0.001
                 && powerInfo.CurrentVolts <= powerInfo.MaxVolts + 0.2
-                && 0 < powerInfo.FullAmpHours;
+                && 0 < powerInfo.MaxAmpHours
+                && 0 <= powerInfo.MinAmpHours
+                && powerInfo.MinAmpHours < powerInfo.MaxAmpHours;
         }
 
         private static bool IsPositionCorrect(PointLatLngAlt position)

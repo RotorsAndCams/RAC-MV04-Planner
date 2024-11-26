@@ -1317,10 +1317,22 @@ namespace MissionPlanner
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_DescConsumption"] = DescConsumption.ToString();
 
-            int SafetyMarginPercent = int.Parse(Settings.Instance["PlanCheck_SafetyMarginPercent", "10"]);
+            int SafetyMarginPercent = int.Parse(Settings.Instance["PlanCheck_SafetyMarginPercent", "0"]);
             Settings.Instance["PlanCheck_SafetyMarginPercent"] = SafetyMarginPercent.ToString();
 
             Settings.Instance.Save();
+            #endregion
+
+            #region Param read
+            double param_MaxAmpHours = comPort.MAV.param["BATT_CAPACITY"].Value; // mAh
+            double MaxAmpHours = param_MaxAmpHours < 0 + double.Epsilon ? 36 : param_MaxAmpHours / 1000; // Ah
+
+            double param_lowMah = comPort.MAV.param["BATT_LOW_MAH"].Value; // mAh
+            double lowMah = param_lowMah < 0 + double.Epsilon ? MaxAmpHours * 1000 : param_lowMah; // mAh
+            double param_crtMah = comPort.MAV.param["BATT_CRT_MAH"].Value; // mAh
+            double crtMah = param_crtMah < 0 + double.Epsilon ? MaxAmpHours * 1000 : param_crtMah; // mAh
+            double MinAmpHours = Math.Min(lowMah, crtMah) / 1000; // Smallest that is not 0, Ah
+            // Considering both BATT_LOW_MAH and BATT_CRT_MAH for future-proof-ness
             #endregion
 
             #region Wind form read
@@ -1344,7 +1356,8 @@ namespace MissionPlanner
                 MaxVolts = CellNum * CellMaxVolts,
                 MinVolts = CellNum * CellMinVolts,
                 CurrentVolts = comPort.MAV.cs.battery_voltage,
-                FullAmpHours = MaxAmpHours
+                MaxAmpHours = MaxAmpHours,
+                MinAmpHours = MinAmpHours
             };
 
             FlightPlanAnalyzer.UAVInfo uavInfo = new FlightPlanAnalyzer.UAVInfo()
