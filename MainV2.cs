@@ -1253,6 +1253,7 @@ namespace MissionPlanner
                 {
                     CustomMessageBox.Show("ERROR\n\nNo connection", "Flightplan check", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 });
+                log.Error("Flightplan check - No connection");
                 return;
             }
 
@@ -1264,6 +1265,7 @@ namespace MissionPlanner
                 {
                     CustomMessageBox.Show("ERROR\n\nNo flightplan", "Flightplan check", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 });
+                log.Error("Flightplan check - No flightplan");
                 return;
             }
             
@@ -1394,6 +1396,7 @@ namespace MissionPlanner
             {
                 CustomMessageBox.Show($"Flightplan is {result}possible", "Flightplan check", MessageBoxButtons.OK);
             });
+            log.Info("Flightplan check - Done");
         }
 
         public void SwitchTRIPRelay(bool state)
