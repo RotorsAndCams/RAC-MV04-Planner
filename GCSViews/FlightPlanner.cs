@@ -135,6 +135,7 @@ namespace MissionPlanner.GCSViews
         public GMapPolygon wppolygon;
         private GMapMarker CurrentMidLine;
 
+        public static bool SmartRTL { get; private set; } = false;
 
         public void Init()
         {
@@ -251,7 +252,6 @@ namespace MissionPlanner.GCSViews
             Up.Image = Resources.up;
             Down.Image = Resources.down;
 
-
             Frame.DisplayMember = "Value";
             Frame.ValueMember = "Key";
             Frame.DataSource = EnumTranslator.EnumToList<altmode>();
@@ -260,7 +260,6 @@ namespace MissionPlanner.GCSViews
 
             // hide the map to prevent redraws when its loaded
             panelMap.Visible = false;
-
 
             // setup geofence
             List<PointLatLng> polygonPoints = new List<PointLatLng>();
@@ -274,21 +273,28 @@ namespace MissionPlanner.GCSViews
             drawnpolygon.Stroke = new Pen(Color.Red, 2);
             drawnpolygon.Fill = Brushes.Transparent;
 
-            /*
-            var timer = new System.Timers.Timer();
+            // Add RTL - SmartRTL switch
+            ComboBox smartRTLSwitch = new ComboBox();
+            // TODO: Make it bigger
+            smartRTLSwitch.Width = 123;
+            smartRTLSwitch.DropDownWidth = 123;
+            smartRTLSwitch.DropDownStyle = ComboBoxStyle.DropDownList;
+            smartRTLSwitch.Items.AddRange(new string[] { "RTL", "SmartRTL" });
+            smartRTLSwitch.SelectedIndex = SmartRTL ? 1 : 0;
+            smartRTLSwitch.SelectedIndexChanged += SmartRTLSwitch_SelectedIndexChanged;
+            flowLayoutPanel1.Controls.Add(smartRTLSwitch);
+        }
 
-            // 2 second
-            timer.Interval = 2000;
-            timer.Elapsed += updateMapType;
-
-            timer.Start();
-            */
+        private void SmartRTLSwitch_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SmartRTL = (sender as ComboBox).SelectedIndex == 1;
+            // TODO: Set failsafe response action params if they are in use
+            // *_FS_*_ACT params
         }
 
         public static FlightPlanner instance { get; set; }
 
         public List<PointLatLngAlt> pointlist { get; set; } = new List<PointLatLngAlt>();
-
 
         public void Activate()
         {
