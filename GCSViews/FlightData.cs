@@ -564,7 +564,7 @@ namespace MissionPlanner.GCSViews
 
             hud1.doResize();
 
-            if (!MainV2.instance.devmode)
+            if (!MainV2.instance.Devmode)
             {
                 CullControls();
             }

@@ -586,6 +586,10 @@ namespace MissionPlanner
 
         private YesNoForm TRIPOffMessageBox = null;
 
+        public bool Devmode { get; private set; } = false;
+
+        public bool DefaultConnect { get; private set; } = false;
+
         public void updateLayout(object sender, EventArgs e)
         {
             MenuSimulation.Visible = DisplayConfiguration.displaySimulation;
@@ -1185,48 +1189,45 @@ namespace MissionPlanner
             // save config to test we have write access
             SaveConfig();
 
-            //MessageBox.Show("Give the name");
-
-            
-
             GetUserNameForm frm = new GetUserNameForm();
             frm.ShowDialog();
 
             this.Text = "Secop Planner 2" + " " + comPort.MAV.VersionString;
             this.ShowIcon = false;
             
-
             StateHandler.MV04StateChange += CheckFlightPlan;
 
             _comPort.ParamListChanged += _comPort_ParamListChanged;
 
-            
             if (bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw)) && !SingleYawHandler.IsRunning)
                 SingleYawHandler.StartSingleYaw(MainV2.comPort);
 
             this.ShowIcon = false;
-            //this.switchicons
             this.ShowInTaskbar = true;
-            //SetGUI();
-
-            this.VisibleChanged += MainV2_VisibleChanged;
 
             if(frm.UserName == "devmode")
             {
-                devmode = true;
+                Devmode = true;
                 CustomMessageBox.Show("Running in devmode");
             }
             else
             {
-                this.MenuInitConfig.Visible = false;
-                this.MenuConfigTune.Visible = false;
+                CullControls();
             }
         }
-        public bool devmode = false;
-        private void MainV2_VisibleChanged(object sender, EventArgs e)
-        {
-        }
 
+        private void CullControls()
+        {
+            #region Menu buttons
+            this.MenuInitConfig.Visible = false;
+            this.MenuConfigTune.Visible = false;
+            #endregion
+
+            #region Connect button
+            toolStripConnectionControl.Visible = false;
+            DefaultConnect = true;
+            #endregion
+        }
 
         private void _comPort_ParamListChanged(object sender, EventArgs e)
         {
@@ -2223,7 +2224,6 @@ namespace MissionPlanner
             }
         }
 
-
         private void MenuConnect_Click(object sender, EventArgs e)
         {
             Connect();
@@ -2270,6 +2270,15 @@ namespace MissionPlanner
             if (comPort.BaseStream.IsOpen)
             {
                 doDisconnect(comPort);
+            }
+            else if (DefaultConnect)
+            {
+                // TODO: Select which connection method works as intended
+
+                //AutoConnect.Start();
+                doConnect(comPort, "AUTO", new System.ComponentModel.ComponentResourceManager(typeof(ConnectionControl)).GetString("cmb_Baud.Items8"));
+                //doConnect(comPort, "preset", new System.ComponentModel.ComponentResourceManager(typeof(ConnectionControl)).GetString("cmb_Baud.Items8"));
+                //doConnect(comPort, "UDP", "115200");
             }
             else
             {
