@@ -1220,6 +1220,7 @@ namespace MissionPlanner
             {
                 this.MenuInitConfig.Visible = false;
                 this.MenuConfigTune.Visible = false;
+                this.MenuHelp.Visible = false;
             }
         }
         public bool devmode = false;
