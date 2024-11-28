@@ -19,16 +19,42 @@ namespace MissionPlanner.GCSViews
         {
             InitializeComponent();
 
+            SetDevModeGUI();
+
             SetSavedSettingsValues();
+        }
+
+        private void SetDevModeGUI()
+        {
+            if (MainV2.instance.devmode)
+            {
+                this.lb_CamIP.Visible = true;
+                this.tb_CamIP.Visible = true;
+
+                this.lb_CamPort.Visible = true;
+                this.tb_CamPort.Visible = true;
+
+                this.lb_CamStream.Visible = true;
+                this.cb_CamStream.Visible = true;
+
+                this.lb_AutoConnectCam.Visible = true;
+                this.tlp_AutoConnCam.Visible = true;
+
+                this.lb_AutoStartSingleYaw.Visible = true;
+                this.tlp_SYAutoStart.Visible = true;
+
+                this.lb_AutoStartCameraStream.Visible = true;
+                this.tlp_AutoStartCameraStream.Visible = true;
+            }
         }
 
         private void SetSavedSettingsValues()
         {
             returnData = SettingManager.GetSettings();
 
-            textBox_cameraIp.Text = GetValue(returnData, Setting.CameraIP);
-            comboBox_cameraStreamChannel.SelectedItem = GetValue(returnData, Setting.CameraStreamChannel);
-            textBox_cameraControlPort.Text = GetValue(returnData, Setting.CameraControlPort);
+            tb_CamIP.Text = GetValue(returnData, Setting.CameraIP);
+            cb_CamStream.SelectedItem = GetValue(returnData, Setting.CameraStreamChannel);
+            tb_CamPort.Text = GetValue(returnData, Setting.CameraControlPort);
             radioButton_AutoConnect_Yes.Checked = bool.Parse(GetValue(returnData, Setting.AutoConnect));
             radioButton_AutoConnect_No.Checked = !radioButton_AutoConnect_Yes.Checked;
             numericUpDown_VideoSegmentLength.Value = int.Parse(GetValue(returnData, Setting.VideoSegmentLength));
@@ -69,9 +95,9 @@ namespace MissionPlanner.GCSViews
 
         private void button_Save_Click(object sender, EventArgs e)
         {
-            SetIfValid(returnData, Setting.CameraIP, textBox_cameraIp.Text);
-            SetIfValid(returnData, Setting.CameraStreamChannel, comboBox_cameraStreamChannel.SelectedItem.ToString());
-            SetIfValid(returnData, Setting.CameraControlPort, textBox_cameraControlPort.Text);
+            SetIfValid(returnData, Setting.CameraIP, tb_CamIP.Text);
+            SetIfValid(returnData, Setting.CameraStreamChannel, cb_CamStream.SelectedItem.ToString());
+            SetIfValid(returnData, Setting.CameraControlPort, tb_CamPort.Text);
             SetIfValid(returnData, Setting.AutoConnect, radioButton_AutoConnect_Yes.Checked.ToString());
             SetIfValid(returnData, Setting.VideoSegmentLength, numericUpDown_VideoSegmentLength.Value.ToString());
             SetIfValid(returnData, Setting.IrColorMode, comboBox_IrColorMode.SelectedItem.ToString());

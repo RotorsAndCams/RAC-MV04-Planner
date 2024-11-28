@@ -100,7 +100,6 @@ namespace MissionPlanner.GCSViews
         Media _mediaRecord;
 
         Panel panelDoubleClick;
-        Label lb_FollowDebugText;
 
         System.Timers.Timer _feedTimer;
         ElapsedEventHandler handler = null;
@@ -207,18 +206,6 @@ namespace MissionPlanner.GCSViews
             
             #endregion
 
-            #region debug label
-
-            lb_FollowDebugText = new Label();
-            lb_FollowDebugText.Text = "Debug";
-            lb_FollowDebugText.ForeColor = Color.White;
-            lb_FollowDebugText.Font = new Font("Stencil", 14);
-            this.Location = new Point(10, (this.Height / 3));
-            this.Controls.Add(lb_FollowDebugText);
-            lb_FollowDebugText.BringToFront();
-
-            #endregion
-
             #region recording vlc stream
 
             _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
@@ -238,7 +225,6 @@ namespace MissionPlanner.GCSViews
             _feedTimer.Interval = 1000 * 5;
             _feedTimer.Elapsed += _feedTimer_Elapsed;
             _feedTimer.Enabled = false;
-            lb_FollowDebugText.Size = new Size(lb_FollowDebugText.Width + 500, lb_FollowDebugText.Height);
 
             #endregion
 
@@ -311,27 +297,30 @@ namespace MissionPlanner.GCSViews
             #region Dev debug tools
 
 #if DEBUG
+            if (MainV2.instance.devmode)
+            {
+                ComboBox cb_TestFunctions = new ComboBox();
+                cb_TestFunctions.DropDownStyle = ComboBoxStyle.DropDownList;
+                cb_TestFunctions.Items.AddRange(testFunctions.Keys.ToArray());
+                cb_TestFunctions.SelectedIndex = 0;
+                cb_TestFunctions.Location = new Point(10, (this.Height / 3) + 0);
+                cb_TestFunctions.Width = 300;
+                cb_TestFunctions.Font = new Font("Stencil", 16);
+                this.Controls.Add(cb_TestFunctions);
+                cb_TestFunctions.BringToFront();
 
-            ComboBox cb_TestFunctions = new ComboBox();
-            cb_TestFunctions.DropDownStyle = ComboBoxStyle.DropDownList;
-            cb_TestFunctions.Items.AddRange(testFunctions.Keys.ToArray());
-            cb_TestFunctions.SelectedIndex = 0;
-            cb_TestFunctions.Location = new Point(10, (this.Height / 3) + 0);
-            cb_TestFunctions.Width = 300;
-            cb_TestFunctions.Font = new Font("Stencil", 16);
-            this.Controls.Add(cb_TestFunctions);
-            cb_TestFunctions.BringToFront();
-
-            Button bt_DoTestFunction = new Button();
-            bt_DoTestFunction.Text = "Test function";
-            bt_DoTestFunction.Location = new Point(10, (this.Height / 3) + 25);
-            bt_DoTestFunction.Width = 300;
-            bt_DoTestFunction.Height = 50;
-            bt_DoTestFunction.BackColor = Color.White;
-            bt_DoTestFunction.ForeColor = Color.Black;
-            bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
-            this.Controls.Add(bt_DoTestFunction);
-            bt_DoTestFunction.BringToFront();
+                Button bt_DoTestFunction = new Button();
+                bt_DoTestFunction.Text = "Test function";
+                bt_DoTestFunction.Location = new Point(10, (this.Height / 3) + 25);
+                bt_DoTestFunction.Width = 300;
+                bt_DoTestFunction.Height = 50;
+                bt_DoTestFunction.BackColor = Color.White;
+                bt_DoTestFunction.ForeColor = Color.Black;
+                bt_DoTestFunction.Click += (sender, e) => testFunctions[cb_TestFunctions.SelectedItem.ToString()]();
+                this.Controls.Add(bt_DoTestFunction);
+                bt_DoTestFunction.BringToFront();
+            }
+            
 #endif
 
             #endregion
@@ -351,14 +340,14 @@ namespace MissionPlanner.GCSViews
             //Check track mode
             if (!IsCameraTrackingModeActive || _cameraState != NvSystemModes.Tracking)
             {
-                MessageBox.Show("Camera is not tracking");
+                CustomMessageBox.Show("Camera is not tracking");
                 StopFeed();
                 return;
             }
 
             if (!MainV2.comPort.MAV.cs.connected || MainV2.comPort.MAV.cs.failsafe)
             {
-                MessageBox.Show("not connected - follow stop");
+                CustomMessageBox.Show("not connected - follow stop");
                 StopFeed();
                 return;
             }
@@ -369,26 +358,10 @@ namespace MissionPlanner.GCSViews
                 float target_lng = ((MavProto.GndCrsReport)CameraHandler.Instance.CameraReports[MavProto.MavReportType.GndCrsReport]).gndCrsLon;
                 float target_alt = (int)MainV2.comPort.MAV.cs.alt;
 
-#if DEBUG
-
-                //debug to screen
-                if (InvokeRequired)
-                    Invoke(new Action(() => {
-                        lb_FollowDebugText.Text = "sendALT: " + MainV2.comPort.MAV.GuidedMode.z + " cs.alt: " + MainV2.comPort.MAV.cs.alt;
-                        lb_FollowDebugText.Refresh();
-                    }));
-                else
-                {
-                    lb_FollowDebugText.Text = "sendALT: " + MainV2.comPort.MAV.GuidedMode.z + " cs.alt: " + MainV2.comPort.MAV.cs.alt;
-                    lb_FollowDebugText.Refresh();
-                }
-
-#endif
-
                 //MainV2.comPort.MAV.GuidedMode.z = target_alt / CurrentState.multiplieralt;
                 
                 if (MainV2.comPort.MAV.GuidedMode.z < 10)
-                    MainV2.comPort.MAV.GuidedMode.z = 10 / CurrentState.multiplieralt;
+                    MainV2.comPort.MAV.GuidedMode.z = 50 / CurrentState.multiplieralt;
 
                 MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
                 MainV2.comPort.MAV.GuidedMode.x = (int)((target_lat - 0.0002) * 1e7);
@@ -411,19 +384,6 @@ namespace MissionPlanner.GCSViews
                     CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
                 }
             }
-
-
-            #region testdata
-
-            /*
-                    Simulated copter desired positions
-                    -35.3621410612455	149.164499044418	1
-                    -35.3619048250147	149.166129827499	2
-
-            */
-
-            #endregion
-
         }
 
         private void StopFeed()
@@ -1028,28 +988,6 @@ namespace MissionPlanner.GCSViews
 
         private void btn_SetAlt_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    //
-            //    //MainV2.comPort.setGuidedModeWP(gotohere);
-
-            //    float target_alt = (int)(cs_ColorSliderAltitude.Value / CurrentState.multiplieralt);
-            //    float target_lat = (float)MainV2.comPort.MAV.cs.lat;
-            //    float target_lng = (float)MainV2.comPort.MAV.cs.lng;
-
-            //    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
-            //    {
-            //        alt = target_alt,
-            //        lat = target_lat,
-            //        lng = target_lng,
-            //        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-            //    });
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
-            //}
-
             Locationwp gotohere = new Locationwp();
 
             gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
@@ -1057,7 +995,7 @@ namespace MissionPlanner.GCSViews
             MainV2.comPort.MAV.GuidedMode.z = cs_ColorSliderAltitude.Value / CurrentState.multiplieralt;
 
             if (MainV2.comPort.MAV.GuidedMode.z < 10)
-                MainV2.comPort.MAV.GuidedMode.z = 10 / CurrentState.multiplieralt;
+                MainV2.comPort.MAV.GuidedMode.z = 50 / CurrentState.multiplieralt;
 
             gotohere.alt = MainV2.comPort.MAV.GuidedMode.z; // back to m
             gotohere.lat = MainV2.comPort.MAV.GuidedMode.x;
@@ -1068,38 +1006,18 @@ namespace MissionPlanner.GCSViews
 
             try
             {
-                MainV2.comPort.ShowInfo = true;
-                MainV2.comPort.setGuidedModeWP(new Locationwp
+                Locationwp wp = new Locationwp()
                 {
                     alt = MainV2.comPort.MAV.GuidedMode.z,
                     lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
-                });
-                MainV2.comPort.ShowInfo = true;
+                    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                };
+
                 for (int i = 0; i <= 5; i++)
                 {
-                    MainV2.comPort.setGuidedModeWP(new Locationwp
-                    {
-                        alt = MainV2.comPort.MAV.GuidedMode.z,
-                        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
-                    });
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, wp);
                 }
-                MainV2.comPort.ShowInfo = true;
-                for (int i = 0; i <= 5; i++)
-                {
-                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
-                    {
-                        alt = MainV2.comPort.MAV.GuidedMode.z,
-                        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
-                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                    });
-                }
-
-                //CustomMessageBox.Show("after multiple sendings, gotohere = id: " + gotohere.id + " alt: " + gotohere.alt + " lat: " + gotohere.lat + " lng: " + gotohere.lng + " frame: " + gotohere.frame);
-
-
             }
             catch (Exception ex)
             {

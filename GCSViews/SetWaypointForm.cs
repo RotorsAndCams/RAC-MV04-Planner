@@ -446,7 +446,6 @@ namespace MissionPlanner.GCSViews
 
             MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "GUIDED");
             Thread.Sleep(500);
-            MainV2.comPort.ShowInfo = true;
             for (int i = 0; i <= 100; i++)
             {
                 MainV2.comPort.setPositionTargetGlobalInt(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, true, false, false, false,
@@ -471,7 +470,6 @@ namespace MissionPlanner.GCSViews
         private void button3_Click_2(object sender, EventArgs e)
         {
             ReadCoordinate();
-            MainV2.comPort.ShowInfo = true;
             Locationwp gotohere = new Locationwp() {
                 alt = _Alt,
                 lat = _Lat,
@@ -493,7 +491,6 @@ namespace MissionPlanner.GCSViews
                 lng = _Lon,
                 id = (ushort)MAVLink.MAV_CMD.WAYPOINT
             };
-            MainV2.comPort.ShowInfo = true;
             for (int i = 0; i <= 200; i++)
             {
                 MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere, false);

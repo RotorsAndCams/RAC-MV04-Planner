@@ -6447,25 +6447,6 @@ namespace MissionPlanner.GCSViews
 
         private void btn_SetAltitudeSendCommand_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    float target_alt = (int)(cs_ColorSliderAltitude.Value / CurrentState.multiplieralt);
-            //    float target_lat = (float)MainV2.comPort.MAV.cs.lat;
-            //    float target_lng = (float)MainV2.comPort.MAV.cs.lng;
-
-            //    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
-            //    {
-            //        alt = target_alt,
-            //        lat = target_lat,          
-            //        lng = target_lng,
-            //        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-            //    });
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
-            //}
-
             Locationwp gotohere = new Locationwp();
 
             gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
@@ -6473,7 +6454,7 @@ namespace MissionPlanner.GCSViews
             MainV2.comPort.MAV.GuidedMode.z = cs_ColorSliderAltitude.Value / CurrentState.multiplieralt;
 
             if (MainV2.comPort.MAV.GuidedMode.z < 10)
-                MainV2.comPort.MAV.GuidedMode.z = 10 / CurrentState.multiplieralt;
+                MainV2.comPort.MAV.GuidedMode.z = 50 / CurrentState.multiplieralt;
 
             gotohere.alt = MainV2.comPort.MAV.GuidedMode.z; // back to m
             gotohere.lat = MainV2.comPort.MAV.GuidedMode.x;
@@ -6484,38 +6465,18 @@ namespace MissionPlanner.GCSViews
 
             try
             {
-                MainV2.comPort.ShowInfo = true;
-                MainV2.comPort.setGuidedModeWP(new Locationwp
+                Locationwp wp = new Locationwp()
                 {
                     alt = MainV2.comPort.MAV.GuidedMode.z,
                     lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
-                });
-                MainV2.comPort.ShowInfo = true;
+                    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                };
+
                 for (int i = 0; i <= 5; i++)
                 {
-                    MainV2.comPort.setGuidedModeWP(new Locationwp
-                    {
-                        alt = MainV2.comPort.MAV.GuidedMode.z,
-                        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
-                    });
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, wp);
                 }
-                MainV2.comPort.ShowInfo = true;
-                for (int i = 0; i <= 5; i++)
-                {
-                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
-                    {
-                        alt = MainV2.comPort.MAV.GuidedMode.z,
-                        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
-                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                    });
-                }
-
-                //CustomMessageBox.Show("after multiple sendings, gotohere = id: " + gotohere.id + " alt: " + gotohere.alt + " lat: " + gotohere.lat + " lng: " + gotohere.lng + " frame: " + gotohere.frame);
-
-
             }
             catch (Exception ex)
             {
