@@ -1427,7 +1427,7 @@ namespace MissionPlanner.GCSViews
             try
             {
                 ((Control) sender).Enabled = false;
-                MainV2.comPort.setMode("RTL");
+                MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, FlightPlanner.SmartRTL ? "SmartRTL" : "RTL");
             }
             catch
             {
