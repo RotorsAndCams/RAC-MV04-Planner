@@ -297,6 +297,56 @@ namespace MissionPlanner.GCSViews
                     MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "SmartRTL");
                 }
             };
+
+            SmartRTL_SwitchParams(); // Set parameters
+        }
+
+        private void SmartRTL_SwitchParams()
+        {
+            if (MainV2.comPort != null               //
+                && MainV2.comPort.BaseStream != null // Connected
+                && MainV2.comPort.BaseStream.IsOpen) //
+            {
+                Dictionary<string, (int smartRTL, int RTL)> RTLParams = new Dictionary<string, (int, int)>
+                {
+                    { "FENCE_ACTION", (3, 1) },
+                    { "FS_DR_ENABLE", (3, 2) },
+                    { "FS_GCS_ENABLE", (3, 1) },
+                    { "FS_THR_ENABLE", (4, 1) }
+                };
+                (int smartRTL, int RTL) BattRTLParams = (3, 2); // BATT[1:9]_FS_[LOW/CRT]_ACT
+                (int smartRTL, int RTL) RCRTLParams = (42, 4);  // RC[1:16]_OPTION
+
+                foreach (var item in RTLParams) // Unique params
+                {
+                    SetRTLParam(item.Key, item.Value.smartRTL, item.Value.RTL);
+                }
+
+                for (int i = 0; i <= 9; i++) // Battery FS params
+                {
+                    string low = i == 0 ? "BATT_FS_LOW_ACT" : $"BATT{i}_FS_LOW_ACT",
+                           crt = i == 0 ? "BATT_FS_CRT_ACT" : $"BATT{i}_FS_CRT_ACT";
+                    SetRTLParam(low, BattRTLParams.smartRTL, BattRTLParams.RTL);
+                    SetRTLParam(crt, BattRTLParams.smartRTL, BattRTLParams.RTL);
+                }
+
+                for (int i = 1; i <= 16; i++) // RC option params
+                {
+                    string rcopt = $"RC{i}_OPTION";
+                    SetRTLParam(rcopt, RCRTLParams.smartRTL, RCRTLParams.RTL);
+                }
+            }
+        }
+
+        private void SetRTLParam(string paramName, int smartRTL, int RTL)
+        {
+            if (MainV2.comPort.MAV.param[paramName] != null // Param exists
+                && ((int)MainV2.comPort.MAV.param[paramName].Value == smartRTL // Is set to SmartRTL
+                || (int)MainV2.comPort.MAV.param[paramName].Value == RTL)      // Is set to RTL
+                && MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, paramName, SmartRTL ? smartRTL : RTL)) // Set remotely
+            {
+                MainV2.comPort.MAV.param[paramName].Value = SmartRTL ? smartRTL : RTL; // Set locally
+            }
         }
 
         public static FlightPlanner instance { get; set; }
