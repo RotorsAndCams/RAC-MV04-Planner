@@ -52,6 +52,7 @@ using Resources = MissionPlanner.Properties.Resources;
 using Newtonsoft.Json;
 using MissionPlanner.ArduPilot.Mavlink;
 using MV04.State;
+using System.Text;
 
 namespace MissionPlanner.GCSViews
 {
@@ -135,14 +136,22 @@ namespace MissionPlanner.GCSViews
         public GMapOverlay top;
         public GMapPolygon wppolygon;
         private GMapMarker CurrentMidLine;
-
-        public static bool SmartRTL { get; private set; } = false;
-
+        private ComboBox SmartRTLSwitch;
+        
+        private static bool _SmartRTL = false;
+        public static bool SmartRTL
+        {
+            get => _SmartRTL;
+            private set
+            {
+                _SmartRTL = value;
+                instance.SmartRTLSwitch.SelectedIndex = value ? 1 : 0;
+            }
+        }
+        
         public void Init()
         {
             instance = this;
-
-
 
             // config map
             MainMap.CacheLocation = Settings.GetDataDirectory() +
@@ -275,20 +284,37 @@ namespace MissionPlanner.GCSViews
             drawnpolygon.Fill = Brushes.Transparent;
 
             // Add RTL - SmartRTL switch
-            ComboBox smartRTLSwitch = new ComboBox();
-            // TODO: Make it bigger
-            smartRTLSwitch.Width = 123;
-            smartRTLSwitch.DropDownWidth = 123;
-            smartRTLSwitch.DropDownStyle = ComboBoxStyle.DropDownList;
-            smartRTLSwitch.Items.AddRange(new string[] { "RTL", "SmartRTL" });
-            smartRTLSwitch.SelectedIndex = SmartRTL ? 1 : 0;
-            smartRTLSwitch.SelectedIndexChanged += SmartRTLSwitch_SelectedIndexChanged;
-            flowLayoutPanel1.Controls.Add(smartRTLSwitch);
+            SmartRTLSwitch = new ComboBox();
+            // TODO: Make the font bigger
+            SmartRTLSwitch.Height = 30;
+            SmartRTLSwitch.Width = 123;
+            SmartRTLSwitch.DropDownWidth = 123;
+            SmartRTLSwitch.DropDownStyle = ComboBoxStyle.DropDownList;
+            SmartRTLSwitch.Items.AddRange(new string[] { "RTL", "SmartRTL" });
+            SmartRTLSwitch.SelectedIndex = SmartRTL ? 1 : 0;
+            SmartRTLSwitch.SelectedIndexChanged += SmartRTLSwitch_SelectedIndexChanged;
+            flowLayoutPanel1.Controls.Add(SmartRTLSwitch);
+
+            // Set SmartRTL bool from status message
+            MainV2.comPort.OnPacketReceived += (sender, e) =>
+            {
+                if (e.msgid == (uint)MAVLink.MAVLINK_MSG_ID.STATUSTEXT
+                && Encoding.ASCII.GetString(e.ToStructure<MAVLink.mavlink_statustext_t>().text).ToLower().Contains("smartrtl deactivated"))
+                {
+                    SmartRTL = false;
+                    Action ca = () => SmartRTLSwitch.Enabled = false;
+                    if (SmartRTLSwitch.InvokeRequired)
+                        SmartRTLSwitch.Invoke(ca);
+                    else
+                        ca();
+                }
+            };
         }
 
         private void SmartRTLSwitch_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SmartRTL = (sender as ComboBox).SelectedIndex == 1;
+            _SmartRTL = (sender as ComboBox).SelectedIndex == 1;
+            // Setting by the property would trigger an infinite Set - SelectedIndexChanged loop
 
             StateHandler.MV04StateChange += (sender2, ea) => // GCS RTL Button
             {
