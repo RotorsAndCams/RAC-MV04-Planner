@@ -51,6 +51,7 @@ using Point = System.Drawing.Point;
 using Resources = MissionPlanner.Properties.Resources;
 using Newtonsoft.Json;
 using MissionPlanner.ArduPilot.Mavlink;
+using MV04.State;
 
 namespace MissionPlanner.GCSViews
 {
@@ -288,8 +289,14 @@ namespace MissionPlanner.GCSViews
         private void SmartRTLSwitch_SelectedIndexChanged(object sender, EventArgs e)
         {
             SmartRTL = (sender as ComboBox).SelectedIndex == 1;
-            // TODO: Set failsafe response action params if they are in use
-            // *_FS_*_ACT params
+
+            StateHandler.MV04StateChange += (sender2, ea) => // GCS RTL Button
+            {
+                if (ea.NewState == MV04_State.RTL && SmartRTL)
+                {
+                    MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "SmartRTL");
+                }
+            };
         }
 
         public static FlightPlanner instance { get; set; }
