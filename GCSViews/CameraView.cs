@@ -360,7 +360,7 @@ namespace MissionPlanner.GCSViews
 
                 //MainV2.comPort.MAV.GuidedMode.z = target_alt / CurrentState.multiplieralt;
                 
-                if (MainV2.comPort.MAV.GuidedMode.z < 10)
+                if (MainV2.comPort.MAV.GuidedMode.z < 50)
                     MainV2.comPort.MAV.GuidedMode.z = 50 / CurrentState.multiplieralt;
 
                 MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
