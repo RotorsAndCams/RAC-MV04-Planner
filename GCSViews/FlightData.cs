@@ -449,6 +449,8 @@ namespace MissionPlanner.GCSViews
             else
                 this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
 
+            panelka = splitContainer1.Panel2;
+
         }
 
         private int _sliderAltitude;
@@ -1082,6 +1084,8 @@ namespace MissionPlanner.GCSViews
             if (MainV2.comPort.MAV.camerapoints != null)
                 MainV2.comPort.MAV.camerapoints.Clear();
         }
+
+        public SplitterPanel panelka;
 
         void but_Click(object sender, EventArgs e)
         {

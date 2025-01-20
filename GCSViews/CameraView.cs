@@ -228,11 +228,42 @@ namespace MissionPlanner.GCSViews
 
             #endregion
 
+            columnWidth = tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width;
+            Button btn = new Button();
+            btn.Text = "Close";
+            btn.Location = new Point(0, 0);//(this.vv_VLC.Width - 200, (this.vv_VLC.Height - 100));
+            btn.Width = 100;
+            btn.Height = 50;
+            btn.BackColor = Color.Transparent;
+            btn.ForeColor = Color.White;
+            btn.FlatStyle = FlatStyle.Popup;
 
-
+            btn.Click += (sender, e) => {
+                if (controlsClosed)
+                {
+                    tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
+                    controlsClosed = false;
+                    btn.Text = "Close";
+                }
+                else
+                {
+                    tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = 0;
+                    controlsClosed = true;
+                    btn.Text = "Open";
+                }
+                
+            };
+            this.Controls.Add(btn);
+            btn.BringToFront();
+            btn.BringToFront();
+            
             this.FormClosing += CameraView_FormClosing;
+            //this.
 
         }
+
+        bool controlsClosed = false;
+        float columnWidth;
 
         #endregion
 

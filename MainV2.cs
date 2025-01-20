@@ -4956,5 +4956,39 @@ namespace MissionPlanner
         {
             MyView.Dispose();
         }
+
+        private bool isMapActive = true;
+        private void tsb_ChangeView_Click(object sender, EventArgs e)
+        {
+            //Show camera screen or show map
+            if (isMapActive)
+            {
+                FlightData.instance.gMapControl1.Hide();
+                //FlightData.instance.ShowCamera();
+
+                CameraView cv = new CameraView();
+                FlightData.instance.panelka.Controls.Add(CameraView.instance);
+                CameraView.instance.Dock = DockStyle.Fill;
+                CameraView.instance.Padding = new Padding(50);
+                CameraView.instance.Show();
+                isMapActive = false;
+                CameraView.instance.BringToFront();
+
+            }
+            else
+            {
+                FlightData.instance.gMapControl1.Show();
+                FlightData.instance.panelka.Controls.Remove(CameraView.instance);
+                //FlightData.instance.HideCamera();
+                CameraView.instance.Hide();
+                isMapActive = true;
+            }
+                
+        }
+
+        private void Btn_Click(object sender, EventArgs e)
+        {
+            //CameraView.instance.CloseButtons();
+        }
     }
 }

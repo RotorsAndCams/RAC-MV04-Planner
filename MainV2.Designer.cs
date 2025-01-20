@@ -56,6 +56,7 @@ namespace MissionPlanner
             this.menu = new MissionPlanner.Controls.MyButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.status1 = new MissionPlanner.Controls.Status();
+            this.tsb_ChangeView = new System.Windows.Forms.ToolStripButton();
             this.MainMenu.SuspendLayout();
             this.CTX_mainmenu.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -70,6 +71,7 @@ namespace MissionPlanner
             this.MainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MenuFlightData,
             this.MenuFlightPlanner,
+            this.tsb_ChangeView,
             this.MenuCamera,
             this.MenuInitConfig,
             this.MenuConfigTune,
@@ -236,6 +238,14 @@ namespace MissionPlanner
             this.status1.Name = "status1";
             this.status1.Percent = 0D;
             // 
+            // tsb_ChangeView
+            // 
+            this.tsb_ChangeView.ForeColor = System.Drawing.SystemColors.ControlLight;
+            resources.ApplyResources(this.tsb_ChangeView, "tsb_ChangeView");
+            this.tsb_ChangeView.Margin = new System.Windows.Forms.Padding(0);
+            this.tsb_ChangeView.Name = "tsb_ChangeView";
+            this.tsb_ChangeView.Click += new System.EventHandler(this.tsb_ChangeView_Click);
+            // 
             // MainV2
             // 
             resources.ApplyResources(this, "$this");
@@ -280,5 +290,6 @@ namespace MissionPlanner
         public System.Windows.Forms.ToolStripButton MenuHelp;
         public System.Windows.Forms.ToolStripButton MenuArduPilot;
         public Controls.Status status1;
+        public System.Windows.Forms.ToolStripButton tsb_ChangeView;
     }
 }
