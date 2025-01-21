@@ -5018,6 +5018,7 @@
     <None Include="Resources\secopplanner2.png" />
     <None Include="Resources\Logo_SecopPlanner2.png" />
     <None Include="Resources\inverted_cam_but.png" />
+    <None Include="Resources\icons8-right-100.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

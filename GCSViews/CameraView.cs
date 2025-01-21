@@ -232,16 +232,21 @@ namespace MissionPlanner.GCSViews
             Button btn = new Button();
             btn.Text = "Close";
             btn.Location = new Point(0, 0);//(this.vv_VLC.Width - 200, (this.vv_VLC.Height - 100));
-            btn.Width = 100;
+            btn.Width = 50;
             btn.Height = 50;
             btn.BackColor = Color.Transparent;
             btn.ForeColor = Color.White;
             btn.FlatStyle = FlatStyle.Popup;
+            //btn.Image = global::MissionPlanner.Properties.Resources.icons8_right_100;
+            //btn.ImageAlign = ContentAlignment.MiddleLeft;
+            //btn.BackgroundImageLayout = ImageLayout.;
 
             btn.Click += (sender, e) => {
                 if (controlsClosed)
                 {
                     tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
+                    vv_VLC.Dock = DockStyle.Fill;
+                    vv_VLC.BringToFront();
                     controlsClosed = false;
                     btn.Text = "Close";
                 }
@@ -258,8 +263,6 @@ namespace MissionPlanner.GCSViews
             btn.BringToFront();
             
             this.FormClosing += CameraView_FormClosing;
-            //this.
-
         }
 
         bool controlsClosed = false;
