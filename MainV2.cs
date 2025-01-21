@@ -1218,6 +1218,7 @@ namespace MissionPlanner
             }
             else
             {
+                this.MenuCamera.Visible = false;
                 this.MenuInitConfig.Visible = false;
                 this.MenuConfigTune.Visible = false;
                 this.MenuHelp.Visible = false;
