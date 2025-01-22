@@ -450,8 +450,11 @@ namespace MissionPlanner.GCSViews
                 this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
 
             panelka = splitContainer1.Panel2;
+            spltContainer = this.SubMainLeft;
+            
 
         }
+        public SplitContainer spltContainer;
 
         private int _sliderAltitude;
 

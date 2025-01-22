@@ -299,6 +299,9 @@ namespace MissionPlanner.Utilities
 
         public static void ApplyThemeTo(object control)
         {
+            if (control is CameraView || control is CameraSettingsForm || control is CameraFullScreenForm)
+                return;
+
             if (control is Control)
                 ApplyThemeTo(control as Control);
         }
@@ -810,6 +813,9 @@ mc:Ignorable=""d""
 
             foreach (Control ctl in temp.Controls)
             {
+                if (ctl is CameraView || ctl is CameraSettingsForm || ctl is CameraFullScreenForm)
+                    continue;
+
                 if (ctl.GetType() == typeof(Panel))
                 {
                     ctl.BackColor = BGColor;

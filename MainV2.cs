@@ -1221,10 +1221,64 @@ namespace MissionPlanner
                 this.MenuCamera.Visible = false;
                 this.MenuInitConfig.Visible = false;
                 this.MenuConfigTune.Visible = false;
-                this.MenuHelp.Visible = false;
+                //this.MenuHelp.Visible = false;
             }
+
+            this.MenuHelp.Image = global::MissionPlanner.Properties.Resources.icons8_menu_100;
+
         }
         public bool devmode = false;
+
+        public void HideflightData()
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => DoHideLeftSide()));
+            else
+            {
+                DoHideLeftSide();
+            }
+
+            
+        }
+
+        int spltWidth;
+        int pnlWidth;
+        private void DoHideLeftSide()
+        {
+            if (CameraView.instance == null)
+                return;
+
+            if (CameraView.instance.controlsClosed)
+            {
+               // FlightData.spltContainer.Panel1.Hide();
+               // FlightData.spltContainer.Panel2.Hide();
+                //FlightData.spltContainer.Hide();
+                //spltWidth = FlightData.spltContainer.Width;
+                //FlightData.spltContainer.Width = 0;
+
+                
+                pnlWidth = FlightData.MainH.Panel1.Width;
+
+                FlightData.MainH.SplitterDistance = 0;
+                //FlightData.MainH.Panel1.Hide();
+
+                FlightData.MainH.Panel1Collapsed = true;
+
+            }
+            else
+            {
+                //FlightData.spltContainer.Panel1.Show();
+                //FlightData.spltContainer.Panel2.Show();
+                //FlightData.spltContainer.Show();
+                //FlightData.spltContainer.Width = spltWidth;
+
+                FlightData.MainH.SplitterDistance = pnlWidth;
+
+                //FlightData.MainH.Panel1.Show();
+                FlightData.MainH.Panel1Collapsed = false;
+            }
+        }
+
         private void MainV2_VisibleChanged(object sender, EventArgs e)
         {
         }
@@ -1716,6 +1770,13 @@ namespace MissionPlanner
 
             // save config
             SaveConfig();
+
+            FlightData.MainH.Panel1Collapsed = false;
+
+            DisplayMap();
+
+            if (CameraView.instance != null)
+                CameraView.instance.ResetMenuCollapse();
         }
 
         private void MenuFlightPlanner_Click(object sender, EventArgs e)
@@ -4184,7 +4245,22 @@ namespace MissionPlanner
 
         private void MenuHelp_Click(object sender, EventArgs e)
         {
-            MyView.ShowScreen("Help");
+            //
+
+            if (CameraView.instance != null)
+            {
+                CameraView.instance.SetMenu();
+
+                if (CameraView.instance.controlsClosed)
+                {
+                    MenuHelp.Text = "OPEN";
+                }
+                else
+                {
+                    MenuHelp.Text = "HIDE";
+                }
+            }
+            HideflightData();
         }
 
 
@@ -4964,27 +5040,41 @@ namespace MissionPlanner
             //Show camera screen or show map
             if (isMapActive)
             {
-                FlightData.instance.gMapControl1.Hide();
-                //FlightData.instance.ShowCamera();
-
-                CameraView cv = new CameraView();
-                FlightData.instance.panelka.Controls.Add(CameraView.instance);
-                CameraView.instance.Dock = DockStyle.Fill;
-                CameraView.instance.Padding = new Padding(50);
-                CameraView.instance.Show();
-                isMapActive = false;
-                CameraView.instance.BringToFront();
-
+                DisplayCamera();
             }
             else
             {
-                FlightData.instance.gMapControl1.Show();
-                FlightData.instance.panelka.Controls.Remove(CameraView.instance);
-                //FlightData.instance.HideCamera();
-                CameraView.instance.Hide();
-                isMapActive = true;
+                DisplayMap();
             }
-                
+            //hiddenleft = false;
+
+            //FlightData.MainH.Panel1Collapsed = false;
+            //if (CameraView.instance != null)
+            //    CameraView.instance.ResetMenuCollapse();
+        }
+
+        private void DisplayMap()
+        {
+            FlightData.instance.gMapControl1.Show();
+            FlightData.instance.panelka.Controls.Remove(CameraView.instance);
+            //FlightData.instance.HideCamera();
+            if(CameraView.instance != null)
+                CameraView.instance.Hide();
+            isMapActive = true;
+        }
+
+        private void DisplayCamera()
+        {
+            FlightData.instance.gMapControl1.Hide();
+            //FlightData.instance.ShowCamera();
+
+            CameraView cv = new CameraView();
+            FlightData.instance.panelka.Controls.Add(CameraView.instance);
+            CameraView.instance.Dock = DockStyle.Fill;
+            CameraView.instance.Padding = new Padding(5);
+            CameraView.instance.Show();
+            isMapActive = false;
+            CameraView.instance.BringToFront();
         }
 
         private void Btn_Click(object sender, EventArgs e)

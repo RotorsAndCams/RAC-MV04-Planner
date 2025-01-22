@@ -176,7 +176,6 @@ namespace MissionPlanner.GCSViews
 
             #region State handling
 
-            SetDroneStatusValue();
             SetDroneLEDStates(enum_LandingLEDState.Off, enum_PositionLEDState_IR.Off, enum_PositionLEDState_RedLight.Off);
             LEDStateHandler.LedStateChanged += LEDStateHandler_LedStateChanged;
 
@@ -192,19 +191,6 @@ namespace MissionPlanner.GCSViews
 
             #endregion
 
-            #region altitude control set up 
-
-            if (MainV2.comPort != null)
-            {
-                if ((int)MainV2.comPort.MAV.cs.alt < _minAllowedAltitudeValue)
-                    this.cs_ColorSliderAltitude.Value = _minAllowedAltitudeValue;
-                else if ((int)MainV2.comPort.MAV.cs.alt > _maxAllowedAltitudeValue)
-                    this.cs_ColorSliderAltitude.Value -= _maxAllowedAltitudeValue;
-                else
-                    this.cs_ColorSliderAltitude.Value = (int)MainV2.comPort.MAV.cs.alt;
-            }
-            
-            #endregion
 
             #region recording vlc stream
 
@@ -229,44 +215,113 @@ namespace MissionPlanner.GCSViews
             #endregion
 
             columnWidth = tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width;
-            Button btn = new Button();
-            btn.Text = "Close";
-            btn.Location = new Point(0, 0);//(this.vv_VLC.Width - 200, (this.vv_VLC.Height - 100));
-            btn.Width = 50;
-            btn.Height = 50;
-            btn.BackColor = Color.Transparent;
-            btn.ForeColor = Color.White;
-            btn.FlatStyle = FlatStyle.Popup;
+            
+            //btn.Text = "Close";
+            //btn.Location = new Point(0, 0);//(this.vv_VLC.Width - 200, (this.vv_VLC.Height - 100));
+            //btn.Width = 75;
+            //btn.Height = 75;
+            //btn.BackColor = Color.Transparent;
+            //btn.ForeColor = Color.Transparent;
+            ////btn.FlatStyle = FlatStyle.Popup;
+            //btn.Dock = DockStyle.None;
             //btn.Image = global::MissionPlanner.Properties.Resources.icons8_right_100;
-            //btn.ImageAlign = ContentAlignment.MiddleLeft;
-            //btn.BackgroundImageLayout = ImageLayout.;
+            ////btn.Image = global::MissionPlanner.Properties.Resources.icons8_right_100;
+            ////btn.ImageAlign = ContentAlignment.MiddleLeft;
+            ////btn.BackgroundImageLayout = ImageLayout.;
 
-            btn.Click += (sender, e) => {
-                if (controlsClosed)
+            //btn.Click += (sender, e) => {
+                
+                
+            //};
+            //this.Controls.Add(btn);
+            //btn.BringToFront();
+            //btn.BringToFront();
+            
+            this.FormClosing += CameraView_FormClosing;
+
+            if(MainV2.instance.devmode)
+                btn_StartStopSingleYaw.Visible = false;
+        }
+
+        public bool controlsClosed = false;
+        float columnWidth;
+        PictureBox btn = new PictureBox();
+
+        public void SetMenu()
+        {
+            if (controlsClosed)
+            {
+                ShowMenu();
+            }
+            else
+            {
+                HideMenu();
+            }
+        }
+
+        public void HideMenu()
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() =>
+                {
+                    tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = 0;
+                    controlsClosed = true;
+                    btn.Text = "Open";
+
+                }));
+            else
+            {
+                tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = 0;
+                controlsClosed = true;
+                btn.Text = "Open";
+
+            }
+        }
+
+        public void ShowMenu()
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() =>
                 {
                     tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
                     vv_VLC.Dock = DockStyle.Fill;
                     vv_VLC.BringToFront();
                     controlsClosed = false;
                     btn.Text = "Close";
-                }
-                else
-                {
-                    tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = 0;
-                    controlsClosed = true;
-                    btn.Text = "Open";
-                }
-                
-            };
-            this.Controls.Add(btn);
-            btn.BringToFront();
-            btn.BringToFront();
-            
-            this.FormClosing += CameraView_FormClosing;
+                    MainV2.instance.HideflightData();
+                }));
+            else
+            {
+                tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
+                vv_VLC.Dock = DockStyle.Fill;
+                vv_VLC.BringToFront();
+                controlsClosed = false;
+                btn.Text = "Close";
+                MainV2.instance.HideflightData();
+            }
         }
 
-        bool controlsClosed = false;
-        float columnWidth;
+
+        public void ResetMenuCollapse()
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() =>
+                {
+                    tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
+                    vv_VLC.Dock = DockStyle.Fill;
+                    vv_VLC.BringToFront();
+                    controlsClosed = false;
+                    btn.Text = "Close";
+                }));
+            else
+            {
+                tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
+                vv_VLC.Dock = DockStyle.Fill;
+                vv_VLC.BringToFront();
+                controlsClosed = false;
+                btn.Text = "Close";
+            }
+        }
 
         #endregion
 
@@ -276,7 +331,7 @@ namespace MissionPlanner.GCSViews
         {
             if (keyData == (Keys.Control | Keys.A))
             {
-                tlp_AGLContainer.Visible = !tlp_AGLContainer.Visible;
+                //to stg
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
@@ -284,7 +339,7 @@ namespace MissionPlanner.GCSViews
 
         private void DisableControls()
         {
-            this.tlp_AGLContainer.Visible = false;
+
         }
 
         private void DrawUI()
@@ -315,7 +370,7 @@ namespace MissionPlanner.GCSViews
                 {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
                 {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }},
                 {"Start single-yaw (Auto)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Auto); }},
-                {"Start single-yaw (Master)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Master); }},
+                {"Start single-yaw (Master)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Master); }}, 
                 {"Start single-yaw (Slave)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Slave); }},
                 {"Stop single-yaw", async () => { SingleYawHandler.StopSingleYaw(); }},
                 {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
@@ -736,51 +791,39 @@ namespace MissionPlanner.GCSViews
             ChangeCrossHair();
         }
 
-        private void btn_Up_Click(object sender, EventArgs e)
-        {
-
-            if (this.cs_ColorSliderAltitude.Value < _maxAllowedAltitudeValue - 10)
-                this.cs_ColorSliderAltitude.Value += 10;
-            else
-                this.cs_ColorSliderAltitude.Value = _maxAllowedAltitudeValue;
-
-            this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
-        }
-
-        private void btn_Down_Click(object sender, EventArgs e)
-        {
-            if (this.cs_ColorSliderAltitude.Value > _minAllowedAltitudeValue + 10)
-                this.cs_ColorSliderAltitude.Value -= 10;
-            else
-                this.cs_ColorSliderAltitude.Value = _minAllowedAltitudeValue;
-
-            this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
-        }
-
         Form _fsForm;
 
         private void btn_FullScreen_Click(object sender, EventArgs e)
         {
-            if(_fsForm == null)
+            try
             {
-                this.tlp_CVBase.Controls.Remove(this.vv_VLC);
-                _fsForm = new Form();
-                _fsForm.Controls.Add(this.vv_VLC);
-                vv_VLC.Dock = DockStyle.Fill;
-                vv_VLC.BringToFront();
-                _mediaPlayer.Fullscreen = true;
-                _fsForm.WindowState = FormWindowState.Maximized;
+                if (_fsForm == null)
+                {
+                    this.tlp_CVBase.Controls.Remove(this.vv_VLC);
+                    _fsForm = new Form();
+                    _fsForm.Controls.Add(this.vv_VLC);
+                    vv_VLC.Dock = DockStyle.Fill;
+                    vv_VLC.BringToFront();
+                    _mediaPlayer.Fullscreen = true;
+                    _fsForm.WindowState = FormWindowState.Maximized;
 
-                _fsForm.FormClosing += _fsForm_FormClosing;
+                    _fsForm.FormClosing += _fsForm_FormClosing;
 
-                _fsForm.Show();
+                    _fsForm.Show();
+                }
+                else
+                {
+                    //_fsForm.Close();
+                    //_fsForm.Dispose();
+                    //_fsForm = null;
+                    _fsForm.Show();
+                }
             }
-            else
+            catch
             {
-                _fsForm.Close();
-                _fsForm.Dispose();
-                _fsForm = null;
+                CustomMessageBox.Show("Error occured");
             }
+            
         }
 
         private void _fsForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -877,11 +920,6 @@ namespace MissionPlanner.GCSViews
                 else
                     SetCameraStatusValue(systemModeStr);
 
-                //Test: Set Drone Status
-                if (InvokeRequired)
-                    Invoke(new Action(() => { SetDroneStatusValue(); }));
-                else
-                    SetDroneStatusValue();
 
                 if (InvokeRequired)
                     Invoke(new Action(() => { SetGCSStatusValue(); }));
@@ -996,10 +1034,6 @@ namespace MissionPlanner.GCSViews
             if (CameraView.instance.IsDisposed)
                 return;
 
-            if (InvokeRequired)
-                Invoke(new Action(() => { SetDroneStatusValue(); }));
-            else
-                SetDroneStatusValue();
 
             if (InvokeRequired)
                 Invoke(new Action(() => { SetGCSStatusValue(); }));
@@ -1020,50 +1054,7 @@ namespace MissionPlanner.GCSViews
                 SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState_IR, e.PositionLEDState_RedLight);
         }
 
-        private void btn_SetAlt_Click(object sender, EventArgs e)
-        {
-            Locationwp gotohere = new Locationwp();
 
-            gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
-
-            MainV2.comPort.MAV.GuidedMode.z = cs_ColorSliderAltitude.Value / CurrentState.multiplieralt;
-
-            if (MainV2.comPort.MAV.GuidedMode.z < 10)
-                MainV2.comPort.MAV.GuidedMode.z = 50 / CurrentState.multiplieralt;
-
-            gotohere.alt = MainV2.comPort.MAV.GuidedMode.z; // back to m
-            gotohere.lat = MainV2.comPort.MAV.GuidedMode.x;
-            gotohere.lng = MainV2.comPort.MAV.GuidedMode.y;
-            gotohere.frame = MainV2.comPort.MAV.GuidedMode.frame;
-
-            MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
-
-            try
-            {
-                Locationwp wp = new Locationwp()
-                {
-                    alt = MainV2.comPort.MAV.GuidedMode.z,
-                    lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
-                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                };
-
-                for (int i = 0; i <= 5; i++)
-                {
-                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, wp);
-                }
-            }
-            catch (Exception ex)
-            {
-                CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
-            }
-        }
-
-        private void cs_ColorSliderAltitude_ValueChanged(object sender, EventArgs e)
-        {
-            this.lb_AltitudeValue.Text = cs_ColorSliderAltitude.Value + "m";
-        }
-        
         private void btn_TripSwitchOnOff_Click(object sender, EventArgs e)
         {
             MainV2.instance.SwitchTRIPRelay(!MainV2.instance.TRIPRelayState);
@@ -1109,21 +1100,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private void SetDroneStatusValue()
-        {
-            try
-            {
-                string mode = MainV2.comPort.MAV.cs.mode;
-                this.lb_DroneStatusValue.Text = mode;
-
-                int agl = (int)MainV2.comPort.MAV.cs.alt;
-                this.lb_AltitudeValue.Text = agl.ToString() + "m";
-            }
-            catch (Exception ex)
-            {
-                //log error
-            }
-        }
 
         private void SetCameraStatusValue(string st)
         {
@@ -1460,6 +1436,12 @@ namespace MissionPlanner.GCSViews
         private void btn_NUC_Click(object sender, EventArgs e)
         {
             CameraHandler.Instance.DoNUC();
+        }
+
+        private void btn_Polarity_Click(object sender, EventArgs e)
+        {
+            //
+            ToggleIRPolarity();
         }
     }
 }

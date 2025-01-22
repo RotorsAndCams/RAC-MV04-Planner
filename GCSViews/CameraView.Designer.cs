@@ -35,7 +35,6 @@
             this.btn_Surveillance = new System.Windows.Forms.Button();
             this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.btn_StartStopSingleYaw = new System.Windows.Forms.Button();
-            this.btn_StopTracking = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
             this.btn_Settings = new System.Windows.Forms.Button();
@@ -55,15 +54,6 @@
             this.pb_DroneTakeOff = new System.Windows.Forms.PictureBox();
             this.pb_InfraLight = new System.Windows.Forms.PictureBox();
             this.pb_PositionIndicator = new System.Windows.Forms.PictureBox();
-            this.tlp_AGLContainer = new System.Windows.Forms.TableLayoutPanel();
-            this.cs_ColorSliderAltitude = new MissionPlanner.Controls.ColorSlider();
-            this.tlp_AGLIncrement = new System.Windows.Forms.TableLayoutPanel();
-            this.btn_SetAlt = new System.Windows.Forms.Button();
-            this.btn_Down = new System.Windows.Forms.Button();
-            this.btn_Up = new System.Windows.Forms.Button();
-            this.tlp_AGLData = new System.Windows.Forms.TableLayoutPanel();
-            this.lb_AltitudeValue = new System.Windows.Forms.Label();
-            this.lb_Agl = new System.Windows.Forms.Label();
             this.tlp_ButtonSection1 = new System.Windows.Forms.TableLayoutPanel();
             this.btn_TripSwitchOnOff = new System.Windows.Forms.Button();
             this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
@@ -71,6 +61,8 @@
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
             this.vv_VLC = new LibVLCSharp.WinForms.VideoView();
+            this.btn_Polarity = new System.Windows.Forms.Button();
+            this.btn_StopTracking = new System.Windows.Forms.Button();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
@@ -85,9 +77,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb_DroneTakeOff)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_InfraLight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_PositionIndicator)).BeginInit();
-            this.tlp_AGLContainer.SuspendLayout();
-            this.tlp_AGLIncrement.SuspendLayout();
-            this.tlp_AGLData.SuspendLayout();
             this.tlp_ButtonSection1.SuspendLayout();
             this.tlp_CVBase.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).BeginInit();
@@ -98,18 +87,18 @@
             resources.ApplyResources(this.tlp_ControlsBase, "tlp_ControlsBase");
             this.tlp_ControlsBase.Controls.Add(this.tlp_Buttonsection2, 0, 2);
             this.tlp_ControlsBase.Controls.Add(this.tlp_InfoBase, 0, 0);
-            this.tlp_ControlsBase.Controls.Add(this.tlp_AGLContainer, 0, 3);
             this.tlp_ControlsBase.Controls.Add(this.tlp_ButtonSection1, 0, 1);
             this.tlp_ControlsBase.Name = "tlp_ControlsBase";
             // 
             // tlp_Buttonsection2
             // 
             resources.ApplyResources(this.tlp_Buttonsection2, "tlp_Buttonsection2");
-            this.tlp_Buttonsection2.Controls.Add(this.btn_NUC, 0, 2);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 0, 2);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_Polarity, 1, 0);
             this.tlp_Buttonsection2.Controls.Add(this.btn_Surveillance, 0, 1);
             this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 0);
-            this.tlp_Buttonsection2.Controls.Add(this.btn_StartStopSingleYaw, 1, 0);
-            this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 1, 1);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_StartStopSingleYaw, 1, 2);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_NUC, 1, 1);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
             // 
             // btn_NUC
@@ -148,16 +137,6 @@
             this.btn_StartStopSingleYaw.Name = "btn_StartStopSingleYaw";
             this.btn_StartStopSingleYaw.UseVisualStyleBackColor = false;
             this.btn_StartStopSingleYaw.Click += new System.EventHandler(this.btn_StartStopSingleYaw_Click);
-            // 
-            // btn_StopTracking
-            // 
-            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
-            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
-            this.btn_StopTracking.Name = "btn_StopTracking";
-            this.btn_StopTracking.UseVisualStyleBackColor = false;
-            this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
             // 
             // tlp_InfoBase
             // 
@@ -291,95 +270,6 @@
             this.pb_PositionIndicator.Name = "pb_PositionIndicator";
             this.pb_PositionIndicator.TabStop = false;
             // 
-            // tlp_AGLContainer
-            // 
-            this.tlp_AGLContainer.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.tlp_AGLContainer, "tlp_AGLContainer");
-            this.tlp_AGLContainer.Controls.Add(this.cs_ColorSliderAltitude, 1, 0);
-            this.tlp_AGLContainer.Controls.Add(this.tlp_AGLIncrement, 0, 0);
-            this.tlp_AGLContainer.ForeColor = System.Drawing.Color.RosyBrown;
-            this.tlp_AGLContainer.Name = "tlp_AGLContainer";
-            // 
-            // cs_ColorSliderAltitude
-            // 
-            this.cs_ColorSliderAltitude.BackColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.BarInnerColor = System.Drawing.Color.Chartreuse;
-            this.cs_ColorSliderAltitude.BarOuterColor = System.Drawing.Color.DarkGreen;
-            this.cs_ColorSliderAltitude.BarPenColor = System.Drawing.Color.Silver;
-            this.cs_ColorSliderAltitude.BorderRoundRectSize = new System.Drawing.Size(15, 15);
-            resources.ApplyResources(this.cs_ColorSliderAltitude, "cs_ColorSliderAltitude");
-            this.cs_ColorSliderAltitude.ForeColor = System.Drawing.Color.Black;
-            this.cs_ColorSliderAltitude.LargeChange = ((uint)(10u));
-            this.cs_ColorSliderAltitude.Maximum = 500;
-            this.cs_ColorSliderAltitude.Minimum = 50;
-            this.cs_ColorSliderAltitude.MouseWheelBarPartitions = 50;
-            this.cs_ColorSliderAltitude.Name = "cs_ColorSliderAltitude";
-            this.cs_ColorSliderAltitude.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.cs_ColorSliderAltitude.SmallChange = ((uint)(1u));
-            this.cs_ColorSliderAltitude.ThumbInnerColor = System.Drawing.Color.White;
-            this.cs_ColorSliderAltitude.ThumbRoundRectSize = new System.Drawing.Size(10, 20);
-            this.cs_ColorSliderAltitude.ThumbSize = 40;
-            this.cs_ColorSliderAltitude.ValueChanged += new System.EventHandler(this.cs_ColorSliderAltitude_ValueChanged);
-            // 
-            // tlp_AGLIncrement
-            // 
-            resources.ApplyResources(this.tlp_AGLIncrement, "tlp_AGLIncrement");
-            this.tlp_AGLIncrement.Controls.Add(this.btn_SetAlt, 0, 3);
-            this.tlp_AGLIncrement.Controls.Add(this.btn_Down, 0, 2);
-            this.tlp_AGLIncrement.Controls.Add(this.btn_Up, 0, 0);
-            this.tlp_AGLIncrement.Controls.Add(this.tlp_AGLData, 0, 1);
-            this.tlp_AGLIncrement.Name = "tlp_AGLIncrement";
-            // 
-            // btn_SetAlt
-            // 
-            resources.ApplyResources(this.btn_SetAlt, "btn_SetAlt");
-            this.btn_SetAlt.BackColor = System.Drawing.Color.Black;
-            this.btn_SetAlt.ForeColor = System.Drawing.Color.Black;
-            this.btn_SetAlt.Image = global::MissionPlanner.Properties.Resources.confirm_64;
-            this.btn_SetAlt.Name = "btn_SetAlt";
-            this.btn_SetAlt.UseVisualStyleBackColor = false;
-            this.btn_SetAlt.Click += new System.EventHandler(this.btn_SetAlt_Click);
-            // 
-            // btn_Down
-            // 
-            resources.ApplyResources(this.btn_Down, "btn_Down");
-            this.btn_Down.BackColor = System.Drawing.Color.Black;
-            this.btn_Down.ForeColor = System.Drawing.Color.Black;
-            this.btn_Down.Image = global::MissionPlanner.Properties.Resources.icons8_down_64__1_;
-            this.btn_Down.Name = "btn_Down";
-            this.btn_Down.UseVisualStyleBackColor = false;
-            this.btn_Down.Click += new System.EventHandler(this.btn_Down_Click);
-            // 
-            // btn_Up
-            // 
-            resources.ApplyResources(this.btn_Up, "btn_Up");
-            this.btn_Up.BackColor = System.Drawing.Color.Black;
-            this.btn_Up.ForeColor = System.Drawing.Color.Black;
-            this.btn_Up.Image = global::MissionPlanner.Properties.Resources.icons8_upward_arrow_64;
-            this.btn_Up.Name = "btn_Up";
-            this.btn_Up.UseVisualStyleBackColor = false;
-            this.btn_Up.Click += new System.EventHandler(this.btn_Up_Click);
-            // 
-            // tlp_AGLData
-            // 
-            this.tlp_AGLData.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.tlp_AGLData, "tlp_AGLData");
-            this.tlp_AGLData.Controls.Add(this.lb_AltitudeValue, 0, 1);
-            this.tlp_AGLData.Controls.Add(this.lb_Agl, 0, 0);
-            this.tlp_AGLData.Name = "tlp_AGLData";
-            // 
-            // lb_AltitudeValue
-            // 
-            resources.ApplyResources(this.lb_AltitudeValue, "lb_AltitudeValue");
-            this.lb_AltitudeValue.ForeColor = System.Drawing.Color.White;
-            this.lb_AltitudeValue.Name = "lb_AltitudeValue";
-            // 
-            // lb_Agl
-            // 
-            resources.ApplyResources(this.lb_Agl, "lb_Agl");
-            this.lb_Agl.ForeColor = System.Drawing.Color.White;
-            this.lb_Agl.Name = "lb_Agl";
-            // 
             // tlp_ButtonSection1
             // 
             resources.ApplyResources(this.tlp_ButtonSection1, "tlp_ButtonSection1");
@@ -394,6 +284,7 @@
             this.btn_TripSwitchOnOff.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.btn_TripSwitchOnOff, "btn_TripSwitchOnOff");
             this.btn_TripSwitchOnOff.ForeColor = System.Drawing.Color.White;
+            this.btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.icons8_power_64_inv;
             this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
             this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
             this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
@@ -436,11 +327,29 @@
             // 
             // vv_VLC
             // 
-            this.vv_VLC.BackColor = System.Drawing.Color.DarkOrange;
+            this.vv_VLC.BackColor = System.Drawing.SystemColors.ControlDark;
             resources.ApplyResources(this.vv_VLC, "vv_VLC");
-            this.vv_VLC.ForeColor = System.Drawing.Color.DarkOrange;
+            this.vv_VLC.ForeColor = System.Drawing.SystemColors.ControlDark;
             this.vv_VLC.MediaPlayer = null;
             this.vv_VLC.Name = "vv_VLC";
+            // 
+            // btn_Polarity
+            // 
+            this.btn_Polarity.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_Polarity, "btn_Polarity");
+            this.btn_Polarity.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_Polarity.Image = global::MissionPlanner.Properties.Resources.icons8_invert_50;
+            this.btn_Polarity.Name = "btn_Polarity";
+            this.btn_Polarity.UseVisualStyleBackColor = false;
+            // 
+            // btn_StopTracking
+            // 
+            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
+            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
+            this.btn_StopTracking.Name = "btn_StopTracking";
+            this.btn_StopTracking.UseVisualStyleBackColor = false;
             // 
             // CameraView
             // 
@@ -468,11 +377,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb_DroneTakeOff)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_InfraLight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb_PositionIndicator)).EndInit();
-            this.tlp_AGLContainer.ResumeLayout(false);
-            this.tlp_AGLIncrement.ResumeLayout(false);
-            this.tlp_AGLIncrement.PerformLayout();
-            this.tlp_AGLData.ResumeLayout(false);
-            this.tlp_AGLData.PerformLayout();
             this.tlp_ButtonSection1.ResumeLayout(false);
             this.tlp_CVBase.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).EndInit();
@@ -483,7 +387,6 @@
         #endregion
         private System.Windows.Forms.TableLayoutPanel tlp_ControlsBase;
         private System.Windows.Forms.TableLayoutPanel tlp_Buttonsection2;
-        private System.Windows.Forms.Button btn_StopTracking;
         private System.Windows.Forms.Button btn_ResetZoom;
         private System.Windows.Forms.TableLayoutPanel tlp_ButtonSection1;
         private System.Windows.Forms.Button btn_TripSwitchOnOff;
@@ -509,19 +412,12 @@
         private System.Windows.Forms.PictureBox pb_DroneTakeOff;
         private System.Windows.Forms.PictureBox pb_InfraLight;
         private System.Windows.Forms.PictureBox pb_PositionIndicator;
-        private System.Windows.Forms.TableLayoutPanel tlp_AGLContainer;
-        private Controls.ColorSlider cs_ColorSliderAltitude;
-        private System.Windows.Forms.TableLayoutPanel tlp_AGLIncrement;
-        private System.Windows.Forms.Button btn_SetAlt;
-        private System.Windows.Forms.Button btn_Down;
-        private System.Windows.Forms.Button btn_Up;
-        private System.Windows.Forms.TableLayoutPanel tlp_AGLData;
-        private System.Windows.Forms.Label lb_AltitudeValue;
-        private System.Windows.Forms.Label lb_Agl;
         private System.Windows.Forms.TableLayoutPanel tlp_CVBase;
         private System.Windows.Forms.Button btn_StartStopSingleYaw;
         private LibVLCSharp.WinForms.VideoView vv_VLC;
         private System.Windows.Forms.Button btn_Surveillance;
         private System.Windows.Forms.Button btn_NUC;
+        private System.Windows.Forms.Button btn_Polarity;
+        private System.Windows.Forms.Button btn_StopTracking;
     }
 }

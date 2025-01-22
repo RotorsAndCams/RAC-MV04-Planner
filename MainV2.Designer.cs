@@ -45,6 +45,7 @@ namespace MissionPlanner
             this.connectionListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuFlightData = new System.Windows.Forms.ToolStripButton();
             this.MenuFlightPlanner = new System.Windows.Forms.ToolStripButton();
+            this.tsb_ChangeView = new System.Windows.Forms.ToolStripButton();
             this.MenuCamera = new System.Windows.Forms.ToolStripButton();
             this.MenuInitConfig = new System.Windows.Forms.ToolStripButton();
             this.MenuConfigTune = new System.Windows.Forms.ToolStripButton();
@@ -56,7 +57,6 @@ namespace MissionPlanner
             this.menu = new MissionPlanner.Controls.MyButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.status1 = new MissionPlanner.Controls.Status();
-            this.tsb_ChangeView = new System.Windows.Forms.ToolStripButton();
             this.MainMenu.SuspendLayout();
             this.CTX_mainmenu.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -145,6 +145,15 @@ namespace MissionPlanner
             this.MenuFlightPlanner.Name = "MenuFlightPlanner";
             this.MenuFlightPlanner.Click += new System.EventHandler(this.MenuFlightPlanner_Click);
             // 
+            // tsb_ChangeView
+            // 
+            this.tsb_ChangeView.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.tsb_ChangeView.Image = global::MissionPlanner.Properties.Resources.camera_64;
+            resources.ApplyResources(this.tsb_ChangeView, "tsb_ChangeView");
+            this.tsb_ChangeView.Margin = new System.Windows.Forms.Padding(0);
+            this.tsb_ChangeView.Name = "tsb_ChangeView";
+            this.tsb_ChangeView.Click += new System.EventHandler(this.tsb_ChangeView_Click);
+            // 
             // MenuCamera
             // 
             this.MenuCamera.ForeColor = System.Drawing.SystemColors.ControlLight;
@@ -181,6 +190,7 @@ namespace MissionPlanner
             // MenuHelp
             // 
             this.MenuHelp.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.MenuHelp.Image = global::MissionPlanner.Properties.Resources.icons8_menu_100;
             resources.ApplyResources(this.MenuHelp, "MenuHelp");
             this.MenuHelp.Margin = new System.Windows.Forms.Padding(0);
             this.MenuHelp.Name = "MenuHelp";
@@ -237,14 +247,6 @@ namespace MissionPlanner
             resources.ApplyResources(this.status1, "status1");
             this.status1.Name = "status1";
             this.status1.Percent = 0D;
-            // 
-            // tsb_ChangeView
-            // 
-            this.tsb_ChangeView.ForeColor = System.Drawing.SystemColors.ControlLight;
-            resources.ApplyResources(this.tsb_ChangeView, "tsb_ChangeView");
-            this.tsb_ChangeView.Margin = new System.Windows.Forms.Padding(0);
-            this.tsb_ChangeView.Name = "tsb_ChangeView";
-            this.tsb_ChangeView.Click += new System.EventHandler(this.tsb_ChangeView_Click);
             // 
             // MainV2
             // 
