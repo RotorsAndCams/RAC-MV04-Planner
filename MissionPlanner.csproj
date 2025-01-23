@@ -5026,6 +5026,11 @@
     <None Include="Resources\istanding-man-50.png" />
     <None Include="Resources\standing-man-50.png" />
     <None Include="Resources\icons8-invert-50.png" />
+    <None Include="Resources\icons8-menu-256.png" />
+    <None Include="Resources\icons8-flight-100.png" />
+    <None Include="Resources\icons8-flight-64 %281%29.png" />
+    <None Include="Resources\icons8-earth-64.png" />
+    <None Include="Resources\icons8-earth-64 %281%29.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

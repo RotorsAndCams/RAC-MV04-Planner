@@ -1222,10 +1222,44 @@ namespace MissionPlanner
                 this.MenuInitConfig.Visible = false;
                 this.MenuConfigTune.Visible = false;
                 //this.MenuHelp.Visible = false;
+
+                
             }
 
-            this.MenuHelp.Image = global::MissionPlanner.Properties.Resources.icons8_menu_100;
+            MenuFlightData.Width = 200;
+            MenuFlightData.Height = 200;
+            MenuFlightData.BackColor = Color.White;
+            MenuFlightData.ImageScaling = ToolStripItemImageScaling.None;
 
+            MenuHelp.Width = 200;
+            MenuHelp.Height = 200;
+            MenuHelp.BackColor = Color.White;
+            MenuHelp.Size = new Size(200, 200);
+            MenuHelp.ImageScaling = ToolStripItemImageScaling.None;
+
+            MenuSimulation.Width = 200;
+            MenuSimulation.Height = 200;
+            MenuSimulation.BackColor = Color.White;
+            MenuSimulation.ImageScaling = ToolStripItemImageScaling.None;
+
+            MenuFlightPlanner.Width = 200;
+            MenuFlightPlanner.Height = 200;
+            MenuFlightPlanner.BackColor = Color.White;
+            MenuFlightPlanner.ImageScaling = ToolStripItemImageScaling.None;
+
+            tsb_ChangeView.Width = 200;
+            tsb_ChangeView.Height = 200;
+            tsb_ChangeView.BackColor = Color.White;
+            tsb_ChangeView.ImageScaling = ToolStripItemImageScaling.None;
+
+            //MainMenu.Width = MainMenu.Width * 2;
+            //MainMenu.Height = MainMenu.Height * 2;
+            //MainMenu.BackColor = Color.White;
+            //menustrip
+            this.MenuFlightData.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
+            this.MenuHelp.Image = global::MissionPlanner.Properties.Resources.icons8_menu_100;
+            this.MenuFlightData.Image = this.MenuFlightData.Image;
+            this.MenuFlightPlanner.Image = this.MenuFlightPlanner.Image;
         }
         public bool devmode = false;
 
@@ -4584,7 +4618,7 @@ namespace MissionPlanner
         {
             this.SuspendLayout();
             panel1.Location = new Point(0, 0);
-            panel1.Width = menu.Width;
+            //panel1.Width = menu.Width;
             panel1.BringToFront();
             panel1.Visible = true;
             this.ResumeLayout();
@@ -4607,7 +4641,7 @@ namespace MissionPlanner
                 panel1.Dock = DockStyle.Top;
                 panel1.SendToBack();
                 panel1.Visible = true;
-                menu.Visible = false;
+                //menu.Visible = false;
                 MainMenu.MouseLeave -= MainMenu_MouseLeave;
                 panel1.MouseLeave -= MainMenu_MouseLeave;
                 toolStripConnectionControl.MouseLeave -= MainMenu_MouseLeave;
@@ -4621,8 +4655,8 @@ namespace MissionPlanner
                 MainMenu.MouseLeave += MainMenu_MouseLeave;
                 panel1.MouseLeave += MainMenu_MouseLeave;
                 toolStripConnectionControl.MouseLeave += MainMenu_MouseLeave;
-                menu.Visible = true;
-                menu.SendToBack();
+                //menu.Visible = true;
+                //menu.SendToBack();
                 this.ResumeLayout();
             }
         }

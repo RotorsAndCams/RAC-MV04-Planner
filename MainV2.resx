@@ -331,48 +331,11 @@
   <data name="MainMenu.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
-  <data name="MenuFlightData.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAADEAAAAtCAYAAAAHiIP8AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAc7SURBVGhD7ZhtUxNXFMf5BmVqdZUYstk8oL7KN+jO9EU7
-        tS3Wh1qtUzJFpYIOUaioBFlBXAiGJaRWBTEiQQgBV5JAiCGuDhTs+JBSxcdRhvow+iof4fSenTWlmlhD
-        AGvb/8wZyM3m7v3tuefcczZjNrVh16JVX1kWuNYVLjQpQ++edjqzYFvtYthUthDW7njfogy/W+LP0WJ1
-        dzaUHMmCfI6Cr3cumHznvCKImszGIW3U5qfBeloNhbYlslfW7FjAKZe8GxKCGropyMSE81qo9mbDLuIV
-        cwUF63Z8IOUWv5epXCYrt4CilX//eRJCGpOTgDQOMVDro2HPCTVsObgY1pcsiq3evmiVclnG+hKKXb2d
-        iuYWLDQrQzLYynyKVT6+XSEIesRxgYH6fi3s78iG7XYVbNpLwYYfKCGfV7EFDiqWX62CtRZKzC3WZG4q
-        zxI27FFB7rYloEzz9iWENWyTxIAjogN7iCHbSwslx9RQ7FRDeTsNlR4GLD9RsS01Kq6Ap2KlJxgoFGhY
-        Y1niUqZIX4Ig0A6Hg0vFnE4n19rSygWDQe7WrVsWYYgxOy7ooJFYw3k91AYYqOnTAR/QQfVZHext00r7
-        2hngvAao6DJAAU/H0CvKEtKT2+02B/x+CA0OpmznQyGIDA3B6Ogo3L17VxBCjBkhGiN6aBjSgz1sAFtQ
-        J8NUn9PBIb8BanxG2H2SgW/KVbPjBVEUM8fGxmIPHjyAycnJlO3hw4dw584d+OXyZbg8dhlBzA1hnWs6
-        RH1ID3UDxDNBgwyBnrAc1Qob96nEldsWT366Oc3z5cqVK+zTp0/h2bNn8PvUVIwsjEvV7t+/z127do2L
-        hMPc8PCwfE4gyAuIw2Rr1YcMUDdoIN4wQLlbB6WtWrGokYb1ZVRs5dYl6Z34t2/fZp8/fw737t2DS5cu
-        ScrwrOhwmIm+DHGQQOz36MF6Rg87m3Wwyao25+alGRcIgZ4gHgF3W9usQVR1a8x2sviXIfiAEQ72GaG8
-        Qw/5NtWkcnl6egEx+vPPcPzYsThEk9BkTpSRkhnJblx9fT3+zSxuyjIfErUE4FWI2gEjHArkQFmbDr6t
-        XAqff5/mVkIlg+jv75cSZaNENjAwAN2ebjh16pQLAap6aJJidXCYBHRtQA+8X8fV9utcLyB4AmHt1MOW
-        Og18WUDFPs5LsyRJBkGyjESCNmFGmm4PSVb7bXwcIpGIVNqcZarupGMNYUaGOEAOvNJmdbzMQBAZoj8H
-        qkQjlLTKMQGfbVmc3jZOBvE6YQVb59dwvKjhqr0attKlyUQ72EnFGshpbT/PQBWB2S78CYAi0JmH/EYX
-        QtT4cmC/1whFDgbWlajgk81pbKuZQFS0qy0HurLB2rYUdh9XQVmzCqo82WAf1MLhIEO2ijpaLGS9kvtH
-        R0ZEko7ZKp9BqPETb/Qtgz3tRtjM05BblAWf5s3wvEgGYbPZTCRQ2enmFATW6/WyzYGNJt5Px/hzGqjp
-        1UBtn4YsXkuKPxoq2rNdp7uaVh09elT+Dc/z8f2OWw4PRTwQq0SDudq3DCp7l8GuEwb4piIbVm6loh/O
-        JN0mg/B4PFKP1wvTrbenBwaDQRj/dTzaPryGxRLceZEBNPQCegdjgJQwMU9XF84HdXV18SaJ/E4aGR4B
-        ciDCzZs3TZVijvnAueVg9SyHwiYdrCtdCh9/RwnK5W+uZBDj4+MSeWL41OJ2a2ICrl29KpcX5Pto90ie
-        yRHRSghhC6AX1GjcxMSEdP36dRDPioCpV5kyY2pqSiIg4Pf5gRSNch9R2ZNjrjy7AnafzoHveC18UaSC
-        j/JS7DGSQeCTwu9etmg0yobDYdbv97OSJMmuR4/gVtrvVpM4UUv4W7yO1GUsVsfyhERPnjyRsM4629sL
-        LS0t8YVau3PMVu9ysLQYYaOVhk/yUzwEcWGpBvbLwl6CD2pjCFFUn5V0AQiBHsWtKZB4UYZl7XOvMJWd
-        yYltbdBD7g51at6YDQiULaAx7W1dKuVVUElfFEyHwKBXhuMqda0wFf6oF1fvUkdTOgCTQZDsIuDn19rx
-        41KH2y2FQiGJxIp06eJF+TN+d+TIEclut0skO8XPir+DmLGSQWBFi2N/a6QZwmC/ceMGZi25r8DxC5EI
-        nOnoAHu9Pe6ZeYcgNxNIoyTN1EhwS319fVKTILw9T8yF/od4nZJBpNpPvGJKf0ECO77YeYdIpZ9IZD6f
-        D1wnT+Ji32pgv1E/kcxIYMsg6BFlyv9j4rX6V0Mk6idSNQzq6f3EvEMk6idSsc4znTjfX/qJeYdI1E+k
-        Yon6iXmHSNZPvKkl6yfmFWIuNOcQWH2SbmsSmxXy9Fin4EzTBHkeXKyrxcWOjY2xjx49mpwrCBpfKGP/
-        jCct3mC2DefF+fE+2J7i28LpWWtWRCYX0RukhE4YpOkazovzIwS+LXS3t4vKrWdPpEzIJK7mcM/OlT1+
-        /BjjQQqHw/JLZ+XW/0VlZPwByvoJC18+AxgAAAAASUVORK5CYII=
-</value>
-  </data>
   <data name="MenuFlightData.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>Magenta</value>
   </data>
   <data name="MenuFlightData.Size" type="System.Drawing.Size, System.Drawing">
-    <value>49, 47</value>
+    <value>49, 92</value>
   </data>
   <data name="MenuFlightData.Text" xml:space="preserve">
     <value>DATA</value>
@@ -386,60 +349,11 @@
   <data name="MenuFlightData.ToolTipText" xml:space="preserve">
     <value>Flight Data</value>
   </data>
-  <data name="MenuFlightPlanner.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        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
-        AAAASUVORK5CYII=
-</value>
-  </data>
   <data name="MenuFlightPlanner.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
     <value>White</value>
   </data>
   <data name="MenuFlightPlanner.Size" type="System.Drawing.Size, System.Drawing">
-    <value>49, 47</value>
+    <value>39, 92</value>
   </data>
   <data name="MenuFlightPlanner.Text" xml:space="preserve">
     <value>PLAN</value>
@@ -457,7 +371,7 @@
     <value>Magenta</value>
   </data>
   <data name="tsb_ChangeView.Size" type="System.Drawing.Size, System.Drawing">
-    <value>56, 47</value>
+    <value>56, 92</value>
   </data>
   <data name="tsb_ChangeView.Text" xml:space="preserve">
     <value>CHANGE</value>
@@ -475,7 +389,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuCamera.Size" type="System.Drawing.Size, System.Drawing">
-    <value>56, 47</value>
+    <value>56, 92</value>
   </data>
   <data name="MenuCamera.Text" xml:space="preserve">
     <value>CAMERA</value>
@@ -536,7 +450,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuInitConfig.Size" type="System.Drawing.Size, System.Drawing">
-    <value>49, 47</value>
+    <value>49, 92</value>
   </data>
   <data name="MenuInitConfig.Text" xml:space="preserve">
     <value>SETUP</value>
@@ -597,7 +511,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuConfigTune.Size" type="System.Drawing.Size, System.Drawing">
-    <value>51, 47</value>
+    <value>51, 92</value>
   </data>
   <data name="MenuConfigTune.Text" xml:space="preserve">
     <value>CONFIG</value>
@@ -652,7 +566,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuSimulation.Size" type="System.Drawing.Size, System.Drawing">
-    <value>77, 47</value>
+    <value>77, 92</value>
   </data>
   <data name="MenuSimulation.Text" xml:space="preserve">
     <value>SIMULATION</value>
@@ -670,7 +584,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuHelp.Size" type="System.Drawing.Size, System.Drawing">
-    <value>49, 47</value>
+    <value>49, 92</value>
   </data>
   <data name="MenuHelp.Text" xml:space="preserve">
     <value>MENU</value>
@@ -723,7 +637,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuConnect.Size" type="System.Drawing.Size, System.Drawing">
-    <value>63, 47</value>
+    <value>63, 92</value>
   </data>
   <data name="MenuConnect.Text" xml:space="preserve">
     <value>CONNECT</value>
@@ -892,7 +806,7 @@
 </value>
   </data>
   <data name="toolStripConnectionControl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>241, 47</value>
+    <value>241, 92</value>
   </data>
   <data name="MenuArduPilot.AutoSize" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -916,7 +830,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="MainMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>923, 47</value>
+    <value>935, 92</value>
   </data>
   <data name="MainMenu.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -936,44 +850,14 @@
   <data name="&gt;&gt;MainMenu.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="menu.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="menu.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="menu.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
-  </data>
-  <data name="menu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>944, 28</value>
-  </data>
-  <data name="menu.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="menu.Text" xml:space="preserve">
-    <value>Menu</value>
-  </data>
-  <data name="&gt;&gt;menu.Name" xml:space="preserve">
-    <value>menu</value>
-  </data>
-  <data name="&gt;&gt;menu.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.MyButton, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;menu.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;menu.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
   <data name="status1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left, Right</value>
   </data>
   <data name="status1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 42</value>
+    <value>0, 87</value>
   </data>
   <data name="status1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>923, 4</value>
+    <value>935, 4</value>
   </data>
   <data name="status1.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -985,7 +869,7 @@
     <value>status1</value>
   </data>
   <data name="&gt;&gt;status1.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.Status, SecopPlanner2, Version=1.3.9153.28046, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.Status, SecopPlanner2, Version=1.3.9154.20848, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;status1.Parent" xml:space="preserve">
     <value>panel1</value>
@@ -994,7 +878,7 @@
     <value>0</value>
   </data>
   <data name="panel1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 54</value>
+    <value>0, 9</value>
   </data>
   <data name="panel1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -1003,7 +887,7 @@
     <value>133332, 123</value>
   </data>
   <data name="panel1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>923, 47</value>
+    <value>935, 92</value>
   </data>
   <data name="panel1.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -2782,7 +2666,7 @@
     <value>toolStripConnectionControl</value>
   </data>
   <data name="&gt;&gt;toolStripConnectionControl.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ToolStripConnectionControl, SecopPlanner2, Version=1.3.9153.28046, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ToolStripConnectionControl, SecopPlanner2, Version=1.3.9154.20848, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;MenuArduPilot.Name" xml:space="preserve">
     <value>MenuArduPilot</value>

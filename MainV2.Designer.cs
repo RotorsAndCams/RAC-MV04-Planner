@@ -54,7 +54,6 @@ namespace MissionPlanner
             this.MenuConnect = new System.Windows.Forms.ToolStripButton();
             this.toolStripConnectionControl = new MissionPlanner.Controls.ToolStripConnectionControl();
             this.MenuArduPilot = new System.Windows.Forms.ToolStripButton();
-            this.menu = new MissionPlanner.Controls.MyButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.status1 = new MissionPlanner.Controls.Status();
             this.MainMenu.SuspendLayout();
@@ -132,6 +131,7 @@ namespace MissionPlanner
             // MenuFlightData
             // 
             this.MenuFlightData.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.MenuFlightData.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
             resources.ApplyResources(this.MenuFlightData, "MenuFlightData");
             this.MenuFlightData.Margin = new System.Windows.Forms.Padding(0);
             this.MenuFlightData.Name = "MenuFlightData";
@@ -226,14 +226,6 @@ namespace MissionPlanner
             this.MenuArduPilot.Name = "MenuArduPilot";
             this.MenuArduPilot.Click += new System.EventHandler(this.MenuArduPilot_Click);
             // 
-            // menu
-            // 
-            resources.ApplyResources(this.menu, "menu");
-            this.menu.Name = "menu";
-            this.menu.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
-            this.menu.UseVisualStyleBackColor = true;
-            this.menu.MouseEnter += new System.EventHandler(this.menu_MouseEnter);
-            // 
             // panel1
             // 
             this.panel1.Controls.Add(this.status1);
@@ -253,7 +245,6 @@ namespace MissionPlanner
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.menu);
             this.KeyPreview = true;
             this.MainMenuStrip = this.MainMenu;
             this.Name = "MainV2";
@@ -280,7 +271,6 @@ namespace MissionPlanner
         public System.Windows.Forms.ToolStripButton MenuConfigTune;
         public System.Windows.Forms.ToolStripButton MenuConnect;
         private Controls.ToolStripConnectionControl toolStripConnectionControl;
-        private Controls.MyButton menu;
         public System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ContextMenuStrip CTX_mainmenu;
         private System.Windows.Forms.ToolStripMenuItem autoHideToolStripMenuItem;
