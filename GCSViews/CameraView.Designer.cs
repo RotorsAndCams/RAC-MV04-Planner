@@ -31,10 +31,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CameraView));
             this.tlp_ControlsBase = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_Buttonsection2 = new System.Windows.Forms.TableLayoutPanel();
-            this.btn_NUC = new System.Windows.Forms.Button();
+            this.btn_StopTracking = new System.Windows.Forms.Button();
+            this.btn_Polarity = new System.Windows.Forms.Button();
             this.btn_Surveillance = new System.Windows.Forms.Button();
             this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.btn_StartStopSingleYaw = new System.Windows.Forms.Button();
+            this.btn_NUC = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
             this.btn_Settings = new System.Windows.Forms.Button();
@@ -61,8 +63,6 @@
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
             this.vv_VLC = new LibVLCSharp.WinForms.VideoView();
-            this.btn_Polarity = new System.Windows.Forms.Button();
-            this.btn_StopTracking = new System.Windows.Forms.Button();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
@@ -101,14 +101,24 @@
             this.tlp_Buttonsection2.Controls.Add(this.btn_NUC, 1, 1);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
             // 
-            // btn_NUC
+            // btn_StopTracking
             // 
-            this.btn_NUC.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_NUC, "btn_NUC");
-            this.btn_NUC.ForeColor = System.Drawing.Color.White;
-            this.btn_NUC.Name = "btn_NUC";
-            this.btn_NUC.UseVisualStyleBackColor = false;
-            this.btn_NUC.Click += new System.EventHandler(this.btn_NUC_Click);
+            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
+            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
+            this.btn_StopTracking.Name = "btn_StopTracking";
+            this.btn_StopTracking.UseVisualStyleBackColor = false;
+            // 
+            // btn_Polarity
+            // 
+            this.btn_Polarity.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_Polarity, "btn_Polarity");
+            this.btn_Polarity.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_Polarity.Image = global::MissionPlanner.Properties.Resources.icons8_invert_50;
+            this.btn_Polarity.Name = "btn_Polarity";
+            this.btn_Polarity.UseVisualStyleBackColor = false;
+            this.btn_Polarity.Click += new System.EventHandler(this.btn_Polarity_Click);
             // 
             // btn_Surveillance
             // 
@@ -137,6 +147,15 @@
             this.btn_StartStopSingleYaw.Name = "btn_StartStopSingleYaw";
             this.btn_StartStopSingleYaw.UseVisualStyleBackColor = false;
             this.btn_StartStopSingleYaw.Click += new System.EventHandler(this.btn_StartStopSingleYaw_Click);
+            // 
+            // btn_NUC
+            // 
+            this.btn_NUC.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_NUC, "btn_NUC");
+            this.btn_NUC.ForeColor = System.Drawing.Color.White;
+            this.btn_NUC.Name = "btn_NUC";
+            this.btn_NUC.UseVisualStyleBackColor = false;
+            this.btn_NUC.Click += new System.EventHandler(this.btn_NUC_Click);
             // 
             // tlp_InfoBase
             // 
@@ -332,24 +351,6 @@
             this.vv_VLC.ForeColor = System.Drawing.SystemColors.ControlDark;
             this.vv_VLC.MediaPlayer = null;
             this.vv_VLC.Name = "vv_VLC";
-            // 
-            // btn_Polarity
-            // 
-            this.btn_Polarity.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_Polarity, "btn_Polarity");
-            this.btn_Polarity.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_Polarity.Image = global::MissionPlanner.Properties.Resources.icons8_invert_50;
-            this.btn_Polarity.Name = "btn_Polarity";
-            this.btn_Polarity.UseVisualStyleBackColor = false;
-            // 
-            // btn_StopTracking
-            // 
-            this.btn_StopTracking.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_StopTracking, "btn_StopTracking");
-            this.btn_StopTracking.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
-            this.btn_StopTracking.Name = "btn_StopTracking";
-            this.btn_StopTracking.UseVisualStyleBackColor = false;
             // 
             // CameraView
             // 

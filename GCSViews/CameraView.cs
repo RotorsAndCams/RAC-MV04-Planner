@@ -1438,6 +1438,8 @@ namespace MissionPlanner.GCSViews
             CameraHandler.Instance.DoNUC();
         }
 
+
+
         private void btn_Polarity_Click(object sender, EventArgs e)
         {
             //
