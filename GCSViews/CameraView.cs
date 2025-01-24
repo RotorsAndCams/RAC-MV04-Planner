@@ -1439,11 +1439,22 @@ namespace MissionPlanner.GCSViews
         }
 
 
-
+        bool isPolarityInverted = false;
         private void btn_Polarity_Click(object sender, EventArgs e)
         {
             //
-            ToggleIRPolarity();
+            //ToggleIRPolarity();
+
+            if (isPolarityInverted)
+            {
+                CameraHandler.Instance.SetIRPolarity(IRPolarity.Normal);
+                isPolarityInverted = false;
+            }
+            else
+            {
+                CameraHandler.Instance.SetIRPolarity(IRPolarity.Inverted);
+                isPolarityInverted = true;
+            }
         }
     }
 }
