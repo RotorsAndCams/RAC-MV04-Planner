@@ -51,6 +51,7 @@ namespace MissionPlanner
             this.MenuConfigTune = new System.Windows.Forms.ToolStripButton();
             this.MenuSimulation = new System.Windows.Forms.ToolStripButton();
             this.MenuHelp = new System.Windows.Forms.ToolStripButton();
+            this.tsb_Error = new System.Windows.Forms.ToolStripButton();
             this.MenuConnect = new System.Windows.Forms.ToolStripButton();
             this.toolStripConnectionControl = new MissionPlanner.Controls.ToolStripConnectionControl();
             this.MenuArduPilot = new System.Windows.Forms.ToolStripButton();
@@ -76,6 +77,7 @@ namespace MissionPlanner
             this.MenuConfigTune,
             this.MenuSimulation,
             this.MenuHelp,
+            this.tsb_Error,
             this.MenuConnect,
             this.toolStripConnectionControl,
             this.MenuArduPilot});
@@ -200,6 +202,15 @@ namespace MissionPlanner
             this.MenuHelp.Name = "MenuHelp";
             this.MenuHelp.Click += new System.EventHandler(this.MenuHelp_Click);
             // 
+            // tsb_Error
+            // 
+            this.tsb_Error.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.tsb_Error.Image = global::MissionPlanner.Properties.Resources.icons8_error_64;
+            resources.ApplyResources(this.tsb_Error, "tsb_Error");
+            this.tsb_Error.Margin = new System.Windows.Forms.Padding(0);
+            this.tsb_Error.Name = "tsb_Error";
+            this.tsb_Error.Click += new System.EventHandler(this.tsb_Error_Click);
+            // 
             // MenuConnect
             // 
             this.MenuConnect.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -287,5 +298,6 @@ namespace MissionPlanner
         public System.Windows.Forms.ToolStripButton MenuArduPilot;
         public Controls.Status status1;
         public System.Windows.Forms.ToolStripButton tsb_ChangeView;
+        public System.Windows.Forms.ToolStripButton tsb_Error;
     }
 }

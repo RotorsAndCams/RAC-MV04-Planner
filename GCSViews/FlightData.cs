@@ -5123,6 +5123,12 @@ namespace MissionPlanner.GCSViews
             e.DrawFocusRectangle();
         }
 
+        public void SelectMessagesTab()
+        {
+            //this.tabControlactions.SelectedIndex = 0;
+            tabControlactions.SelectedTab = tabPagemessages;
+        }
+
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             Messagetabtimer.Stop();

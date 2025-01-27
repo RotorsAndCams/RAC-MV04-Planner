@@ -5070,6 +5070,9 @@ namespace MissionPlanner
                     break;
                 }
             }
+
+            DoBlinkingErrorButton();
+
         }
 
         private void MainV2_FormClosing(object sender, FormClosingEventArgs e)
@@ -5099,30 +5102,78 @@ namespace MissionPlanner
         private void DisplayMap()
         {
             FlightData.instance.gMapControl1.Show();
-            FlightData.instance.panelka.Controls.Remove(CameraView.instance);
+            //FlightData.instance.panelka.Controls.Remove(CameraView.instance);
             //FlightData.instance.HideCamera();
             if(CameraView.instance != null)
                 CameraView.instance.Hide();
             isMapActive = true;
         }
-
+        CameraView cv;
         private void DisplayCamera()
         {
             FlightData.instance.gMapControl1.Hide();
             //FlightData.instance.ShowCamera();
 
-            CameraView cv = new CameraView();
-            FlightData.instance.panelka.Controls.Add(CameraView.instance);
-            CameraView.instance.Dock = DockStyle.Fill;
-            CameraView.instance.Padding = new Padding(5);
+            if(CameraView.instance == null)
+            {
+                cv = new CameraView();
+            }
+            if (!FlightData.instance.panelka.Controls.Contains(CameraView.instance))
+            {
+                FlightData.instance.panelka.Controls.Add(CameraView.instance);
+                CameraView.instance.Dock = DockStyle.Fill;
+            }
+            
+            //CameraView.instance.Padding = new Padding(5);
             CameraView.instance.Show();
             isMapActive = false;
             CameraView.instance.BringToFront();
         }
 
-        private void Btn_Click(object sender, EventArgs e)
+
+        private void tsb_Error_Click(object sender, EventArgs e)
         {
-            //CameraView.instance.CloseButtons();
+            //if(CameraView.instance != null)
+            //{
+            //    if (CameraView.instance.controlsClosed)
+            //    {
+            //        MenuHelp.Text = "OPEN";
+            //        HideflightData();
+            //    }
+            //}
+
+            if (InvokeRequired)
+                Invoke(new Action(() => MenuHelp.Text = "OPEN"));
+            else
+                MenuHelp.Text = "OPEN";
+
+            HideflightData();
+
+            FlightData.instance.SelectMessagesTab();
+
+        }
+
+        private void DoBlinkingErrorButton()
+        {
+            Task.Run(() => BlinkErrorButton());
+
+        }
+
+        private async void BlinkErrorButton()
+        {
+            int _blinkCounter = 0;
+            while (_blinkCounter != 10)
+            {
+                await Task.Delay(500);
+
+                if (InvokeRequired)
+                    Invoke(new Action(() => tsb_Error.BackColor = tsb_Error.BackColor == Color.Red ? Color.Transparent : Color.Red));
+                else
+                    tsb_Error.BackColor = tsb_Error.BackColor == Color.Red ? Color.Transparent : Color.Red;
+
+
+                ++_blinkCounter;
+            }
         }
     }
 }
