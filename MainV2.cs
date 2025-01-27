@@ -4303,6 +4303,7 @@ namespace MissionPlanner
                     MenuHelp.Text = "HIDE";
                 }
             }
+
             HideflightData();
         }
 
@@ -5133,21 +5134,32 @@ namespace MissionPlanner
 
         private void tsb_Error_Click(object sender, EventArgs e)
         {
-            //if(CameraView.instance != null)
-            //{
-            //    if (CameraView.instance.controlsClosed)
-            //    {
-            //        MenuHelp.Text = "OPEN";
-            //        HideflightData();
-            //    }
-            //}
-
             if (InvokeRequired)
-                Invoke(new Action(() => MenuHelp.Text = "OPEN"));
-            else
-                MenuHelp.Text = "OPEN";
+                Invoke(new Action(() => {
 
-            HideflightData();
+                    if(CameraView.instance != null)
+                        CameraView.instance.SetMenu();
+
+                    MenuHelp.Text = "HIDE";
+                    pnlWidth = FlightData.MainH.Panel1.Width;
+
+                    FlightData.MainH.SplitterDistance = pnlWidth;
+
+                    FlightData.MainH.Panel1Collapsed = false;
+
+                }));
+            else
+            {
+                if (CameraView.instance != null)
+                    CameraView.instance.SetMenu();
+
+                MenuHelp.Text = "HIDE";
+                pnlWidth = FlightData.MainH.Panel1.Width;
+
+                FlightData.MainH.SplitterDistance = pnlWidth;
+
+                FlightData.MainH.Panel1Collapsed = false;
+            }
 
             FlightData.instance.SelectMessagesTab();
 
