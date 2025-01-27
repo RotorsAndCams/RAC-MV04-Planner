@@ -997,6 +997,26 @@ namespace MissionPlanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap icons8_earth_100 {
+            get {
+                object obj = ResourceManager.GetObject("icons8-earth-100", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap icons8_earth_100__1_ {
+            get {
+                object obj = ResourceManager.GetObject("icons8-earth-100 (1)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap icons8_flight_64__1_ {
             get {
                 object obj = ResourceManager.GetObject("icons8-flight-64 (1)", resourceCulture);
@@ -1010,6 +1030,16 @@ namespace MissionPlanner.Properties {
         public static System.Drawing.Bitmap icons8_fullscreen_50 {
             get {
                 object obj = ResourceManager.GetObject("icons8-fullscreen-50", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap icons8_globe_100 {
+            get {
+                object obj = ResourceManager.GetObject("icons8-globe-100", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1100,6 +1130,16 @@ namespace MissionPlanner.Properties {
         public static System.Drawing.Bitmap icons8_upward_arrow_64 {
             get {
                 object obj = ResourceManager.GetObject("icons8-upward-arrow-64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap icons8_war_thunder_100 {
+            get {
+                object obj = ResourceManager.GetObject("icons8-war-thunder-100", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

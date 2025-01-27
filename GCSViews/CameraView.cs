@@ -239,8 +239,8 @@ namespace MissionPlanner.GCSViews
             
             this.FormClosing += CameraView_FormClosing;
 
-            if(MainV2.instance.devmode)
-                btn_StartStopSingleYaw.Visible = false;
+            //if(MainV2.instance.devmode)
+            //    btn_StartStopSingleYaw.Visible = false;
         }
 
         public bool controlsClosed = false;

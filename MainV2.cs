@@ -1244,7 +1244,7 @@ namespace MissionPlanner
 
             MenuFlightPlanner.Width = 200;
             MenuFlightPlanner.Height = 200;
-            MenuFlightPlanner.BackColor = Color.White;
+            //MenuFlightPlanner.BackColor = Color.White;
             MenuFlightPlanner.ImageScaling = ToolStripItemImageScaling.None;
 
             tsb_ChangeView.Width = 200;
@@ -1256,10 +1256,19 @@ namespace MissionPlanner
             //MainMenu.Height = MainMenu.Height * 2;
             //MainMenu.BackColor = Color.White;
             //menustrip
+
+            MenuFlightPlanner.ImageScaling = ToolStripItemImageScaling.None;
+            MenuFlightPlanner.Visible = true;
             this.MenuFlightData.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
+
             this.MenuHelp.Image = global::MissionPlanner.Properties.Resources.icons8_menu_100;
+
+            this.MenuSimulation.Image = global::MissionPlanner.Properties.Resources.icons8_war_thunder_100;
+
+            this.MenuFlightPlanner.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
             this.MenuFlightData.Image = this.MenuFlightData.Image;
-            this.MenuFlightPlanner.Image = this.MenuFlightPlanner.Image;
+
+
         }
         public bool devmode = false;
 
