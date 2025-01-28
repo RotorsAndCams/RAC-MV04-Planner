@@ -1791,7 +1791,8 @@ namespace MissionPlanner
 
         private void MenuFlightData_Click(object sender, EventArgs e)
         {
-            MyView.ShowScreen("FlightData");
+            bool b = FlightData.instance.panelka.Controls.Contains(CameraView.instance);
+            MyView.ShowScreen("FlightData", b);
 
             // save config
             SaveConfig();
