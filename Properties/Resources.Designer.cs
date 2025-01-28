@@ -1007,16 +1007,6 @@ namespace MissionPlanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap icons8_earth_100__1_ {
-            get {
-                object obj = ResourceManager.GetObject("icons8-earth-100 (1)", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         public static System.Drawing.Bitmap icons8_error_64 {
             get {
                 object obj = ResourceManager.GetObject("icons8-error-64", resourceCulture);
@@ -1070,16 +1060,6 @@ namespace MissionPlanner.Properties {
         public static System.Drawing.Bitmap icons8_menu_100 {
             get {
                 object obj = ResourceManager.GetObject("icons8-menu-100", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap icons8_menu_256 {
-            get {
-                object obj = ResourceManager.GetObject("icons8-menu-256", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

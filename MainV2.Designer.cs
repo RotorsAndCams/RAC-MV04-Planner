@@ -142,10 +142,9 @@ namespace MissionPlanner
             // MenuFlightPlanner
             // 
             this.MenuFlightPlanner.BackColor = System.Drawing.SystemColors.Control;
-            this.MenuFlightPlanner.BackgroundImage = global::MissionPlanner.Properties.Resources.icons8_globe_100;
-            resources.ApplyResources(this.MenuFlightPlanner, "MenuFlightPlanner");
             this.MenuFlightPlanner.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.MenuFlightPlanner.Image = global::MissionPlanner.Properties.Resources.icons8_globe_100;
+            this.MenuFlightPlanner.Image = global::MissionPlanner.Properties.Resources.icons8_earth_100;
+            resources.ApplyResources(this.MenuFlightPlanner, "MenuFlightPlanner");
             this.MenuFlightPlanner.Margin = new System.Windows.Forms.Padding(0);
             this.MenuFlightPlanner.Name = "MenuFlightPlanner";
             this.MenuFlightPlanner.Click += new System.EventHandler(this.MenuFlightPlanner_Click);

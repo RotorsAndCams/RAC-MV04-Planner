@@ -299,7 +299,7 @@ namespace MissionPlanner.Utilities
 
         public static void ApplyThemeTo(object control)
         {
-            if (control is CameraView || control is CameraSettingsForm || control is CameraFullScreenForm || control is MenuStrip || control is Form || control is ToolStripButton)
+            if (control is CameraView || control is CameraSettingsForm || control is CameraFullScreenForm /*|| control is MenuStrip || control is Form || control is ToolStripButton*/)
                 return;
 
             if (control is Control)
@@ -319,7 +319,7 @@ namespace MissionPlanner.Utilities
             if (control.GetType().IsDefined(typeof(PreventThemingAttribute)))
                 return;
 
-            if (control is CameraView || control is CameraSettingsForm || control is CameraFullScreenForm || control is MenuStrip || control is Form || control is ToolStripButton)
+            if (control is CameraView || control is CameraSettingsForm || control is CameraFullScreenForm /*|| control is MenuStrip || control is Form || control is ToolStripButton*/)
                 return;
 
             ApplyTheme(control, 0);
