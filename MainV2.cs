@@ -1293,31 +1293,17 @@ namespace MissionPlanner
 
             if (CameraView.instance.controlsClosed)
             {
-               // FlightData.spltContainer.Panel1.Hide();
-               // FlightData.spltContainer.Panel2.Hide();
-                //FlightData.spltContainer.Hide();
-                //spltWidth = FlightData.spltContainer.Width;
-                //FlightData.spltContainer.Width = 0;
-
-                
                 pnlWidth = FlightData.MainH.Panel1.Width;
 
                 FlightData.MainH.SplitterDistance = 0;
-                //FlightData.MainH.Panel1.Hide();
 
                 FlightData.MainH.Panel1Collapsed = true;
 
             }
             else
             {
-                //FlightData.spltContainer.Panel1.Show();
-                //FlightData.spltContainer.Panel2.Show();
-                //FlightData.spltContainer.Show();
-                //FlightData.spltContainer.Width = spltWidth;
-
                 FlightData.MainH.SplitterDistance = pnlWidth;
 
-                //FlightData.MainH.Panel1.Show();
                 FlightData.MainH.Panel1Collapsed = false;
             }
         }
