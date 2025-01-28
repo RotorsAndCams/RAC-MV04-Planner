@@ -53,7 +53,7 @@ namespace MissionPlanner.Controls
                 if (string.Equals(unit.ToLower(), "cm"))
                 {
                     unit = "m";
-                    _InputToParam = 1000.0; // m to cm
+                    _InputToParam = 100.0; // m to cm
                     _ParamToInput = 1.0 / _InputToParam; // cm to m
                 }
 
