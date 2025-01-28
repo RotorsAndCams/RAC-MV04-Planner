@@ -10,6 +10,7 @@ namespace MissionPlanner.Utilities
 {
     public class Speech : IDisposable, ISpeech
     {
+        public event EventHandler SpeakComplete;
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public bool speechEnable { get; set; } = false;
@@ -60,6 +61,9 @@ namespace MissionPlanner.Utilities
             {
                 _speechwindows = new SpeechSynthesizer();
             }
+
+            if (SpeakComplete != null)
+                SpeakComplete(null, null);
         }
 
         public void SpeakAsync(string text)
@@ -125,6 +129,9 @@ namespace MissionPlanner.Utilities
             }
 
             log.Info("TTS: say " + text);
+
+            if (SpeakComplete != null)
+                SpeakComplete(null, null);
         }
 
         void _speechlinux_Exited(object sender, EventArgs e)

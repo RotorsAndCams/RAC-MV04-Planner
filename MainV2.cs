@@ -851,6 +851,10 @@ namespace MissionPlanner
 
             Warnings.WarningEngine.QuickPanelColoring += WarningEngine_QuickPanelColoring;
 
+            //Warnings.WarningEngine.WarningMessage += (sender, s) => { DoBlinkingErrorButton(); };
+
+            speechEngine.SpeakComplete += (sender, s) => { DoBlinkingErrorButton(); };
+
             // proxy loader - dll load now instead of on config form load
             new Transition(new TransitionType_EaseInEaseOut(2000));
 
