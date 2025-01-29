@@ -218,9 +218,9 @@ namespace MissionPlanner.GCSViews
 
             columnWidth = tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width;
             
-            
             this.FormClosing += CameraView_FormClosing;
 
+            SetDroneStatusValue();
         }
 
         public bool controlsClosed = false;
@@ -884,11 +884,14 @@ namespace MissionPlanner.GCSViews
                 try
                 {
                     _cameraState = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report);
-                    
-                    if((int)MainV2.comPort.MAV.cs.alt < 5)
+                    if (!MainV2.instance.devmode)
                     {
-                        CameraHandler.Instance.SetMode(NvSystemModes.Stow);
+                        if ((int)MainV2.comPort.MAV.cs.alt < 5)
+                        {
+                            CameraHandler.Instance.SetMode(NvSystemModes.Stow);
+                        }
                     }
+                    
                 }
                 catch { }
 
@@ -905,6 +908,8 @@ namespace MissionPlanner.GCSViews
                     Invoke(new Action(() => { SetGCSStatusValue(); }));
                 else
                     SetGCSStatusValue();
+
+                SetDroneStatusValue();
 
                 if (_needToResetTime)
                 {
@@ -1014,11 +1019,12 @@ namespace MissionPlanner.GCSViews
             if (CameraView.instance.IsDisposed)
                 return;
 
-
             if (InvokeRequired)
                 Invoke(new Action(() => { SetGCSStatusValue(); }));
             else
                 SetGCSStatusValue();
+
+            SetDroneStatusValue();
         }
 
         private void LEDStateHandler_LedStateChanged(object sender, LEDStateChangedEventArgs e)
@@ -1084,6 +1090,14 @@ namespace MissionPlanner.GCSViews
         private void SetCameraStatusValue(string st)
         {
             this.lb_CameraStatusValue.Text = st;
+        }
+
+        private void SetDroneStatusValue()
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => { this.lb_DroneStatusValue.Text = MainV2.comPort.MAV.cs.mode; }));
+            else
+                this.lb_DroneStatusValue.Text = MainV2.comPort.MAV.cs.mode;
         }
 
         private void SetGCSStatusValue()
