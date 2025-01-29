@@ -223,6 +223,7 @@ namespace MissionPlanner.GCSViews
             SetDroneStatusValue();
         }
 
+        public bool isCameraConnected = false;
         public bool controlsClosed = false;
         float columnWidth;
         PictureBox btn = new PictureBox();
@@ -881,6 +882,7 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
+                isCameraConnected = true;
                 try
                 {
                     _cameraState = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report);
@@ -1445,5 +1447,6 @@ namespace MissionPlanner.GCSViews
                 isPolarityInverted = true;
             }
         }
+
     }
 }

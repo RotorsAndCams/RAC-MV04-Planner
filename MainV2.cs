@@ -1531,6 +1531,9 @@ namespace MissionPlanner
                 return;
             }
 
+            if(!CameraView.instance.isCameraConnected)
+                return;
+
             // Close if open
             if (TRIPOffMessageBox != null)
             {
