@@ -109,6 +109,7 @@
             this.btn_StopTracking.Image = global::MissionPlanner.Properties.Resources.icons8_stop_sign_50;
             this.btn_StopTracking.Name = "btn_StopTracking";
             this.btn_StopTracking.UseVisualStyleBackColor = false;
+            this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
             // 
             // btn_Polarity
             // 
