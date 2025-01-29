@@ -172,6 +172,9 @@ namespace MissionPlanner.GCSViews
 
             SetTripOnOffButton(true);
 
+            if (!MainV2.instance.devmode)
+                vv_VLC.BackColor = Color.Black;
+
             #endregion
 
             #region State handling
@@ -190,7 +193,6 @@ namespace MissionPlanner.GCSViews
             _droneStatusTimer.Enabled = true;
 
             #endregion
-
 
             #region recording vlc stream
 
@@ -216,31 +218,9 @@ namespace MissionPlanner.GCSViews
 
             columnWidth = tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width;
             
-            //btn.Text = "Close";
-            //btn.Location = new Point(0, 0);//(this.vv_VLC.Width - 200, (this.vv_VLC.Height - 100));
-            //btn.Width = 75;
-            //btn.Height = 75;
-            //btn.BackColor = Color.Transparent;
-            //btn.ForeColor = Color.Transparent;
-            ////btn.FlatStyle = FlatStyle.Popup;
-            //btn.Dock = DockStyle.None;
-            //btn.Image = global::MissionPlanner.Properties.Resources.icons8_right_100;
-            ////btn.Image = global::MissionPlanner.Properties.Resources.icons8_right_100;
-            ////btn.ImageAlign = ContentAlignment.MiddleLeft;
-            ////btn.BackgroundImageLayout = ImageLayout.;
-
-            //btn.Click += (sender, e) => {
-                
-                
-            //};
-            //this.Controls.Add(btn);
-            //btn.BringToFront();
-            //btn.BringToFront();
             
             this.FormClosing += CameraView_FormClosing;
 
-            //if(MainV2.instance.devmode)
-            //    btn_StartStopSingleYaw.Visible = false;
         }
 
         public bool controlsClosed = false;
