@@ -170,7 +170,7 @@ namespace MissionPlanner.GCSViews
 
             MainV2.instance.RelaySwitched += MainV2_RelaySwitched;
 
-            SetTripOnOffButton(true);
+            //SetTripOnOffButton(true);
 
             if (!MainV2.instance.devmode)
                 vv_VLC.BackColor = Color.Black;
@@ -883,6 +883,7 @@ namespace MissionPlanner.GCSViews
             try
             {
                 isCameraConnected = true;
+                SetTripOnOffButton(true);
                 try
                 {
                     _cameraState = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report);
@@ -1052,7 +1053,7 @@ namespace MissionPlanner.GCSViews
                     ReconnectCameraStreamAndControl();
                     _needToResetTime = true;
                 }
-                SetTripOnOffButton(e.State);
+                //SetTripOnOffButton(e.State);
             }
         }
 
@@ -1382,13 +1383,11 @@ namespace MissionPlanner.GCSViews
             {
                 if (tripState)
                 {
-                    btn_TripSwitchOnOff.BackColor = Color.DarkGreen;
-                    btn_TripSwitchOnOff.Text = "Camera is On";
+                    btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.icons8_power_64_green;
                 }
                 else
                 {
-                    btn_TripSwitchOnOff.BackColor = Color.Black;
-                    btn_TripSwitchOnOff.Text = "Camera is Off";
+                    btn_TripSwitchOnOff.Image = global::MissionPlanner.Properties.Resources.icons8_power_64_inv;
                 }
             };
 
