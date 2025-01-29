@@ -966,11 +966,6 @@ namespace MissionPlanner.GCSViews
         {
             if (_feedTimer.Enabled)
                 StopFeed();
-
-            if (MainV2.comPort.MAV.wps.Values.Count <= 0)
-            {
-                CustomMessageBox.Show("No uploaded plan");
-            }
         }
 
         private void Execute_Follow_Tasks()
