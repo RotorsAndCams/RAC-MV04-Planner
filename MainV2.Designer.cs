@@ -88,6 +88,7 @@ namespace MissionPlanner
             // 
             // CTX_mainmenu
             // 
+            this.CTX_mainmenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.CTX_mainmenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.autoHideToolStripMenuItem,
             this.fullScreenToolStripMenuItem,
@@ -186,7 +187,7 @@ namespace MissionPlanner
             // MenuSimulation
             // 
             this.MenuSimulation.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.MenuSimulation.Image = global::MissionPlanner.Properties.Resources.icons8_war_thunder_100;
+            this.MenuSimulation.Image = global::MissionPlanner.Properties.Resources.icons8_simulation_64;
             resources.ApplyResources(this.MenuSimulation, "MenuSimulation");
             this.MenuSimulation.Margin = new System.Windows.Forms.Padding(0);
             this.MenuSimulation.Name = "MenuSimulation";

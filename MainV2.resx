@@ -286,37 +286,37 @@
     <value>127, 17</value>
   </metadata>
   <data name="autoHideToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>181, 22</value>
+    <value>209, 24</value>
   </data>
   <data name="autoHideToolStripMenuItem.Text" xml:space="preserve">
     <value>AutoHide</value>
   </data>
   <data name="fullScreenToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>181, 22</value>
+    <value>209, 24</value>
   </data>
   <data name="fullScreenToolStripMenuItem.Text" xml:space="preserve">
     <value>Full Screen</value>
   </data>
   <data name="readonlyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>181, 22</value>
+    <value>209, 24</value>
   </data>
   <data name="readonlyToolStripMenuItem.Text" xml:space="preserve">
     <value>Readonly</value>
   </data>
   <data name="connectionOptionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>181, 22</value>
+    <value>209, 24</value>
   </data>
   <data name="connectionOptionsToolStripMenuItem.Text" xml:space="preserve">
     <value>Connection Options</value>
   </data>
   <data name="connectionListToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>181, 22</value>
+    <value>209, 24</value>
   </data>
   <data name="connectionListToolStripMenuItem.Text" xml:space="preserve">
     <value>Connection List</value>
   </data>
   <data name="CTX_mainmenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>182, 114</value>
+    <value>210, 124</value>
   </data>
   <data name="&gt;&gt;CTX_mainmenu.Name" xml:space="preserve">
     <value>CTX_mainmenu</value>
@@ -335,7 +335,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuFlightData.Size" type="System.Drawing.Size, System.Drawing">
-    <value>49, 92</value>
+    <value>49, 113</value>
   </data>
   <data name="MenuFlightData.Text" xml:space="preserve">
     <value>DATA</value>
@@ -353,7 +353,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuFlightPlanner.Size" type="System.Drawing.Size, System.Drawing">
-    <value>49, 92</value>
+    <value>49, 113</value>
   </data>
   <data name="MenuFlightPlanner.Text" xml:space="preserve">
     <value>PLAN</value>
@@ -371,7 +371,7 @@
     <value>Magenta</value>
   </data>
   <data name="tsb_ChangeView.Size" type="System.Drawing.Size, System.Drawing">
-    <value>56, 92</value>
+    <value>70, 113</value>
   </data>
   <data name="tsb_ChangeView.Text" xml:space="preserve">
     <value>CHANGE</value>
@@ -389,7 +389,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuCamera.Size" type="System.Drawing.Size, System.Drawing">
-    <value>56, 92</value>
+    <value>69, 113</value>
   </data>
   <data name="MenuCamera.Text" xml:space="preserve">
     <value>CAMERA</value>
@@ -406,7 +406,7 @@
   <data name="MenuInitConfig.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAADQAAAAtCAYAAADhoUi4AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAisSURBVGhD7VhpU1NpFvYn+KUrBQgEQkB0PuQn8GXKmZrq
+        YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAisSURBVGhD7VhpU1NpFvYn+KUrBQgEQkB0PuQn8GXKmZrq
         bi0/WNOOA0pXMY4LNL0wEparDQZCYmQJgaYhMFYIECCGBJBmuaC0K2PEfZ2471X5CWfOc7k3JiEqm8tU
         capOZXtz3/O855znnPOuWZVVWZVV+ehisVh0dZa6HIvZLBirqgrKy8vXyj/9/0mno9M+4PHQ0NAQeY4f
         p7bWNjLVmPwMUgJls1oFq9Uq1pqPip892BGfT3f58mW6c+cO/ffePbp16xadnJqif3d0UGtra4HH4xFO
@@ -450,7 +450,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuInitConfig.Size" type="System.Drawing.Size, System.Drawing">
-    <value>49, 92</value>
+    <value>58, 113</value>
   </data>
   <data name="MenuInitConfig.Text" xml:space="preserve">
     <value>SETUP</value>
@@ -467,7 +467,7 @@
   <data name="MenuConfigTune.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAADQAAAAtCAYAAADhoUi4AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAiISURBVGhD7Zn9U1PZGcf9D5Zpx72FEG7eCOpP+Q+amc6O
+        YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAiISURBVGhD7Zn9U1PZGcf9D5Zpx72FEG7eCOpP+Q+amc6O
         M7szlW27pbrdJVV3afGFuLDSCjQXCARI2ADBt7h4IaDRgFyyAWIEGhU0SNVUEVBR4/v7TP6Ep89zzGUD
         u+sKrUpmfGbO3EvuIZzPfd6+57Dinb2znzen05nW0NBgslqthsRHqWsdHR1mr9cb93R4wGazxS0WS1ri
         UerZQCAgXjh/HmZmZiASiUBXZyegp6TE49SyoaEh8dq1a/Do0SN4+vQp0L2/ry9K4ZeYkjo2HBo23bhx
@@ -511,7 +511,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuConfigTune.Size" type="System.Drawing.Size, System.Drawing">
-    <value>51, 92</value>
+    <value>64, 113</value>
   </data>
   <data name="MenuConfigTune.Text" xml:space="preserve">
     <value>CONFIG</value>
@@ -529,7 +529,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuSimulation.Size" type="System.Drawing.Size, System.Drawing">
-    <value>77, 92</value>
+    <value>95, 113</value>
   </data>
   <data name="MenuSimulation.Text" xml:space="preserve">
     <value>SIMULATION</value>
@@ -547,7 +547,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuHelp.Size" type="System.Drawing.Size, System.Drawing">
-    <value>49, 92</value>
+    <value>52, 113</value>
   </data>
   <data name="MenuHelp.Text" xml:space="preserve">
     <value>MENU</value>
@@ -565,7 +565,7 @@
     <value>Magenta</value>
   </data>
   <data name="tsb_Error.Size" type="System.Drawing.Size, System.Drawing">
-    <value>49, 92</value>
+    <value>49, 113</value>
   </data>
   <data name="tsb_Error.Text" xml:space="preserve">
     <value>Error</value>
@@ -582,7 +582,7 @@
   <data name="MenuConnect.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAD4AAAAtCAYAAAD2g9hxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAalSURBVGhD7ZnrT1N3GMd519Ce03PabnORTSqIXAYCKjBF
+        YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAalSURBVGhD7ZnrT1N3GMd519Ce03PabnORTSqIXAYCKjBF
         pcpe7c1IlmzZK8j2dgtkmrFky2CbCamgR/EC4qUCIoKUUgYWENIhIFDAQ7kq6qp4vyTnT3j2PGctAanc
         XOCw8U2etD238Pk9z++5HALWtKY1rWlNq0ifcRz/mYozen/+P/Q1817al6p3pc81eg8tgPfwf1fpXDB/
         QBtky+E3QDYXBOnMO5Cm5gXv6dWhbFW4MVsVvOBQzdQEmX7TGD1HdKFQqA8Bsz4YMrXvwxcaHXyq5uK8
@@ -618,7 +618,7 @@
     <value>Magenta</value>
   </data>
   <data name="MenuConnect.Size" type="System.Drawing.Size, System.Drawing">
-    <value>63, 92</value>
+    <value>79, 113</value>
   </data>
   <data name="MenuConnect.Text" xml:space="preserve">
     <value>CONNECT</value>
@@ -787,7 +787,7 @@
 </value>
   </data>
   <data name="toolStripConnectionControl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>241, 92</value>
+    <value>320, 113</value>
   </data>
   <data name="MenuArduPilot.AutoSize" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -811,7 +811,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="MainMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>935, 92</value>
+    <value>1247, 113</value>
   </data>
   <data name="MainMenu.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -835,10 +835,13 @@
     <value>Bottom, Left, Right</value>
   </data>
   <data name="status1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 87</value>
+    <value>0, 107</value>
+  </data>
+  <data name="status1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>5, 5, 5, 5</value>
   </data>
   <data name="status1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>935, 4</value>
+    <value>1247, 5</value>
   </data>
   <data name="status1.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -850,7 +853,7 @@
     <value>status1</value>
   </data>
   <data name="&gt;&gt;status1.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.Status, SecopPlanner2, Version=1.3.9159.18169, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.Status, SecopPlanner2, Version=1.3.9159.26266, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;status1.Parent" xml:space="preserve">
     <value>panel1</value>
@@ -859,16 +862,16 @@
     <value>0</value>
   </data>
   <data name="panel1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 9</value>
+    <value>0, 11</value>
   </data>
   <data name="panel1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
   <data name="panel1.MaximumSize" type="System.Drawing.Size, System.Drawing">
-    <value>133332, 123</value>
+    <value>177776, 151</value>
   </data>
   <data name="panel1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>935, 92</value>
+    <value>1247, 113</value>
   </data>
   <data name="panel1.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -895,10 +898,10 @@
     <value>46</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
+    <value>8, 16</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>944, 536</value>
+    <value>1259, 660</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -2548,10 +2551,10 @@
 </value>
   </data>
   <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
+    <value>5, 5, 5, 5</value>
   </data>
   <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
-    <value>640, 450</value>
+    <value>847, 543</value>
   </data>
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterScreen</value>
@@ -2653,7 +2656,7 @@
     <value>toolStripConnectionControl</value>
   </data>
   <data name="&gt;&gt;toolStripConnectionControl.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ToolStripConnectionControl, SecopPlanner2, Version=1.3.9159.18169, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ToolStripConnectionControl, SecopPlanner2, Version=1.3.9159.26266, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;MenuArduPilot.Name" xml:space="preserve">
     <value>MenuArduPilot</value>

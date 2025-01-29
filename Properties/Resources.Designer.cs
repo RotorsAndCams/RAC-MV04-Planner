@@ -1107,6 +1107,16 @@ namespace MissionPlanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap icons8_simulation_64 {
+            get {
+                object obj = ResourceManager.GetObject("icons8-simulation-64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap icons8_stop_sign_50 {
             get {
                 object obj = ResourceManager.GetObject("icons8-stop-sign-50", resourceCulture);

@@ -1256,12 +1256,17 @@ namespace MissionPlanner
             tsb_ChangeView.BackColor = Color.White;
             tsb_ChangeView.ImageScaling = ToolStripItemImageScaling.None;
 
+            tsb_Error.Width = 200;
+            tsb_Error.Height = 200;
+            tsb_Error.BackColor = Color.White;
+            tsb_Error.ImageScaling = ToolStripItemImageScaling.None;
+
 
             this.MenuFlightData.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
 
             this.MenuHelp.Image = global::MissionPlanner.Properties.Resources.icons8_menu_100;
 
-            this.MenuSimulation.Image = global::MissionPlanner.Properties.Resources.icons8_war_thunder_100;
+            this.MenuSimulation.Image = global::MissionPlanner.Properties.Resources.icons8_simulation_64;
 
             this.MenuFlightPlanner.Image = global::MissionPlanner.Properties.Resources.icons8_earth_100;
 
