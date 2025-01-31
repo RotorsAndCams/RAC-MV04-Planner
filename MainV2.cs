@@ -1369,7 +1369,7 @@ namespace MissionPlanner
             double MinVolts = double.Parse(Settings.Instance["PlanCheck_MinVolts", "21.6"] // 6x3.6
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
-            Settings.Instance["PlanCheck_MinVolts"] = MaxVolts.ToString();
+            Settings.Instance["PlanCheck_MinVolts"] = MinVolts.ToString();
 
             double TravelSpeed = double.Parse(Settings.Instance["PlanCheck_TravelSpeed", "23"]
                 .Replace('.', 0.1.ToString()[1])
