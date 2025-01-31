@@ -405,6 +405,8 @@ namespace MissionPlanner.GCSViews
             _feedTimer.Start();
         }
 
+
+        bool followAltModified = false;
         private void _feedTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             //Check track mode
@@ -432,6 +434,36 @@ namespace MissionPlanner.GCSViews
                 
                 if (MainV2.comPort.MAV.GuidedMode.z < 50)
                     MainV2.comPort.MAV.GuidedMode.z = 50 / CurrentState.multiplieralt;
+
+                #region Follow alt set to max alt fence limitation
+
+                try
+                {
+                    double fenceAltMaxValue = MainV2.comPort.MAV.param["FENCE_ALT_MAX"].Value;
+                    if (fenceAltMaxValue < MainV2.comPort.MAV.GuidedMode.z)
+                    {
+                        //menjen a fence alt-on
+                        //MainV2.comPort.MAV.GuidedMode.z = (float)fenceAltMaxValue;
+
+                        //if (!followAltModified)
+                        //    CustomMessageBox.Show("Follow altitude limited for: " + MainV2.comPort.MAV.GuidedMode.z + " m");
+
+                        //followAltModified = true;
+
+                        //Ha a fence alt kisebb mint a follow alt akkor stop
+                        CustomMessageBox.Show("Fence alt is lower than follow alt - follow mode stopped");
+                        StopFeed();
+                    }
+                }
+                catch
+                {
+                    CustomMessageBox.Show("Error - follow mode stopped");
+                    StopFeed();
+                    return;
+                }
+
+                #endregion
+
 
                 MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
                 MainV2.comPort.MAV.GuidedMode.x = (int)((target_lat - 0.0002) * 1e7);

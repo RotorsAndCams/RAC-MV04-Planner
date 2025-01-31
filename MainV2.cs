@@ -1519,6 +1519,9 @@ namespace MissionPlanner
 
         private void TRIPTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (CameraView.instance == null)
+                return;
+
             if (this.IsDisposed)
             {
                 return;
@@ -1531,9 +1534,12 @@ namespace MissionPlanner
                 return;
             }
 
-            if(!CameraView.instance.isCameraConnected)
-                return;
-
+            if (CameraView.instance != null)
+            {
+                if (!CameraView.instance.isCameraConnected)
+                    return;
+            }
+            
             // Close if open
             if (TRIPOffMessageBox != null)
             {
