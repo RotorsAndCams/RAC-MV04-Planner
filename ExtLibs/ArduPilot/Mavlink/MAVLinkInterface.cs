@@ -4313,7 +4313,6 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             setGuidedModeWP(MAV.sysid, MAV.compid, gotohere, setguidedmode);
         }
 
-        public bool ShowInfo = true;
         public void setGuidedModeWP(byte sysid, byte compid, Locationwp gotohere, bool setguidedmode = true)
         {
             if (gotohere.alt == 0 || gotohere.lat == 0 || gotohere.lng == 0)
@@ -4321,10 +4320,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                 bool a = gotohere.alt == 0;
                 bool b = gotohere.lat == 0;
                 bool c = gotohere.lng == 0;
-                CustomMessageBox.Show(
-                    "not sending becaouse: gotohere.alt == 0 -> " + a +
-                    "gotohere.lat == 0 - " + b +
-                    "gotohere.lng == 0 - " + c);
+                CustomMessageBox.Show("Location waypoint is not valid");
                 return;
             }
 
@@ -4335,7 +4331,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             {
                 gotohere.id = (ushort) MAV_CMD.WAYPOINT;
 
-                //if (setguidedmode)
+                //if (setguidedmode)    //set guidedmode automatically before sending to waypoint
                 //{
                 //    // fix for followme change
                 //    if (MAVlist[sysid, compid].cs.mode.ToUpper() != "GUIDED")
@@ -4349,14 +4345,9 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                 {
                     MAV_MISSION_RESULT ans = setWP(sysid, compid, gotohere, 0, MAV_FRAME.GLOBAL_RELATIVE_ALT, (byte)2);
 
-                    if (ShowInfo)
-                    {
-                        CustomMessageBox.Show(ans.ToString());
-                        ShowInfo = false;
-                    }
-
                     if (ans != MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED)
                     {
+                        CustomMessageBox.Show("Destination point is unreachable");
                         giveComport = false;
                         throw new Exception("Guided Mode Failed");
                     }

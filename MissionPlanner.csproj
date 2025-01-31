@@ -1141,6 +1141,11 @@
     <None Include="libman.json" />
     <None Include="MissionPlanner.GCSViews.ConfigurationView.ConfigGPSOrder+GPSCAN.datasource" />
     <None Include="MissionPlanner.GCSViews.ConfigurationView.ConfigHWCompass2+CompassDeviceInfo.datasource" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\AirMarket.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -1189,11 +1194,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Controls\RAW_Sensor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -2263,8 +2263,8 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\RAW_Sensor.resx">
       <DependentUpon>RAW_Sensor.cs</DependentUpon>
@@ -5018,6 +5018,26 @@
     <None Include="Resources\secopplanner2.png" />
     <None Include="Resources\Logo_SecopPlanner2.png" />
     <None Include="Resources\inverted_cam_but.png" />
+    <None Include="Resources\icons8-right-100.png" />
+    <None Include="Resources\icons8-menu-100.png" />
+    <None Include="Resources\icons8-on-off-100.png" />
+    <None Include="Resources\icons8-power-50.png" />
+    <None Include="Resources\icons8-power-64_inv.png" />
+    <None Include="Resources\istanding-man-50.png" />
+    <None Include="Resources\standing-man-50.png" />
+    <None Include="Resources\icons8-invert-50.png" />
+    <None Include="Resources\icons8-menu-256.png" />
+    <None Include="Resources\icons8-flight-100.png" />
+    <None Include="Resources\icons8-flight-64 %281%29.png" />
+    <None Include="Resources\icons8-earth-64.png" />
+    <None Include="Resources\icons8-earth-64 %281%29.png" />
+    <None Include="Resources\icons8-war-thunder-100.png" />
+    <None Include="Resources\icons8-earth-100.png" />
+    <None Include="Resources\icons8-earth-100 %281%29.png" />
+    <None Include="Resources\icons8-globe-100.png" />
+    <None Include="Resources\icons8-error-64.png" />
+    <None Include="Resources\icons8-simulation-64.png" />
+    <None Include="Resources\icons8-power-64-green.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

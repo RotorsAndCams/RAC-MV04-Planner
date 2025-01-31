@@ -299,6 +299,9 @@ namespace MissionPlanner.Utilities
 
         public static void ApplyThemeTo(object control)
         {
+            if (control is CameraView || control is CameraSettingsForm || control is CameraFullScreenForm /*|| control is MenuStrip || control is Form || control is ToolStripButton*/)
+                return;
+
             if (control is Control)
                 ApplyThemeTo(control as Control);
         }
@@ -316,7 +319,7 @@ namespace MissionPlanner.Utilities
             if (control.GetType().IsDefined(typeof(PreventThemingAttribute)))
                 return;
 
-            if (control is CameraView || control is CameraSettingsForm || control is CameraFullScreenForm)
+            if (control is CameraView || control is CameraSettingsForm || control is CameraFullScreenForm /*|| control is MenuStrip || control is Form || control is ToolStripButton*/)
                 return;
 
             ApplyTheme(control, 0);
@@ -810,6 +813,9 @@ mc:Ignorable=""d""
 
             foreach (Control ctl in temp.Controls)
             {
+                if (ctl is CameraView || ctl is CameraSettingsForm || ctl is CameraFullScreenForm)
+                    continue;
+
                 if (ctl.GetType() == typeof(Panel))
                 {
                     ctl.BackColor = BGColor;

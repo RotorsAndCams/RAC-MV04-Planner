@@ -3139,6 +3139,7 @@ namespace MissionPlanner
                                     (armed || !Settings.Instance.GetBoolean("speech_armed_only")))
                                     Speech.SpeakAsync(Common.speechConversion(parent,
                                         "" + Settings.Instance["speechwaypoint"]));
+                                //ggg
                             }
                             catch (Exception ex)
                             {

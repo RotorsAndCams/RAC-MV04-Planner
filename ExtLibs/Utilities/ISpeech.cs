@@ -1,3 +1,5 @@
+using System;
+
 namespace MissionPlanner.Utilities
 {
     public interface ISpeech
@@ -6,5 +8,7 @@ namespace MissionPlanner.Utilities
         bool IsReady { get; }
         void SpeakAsync(string text);
         void SpeakAsyncCancelAll();
+
+        event EventHandler SpeakComplete;
     }
 }

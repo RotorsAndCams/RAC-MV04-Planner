@@ -109,7 +109,7 @@ namespace MissionPlanner.Controls
             current.Control.Visible = false;
         }
 
-        public void ShowScreen(string name)
+        public void ShowScreen(string name, bool b = false)
         {
             if (current != null && current.Control != null)
             {
@@ -170,7 +170,11 @@ namespace MissionPlanner.Controls
             }
 
             if (ApplyTheme != null)
-                ApplyTheme(nextscreen.Control);
+            {
+                if(b == false)
+                    ApplyTheme(nextscreen.Control);
+            }
+                
 
             if (MainControl.InvokeRequired)
             {

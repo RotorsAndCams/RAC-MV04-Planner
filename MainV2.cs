@@ -851,6 +851,10 @@ namespace MissionPlanner
 
             Warnings.WarningEngine.QuickPanelColoring += WarningEngine_QuickPanelColoring;
 
+            //Warnings.WarningEngine.WarningMessage += (sender, s) => { DoBlinkingErrorButton(); };
+
+            speechEngine.SpeakComplete += (sender, s) => { DoBlinkingErrorButton(); };
+
             // proxy loader - dll load now instead of on config form load
             new Transition(new TransitionType_EaseInEaseOut(2000));
 
@@ -1218,11 +1222,97 @@ namespace MissionPlanner
             }
             else
             {
+                this.MenuCamera.Visible = false;
                 this.MenuInitConfig.Visible = false;
                 this.MenuConfigTune.Visible = false;
+                //this.MenuHelp.Visible = false;
+
+                
             }
+
+            MenuFlightData.Width = 200;
+            MenuFlightData.Height = 200;
+            MenuFlightData.BackColor = Color.White;
+            MenuFlightData.ImageScaling = ToolStripItemImageScaling.None;
+
+            MenuHelp.Width = 200;
+            MenuHelp.Height = 200;
+            MenuHelp.BackColor = Color.White;
+            MenuHelp.Size = new Size(200, 200);
+            MenuHelp.ImageScaling = ToolStripItemImageScaling.None;
+
+            MenuSimulation.Width = 200;
+            MenuSimulation.Height = 200;
+            MenuSimulation.BackColor = Color.White;
+            MenuSimulation.ImageScaling = ToolStripItemImageScaling.None;
+
+            MenuFlightPlanner.Width = 200;
+            MenuFlightPlanner.Height = 200;
+            MenuFlightPlanner.BackColor = Color.White;
+            MenuFlightPlanner.ImageScaling = ToolStripItemImageScaling.None;
+
+            tsb_ChangeView.Width = 200;
+            tsb_ChangeView.Height = 200;
+            tsb_ChangeView.BackColor = Color.White;
+            tsb_ChangeView.ImageScaling = ToolStripItemImageScaling.None;
+
+            tsb_Error.Width = 200;
+            tsb_Error.Height = 200;
+            tsb_Error.BackColor = Color.White;
+            tsb_Error.ImageScaling = ToolStripItemImageScaling.None;
+
+
+            this.MenuFlightData.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
+
+            this.MenuHelp.Image = global::MissionPlanner.Properties.Resources.icons8_menu_100;
+
+            this.MenuSimulation.Image = global::MissionPlanner.Properties.Resources.icons8_simulation_64;
+
+            this.MenuFlightPlanner.Image = global::MissionPlanner.Properties.Resources.icons8_earth_100;
+
+
+            this.MenuFlightData.Image = this.MenuFlightData.Image;
+
+
         }
         public bool devmode = false;
+
+        public void HideflightData()
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => DoHideLeftSide()));
+            else
+            {
+                DoHideLeftSide();
+            }
+
+            
+        }
+
+        int spltWidth;
+        int pnlWidth;
+        private void DoHideLeftSide()
+        {
+            if (CameraView.instance == null)
+                return;
+
+            if (CameraView.instance.controlsClosed)
+            {
+                pnlWidth = FlightData.MainH.Panel1.Width;
+
+                FlightData.MainH.SplitterDistance = 0;
+
+                FlightData.MainH.Panel1Collapsed = true;
+
+            }
+            else
+            {
+                FlightData.MainH.SplitterDistance = pnlWidth;
+
+                FlightData.MainH.Panel1Collapsed = false;
+            }
+        }
+
         private void MainV2_VisibleChanged(object sender, EventArgs e)
         {
         }
@@ -1432,6 +1522,9 @@ namespace MissionPlanner
 
         private void TRIPTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (CameraView.instance == null)
+                return;
+
             if (this.IsDisposed)
             {
                 return;
@@ -1444,6 +1537,12 @@ namespace MissionPlanner
                 return;
             }
 
+            if (CameraView.instance != null)
+            {
+                if (!CameraView.instance.isCameraConnected)
+                    return;
+            }
+            
             // Close if open
             if (TRIPOffMessageBox != null)
             {
@@ -1713,10 +1812,18 @@ namespace MissionPlanner
 
         private void MenuFlightData_Click(object sender, EventArgs e)
         {
-            MyView.ShowScreen("FlightData");
+            bool b = FlightData.instance.panelka.Controls.Contains(CameraView.instance);
+            MyView.ShowScreen("FlightData", b);
 
             // save config
             SaveConfig();
+
+            FlightData.MainH.Panel1Collapsed = false;
+
+            DisplayMap();
+
+            if (CameraView.instance != null)
+                CameraView.instance.ResetMenuCollapse();
         }
 
         private void MenuFlightPlanner_Click(object sender, EventArgs e)
@@ -4185,7 +4292,23 @@ namespace MissionPlanner
 
         private void MenuHelp_Click(object sender, EventArgs e)
         {
-            MyView.ShowScreen("Help");
+            //
+
+            if (CameraView.instance != null)
+            {
+                CameraView.instance.SetMenu();
+
+                if (CameraView.instance.controlsClosed)
+                {
+                    MenuHelp.Text = "OPEN";
+                }
+                else
+                {
+                    MenuHelp.Text = "HIDE";
+                }
+            }
+
+            HideflightData();
         }
 
 
@@ -4509,7 +4632,7 @@ namespace MissionPlanner
         {
             this.SuspendLayout();
             panel1.Location = new Point(0, 0);
-            panel1.Width = menu.Width;
+            //panel1.Width = menu.Width;
             panel1.BringToFront();
             panel1.Visible = true;
             this.ResumeLayout();
@@ -4532,7 +4655,7 @@ namespace MissionPlanner
                 panel1.Dock = DockStyle.Top;
                 panel1.SendToBack();
                 panel1.Visible = true;
-                menu.Visible = false;
+                //menu.Visible = false;
                 MainMenu.MouseLeave -= MainMenu_MouseLeave;
                 panel1.MouseLeave -= MainMenu_MouseLeave;
                 toolStripConnectionControl.MouseLeave -= MainMenu_MouseLeave;
@@ -4546,8 +4669,8 @@ namespace MissionPlanner
                 MainMenu.MouseLeave += MainMenu_MouseLeave;
                 panel1.MouseLeave += MainMenu_MouseLeave;
                 toolStripConnectionControl.MouseLeave += MainMenu_MouseLeave;
-                menu.Visible = true;
-                menu.SendToBack();
+                //menu.Visible = true;
+                //menu.SendToBack();
                 this.ResumeLayout();
             }
         }
@@ -4952,11 +5075,121 @@ namespace MissionPlanner
                     break;
                 }
             }
+
+            DoBlinkingErrorButton();
+
         }
 
         private void MainV2_FormClosing(object sender, FormClosingEventArgs e)
         {
             MyView.Dispose();
+        }
+
+        private bool isMapActive = true;
+        private void tsb_ChangeView_Click(object sender, EventArgs e)
+        {
+            //Show camera screen or show map
+            if (isMapActive)
+            {
+                DisplayCamera();
+            }
+            else
+            {
+                DisplayMap();
+            }
+            //hiddenleft = false;
+
+            //FlightData.MainH.Panel1Collapsed = false;
+            //if (CameraView.instance != null)
+            //    CameraView.instance.ResetMenuCollapse();
+        }
+
+        private void DisplayMap()
+        {
+            FlightData.instance.gMapControl1.Show();
+            //FlightData.instance.panelka.Controls.Remove(CameraView.instance);
+            //FlightData.instance.HideCamera();
+            if(CameraView.instance != null)
+                CameraView.instance.Hide();
+            isMapActive = true;
+        }
+        CameraView cv;
+        private void DisplayCamera()
+        {
+            FlightData.instance.gMapControl1.Hide();
+            //FlightData.instance.ShowCamera();
+
+            if(CameraView.instance == null)
+            {
+                cv = new CameraView();
+            }
+            if (!FlightData.instance.panelka.Controls.Contains(CameraView.instance))
+            {
+                FlightData.instance.panelka.Controls.Add(CameraView.instance);
+                CameraView.instance.Dock = DockStyle.Fill;
+            }
+            
+            //CameraView.instance.Padding = new Padding(5);
+            CameraView.instance.Show();
+            isMapActive = false;
+            CameraView.instance.BringToFront();
+        }
+
+
+        private void tsb_Error_Click(object sender, EventArgs e)
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => {
+
+                    if(CameraView.instance != null)
+                        CameraView.instance.SetMenu();
+
+                    MenuHelp.Text = "HIDE";
+                    pnlWidth = FlightData.MainH.Panel1.Width;
+
+                    FlightData.MainH.SplitterDistance = pnlWidth;
+
+                    FlightData.MainH.Panel1Collapsed = false;
+
+                }));
+            else
+            {
+                if (CameraView.instance != null)
+                    CameraView.instance.SetMenu();
+
+                MenuHelp.Text = "HIDE";
+                pnlWidth = FlightData.MainH.Panel1.Width;
+
+                FlightData.MainH.SplitterDistance = pnlWidth;
+
+                FlightData.MainH.Panel1Collapsed = false;
+            }
+
+            FlightData.instance.SelectMessagesTab();
+
+        }
+
+        private void DoBlinkingErrorButton()
+        {
+            Task.Run(() => BlinkErrorButton());
+
+        }
+
+        private async void BlinkErrorButton()
+        {
+            int _blinkCounter = 0;
+            while (_blinkCounter != 10)
+            {
+                await Task.Delay(500);
+
+                if (InvokeRequired)
+                    Invoke(new Action(() => tsb_Error.BackColor = tsb_Error.BackColor == Color.Red ? Color.Transparent : Color.Red));
+                else
+                    tsb_Error.BackColor = tsb_Error.BackColor == Color.Red ? Color.Transparent : Color.Red;
+
+
+                ++_blinkCounter;
+            }
         }
     }
 }
