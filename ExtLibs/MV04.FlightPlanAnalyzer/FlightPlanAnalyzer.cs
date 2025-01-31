@@ -130,6 +130,9 @@ namespace MV04.FlightPlanAnalyzer
         /// <returns>Amp-hours required</returns>
         public static double RequiredAh(FlightPlanInfo flightPlanInfo, UAVInfo uavInfo, WindInfo windInfo, int safetyMarginPercentage = 0)
         {
+            // Clean flightplan
+            CleanFlightplan(flightPlanInfo);
+
             // Check input data
             if (!IsFlightPlanInfoCorrect(flightPlanInfo)
                 || !IsUAVInfoCorrect(uavInfo)
@@ -139,7 +142,6 @@ namespace MV04.FlightPlanAnalyzer
             {
                 return double.MaxValue;
             }
-            if (flightPlanInfo.NextWP == 0) flightPlanInfo.NextWP = 1; // Home WP was removed in IsFlightPlanInfoCorrect()
 
             // Filter & sort nav commands
             List<ushort> navCmdIds = new List<ushort>
@@ -209,9 +211,6 @@ namespace MV04.FlightPlanAnalyzer
 
         private static bool IsFlightPlanInfoCorrect(FlightPlanInfo flightPlanInfo)
         {
-            flightPlanInfo.FlightPlan.TryRemove(0, out _);
-            if (flightPlanInfo.NextWP == 0) flightPlanInfo.NextWP = 1;
-
             return null != flightPlanInfo.FlightPlan
                 && 0 < flightPlanInfo.FlightPlan.Count
                 && 0 < flightPlanInfo.FlightPlan.Count(c => c.Value.seq == flightPlanInfo.NextWP)
@@ -219,6 +218,25 @@ namespace MV04.FlightPlanAnalyzer
                 && IsPositionCorrect(flightPlanInfo.UAVLocation)
                 && null != flightPlanInfo.HomeLocation
                 && IsPositionCorrect(flightPlanInfo.HomeLocation);
+        }
+
+        private static void CleanFlightplan(FlightPlanInfo flightPlanInfo)
+        {
+            // Remove home
+            flightPlanInfo.FlightPlan.TryRemove(0, out _);
+
+            // Remove zero wps
+            List<int> keysToRemove = flightPlanInfo.FlightPlan
+                .Where(wp => (wp.Value.x + wp.Value.y + wp.Value.z) == 0)
+                .Select(wp => wp.Key)
+                .ToList();
+            foreach (int key in keysToRemove)
+            {
+                flightPlanInfo.FlightPlan.TryRemove(key, out _);
+            }
+
+            // Set next wp index
+            flightPlanInfo.NextWP = flightPlanInfo.FlightPlan.Min(wp => wp.Key);
         }
 
         private static bool IsUAVInfoCorrect(UAVInfo uavInfo)
