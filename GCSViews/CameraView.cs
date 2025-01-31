@@ -1041,6 +1041,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_TripSwitchOnOff_Click(object sender, EventArgs e)
         {
+            SetTripOnOffButton(!MainV2.instance.TRIPRelayState);
             MainV2.instance.SwitchTRIPRelay(!MainV2.instance.TRIPRelayState);
         }
 
