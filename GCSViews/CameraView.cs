@@ -976,7 +976,7 @@ namespace MissionPlanner.GCSViews
             if (_cameraState != NvSystemModes.Tracking)
             {
                 CustomMessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
-                Task.Run(() => ProvideGCSError());
+                //Task.Run(() => ProvideGCSError());
             }
             else
             {
@@ -986,7 +986,7 @@ namespace MissionPlanner.GCSViews
 
         private void Execute_RTL_Tasks()
         {
-            Task.Run(() => Blink());
+            //Task.Run(() => Blink());
         }
 
         private void Execute_TakeOff_Tasks()
@@ -1149,7 +1149,7 @@ namespace MissionPlanner.GCSViews
         {
             if (!CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport) /* || MainV2.comPort.MAV.cs.mode ==  ||*/)
             {
-                Task.Run(() => ProvideCameraError());
+                //Task.Run(() => ProvideCameraError());
                 lb_CameraStatusValue.Text = "Error";
                 return;
             }
@@ -1205,17 +1205,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private async void Blink()
-        {
-            int _blinkCounter = 0;
-            while (_blinkCounter != MAXBLINK)
-            {
-                await Task.Delay(500);
-                tlp_DeviceStatusInfo.BackColor = tlp_DeviceStatusInfo.BackColor == Color.Red ? Color.Black : Color.Red;
-                ++_blinkCounter;
-            }
-        }
-
         private async void BlinkControl(Control control)
         {
             if (control == null)
@@ -1232,17 +1221,17 @@ namespace MissionPlanner.GCSViews
 
         private void ProvideCameraError()
         {
-            BlinkControl(this.pnl_Camera);
+            //BlinkControl(this.pnl_Camera);
         }
 
         private void ProvideDroneError()
         {
-            BlinkControl(this.pnl_Drone);
+            //BlinkControl(this.pnl_Drone);
         }
 
         private void ProvideGCSError()
         {
-            BlinkControl(this.pnl_GCS);
+            //BlinkControl(this.pnl_GCS);
         }
 
         private void SetDroneLEDStates(enum_LandingLEDState landing, enum_PositionLEDState_IR position_IR, enum_PositionLEDState_RedLight position_LEDLight)
