@@ -93,7 +93,7 @@ namespace MissionPlanner.GCSViews
         private static LibVLCSharp.Shared.LibVLC _libVlc;
         private static MediaPlayer _mediaPlayer;
         private static Media media;
-        private static string videoUrl = "rtp://225.1.2.3:11024/live0";
+        private static string videoUrl = "rtsp://192.168.70.203:554/live0";//"rtp://225.1.2.3:11024/live0";
 
         LibVLCSharp.Shared.LibVLC _vlcRecord;
         MediaPlayer _mediaPlayerRecord;
