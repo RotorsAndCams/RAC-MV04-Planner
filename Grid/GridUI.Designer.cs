@@ -604,6 +604,7 @@
             // 
             resources.ApplyResources(this.BUT_samplephoto, "BUT_samplephoto");
             this.BUT_samplephoto.Name = "BUT_samplephoto";
+            this.BUT_samplephoto.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
             this.BUT_samplephoto.UseVisualStyleBackColor = true;
             this.BUT_samplephoto.Click += new System.EventHandler(this.BUT_samplephoto_Click);
             // 
@@ -722,6 +723,7 @@
             // 
             resources.ApplyResources(this.BUT_save, "BUT_save");
             this.BUT_save.Name = "BUT_save";
+            this.BUT_save.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
             this.BUT_save.UseVisualStyleBackColor = true;
             this.BUT_save.Click += new System.EventHandler(this.BUT_save_Click);
             // 
@@ -747,6 +749,10 @@
             this.groupBoxSpiral.Controls.Add(this.LBL_clockwise_laps1);
             this.groupBoxSpiral.Controls.Add(this.NUM_clockwise_laps);
             this.groupBoxSpiral.Controls.Add(this.label46);
+            this.groupBoxSpiral.Controls.Add(this.CMB_startfrom);
+            this.groupBoxSpiral.Controls.Add(this.num_sidelap);
+            this.groupBoxSpiral.Controls.Add(this.label8);
+            this.groupBoxSpiral.Controls.Add(this.label15);
             this.groupBoxSpiral.Name = "groupBoxSpiral";
             this.groupBoxSpiral.TabStop = false;
             // 
@@ -945,12 +951,8 @@
             this.groupBox1.Controls.Add(this.label32);
             this.groupBox1.Controls.Add(this.NUM_leadin);
             this.groupBox1.Controls.Add(this.NUM_overshoot2);
-            this.groupBox1.Controls.Add(this.label8);
             this.groupBox1.Controls.Add(this.label6);
-            this.groupBox1.Controls.Add(this.label15);
-            this.groupBox1.Controls.Add(this.CMB_startfrom);
             this.groupBox1.Controls.Add(this.num_overlap);
-            this.groupBox1.Controls.Add(this.num_sidelap);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.NUM_overshoot);
             this.groupBox1.Controls.Add(this.label2);
@@ -1313,12 +1315,12 @@
             // 
             // NUM_altitude
             // 
+            resources.ApplyResources(this.NUM_altitude, "NUM_altitude");
             this.NUM_altitude.Increment = new decimal(new int[] {
             10,
             0,
             0,
             0});
-            resources.ApplyResources(this.NUM_altitude, "NUM_altitude");
             this.NUM_altitude.Maximum = new decimal(new int[] {
             9999,
             0,
@@ -1406,6 +1408,7 @@
             // 
             resources.ApplyResources(this.BUT_Accept, "BUT_Accept");
             this.BUT_Accept.Name = "BUT_Accept";
+            this.BUT_Accept.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
             this.BUT_Accept.UseVisualStyleBackColor = true;
             this.BUT_Accept.Click += new System.EventHandler(this.BUT_Accept_Click);
             // 
