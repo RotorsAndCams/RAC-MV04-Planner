@@ -345,11 +345,12 @@ namespace MissionPlanner.GCSViews
             }
 
             // Add extra PARAM setter controls
-            for (int i = flowLayoutPanel1.Controls.Count - 1; i >= 0; i--) // Remove old controls
+            foreach (Control c in flowLayoutPanel1.Controls) // Remove old controls
             {
-                if (flowLayoutPanel1.Controls[i] is ParamSet)
+                if (flowLayoutPanel1.Controls.Contains(c))
                 {
-                    flowLayoutPanel1.Controls.RemoveAt(i);
+                    if(c is ParamSet)
+                        flowLayoutPanel1.Controls.Remove(c);
                 }
                 if (flowLayoutPanel1.Controls.Contains(btn_SurveyGrid))
                 {
