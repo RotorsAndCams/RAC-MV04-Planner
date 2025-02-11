@@ -1366,11 +1366,6 @@ namespace MissionPlanner
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_MaxVolts"] = MaxVolts.ToString();
 
-            double MinVolts = double.Parse(Settings.Instance["PlanCheck_MinVolts", "21.6"] // 6x3.6
-                .Replace('.', 0.1.ToString()[1])
-                .Replace(',', 0.1.ToString()[1]));
-            Settings.Instance["PlanCheck_MinVolts"] = MinVolts.ToString();
-
             double TravelSpeed = double.Parse(Settings.Instance["PlanCheck_TravelSpeed", "23"]
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
@@ -1408,15 +1403,15 @@ namespace MissionPlanner
             #endregion
 
             #region Param read
-            double param_MaxAmpHours = comPort.MAV.param["BATT_CAPACITY"].Value; // mAh
-            double MaxAmpHours = param_MaxAmpHours < 0 + double.Epsilon ? 36 : param_MaxAmpHours / 1000; // Ah
+            // Considering both BATT_LOW_VOLT and BATT_CRT_VOLT for future-proof-ness
+            double param_lowVolt = comPort.MAV.param["BATT_LOW_VOLT"].Value;
+            double lowVolt = param_lowVolt < double.Epsilon ? MaxVolts : param_lowVolt;
+            double param_crtVolt = comPort.MAV.param["BATT_CRT_VOLT"].Value;
+            double crtVolt = param_crtVolt < double.Epsilon ? MaxVolts : param_crtVolt;
+            double MinVolts = Math.Min(lowVolt, crtVolt); // Smallest that is not 0
 
-            double param_lowMah = comPort.MAV.param["BATT_LOW_MAH"].Value; // mAh
-            double lowMah = param_lowMah < 0 + double.Epsilon ? MaxAmpHours * 1000 : param_lowMah; // mAh
-            double param_crtMah = comPort.MAV.param["BATT_CRT_MAH"].Value; // mAh
-            double crtMah = param_crtMah < 0 + double.Epsilon ? MaxAmpHours * 1000 : param_crtMah; // mAh
-            double MinAmpHours = Math.Min(lowMah, crtMah) / 1000; // Smallest that is not 0, Ah
-            // Considering both BATT_LOW_MAH and BATT_CRT_MAH for future-proof-ness
+            double param_MaxAmpHours = comPort.MAV.param["BATT_CAPACITY"].Value; // mAh
+            double MaxAmpHours = param_MaxAmpHours < double.Epsilon ? 36 : param_MaxAmpHours / 1000; // Ah
             #endregion
 
             #region Wind form read
@@ -1440,8 +1435,7 @@ namespace MissionPlanner
                 MaxVolts = MaxVolts,
                 MinVolts = MinVolts,
                 CurrentVolts = comPort.MAV.cs.battery_voltage,
-                MaxAmpHours = MaxAmpHours,
-                MinAmpHours = MinAmpHours
+                MaxAmpHours = MaxAmpHours
             };
 
             FlightPlanAnalyzer.UAVInfo uavInfo = new FlightPlanAnalyzer.UAVInfo()
@@ -1476,10 +1470,9 @@ namespace MissionPlanner
             #endregion
 
             // Get calculations
-            double available = FlightPlanAnalyzer.AvailableAh(powerInfo);
-            double required = FlightPlanAnalyzer.RequiredAh(flightPlanInfo, uavInfo, windInfo, SafetyMarginPercent);
+            double available = FlightPlanAnalyzer.AvailableV(powerInfo);
+            double required = FlightPlanAnalyzer.RequiredV(powerInfo, flightPlanInfo, uavInfo, windInfo, SafetyMarginPercent);
             string result = available >= required ? "" : "NOT ";
-            double remaining = Math.Max(0, available - required);
 
             // Announce result
             Task.Run(() =>
