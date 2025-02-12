@@ -63,7 +63,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyName>SecopPlanner2</AssemblyName>
+    <AssemblyName>MissionPlanner</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="APMPlannerXplanes\**" />

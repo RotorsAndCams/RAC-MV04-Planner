@@ -46,6 +46,81 @@ namespace MissionPlanner.GCSViews
                 this.lb_AutoStartCameraStream.Visible = true;
                 this.tlp_AutoStartCameraStream.Visible = true;
             }
+            else
+            {
+                numericUpDown_VideoSegmentLength.Height = numericUpDown_VideoSegmentLength.Height * 2;
+                numericUpDown_VideoSegmentLength.Font = new Font(numericUpDown_VideoSegmentLength.Font.FontFamily, numericUpDown_VideoSegmentLength.Font.Size *2);
+
+                comboBox_IrColorMode.Height = comboBox_IrColorMode.Height * 2;
+                comboBox_IrColorMode.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 4);
+
+                comboBox_coordFormat.Height = comboBox_coordFormat.Height * 2;
+                comboBox_coordFormat.Font = new Font(comboBox_coordFormat.Font.FontFamily, comboBox_coordFormat.Font.Size + 4);
+
+                comboBox_altFormat.Height = comboBox_altFormat.Height * 2;
+                comboBox_altFormat.Font = new Font(comboBox_altFormat.Font.FontFamily, comboBox_altFormat.Font.Size + 4);
+
+                comboBox_distFormat.Height = comboBox_distFormat.Height * 2;
+                comboBox_distFormat.Font = new Font(comboBox_distFormat.Font.FontFamily, comboBox_distFormat.Font.Size + 4);
+
+                comboBox_speedFormat.Height = comboBox_speedFormat.Height * 2;
+                comboBox_speedFormat.Font = new Font(comboBox_speedFormat.Font.FontFamily, comboBox_speedFormat.Font.Size + 4);
+
+                rb_AutoRecordYes.Height = rb_AutoRecordYes.Height * 2;
+                rb_AutoRecordYes.Font = new Font(rb_AutoRecordYes.Font.FontFamily, rb_AutoRecordYes.Font.Size + 4);
+
+                rb_AutoRecordNo.Height = rb_AutoRecordNo.Height * 2;
+                rb_AutoRecordNo.Font = new Font(rb_AutoRecordNo.Font.FontFamily, rb_AutoRecordNo.Font.Size + 4);
+
+
+                tlp_Base.RowStyles[0].Height = 100;
+                tlp_Base.RowStyles[0].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[1].Height = 100;
+                tlp_Base.RowStyles[1].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[2].Height = 100;
+                tlp_Base.RowStyles[2].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[3].Height = 100;
+                tlp_Base.RowStyles[3].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[4].Height = 100;
+                tlp_Base.RowStyles[4].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[5].Height = 100;
+                tlp_Base.RowStyles[5].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[6].Height = 100;
+                tlp_Base.RowStyles[6].SizeType = SizeType.Percent;
+
+                //7 8 9 10 11 12 legyen 0 és 13 max
+
+                tlp_Base.RowStyles[7].Height = 0;
+                tlp_Base.RowStyles[7].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[8].Height = 0;
+                tlp_Base.RowStyles[8].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[9].Height = 0;
+                tlp_Base.RowStyles[9].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[10].Height = 0;
+                tlp_Base.RowStyles[10].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[11].Height = 0;
+                tlp_Base.RowStyles[11].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[12].Height = 0;
+                tlp_Base.RowStyles[12].SizeType = SizeType.Percent;
+
+                tlp_Base.RowStyles[13].Height = 100;
+                tlp_Base.RowStyles[13].SizeType = SizeType.Percent;
+
+
+
+            }
+
         }
 
         private void SetSavedSettingsValues()

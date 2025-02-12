@@ -51,6 +51,7 @@ using Point = System.Drawing.Point;
 using Resources = MissionPlanner.Properties.Resources;
 using Newtonsoft.Json;
 using MissionPlanner.ArduPilot.Mavlink;
+using Renci.SshNet;
 
 namespace MissionPlanner.GCSViews
 {
@@ -283,6 +284,18 @@ namespace MissionPlanner.GCSViews
 
             timer.Start();
             */
+
+            if(btn_SurveyGrid == null)
+            {
+                btn_SurveyGrid = new Button();
+                btn_SurveyGrid.Text = "SurveyGrid";
+                btn_SurveyGrid.Click += this.surveyGridToolStripMenuItem_Click;
+                btn_SurveyGrid.Height = 100;
+                btn_SurveyGrid.Width = 100;
+                btn_SurveyGrid.BackColor = Color.Yellow;
+                btn_SurveyGrid.ForeColor = Color.Black;
+            }
+            
         }
 
         public static FlightPlanner instance { get; set; }
@@ -332,11 +345,16 @@ namespace MissionPlanner.GCSViews
             }
 
             // Add extra PARAM setter controls
-            for (int i = flowLayoutPanel1.Controls.Count - 1; i >= 0; i--) // Remove old controls
+            foreach (Control c in flowLayoutPanel1.Controls) // Remove old controls
             {
-                if (flowLayoutPanel1.Controls[i] is ParamSet)
+                if (flowLayoutPanel1.Controls.Contains(c))
                 {
-                    flowLayoutPanel1.Controls.RemoveAt(i);
+                    if(c is ParamSet)
+                        flowLayoutPanel1.Controls.Remove(c);
+                }
+                if (flowLayoutPanel1.Controls.Contains(btn_SurveyGrid))
+                {
+                    flowLayoutPanel1.Controls.Remove(btn_SurveyGrid);
                 }
             }
 
@@ -344,8 +362,13 @@ namespace MissionPlanner.GCSViews
             {
                 new ParamSet(MainV2.comPort, "RTL_ALT", "RTL altitude", 30, 1000),
                 new ParamSet(MainV2.comPort, "FENCE_ALT_MAX", "Fence maximum altitude", 10, 1000),
+                
             });
+
+            flowLayoutPanel1.Controls.Add(btn_SurveyGrid);
+
         }
+        Button btn_SurveyGrid;
 
         public void Deactivate()
         {
