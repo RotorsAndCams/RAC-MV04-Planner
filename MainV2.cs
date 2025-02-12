@@ -1339,11 +1339,7 @@ namespace MissionPlanner
                 || comPort.BaseStream == null
                 || !comPort.BaseStream.IsOpen)
             {
-                Task.Run(() =>
-                {
-                    CustomMessageBox.Show("ERROR\n\nNo connection", "Flightplan check", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                });
-                log.Error("Flightplan check - No connection");
+                LogError("Flightplan check", "No connection");
                 return;
             }
 
@@ -1351,53 +1347,97 @@ namespace MissionPlanner
             if (comPort.MAV.wps == null
                 || comPort.MAV.wps.Count == 0)
             {
-                Task.Run(() =>
-                {
-                    CustomMessageBox.Show("ERROR\n\nNo flightplan", "Flightplan check", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                });
-                log.Error("Flightplan check - No flightplan");
+                LogError("Flightplan check", "No flightplan");
                 return;
             }
             
-            // Get input info
+            // Get data for calculations
             #region Config read
             double MaxVolts = double.Parse(Settings.Instance["PlanCheck_MaxVolts", "25.2"] // 6x4.2
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_MaxVolts"] = MaxVolts.ToString();
 
+            if (MaxVolts <= 0)
+            {
+                LogError("Flightplan check", $"Invalid PlanCheck_MaxVolts value ({MaxVolts})");
+                return;
+            }
+
             double TravelSpeed = double.Parse(Settings.Instance["PlanCheck_TravelSpeed", "23"]
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_TravelSpeed"] = TravelSpeed.ToString();
+
+            if (TravelSpeed <= 0)
+            {
+                LogError("Flightplan check", $"Invalid PlanCheck_TravelSpeed value ({TravelSpeed})");
+                return;
+            }
 
             double ClimbSpeed = double.Parse(Settings.Instance["PlanCheck_ClimbSpeed", "6"]
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_ClimbSpeed"] = ClimbSpeed.ToString();
 
+            if (ClimbSpeed <= 0)
+            {
+                LogError("Flightplan check", $"Invalid PlanCheck_ClimbSpeed value ({ClimbSpeed})");
+                return;
+            }
+
             double DescSpeed = double.Parse(Settings.Instance["PlanCheck_DescSpeed", "5"]
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_DescSpeed"] = DescSpeed.ToString();
+
+            if (DescSpeed <= 0)
+            {
+                LogError("Flightplan check", $"Invalid PlanCheck_DescSpeed value ({DescSpeed})");
+                return;
+            }
 
             double TravelConsumption = double.Parse(Settings.Instance["PlanCheck_TravelConsumption", "31"]
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_TravelConsumption"] = TravelConsumption.ToString();
 
+            if (TravelConsumption <= 0)
+            {
+                LogError("Flightplan check", $"Invalid PlanCheck_TravelConsumption value ({TravelConsumption})");
+                return;
+            }
+
             double ClimbConsumption = double.Parse(Settings.Instance["PlanCheck_ClimbConsumption", "30"]
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_ClimbConsumption"] = ClimbConsumption.ToString();
+
+            if (ClimbConsumption <= 0)
+            {
+                LogError("Flightplan check", $"Invalid PlanCheck_ClimbConsumption value ({ClimbConsumption})");
+                return;
+            }
 
             double DescConsumption = double.Parse(Settings.Instance["PlanCheck_DescConsumption", "28"]
                 .Replace('.', 0.1.ToString()[1])
                 .Replace(',', 0.1.ToString()[1]));
             Settings.Instance["PlanCheck_DescConsumption"] = DescConsumption.ToString();
 
+            if (DescConsumption <= 0)
+            {
+                LogError("Flightplan check", $"Invalid PlanCheck_DescConsumption value ({DescConsumption})");
+                return;
+            }
+
             int SafetyMarginPercent = int.Parse(Settings.Instance["PlanCheck_SafetyMarginPercent", "0"]);
             Settings.Instance["PlanCheck_SafetyMarginPercent"] = SafetyMarginPercent.ToString();
+
+            if (SafetyMarginPercent < 0 || SafetyMarginPercent > 100)
+            {
+                LogError("Flightplan check", $"Invalid PlanCheck_SafetyMarginPercent value ({SafetyMarginPercent})");
+                return;
+            }
 
             Settings.Instance.Save();
             #endregion
@@ -1405,12 +1445,32 @@ namespace MissionPlanner
             #region Param read
             // Considering both BATT_LOW_VOLT and BATT_CRT_VOLT for future-proof-ness
             double param_lowVolt = comPort.MAV.param["BATT_LOW_VOLT"].Value;
-            double lowVolt = param_lowVolt < double.Epsilon ? MaxVolts : param_lowVolt;
             double param_crtVolt = comPort.MAV.param["BATT_CRT_VOLT"].Value;
+
+            if (param_lowVolt + param_crtVolt < 2 * double.Epsilon) // Neither are set
+            {
+                LogError("Flightplan check", $"Param BATT_LOW_VOLT ({param_lowVolt}) or BATT_CRT_VOLT ({param_crtVolt}) not set\n(at least one must be set)");
+                return;
+            }
+
+            double lowVolt = param_lowVolt < double.Epsilon ? MaxVolts : param_lowVolt;
             double crtVolt = param_crtVolt < double.Epsilon ? MaxVolts : param_crtVolt;
             double MinVolts = Math.Min(lowVolt, crtVolt); // Smallest that is not 0
 
+            if (MinVolts >= MaxVolts)
+            {
+                LogError("Flightplan check", $"Param BATT_LOW_VOLT ({param_lowVolt}) or BATT_CRT_VOLT ({param_crtVolt}) must be smaller than MaxVolts ({MaxVolts})");
+                return;
+            }
+
             double param_MaxAmpHours = comPort.MAV.param["BATT_CAPACITY"].Value; // mAh
+
+            if (param_MaxAmpHours <= 0)
+            {
+                LogError("Flightplan check", $"Param BATT_CAPACITY ({param_MaxAmpHours}) not set");
+                return;
+            }
+
             double MaxAmpHours = param_MaxAmpHours < double.Epsilon ? 36 : param_MaxAmpHours / 1000; // Ah
             #endregion
 
@@ -1420,6 +1480,7 @@ namespace MissionPlanner
                 WindDir = 0,
                 WindSpeed = 0
             };
+
             using (WindInputForm form = new WindInputForm(windData))
             {
                 if (await Task.Run(() => form.ShowDialog()) == DialogResult.OK)
@@ -1427,6 +1488,19 @@ namespace MissionPlanner
                     windData = form.ReturnData;
                 }
             }
+
+            if (windData.WindSpeed < 0)
+            {
+                LogError("Flightplan check", $"Invalid wind speed ({windData.WindSpeed})");
+                return;
+            }
+
+            if (windData.WindDir < 0 || windData.WindDir >= 360)
+            {
+                LogError("Flightplan check", $"Invalid wind direction ({windData.WindDir})");
+                return;
+            }
+
             #endregion
 
             #region Struct creation
@@ -1469,7 +1543,7 @@ namespace MissionPlanner
             };
             #endregion
 
-            // Get calculations
+            // Do calculations
             double available = FlightPlanAnalyzer.AvailableV(powerInfo);
             double required = FlightPlanAnalyzer.RequiredV(powerInfo, flightPlanInfo, uavInfo, windInfo, SafetyMarginPercent);
             string result = available >= required ? "" : "NOT ";
@@ -1480,6 +1554,15 @@ namespace MissionPlanner
                 CustomMessageBox.Show($"Flightplan is {result}possible", "Flightplan check", MessageBoxButtons.OK);
             });
             log.Info("Flightplan check - Done");
+        }
+
+        private static void LogError(string title, string message)
+        {
+            Task.Run(() => // Async error box
+            {
+                CustomMessageBox.Show($"ERROR\n\n{message}", title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            });
+            log.Error($"{title} - {message}");
         }
 
         public void SwitchTRIPRelay(bool state)
