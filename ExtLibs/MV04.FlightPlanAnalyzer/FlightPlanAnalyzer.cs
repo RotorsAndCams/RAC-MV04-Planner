@@ -28,7 +28,6 @@ namespace MV04.FlightPlanAnalyzer
             public double MaxVolts;
             public double MinVolts;
             public double MaxAmpHours;
-            public double MinAmpHours;
         }
 
         /// <summary>
@@ -75,18 +74,18 @@ namespace MV04.FlightPlanAnalyzer
 
         #region Methods
         /// <summary>
-        /// Calculate the available power in the UAV battery
+        /// Calculate the available volts in the UASV battery
         /// </summary>
         /// <param name="powerInfo">Power info container</param>
-        /// <returns>Amp-hours available</returns>
-        public static double AvailableAh(PowerInfo powerInfo)
+        /// <returns>Volts available</returns>
+        public static double AvailableV(PowerInfo powerInfo)
         {
             if (!IsPowerInfoCorrect(powerInfo))
             {
                 return 0;
             }
 
-            return (powerInfo.MaxAmpHours / (powerInfo.MaxVolts - powerInfo.MinVolts) * (powerInfo.CurrentVolts - powerInfo.MinVolts)) - powerInfo.MinAmpHours;
+            return powerInfo.CurrentVolts - powerInfo.MinVolts;
         }
 
         private static double PointsToAh(PointLatLngAlt pos1, PointLatLngAlt pos2, UAVInfo uavInfo, WindInfo windInfo)
@@ -126,10 +125,14 @@ namespace MV04.FlightPlanAnalyzer
         /// </summary>
         /// <param name="flightPlanInfo">Flightplan info container</param>
         /// <param name="uavInfo">UAV info container</param>
+        /// <param name="windInfo">Windinfo container</param>
         /// <param name="safetyMarginPercentage">Safety margin to add to result in percentages(%)</param>
         /// <returns>Amp-hours required</returns>
         public static double RequiredAh(FlightPlanInfo flightPlanInfo, UAVInfo uavInfo, WindInfo windInfo, int safetyMarginPercentage = 0)
         {
+            // Clean flightplan
+            CleanFlightplan(ref flightPlanInfo);
+
             // Check input data
             if (!IsFlightPlanInfoCorrect(flightPlanInfo)
                 || !IsUAVInfoCorrect(uavInfo)
@@ -139,7 +142,6 @@ namespace MV04.FlightPlanAnalyzer
             {
                 return double.MaxValue;
             }
-            if (flightPlanInfo.NextWP == 0) flightPlanInfo.NextWP = 1; // Home WP was removed in IsFlightPlanInfoCorrect()
 
             // Filter & sort nav commands
             List<ushort> navCmdIds = new List<ushort>
@@ -191,14 +193,25 @@ namespace MV04.FlightPlanAnalyzer
             return segments.Sum(s => PointsToAh(s.pos1, s.pos2, uavInfo, windInfo)) * (1 + ((double)safetyMarginPercentage / 100));
         }
 
+        /// <summary>
+        /// Calculate the required power to execute the given flightplan
+        /// </summary>
+        /// <param name="flightPlanInfo">Flightplan info container</param>
+        /// <param name="uavInfo">UAV info container</param>
+        /// <param name="windInfo">Windinfo container</param>
+        /// <param name="safetyMarginPercentage">Safety margin to add to result in percentages(%)</param>
+        /// <returns>Amp-hours required</returns>
+        public static double RequiredV(PowerInfo powerInfo, FlightPlanInfo flightPlanInfo, UAVInfo uavInfo, WindInfo windInfo, int safetyMarginPercentage = 0)
+        {
+            return dAhTodV(powerInfo.MaxVolts, powerInfo.MinVolts, powerInfo.MaxAmpHours, RequiredAh(flightPlanInfo, uavInfo, windInfo, safetyMarginPercentage));
+        }
+
         private static bool IsPowerInfoCorrect(PowerInfo powerInfo)
         {
-            return 0 < powerInfo.MinVolts
+            return powerInfo.MinVolts > 0
                 && powerInfo.MinVolts <= powerInfo.CurrentVolts + 0.001
                 && powerInfo.CurrentVolts <= powerInfo.MaxVolts + 0.2
-                && 0 < powerInfo.MaxAmpHours
-                && 0 <= powerInfo.MinAmpHours
-                && powerInfo.MinAmpHours < powerInfo.MaxAmpHours;
+                && powerInfo.MaxAmpHours > 0;
         }
 
         private static bool IsPositionCorrect(PointLatLngAlt position)
@@ -209,9 +222,6 @@ namespace MV04.FlightPlanAnalyzer
 
         private static bool IsFlightPlanInfoCorrect(FlightPlanInfo flightPlanInfo)
         {
-            flightPlanInfo.FlightPlan.TryRemove(0, out _);
-            if (flightPlanInfo.NextWP == 0) flightPlanInfo.NextWP = 1;
-
             return null != flightPlanInfo.FlightPlan
                 && 0 < flightPlanInfo.FlightPlan.Count
                 && 0 < flightPlanInfo.FlightPlan.Count(c => c.Value.seq == flightPlanInfo.NextWP)
@@ -219,6 +229,23 @@ namespace MV04.FlightPlanAnalyzer
                 && IsPositionCorrect(flightPlanInfo.UAVLocation)
                 && null != flightPlanInfo.HomeLocation
                 && IsPositionCorrect(flightPlanInfo.HomeLocation);
+        }
+
+        private static void CleanFlightplan(ref FlightPlanInfo flightPlanInfo)
+        {
+            // Remove bad wps
+            List<int> keysToRemove = flightPlanInfo.FlightPlan
+                .Where(wp => wp.Value.seq == 0                      // Home point
+                    || (wp.Value.x + wp.Value.y + wp.Value.z) == 0) // Empty WP
+                .Select(wp => wp.Key)
+                .ToList();
+            foreach (int key in keysToRemove)
+            {
+                flightPlanInfo.FlightPlan.TryRemove(key, out _);
+            }
+
+            // Set next wp index
+            flightPlanInfo.NextWP = flightPlanInfo.FlightPlan.Min(wp => wp.Key);
         }
 
         private static bool IsUAVInfoCorrect(UAVInfo uavInfo)
@@ -238,22 +265,10 @@ namespace MV04.FlightPlanAnalyzer
                 && windInfo.Speed >= 0;
         }
 
-        /// <summary>
-        /// Determines if there is enough power in the UAV battery to execute the given flightplan
-        /// </summary>
-        /// <param name="powerInfo">UAV battery info container</param>
-        /// <param name="flightPlanInfo">Flightplan info container</param>
-        /// <param name="uavInfo">UAV speed & power consumption info container</param>
-        /// <param name="safetyMarginPercentage">Safety margin to add to the required power in percentages(%)</param>
-        /// <returns>True, if there is enough power in the UAV battery to execute the given flightplan</returns>
-        public static bool IsFlightPlanPossible(PowerInfo powerInfo, FlightPlanInfo flightPlanInfo, UAVInfo uavInfo, WindInfo windInfo, int safetyMarginPercentage = 0)
+        private static double dAhTodV(double maxV, double minV, double maxAh, double dAh)
         {
-            // Calculate
-            double requiredAh = RequiredAh(flightPlanInfo, uavInfo, windInfo, safetyMarginPercentage);
-            double availableAh = AvailableAh(powerInfo);
-
-            // Return
-            return availableAh >= requiredAh;
+            // Assume a linear discharge graph
+            return Math.Abs(dAh * ((maxV - minV) / maxAh));
         }
         #endregion
     }
