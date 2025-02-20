@@ -347,7 +347,7 @@
             // 
             // vv_VLC
             // 
-            this.vv_VLC.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.vv_VLC.BackColor = System.Drawing.Color.Black;
             resources.ApplyResources(this.vv_VLC, "vv_VLC");
             this.vv_VLC.ForeColor = System.Drawing.Color.Black;
             this.vv_VLC.MediaPlayer = null;

@@ -1191,7 +1191,10 @@ namespace MissionPlanner
 
             //MessageBox.Show("Give the name");
 
-            
+            if (CameraView.instance == null)
+            {
+                cv = new CameraView();
+            }
 
             GetUserNameForm frm = new GetUserNameForm();
             frm.ShowDialog();
@@ -1272,7 +1275,6 @@ namespace MissionPlanner
 
 
             this.MenuFlightData.Image = this.MenuFlightData.Image;
-
 
         }
         public bool devmode = false;

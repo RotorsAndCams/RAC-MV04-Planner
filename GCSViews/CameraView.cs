@@ -133,6 +133,9 @@ namespace MissionPlanner.GCSViews
 
             videoUrl = "rtsp://" + CameraIP + ":554/live0";
 
+            StartCameraStream();
+            StartCameraControl();
+
             // Snapshot & video save location
             CameraHandler.Instance.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
 
@@ -146,19 +149,15 @@ namespace MissionPlanner.GCSViews
             CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
 
             CameraHandler.Instance.SetEnableCrossHair(_enableCrossHair);
-            CameraHandler.Instance.SetSystemTimeToCurrent();
 
-            StartCameraStream();
-            StartCameraControl();
-
-            
             #endregion
 
             #region UI config
 
             // Draw UI
-            DrawUI();
-            DisableControls();
+            if(MainV2.instance.devmode)
+                DrawUI();
+
             SetStopButtonVisibility();
             SetSingleYawButton();
 
@@ -166,23 +165,17 @@ namespace MissionPlanner.GCSViews
                 ControlStyles.UserPaint |
                 ControlStyles.OptimizedDoubleBuffer,
                 true);
-
             this.DoubleBuffered = true;
 
             MainV2.instance.RelaySwitched += MainV2_RelaySwitched;
-
-            //SetTripOnOffButton(true);
-
-            if (!MainV2.instance.devmode)
-                vv_VLC.BackColor = Color.Black;
 
             #endregion
 
             #region State handling
 
             SetDroneLEDStates(enum_LandingLEDState.Off, enum_PositionLEDState_IR.Off, enum_PositionLEDState_RedLight.Off);
-            LEDStateHandler.LedStateChanged += LEDStateHandler_LedStateChanged;
 
+            LEDStateHandler.LedStateChanged += LEDStateHandler_LedStateChanged;
             StateHandler.MV04StateChange += StateHandler_MV04StateChange;
 
             if (!CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport))
@@ -317,11 +310,6 @@ namespace MissionPlanner.GCSViews
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
-        }
-
-        private void DisableControls()
-        {
-
         }
 
         private void DrawUI()
@@ -1069,7 +1057,6 @@ namespace MissionPlanner.GCSViews
                 SetDroneLEDStates(e.LandingLEDState, e.PositionLEDState_IR, e.PositionLEDState_RedLight);
         }
 
-
         private void btn_TripSwitchOnOff_Click(object sender, EventArgs e)
         {
             SetTripOnOffButton(!MainV2.instance.TRIPRelayState);
@@ -1082,11 +1069,23 @@ namespace MissionPlanner.GCSViews
             {
                 if (e.State)
                 {
+                    //itt ez történjen később?
+                    connectToCamStreamAndControl();
+                }
+            }
+        }
+
+
+        private async void connectToCamStreamAndControl()
+        {
+            await Task.Run(() => {
+                while (!isCameraConnected)
+                {
+                    Thread.Sleep(3000);
                     ReconnectCameraStreamAndControl();
                     _needToResetTime = true;
                 }
-                //SetTripOnOffButton(e.State);
-            }
+            });
         }
 
         #endregion
