@@ -131,6 +131,8 @@ namespace MissionPlanner.GCSViews
             CameraStreamChannel = int.Parse(SettingManager.Get(Setting.CameraStreamChannel));
             CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
 
+            videoUrl = "rtsp://" + CameraIP + ":554/live0";
+
             // Snapshot & video save location
             CameraHandler.Instance.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
 
@@ -146,10 +148,11 @@ namespace MissionPlanner.GCSViews
             CameraHandler.Instance.SetEnableCrossHair(_enableCrossHair);
             CameraHandler.Instance.SetSystemTimeToCurrent();
 
-            StartCameraStream();
-            StartCameraControl();
+            Task.Run(() => {
+                StartCameraStream();
+                StartCameraControl();
+            });
 
-            CameraHandler.Instance.SetMode(NvSystemModes.Stow);
 
             #endregion
 
@@ -500,7 +503,7 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraStream()
         {
-            Task.Run(() => StartVideoStreamVLC());
+            StartVideoStreamVLC();
         }
 
         private void StartCameraControlInNewTask()
@@ -513,6 +516,11 @@ namespace MissionPlanner.GCSViews
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
                 bool autoStartSingleYaw = bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw));
+
+                if (success)
+                {
+                    CameraHandler.Instance.SetMode(NvSystemModes.Stow);
+                }
 
                 // Auto start single-yaw loop
                 if (success && autoStartSingleYaw)
@@ -537,7 +545,7 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraControl()
         {
-            Task.Run(() => StartCameraControlInNewTask());
+            StartCameraControlInNewTask();
         }
 
         private void ReconnectCameraStreamAndControl()
@@ -943,7 +951,6 @@ namespace MissionPlanner.GCSViews
                 else
                     SetCameraStatusValue(systemModeStr);
 
-
                 if (InvokeRequired)
                     Invoke(new Action(() => { SetGCSStatusValue(); }));
                 else
@@ -956,7 +963,6 @@ namespace MissionPlanner.GCSViews
                     CameraHandler.Instance.SetSystemTimeToCurrent();
                     _needToResetTime = false;
                 }
-
 
             }
             catch (Exception ex)
@@ -1357,67 +1363,28 @@ namespace MissionPlanner.GCSViews
             _mediaPlayer.EnableHardwareDecoding = true;
             _mediaPlayer.NetworkCaching = 300;
 
-            if (vv_VLC.InvokeRequired)
-            {
-                //Invoke(new Action(() => StartVLC()));
-                vv_VLC.Invoke(new Action(() => { 
-                    vv_VLC.MediaPlayer = _mediaPlayer;
-                    if (panelDoubleClick == null)
-                    {
-                        panelDoubleClick = new Panel();// panel for double click
-                        vv_VLC.Controls.Add(panelDoubleClick);
-                        panelDoubleClick.BringToFront();
-                        panelDoubleClick.Dock = DockStyle.Fill;
-                        panelDoubleClick.BackColor = Color.Transparent;
-                        panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
-                    }
-                    else
-                        panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
-                    vv_VLC.ThisReallyVisible();
-                    vv_VLC.ChildReallyVisible();
-                }));
-            }
-            else
-            {
-                vv_VLC.MediaPlayer = _mediaPlayer;
-                if (panelDoubleClick == null)
-                {
-                    panelDoubleClick = new Panel();// panel for double click
-                    vv_VLC.Controls.Add(panelDoubleClick);
-                    panelDoubleClick.BringToFront();
-                    panelDoubleClick.Dock = DockStyle.Fill;
-                    panelDoubleClick.BackColor = Color.Transparent;
-                    panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
-                }
-                else
-                    panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
-                vv_VLC.ThisReallyVisible();
-                vv_VLC.ChildReallyVisible();
-            }
-
-            if (tlp_CVBase.InvokeRequired)
-            {
-                //Invoke(new Action(() => StartVLC()));
-                tlp_CVBase.Invoke(new Action(() => {
-                    this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
-                }));
-            }
-            else
-            {
-                this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
-            }
-
-            
+            vv_VLC.MediaPlayer = _mediaPlayer;
+            this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
             vv_VLC.Dock = DockStyle.Fill;
             _mediaPlayer.Fullscreen = true;
 
 
-            
+            if (panelDoubleClick == null)
+            {
+                panelDoubleClick = new Panel();// panel for double click
+                vv_VLC.Controls.Add(panelDoubleClick);
+                panelDoubleClick.BringToFront();
+                panelDoubleClick.Dock = DockStyle.Fill;
+                panelDoubleClick.BackColor = Color.Transparent;
+                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
+            }
+            else
+                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
 
-            
-            
+
+            vv_VLC.ThisReallyVisible();
+            vv_VLC.ChildReallyVisible();
             _mediaPlayer.Play(media);
-
         }
 
         public void StartVideoStreamVLC()
