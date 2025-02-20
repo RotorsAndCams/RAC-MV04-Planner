@@ -148,12 +148,10 @@ namespace MissionPlanner.GCSViews
             CameraHandler.Instance.SetEnableCrossHair(_enableCrossHair);
             CameraHandler.Instance.SetSystemTimeToCurrent();
 
-            Task.Run(() => {
-                StartCameraStream();
-                StartCameraControl();
-            });
+            StartCameraStream();
+            StartCameraControl();
 
-
+            
             #endregion
 
             #region UI config
@@ -220,7 +218,7 @@ namespace MissionPlanner.GCSViews
             #endregion
 
             columnWidth = tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width;
-            
+
             this.FormClosing += CameraView_FormClosing;
 
             SetDroneStatusValue();
@@ -354,7 +352,7 @@ namespace MissionPlanner.GCSViews
                 {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
                 {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }},
                 {"Start single-yaw (Auto)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Auto); }},
-                {"Start single-yaw (Master)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Master); }}, 
+                {"Start single-yaw (Master)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Master); }},
                 {"Start single-yaw (Slave)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Slave); }},
                 {"Stop single-yaw", async () => { SingleYawHandler.StopSingleYaw(); }},
                 {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
@@ -393,7 +391,7 @@ namespace MissionPlanner.GCSViews
                 this.Controls.Add(bt_DoTestFunction);
                 bt_DoTestFunction.BringToFront();
             }
-            
+
 #endif
 
             #endregion
@@ -434,7 +432,7 @@ namespace MissionPlanner.GCSViews
                 float target_alt = (int)MainV2.comPort.MAV.cs.alt;
 
                 //MainV2.comPort.MAV.GuidedMode.z = target_alt / CurrentState.multiplieralt;
-                
+
                 if (MainV2.comPort.MAV.GuidedMode.z < 50)
                     MainV2.comPort.MAV.GuidedMode.z = 50 / CurrentState.multiplieralt;
 
@@ -493,7 +491,7 @@ namespace MissionPlanner.GCSViews
 
         private void StopFeed()
         {
-            
+
             _feedTimer.Stop();
             _feedTimer.Enabled = false;
             _feedTimer.Close();
@@ -506,7 +504,7 @@ namespace MissionPlanner.GCSViews
             StartVideoStreamVLC();
         }
 
-        private void StartCameraControlInNewTask()
+        public void StartCameraControl()
         {
             bool success;
             lock (lckStart)
@@ -516,11 +514,6 @@ namespace MissionPlanner.GCSViews
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
                 bool autoStartSingleYaw = bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw));
-
-                if (success)
-                {
-                    CameraHandler.Instance.SetMode(NvSystemModes.Stow);
-                }
 
                 // Auto start single-yaw loop
                 if (success && autoStartSingleYaw)
@@ -543,17 +536,12 @@ namespace MissionPlanner.GCSViews
 #endif
         }
 
-        private void StartCameraControl()
-        {
-            StartCameraControlInNewTask();
-        }
-
         private void ReconnectCameraStreamAndControl()
         {
             Task.Factory.StartNew(() => {
 
 
-                
+
 
                 if (InvokeRequired)
                     Invoke(new Action(() => {
@@ -569,10 +557,10 @@ namespace MissionPlanner.GCSViews
                 }
 
 
-                
+
             });
 
-            
+
         }
 
         #region Crosshair
@@ -811,7 +799,7 @@ namespace MissionPlanner.GCSViews
             catch { }
 
         }
-        
+
         private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
         {
             ChangeCrossHair();
@@ -849,7 +837,7 @@ namespace MissionPlanner.GCSViews
             {
                 CustomMessageBox.Show("Error occured");
             }
-            
+
         }
 
         private void _fsForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -939,7 +927,7 @@ namespace MissionPlanner.GCSViews
                             CameraHandler.Instance.SetMode(NvSystemModes.Stow);
                         }
                     }
-                    
+
                 }
                 catch { }
 
@@ -983,7 +971,7 @@ namespace MissionPlanner.GCSViews
                 case MV04_State.Manual:
                     Execute_Manual_Tasks();
                     break;
-                case MV04_State.TapToFly:   
+                case MV04_State.TapToFly:
                     break;
                 case MV04_State.Auto:
                     Execute_Auto_Tasks();
@@ -1244,7 +1232,7 @@ namespace MissionPlanner.GCSViews
                     break;
                 case MV04_State.Unknown:
                     break;
-                default: 
+                default:
                     break;
             }
         }
@@ -1435,7 +1423,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_Surveillance_Click(object sender, EventArgs e)
         {
-            
+
 
             NvSystemModes currentMode = CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport) ?
                     CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]) :
