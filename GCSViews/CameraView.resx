@@ -421,7 +421,7 @@
     <value>63, 0</value>
   </data>
   <data name="lb_DroneStatusValue.Size" type="System.Drawing.Size, System.Drawing">
-    <value>46, 16</value>
+    <value>37, 13</value>
   </data>
   <data name="lb_DroneStatusValue.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -451,7 +451,7 @@
     <value>63, 74</value>
   </data>
   <data name="lb_GCSSelectedStateValue.Size" type="System.Drawing.Size, System.Drawing">
-    <value>62, 16</value>
+    <value>53, 13</value>
   </data>
   <data name="lb_GCSSelectedStateValue.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -487,7 +487,7 @@
     <value>0, 0</value>
   </data>
   <data name="lb_GCSSelectedState.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 17</value>
+    <value>36, 13</value>
   </data>
   <data name="lb_GCSSelectedState.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -547,7 +547,7 @@
     <value>0, 0</value>
   </data>
   <data name="lb_Drone.Size" type="System.Drawing.Size, System.Drawing">
-    <value>57, 17</value>
+    <value>45, 13</value>
   </data>
   <data name="lb_Drone.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -607,7 +607,7 @@
     <value>0, 0</value>
   </data>
   <data name="lb_Camera.Size" type="System.Drawing.Size, System.Drawing">
-    <value>68, 17</value>
+    <value>53, 13</value>
   </data>
   <data name="lb_Camera.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -661,7 +661,7 @@
     <value>63, 37</value>
   </data>
   <data name="lb_CameraStatusValue.Size" type="System.Drawing.Size, System.Drawing">
-    <value>60, 16</value>
+    <value>49, 13</value>
   </data>
   <data name="lb_CameraStatusValue.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>

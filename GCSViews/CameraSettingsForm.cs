@@ -82,11 +82,14 @@ namespace MissionPlanner.GCSViews
             try
             {
                 isReconnecting = true;
-                CameraView.instance.StopVLC();
-                CameraView.instance.StartVideoStreamVLC();
+                
                 CameraHandler.Instance.CameraControlConnect(
                     IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                     int.Parse(SettingManager.Get(Setting.CameraControlPort)));
+                Thread.Sleep(2000);
+                CameraView.instance.StopVLC();
+                Thread.Sleep(2000);
+                CameraView.instance.StartVideoStreamVLC();
 
                 isReconnecting = false;
             }

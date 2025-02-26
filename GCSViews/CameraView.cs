@@ -506,12 +506,20 @@ namespace MissionPlanner.GCSViews
                 // Auto start single-yaw loop
                 if (success && autoStartSingleYaw)
                 {
-                    SingleYawHandler.StartSingleYaw(MainV2.comPort);
+                    try
+                    {
+                        SingleYawHandler.StartSingleYaw(MainV2.comPort);
+                    }
+                    catch {}
+                    try
+                    {
+                        if (InvokeRequired)
+                            Invoke(new Action(() => SetSingleYawButton()));
+                        else
+                            SetSingleYawButton();
+                    }
+                    catch {}
 
-                    if (InvokeRequired)
-                        Invoke(new Action(() => SetSingleYawButton()));
-                    else
-                        SetSingleYawButton();
                 }
             }
 
@@ -533,13 +541,13 @@ namespace MissionPlanner.GCSViews
 
                 if (InvokeRequired)
                     Invoke(new Action(() => {
-                        StartCameraStream();
+                        //StartCameraStream();
                         StartCameraControl();
                         CameraHandler.Instance.SetSystemTimeToCurrent();
                     }));
                 else
                 {
-                    StartCameraStream();
+                    //StartCameraStream();
                     StartCameraControl();
                     CameraHandler.Instance.SetSystemTimeToCurrent();
                 }
@@ -903,6 +911,11 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
+                if (isCameraConnected == false)
+                {
+                    //StartCameraStream();
+                }
+
                 isCameraConnected = true;
                 SetTripOnOffButton(true);
                 try
@@ -1063,29 +1076,72 @@ namespace MissionPlanner.GCSViews
             MainV2.instance.SwitchTRIPRelay(!MainV2.instance.TRIPRelayState);
         }
 
-        private void MainV2_RelaySwitched(object sender, MainV2.RelaySwitchEventArgs e)
+        private async void MainV2_RelaySwitched(object sender, MainV2.RelaySwitchEventArgs e)
         {
             if (e.Channel == MainV2.instance.TRIPRelayChannel)
             {
                 if (e.State)
                 {
-                    //itt ez történjen később?
-                    connectToCamStreamAndControl();
+                    //connectToCamStreamAndControl();
+
+                    //System.Threading.Thread newThread = new System.Threading.Thread(new System.Threading.ThreadStart(this.connectToCamStreamAndControl));
+                    //newThread.Start();
+
+                    //bgw = new BackgroundWorker();
+                    //bgw.DoWork += (s, ea) => { reconnectLoop(); };
+                    //bgw.RunWorkerAsync();
+
+                    //Task.Factory.StartNew(() => {
+                    //    reconnectLoop();
+                    //});
+
+                    await Task.Run(() => this.reconnectLoop());
+
+
                 }
             }
         }
 
 
-        private async void connectToCamStreamAndControl()
+
+        private int errorCounter = 0;
+        private async Task reconnectLoop()
         {
-            await Task.Run(() => {
+            await Task.Run(async () => {
                 while (!isCameraConnected)
                 {
-                    Thread.Sleep(3000);
-                    ReconnectCameraStreamAndControl();
-                    _needToResetTime = true;
+                    try
+                    {
+                        await reconnectControlDelayed();
+                        _needToResetTime = true;
+                    }
+                    catch
+                    {
+                        errorCounter++;
+
+                        if(errorCounter > 5)
+                        {
+                            break;
+                        }
+                        CustomMessageBox.Show("Error in camera connect loop");
+                    }
                 }
+                //StartCameraStream();
+
+                Thread.Sleep(2000);
+                CameraView.instance.StopVLC();
+                Thread.Sleep(2000);
+                CameraView.instance.StartVideoStreamVLC();
+
             });
+            
+        }
+
+        private async Task reconnectControlDelayed()
+        {
+            Task.Delay(3000);
+            StartCameraControl();
+
         }
 
         #endregion
