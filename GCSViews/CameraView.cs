@@ -131,7 +131,7 @@ namespace MissionPlanner.GCSViews
             CameraStreamChannel = int.Parse(SettingManager.Get(Setting.CameraStreamChannel));
             CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
 
-            videoUrl = "rtsp://" + CameraIP + ":554/live0";
+            videoUrl = "rtp://225.1.2.3:11024/live0";//"rtsp://" + CameraIP + ":554/live0";
 
             StartCameraStream();
             StartCameraControl();
@@ -191,13 +191,12 @@ namespace MissionPlanner.GCSViews
             #region recording vlc stream
 
             _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
+
+            if (_segmentLength < 60)
+                _segmentLength = 60;
+
             _videoRecordSegmentTimer.Interval = _segmentLength * 1000;
             _videoRecordSegmentTimer.Elapsed += _videoRecordSegmentTimer_Tick;
-
-            if (bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream)))
-            {
-                StartRecording();
-            }
 
             #endregion
 
@@ -215,6 +214,19 @@ namespace MissionPlanner.GCSViews
             this.FormClosing += CameraView_FormClosing;
 
             SetDroneStatusValue();
+
+            MainV2.comPort.CommsClose += ComPort_CommsClose;
+
+            if(bool.Parse(SettingManager.Get(Setting.AutoConnect)))
+                this.btn_TripSwitchOnOff.Enabled = false;
+        }
+
+        private void ComPort_CommsClose(object sender, EventArgs e)
+        {
+            //stop recording
+            StopRecording();
+
+            CustomMessageBox.Show("comm closed");
         }
 
         public bool isCameraConnected = false;
@@ -348,7 +360,9 @@ namespace MissionPlanner.GCSViews
                 {"Stop Feed telemetry", () => { StopFeed(); }},
                 {"Sync Time", () => { CameraHandler.Instance.SetSystemTimeToCurrent(); }},
                 {"Set Waypoint", () => {  new Thread(() => new SetWaypointForm().ShowDialog()).Start();   /*new SetWaypointForm().Show();*/  }},
-                {"Check Flightplan", async () => { MainV2.CheckFlightPlan(null, new MV04StateChangeEventArgs(){PreviousState = MV04_State.Manual, NewState = MV04_State.Auto}); }}
+                {"Check Flightplan", async () => { MainV2.CheckFlightPlan(null, new MV04StateChangeEventArgs(){PreviousState = MV04_State.Manual, NewState = MV04_State.Auto}); }},
+                {"Camera tester", () => { CameraTester(); }}
+
             };
 
             #endregion
@@ -386,6 +400,20 @@ namespace MissionPlanner.GCSViews
         }
 
         #endregion
+
+        private void CameraTester()
+        {
+            CameraTesterForm frm = new CameraTesterForm();
+            frm.Show();
+        }
+
+        public void SetNewURL(string url)
+        {
+            CameraView.instance.StopVLC();
+            Thread.Sleep(2000);
+            videoUrl = url;
+            CameraView.instance.StartVideoStreamVLC();
+        }
 
         private void StartFeed()
         {
@@ -501,26 +529,29 @@ namespace MissionPlanner.GCSViews
                 IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
-                bool autoStartSingleYaw = bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw));
+                //bool autoStartSingleYaw = bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw));
 
-                // Auto start single-yaw loop
-                if (success && autoStartSingleYaw)
-                {
-                    try
-                    {
-                        SingleYawHandler.StartSingleYaw(MainV2.comPort);
-                    }
-                    catch {}
-                    try
-                    {
-                        if (InvokeRequired)
-                            Invoke(new Action(() => SetSingleYawButton()));
-                        else
-                            SetSingleYawButton();
-                    }
-                    catch {}
+                //// Auto start single-yaw loop
+                //if (success && autoStartSingleYaw)
+                //{
+                //    //try
+                //    //{
+                //    //    SingleYawHandler.StartSingleYaw(MainV2.comPort);
+                //    //}
+                //    //catch 
+                //    //{
+                //    //    CustomMessageBox.Show("Error: Start single yaw failed");
+                //    //}
+                //    //try
+                //    //{
+                //    //    if (InvokeRequired)
+                //    //        Invoke(new Action(() => SetSingleYawButton()));
+                //    //    else
+                //    //        SetSingleYawButton();
+                //    //}
+                //    //catch {}
 
-                }
+                //}
             }
 
 
@@ -592,27 +623,40 @@ namespace MissionPlanner.GCSViews
 
         private void StartRecording()
         {
-            if(_vlcRecord == null)
-                _vlcRecord = new LibVLCSharp.Shared.LibVLC();
-
-            if(_mediaPlayerRecord == null)
-                _mediaPlayerRecord = new MediaPlayer(_vlcRecord);
-
-            if(_mediaRecord == null)
+            try
             {
-                _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
-                _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
-            }
-            else
-            {
-                _mediaRecord = null;
-                _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
-                _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
-            }
+                if (isCameraConnected)
+                {
+                    if (_vlcRecord == null)
+                        _vlcRecord = new LibVLCSharp.Shared.LibVLC();
 
-            _mediaPlayerRecord.Play(_mediaRecord);
-            _videoRecordSegmentTimer?.Start();
-            _recordingInProgress = true;
+                    if (_mediaPlayerRecord == null)
+                        _mediaPlayerRecord = new MediaPlayer(_vlcRecord);
+
+                    if (_mediaRecord == null)
+                    {
+                        _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
+                        _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
+                    }
+                    else
+                    {
+                        _mediaRecord = null;
+                        _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
+                        _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
+                    }
+
+                    _mediaPlayerRecord.Play(_mediaRecord);
+                    _videoRecordSegmentTimer?.Start();
+                    _recordingInProgress = true;
+                }
+            }
+            catch
+            {
+                CustomMessageBox.Show("Start video record failed");
+            }
+            
+
+            
         }
 
         public void StopRecording()
@@ -780,6 +824,7 @@ namespace MissionPlanner.GCSViews
             try
             {
                 StopRecording();
+                StopVLC();
                 _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
                 CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
@@ -913,8 +958,47 @@ namespace MissionPlanner.GCSViews
             {
                 if (isCameraConnected == false)
                 {
-                    //StartCameraStream();
+                    try
+                    {
+                        if (bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream)) && _recordingInProgress == false)
+                        {
+                            StartRecording();
+                            if (MainV2.instance.devmode)
+                                CustomMessageBox.Show("video record started");
+                        }
+                    }
+                    catch
+                    {
+                        if (MainV2.instance.devmode)
+                            CustomMessageBox.Show("error at record start in reportarrived");
+                    }
+                    
+
                 }
+
+                try
+                {
+                    if (bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw)) && !SingleYawHandler.IsRunning)
+                        SingleYawHandler.StartSingleYaw(MainV2.comPort);
+
+                    if (InvokeRequired)
+                        Invoke(new Action(() => { SetSingleYawButton(); }));
+                    else
+                        SetSingleYawButton();
+
+                }
+                catch
+                {
+                    if(MainV2.instance.devmode)
+                        CustomMessageBox.Show("Error: Start single yaw failed");
+                }
+
+                //can not switch off trip until report in case of tripautoconnect
+                if (InvokeRequired)
+                    Invoke(new Action(() => { this.btn_TripSwitchOnOff.Enabled = true; }));
+                else
+                    this.btn_TripSwitchOnOff.Enabled = true;
+
 
                 isCameraConnected = true;
                 SetTripOnOffButton(true);
@@ -1082,20 +1166,16 @@ namespace MissionPlanner.GCSViews
             {
                 if (e.State)
                 {
-                    //connectToCamStreamAndControl();
-
-                    //System.Threading.Thread newThread = new System.Threading.Thread(new System.Threading.ThreadStart(this.connectToCamStreamAndControl));
-                    //newThread.Start();
-
-                    //bgw = new BackgroundWorker();
-                    //bgw.DoWork += (s, ea) => { reconnectLoop(); };
-                    //bgw.RunWorkerAsync();
-
-                    //Task.Factory.StartNew(() => {
-                    //    reconnectLoop();
-                    //});
-
-                    await Task.Run(() => this.reconnectLoop());
+                    try
+                    {
+                        await Task.Run(() => this.reconnectLoop());
+                    }
+                    catch
+                    {
+                        if (MainV2.instance.devmode)
+                            CustomMessageBox.Show("error at reconnect trip relayswitched event");
+                    }
+                    
 
 
                 }
@@ -1112,7 +1192,9 @@ namespace MissionPlanner.GCSViews
                 {
                     try
                     {
-                        await reconnectControlDelayed();
+                        await Task.Delay(3000);
+                        StartCameraControl();
+                        //await reconnectControlDelayed();
                         _needToResetTime = true;
                     }
                     catch
@@ -1128,8 +1210,8 @@ namespace MissionPlanner.GCSViews
                 }
                 //StartCameraStream();
 
-                Thread.Sleep(2000);
-                CameraView.instance.StopVLC();
+                //Thread.Sleep(2000);
+                //CameraView.instance.StopVLC();
                 Thread.Sleep(2000);
                 CameraView.instance.StartVideoStreamVLC();
 
