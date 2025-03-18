@@ -141,8 +141,6 @@ namespace MissionPlanner.GCSViews
         {
             instance = this;
 
-
-
             // config map
             MainMap.CacheLocation = Settings.GetDataDirectory() +
                                     "gmapcache" + Path.DirectorySeparatorChar;
@@ -285,23 +283,27 @@ namespace MissionPlanner.GCSViews
             timer.Start();
             */
 
-            if(btn_SurveyGrid == null)
+            // Quick param setters
+            flowLayoutPanel1.Controls.AddRange(new ParamSet[]
             {
-                btn_SurveyGrid = new Button();
-                btn_SurveyGrid.Text = "SurveyGrid";
-                btn_SurveyGrid.Click += this.surveyGridToolStripMenuItem_Click;
-                btn_SurveyGrid.Height = 100;
-                btn_SurveyGrid.Width = 100;
-                btn_SurveyGrid.BackColor = Color.Yellow;
-                btn_SurveyGrid.ForeColor = Color.Black;
-            }
-            
+                new ParamSet(MainV2.comPort, "RTL_ALT", "RTL altitude", 30, 1000),
+                new ParamSet(MainV2.comPort, "FENCE_ALT_MAX", "Fence maximum altitude", 10, 1000),
+            });
+
+            // SurveyGrid button
+            Button btn_SurveyGrid = new Button();
+            btn_SurveyGrid.Text = "SurveyGrid";
+            btn_SurveyGrid.Click += this.surveyGridToolStripMenuItem_Click;
+            btn_SurveyGrid.Height = 100;
+            btn_SurveyGrid.Width = 100;
+            btn_SurveyGrid.BackColor = Color.Yellow;
+            btn_SurveyGrid.ForeColor = Color.Black;
+            flowLayoutPanel1.Controls.Add(btn_SurveyGrid);
         }
 
         public static FlightPlanner instance { get; set; }
 
         public List<PointLatLngAlt> pointlist { get; set; } = new List<PointLatLngAlt>();
-
 
         public void Activate()
         {
@@ -344,31 +346,15 @@ namespace MissionPlanner.GCSViews
                 TXT_DefaultAlt.Text = (50 * CurrentState.multiplieralt).ToString("0");
             }
 
-            // Add extra PARAM setter controls
-            foreach (Control c in flowLayoutPanel1.Controls) // Remove old controls
+            // Update quick param setter controls
+            foreach (Control item in flowLayoutPanel1.Controls)
             {
-                if (flowLayoutPanel1.Controls.Contains(c))
+                if (item is ParamSet)
                 {
-                    if(c is ParamSet)
-                        flowLayoutPanel1.Controls.Remove(c);
-                }
-                if (flowLayoutPanel1.Controls.Contains(btn_SurveyGrid))
-                {
-                    flowLayoutPanel1.Controls.Remove(btn_SurveyGrid);
+                    ((ParamSet)item).Reload();
                 }
             }
-
-            flowLayoutPanel1.Controls.AddRange(new ParamSet[] // Add controls
-            {
-                new ParamSet(MainV2.comPort, "RTL_ALT", "RTL altitude", 30, 1000),
-                new ParamSet(MainV2.comPort, "FENCE_ALT_MAX", "Fence maximum altitude", 10, 1000),
-                
-            });
-
-            flowLayoutPanel1.Controls.Add(btn_SurveyGrid);
-
         }
-        Button btn_SurveyGrid;
 
         public void Deactivate()
         {
