@@ -49,7 +49,6 @@ namespace MissionPlanner.GCSViews
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         string CameraIP;
-        int CameraStreamChannel;
         HudElements HudElements = new HudElements();
 
         (int major, int minor, int build) CameraControlDLLVersion;
@@ -73,6 +72,7 @@ namespace MissionPlanner.GCSViews
         string _tempPath = "";
         int _fileCount = 0;
         NvSystemModes _cameraState = NvSystemModes.Stow;
+        bool isPolarityInverted = false;
 
         public float SlantRange
         {
@@ -85,7 +85,6 @@ namespace MissionPlanner.GCSViews
 
                 return result;
             }
-
         }
 
         System.Timers.Timer _videoRecordSegmentTimer = new System.Timers.Timer();
@@ -93,7 +92,6 @@ namespace MissionPlanner.GCSViews
         private static LibVLCSharp.Shared.LibVLC _libVlc;
         private static MediaPlayer _mediaPlayer;
         private static Media media;
-        private static string videoUrl = "rtsp://192.168.70.203:554/live0";//"rtp://225.1.2.3:11024/live0";
 
         LibVLCSharp.Shared.LibVLC _vlcRecord;
         MediaPlayer _mediaPlayerRecord;
@@ -127,11 +125,8 @@ namespace MissionPlanner.GCSViews
 
             #region Camera set up
 
-            CameraIP = SettingManager.Get(Setting.CameraIP);
-            CameraStreamChannel = int.Parse(SettingManager.Get(Setting.CameraStreamChannel));
             CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
-
-            videoUrl = "rtp://225.1.2.3:11024/live0";//"rtsp://" + CameraIP + ":554/live0";
+            CameraIP = SettingManager.Get(Setting.CameraIP);
 
             StartCameraStream();
             StartCameraControl();
@@ -254,14 +249,12 @@ namespace MissionPlanner.GCSViews
                     tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = 0;
                     controlsClosed = true;
                     btn.Text = "Open";
-
                 }));
             else
             {
                 tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = 0;
                 controlsClosed = true;
                 btn.Text = "Open";
-
             }
         }
 
@@ -287,7 +280,6 @@ namespace MissionPlanner.GCSViews
                 MainV2.instance.HideflightData();
             }
         }
-
 
         public void ResetMenuCollapse()
         {
@@ -320,7 +312,6 @@ namespace MissionPlanner.GCSViews
             {
                 //to stg
             }
-
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
@@ -361,8 +352,7 @@ namespace MissionPlanner.GCSViews
                 {"Sync Time", () => { CameraHandler.Instance.SetSystemTimeToCurrent(); }},
                 {"Set Waypoint", () => {  new Thread(() => new SetWaypointForm().ShowDialog()).Start();   /*new SetWaypointForm().Show();*/  }},
                 {"Check Flightplan", async () => { MainV2.CheckFlightPlan(null, new MV04StateChangeEventArgs(){PreviousState = MV04_State.Manual, NewState = MV04_State.Auto}); }},
-                {"Camera tester", () => { CameraTester(); }}
-
+                {"Set Stream URL", () => { ShowStreamUrlForm(); }}
             };
 
             #endregion
@@ -393,7 +383,6 @@ namespace MissionPlanner.GCSViews
                 this.Controls.Add(bt_DoTestFunction);
                 bt_DoTestFunction.BringToFront();
             }
-
 #endif
 
             #endregion
@@ -401,18 +390,33 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-        private void CameraTester()
+        private void ShowStreamUrlForm()
         {
-            CameraTesterForm frm = new CameraTesterForm();
+            StreamUrlForm frm = new StreamUrlForm(SettingManager.Get(Setting.CameraStreamUrl));
             frm.Show();
         }
 
         public void SetNewURL(string url)
         {
+            // Set new URL
+            SettingManager.Set(Setting.CameraStreamUrl, url);
+            SettingManager.Save();
+            log.Info("Stream URL set to: " + url);
+
+            // Restart VLC
             CameraView.instance.StopVLC();
             Thread.Sleep(2000);
-            videoUrl = url;
             CameraView.instance.StartVideoStreamVLC();
+
+            // Check if URL was set
+            if (media.Mrl == SettingManager.Get(Setting.CameraStreamUrl))
+            {
+                MessageBox.Show("Stream URL set to: " + url);
+            }
+            else
+            {
+                MessageBox.Show("Stream URL set failed");
+            }
         }
 
         private void StartFeed()
@@ -421,7 +425,6 @@ namespace MissionPlanner.GCSViews
             _feedTimer.Enabled = true;
             _feedTimer.Start();
         }
-
 
         bool followAltModified = false;
         private void _feedTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -481,7 +484,6 @@ namespace MissionPlanner.GCSViews
 
                 #endregion
 
-
                 MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
                 MainV2.comPort.MAV.GuidedMode.x = (int)((target_lat - 0.0002) * 1e7);
                 MainV2.comPort.MAV.GuidedMode.y = (int)((target_lng - 0.0002) * 1e7);
@@ -507,7 +509,6 @@ namespace MissionPlanner.GCSViews
 
         private void StopFeed()
         {
-
             _feedTimer.Stop();
             _feedTimer.Enabled = false;
             _feedTimer.Close();
@@ -550,11 +551,8 @@ namespace MissionPlanner.GCSViews
                 //    //        SetSingleYawButton();
                 //    //}
                 //    //catch {}
-
                 //}
             }
-
-
 #if DEBUG
             if (success)
                 AddToOSDDebug("Camera control started");
@@ -566,10 +564,6 @@ namespace MissionPlanner.GCSViews
         private void ReconnectCameraStreamAndControl()
         {
             Task.Factory.StartNew(() => {
-
-
-
-
                 if (InvokeRequired)
                     Invoke(new Action(() => {
                         //StartCameraStream();
@@ -582,12 +576,7 @@ namespace MissionPlanner.GCSViews
                     StartCameraControl();
                     CameraHandler.Instance.SetSystemTimeToCurrent();
                 }
-
-
-
             });
-
-
         }
 
         #region Crosshair
@@ -611,14 +600,12 @@ namespace MissionPlanner.GCSViews
             }
 
             _mediaPlayer.TakeSnapshot(0, CameraHandler.Instance.MediaSavePath + "VideoStreamSnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", (uint)vv_VLC.Bounds.Width, (uint)vv_VLC.Bounds.Height);
-
         }
 
         private void _videoRecordSegmentTimer_Tick(object sender, EventArgs e)
         {
             _mediaPlayerRecord.Stop();
             StartRecording();
-
         }
 
         private void StartRecording()
@@ -635,13 +622,13 @@ namespace MissionPlanner.GCSViews
 
                     if (_mediaRecord == null)
                     {
-                        _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
+                        _mediaRecord = new Media(_vlcRecord, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
                         _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
                     }
                     else
                     {
                         _mediaRecord = null;
-                        _mediaRecord = new Media(_vlcRecord, new Uri(videoUrl));
+                        _mediaRecord = new Media(_vlcRecord, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
                         _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
                     }
 
@@ -654,9 +641,6 @@ namespace MissionPlanner.GCSViews
             {
                 CustomMessageBox.Show("Start video record failed");
             }
-            
-
-            
         }
 
         public void StopRecording()
@@ -1482,8 +1466,8 @@ namespace MissionPlanner.GCSViews
             if (_mediaPlayer == null)
                 _mediaPlayer = new MediaPlayer(_libVlc);
 
-            if (media == null)
-                media = new Media(_libVlc, new Uri(videoUrl));
+            // media has to be created new, because media.Mrl is read-only otherwise
+            media = new Media(_libVlc, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
 
             _mediaPlayer.EnableHardwareDecoding = true;
             _mediaPlayer.NetworkCaching = 300;
@@ -1493,7 +1477,6 @@ namespace MissionPlanner.GCSViews
             vv_VLC.Dock = DockStyle.Fill;
             _mediaPlayer.Fullscreen = true;
 
-
             if (panelDoubleClick == null)
             {
                 panelDoubleClick = new Panel();// panel for double click
@@ -1501,15 +1484,14 @@ namespace MissionPlanner.GCSViews
                 panelDoubleClick.BringToFront();
                 panelDoubleClick.Dock = DockStyle.Fill;
                 panelDoubleClick.BackColor = Color.Transparent;
-                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
             }
-            else
-                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
-
+            panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
 
             vv_VLC.ThisReallyVisible();
             vv_VLC.ChildReallyVisible();
             _mediaPlayer.Play(media);
+
+            log.Info($"VLC started on {media.Mrl}");
         }
 
         public void StartVideoStreamVLC()
@@ -1532,6 +1514,8 @@ namespace MissionPlanner.GCSViews
                 _mediaPlayer.Stop();
                 panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
             }
+
+            log.Info("VLC stopped");
         }
 
         private void SetTripOnOffButton(bool tripState)
@@ -1560,8 +1544,6 @@ namespace MissionPlanner.GCSViews
 
         private void btn_Surveillance_Click(object sender, EventArgs e)
         {
-
-
             NvSystemModes currentMode = CameraHandler.Instance.HasCameraReport(MavReportType.SystemReport) ?
                     CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]) :
                     NvSystemModes.GRR;
@@ -1585,11 +1567,8 @@ namespace MissionPlanner.GCSViews
             CameraHandler.Instance.DoNUC();
         }
 
-
-        bool isPolarityInverted = false;
         private void btn_Polarity_Click(object sender, EventArgs e)
         {
-            //
             //ToggleIRPolarity();
 
             if (isPolarityInverted)
@@ -1603,6 +1582,5 @@ namespace MissionPlanner.GCSViews
                 isPolarityInverted = true;
             }
         }
-
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -16,8 +17,8 @@ namespace MV04.Settings
 
             // Set UI from formData
             textBox_cameraIp.Text = GetValue(formData, Setting.CameraIP);
-            comboBox_cameraStreamChannel.SelectedItem = GetValue(formData, Setting.CameraStreamChannel);
             textBox_cameraControlPort.Text = GetValue(formData, Setting.CameraControlPort);
+            textBox_StreamUrl.Text = GetValue(formData, Setting.CameraStreamUrl);
             radioButton_AutoConnect_Yes.Checked = bool.Parse(GetValue(formData, Setting.AutoConnect));
             radioButton_AutoConnect_No.Checked = !radioButton_AutoConnect_Yes.Checked;
             numericUpDown_VideoSegmentLength.Value = int.Parse(GetValue(formData, Setting.VideoSegmentLength));
@@ -34,8 +35,8 @@ namespace MV04.Settings
         {
             // Validate & save contents
             SetIfValid(returnData, Setting.CameraIP, textBox_cameraIp.Text);
-            SetIfValid(returnData, Setting.CameraStreamChannel, comboBox_cameraStreamChannel.SelectedItem.ToString());
             SetIfValid(returnData, Setting.CameraControlPort, textBox_cameraControlPort.Text);
+            SetIfValid(returnData, Setting.CameraStreamUrl, textBox_StreamUrl.Text);
             SetIfValid(returnData, Setting.AutoConnect, radioButton_AutoConnect_Yes.Checked.ToString());
             SetIfValid(returnData, Setting.VideoSegmentLength, numericUpDown_VideoSegmentLength.Value.ToString());
             SetIfValid(returnData, Setting.IrColorMode, comboBox_IrColorMode.SelectedItem.ToString());
@@ -61,7 +62,7 @@ namespace MV04.Settings
             }
             else
             {
-                // TODO: Error message?
+                throw new InvalidConstraintException($"Invalid value ({value}) for setting {setting.ToString()}");
             }
         }
 
