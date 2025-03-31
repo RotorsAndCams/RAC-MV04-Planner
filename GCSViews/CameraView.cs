@@ -1159,14 +1159,9 @@ namespace MissionPlanner.GCSViews
                         if (MainV2.instance.devmode)
                             CustomMessageBox.Show("error at reconnect trip relayswitched event");
                     }
-                    
-
-
                 }
             }
         }
-
-
 
         private int errorCounter = 0;
         private async Task reconnectLoop()
@@ -1198,9 +1193,7 @@ namespace MissionPlanner.GCSViews
                 //CameraView.instance.StopVLC();
                 Thread.Sleep(2000);
                 CameraView.instance.StartVideoStreamVLC();
-
             });
-            
         }
 
         private async Task reconnectControlDelayed()
@@ -1284,7 +1277,6 @@ namespace MissionPlanner.GCSViews
                     break;
                 default:
                     break;
-
             }
         }
 
@@ -1460,38 +1452,46 @@ namespace MissionPlanner.GCSViews
 
         private void StartVLC()
         {
-            if (_libVlc == null)
-                _libVlc = new LibVLCSharp.Shared.LibVLC();
-
-            if (_mediaPlayer == null)
-                _mediaPlayer = new MediaPlayer(_libVlc);
-
-            // media has to be created new, because media.Mrl is read-only otherwise
-            media = new Media(_libVlc, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
-
-            _mediaPlayer.EnableHardwareDecoding = true;
-            _mediaPlayer.NetworkCaching = 300;
-
-            vv_VLC.MediaPlayer = _mediaPlayer;
-            this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
-            vv_VLC.Dock = DockStyle.Fill;
-            _mediaPlayer.Fullscreen = true;
-
-            if (panelDoubleClick == null)
+            try
             {
-                panelDoubleClick = new Panel();// panel for double click
-                vv_VLC.Controls.Add(panelDoubleClick);
-                panelDoubleClick.BringToFront();
-                panelDoubleClick.Dock = DockStyle.Fill;
-                panelDoubleClick.BackColor = Color.Transparent;
+                if (_libVlc == null)
+                    _libVlc = new LibVLCSharp.Shared.LibVLC();
+
+                if (_mediaPlayer == null)
+                    _mediaPlayer = new MediaPlayer(_libVlc);
+
+                // media has to be created new, because media.Mrl is read-only otherwise
+                media = new Media(_libVlc, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
+
+                _mediaPlayer.EnableHardwareDecoding = true;
+                _mediaPlayer.NetworkCaching = 300;
+
+                vv_VLC.MediaPlayer = _mediaPlayer;
+                this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
+                vv_VLC.Dock = DockStyle.Fill;
+                _mediaPlayer.Fullscreen = true;
+
+                if (panelDoubleClick == null)
+                {
+                    panelDoubleClick = new Panel();// panel for double click
+                    vv_VLC.Controls.Add(panelDoubleClick);
+                    panelDoubleClick.BringToFront();
+                    panelDoubleClick.Dock = DockStyle.Fill;
+                    panelDoubleClick.BackColor = Color.Transparent;
+                }
+                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
+
+                vv_VLC.ThisReallyVisible();
+                vv_VLC.ChildReallyVisible();
+                _mediaPlayer.Play(media);
+
+                log.Info($"VLC started on {media.Mrl}");
             }
-            panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
-
-            vv_VLC.ThisReallyVisible();
-            vv_VLC.ChildReallyVisible();
-            _mediaPlayer.Play(media);
-
-            log.Info($"VLC started on {media.Mrl}");
+            catch (Exception ex)
+            {
+                // No messagebox, because reconnectLoop calls this method repeatedly
+                log.Error($"Error at VLC start: {ex.Message}");
+            }
         }
 
         public void StartVideoStreamVLC()
