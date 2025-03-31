@@ -57,7 +57,7 @@
             this.numericUpDown_VideoSegmentLength = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.comboBox_cameraStreamChannel = new System.Windows.Forms.ComboBox();
+            this.textBox_StreamUrl = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -202,11 +202,11 @@
             // 
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(25, 43);
+            this.label6.Location = new System.Drawing.Point(45, 76);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(122, 13);
+            this.label6.Size = new System.Drawing.Size(102, 13);
             this.label6.TabIndex = 11;
-            this.label6.Text = "Kamera stream Csatorna";
+            this.label6.Text = "Kamera stream URL";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // textBox_cameraIp
@@ -246,7 +246,7 @@
             // textBox_cameraControlPort
             // 
             this.textBox_cameraControlPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_cameraControlPort.Location = new System.Drawing.Point(153, 72);
+            this.textBox_cameraControlPort.Location = new System.Drawing.Point(153, 39);
             this.textBox_cameraControlPort.Name = "textBox_cameraControlPort";
             this.textBox_cameraControlPort.Size = new System.Drawing.Size(228, 20);
             this.textBox_cameraControlPort.TabIndex = 18;
@@ -255,7 +255,7 @@
             // 
             this.label8.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(40, 76);
+            this.label8.Location = new System.Drawing.Point(40, 43);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(107, 13);
             this.label8.TabIndex = 17;
@@ -313,8 +313,9 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.textBox_StreamUrl, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.comboBox_IrColorMode, 1, 5);
-            this.tableLayoutPanel1.Controls.Add(this.textBox_cameraControlPort, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.textBox_cameraControlPort, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.comboBox_coordFormat, 1, 6);
             this.tableLayoutPanel1.Controls.Add(this.comboBox_altFormat, 1, 7);
             this.tableLayoutPanel1.Controls.Add(this.comboBox_distFormat, 1, 8);
@@ -322,18 +323,17 @@
             this.tableLayoutPanel1.Controls.Add(this.label5, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.textBox_cameraIp, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.label11, 0, 4);
-            this.tableLayoutPanel1.Controls.Add(this.label6, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label6, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.label7, 0, 5);
             this.tableLayoutPanel1.Controls.Add(this.label4, 0, 9);
             this.tableLayoutPanel1.Controls.Add(this.label10, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.label3, 0, 8);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 6);
-            this.tableLayoutPanel1.Controls.Add(this.label8, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.label8, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.label2, 0, 7);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel3, 1, 10);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 4);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 1, 3);
-            this.tableLayoutPanel1.Controls.Add(this.comboBox_cameraStreamChannel, 1, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -416,18 +416,13 @@
             this.tableLayoutPanel4.Size = new System.Drawing.Size(228, 27);
             this.tableLayoutPanel4.TabIndex = 31;
             // 
-            // comboBox_cameraStreamChannel
+            // textBox_StreamUrl
             // 
-            this.comboBox_cameraStreamChannel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBox_cameraStreamChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_cameraStreamChannel.FormattingEnabled = true;
-            this.comboBox_cameraStreamChannel.Items.AddRange(new object[] {
-            "0",
-            "1"});
-            this.comboBox_cameraStreamChannel.Location = new System.Drawing.Point(153, 39);
-            this.comboBox_cameraStreamChannel.Name = "comboBox_cameraStreamChannel";
-            this.comboBox_cameraStreamChannel.Size = new System.Drawing.Size(228, 21);
-            this.comboBox_cameraStreamChannel.TabIndex = 32;
+            this.textBox_StreamUrl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_StreamUrl.Location = new System.Drawing.Point(153, 72);
+            this.textBox_StreamUrl.Name = "textBox_StreamUrl";
+            this.textBox_StreamUrl.Size = new System.Drawing.Size(228, 20);
+            this.textBox_StreamUrl.TabIndex = 32;
             // 
             // SettingForm
             // 
@@ -484,6 +479,6 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.ComboBox comboBox_cameraStreamChannel;
+        private System.Windows.Forms.TextBox textBox_StreamUrl;
     }
 }

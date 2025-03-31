@@ -35,7 +35,7 @@ namespace MissionPlanner.GCSViews
                 this.tb_CamPort.Visible = true;
 
                 this.lb_CamStream.Visible = true;
-                this.cb_CamStream.Visible = true;
+                this.tb_StreamUrl.Visible = true;
 
                 this.lb_AutoConnectCam.Visible = true;
                 this.tlp_AutoConnCam.Visible = true;
@@ -116,11 +116,7 @@ namespace MissionPlanner.GCSViews
 
                 tlp_Base.RowStyles[13].Height = 100;
                 tlp_Base.RowStyles[13].SizeType = SizeType.Percent;
-
-
-
             }
-
         }
 
         private void SetSavedSettingsValues()
@@ -128,7 +124,7 @@ namespace MissionPlanner.GCSViews
             returnData = SettingManager.GetSettings();
 
             tb_CamIP.Text = GetValue(returnData, Setting.CameraIP);
-            cb_CamStream.SelectedItem = GetValue(returnData, Setting.CameraStreamChannel);
+            tb_StreamUrl.Text = GetValue(returnData, Setting.CameraStreamUrl);
             tb_CamPort.Text = GetValue(returnData, Setting.CameraControlPort);
             radioButton_AutoConnect_Yes.Checked = bool.Parse(GetValue(returnData, Setting.AutoConnect));
             radioButton_AutoConnect_No.Checked = !radioButton_AutoConnect_Yes.Checked;
@@ -164,14 +160,14 @@ namespace MissionPlanner.GCSViews
             }
             else
             {
-                // TODO: Error message?
+                throw new InvalidConstraintException($"Invalid value ({value}) for setting {setting.ToString()}");
             }
         }
 
         private void button_Save_Click(object sender, EventArgs e)
         {
             SetIfValid(returnData, Setting.CameraIP, tb_CamIP.Text);
-            SetIfValid(returnData, Setting.CameraStreamChannel, cb_CamStream.SelectedItem.ToString());
+            SetIfValid(returnData, Setting.CameraStreamUrl, tb_StreamUrl.Text);
             SetIfValid(returnData, Setting.CameraControlPort, tb_CamPort.Text);
             SetIfValid(returnData, Setting.AutoConnect, radioButton_AutoConnect_Yes.Checked.ToString());
             SetIfValid(returnData, Setting.VideoSegmentLength, numericUpDown_VideoSegmentLength.Value.ToString());

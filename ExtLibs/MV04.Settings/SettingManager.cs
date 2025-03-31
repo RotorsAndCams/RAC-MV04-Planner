@@ -12,8 +12,8 @@ namespace MV04.Settings
     public enum Setting
     {
         CameraIP,
-        CameraStreamChannel,
         CameraControlPort,
+        CameraStreamUrl,
         AutoConnect,
         VideoSegmentLength,
         MediaSaveFolder,
@@ -55,22 +55,21 @@ namespace MV04.Settings
                     // Define settings and default values
                     _SettingCollection = new HashSet<SettingItem>
                     {
-                        new SettingItem(Setting.CameraIP, "192.168.69.203", value =>
+                        new SettingItem(Setting.CameraIP, "192.168.70.203", value =>
                             !string.IsNullOrWhiteSpace(value)
                             && value.Count(c => c == '.') == 3
                             && value.Split('.').Length == 4
                             && value.Split('.').All(s => int.TryParse(s, out int i))
                             && value.Split('.').All(s => int.Parse(s) >= 0 && int.Parse(s) <= 255)
                         ),
-                        new SettingItem(Setting.CameraStreamChannel, "0", value =>
-                            !string.IsNullOrWhiteSpace(value)
-                            && int.TryParse(value, out int channel)
-                            && (channel == 0 || channel == 1)
-                        ),
                         new SettingItem(Setting.CameraControlPort, "10024", value =>
                             !string.IsNullOrWhiteSpace(value)
                             && int.TryParse(value, out int port)
                             && port >= 1024 && port <= 65536
+                        ),
+                        new SettingItem(Setting.CameraStreamUrl, $"rtsp://192.168.70.203:554/live0", value =>
+                            !string.IsNullOrWhiteSpace(value)
+                            // TODO: Add more validation
                         ),
                         new SettingItem(Setting.AutoConnect, true.ToString(), value =>
                             !string.IsNullOrWhiteSpace(value)
@@ -167,11 +166,26 @@ namespace MV04.Settings
         /// <summary>
         /// Retrieves the setting value for a setting type
         /// </summary>
-        /// <param name="setting"></param>
-        /// <returns></returns>
         public static string Get(Setting setting)
         {
             return SettingCollection.FirstOrDefault(s => s.Setting == setting).Value;
+        }
+
+        /// <summary>
+        /// Sets the value for a setting type
+        /// </summary>
+        /// <exception cref="InvalidConstraintException"></exception>
+        public static void Set(Setting setting, string value)
+        {
+            SettingItem si = SettingCollection.FirstOrDefault(s => s.Setting == setting);
+            if (si.Valid(value))
+            {
+                si.Value = value;
+            }
+            else
+            {
+                throw new InvalidConstraintException($"Invalid value ({value}) for setting {setting.ToString()}");
+            }
         }
 
         /// <summary>

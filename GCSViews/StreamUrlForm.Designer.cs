@@ -1,6 +1,6 @@
 ﻿namespace MissionPlanner.GCSViews
 {
-    partial class CameraTesterForm
+    partial class StreamUrlForm
     {
         /// <summary>
         /// Required designer variable.
@@ -59,8 +59,8 @@
             this.ClientSize = new System.Drawing.Size(491, 86);
             this.Controls.Add(this.btn_SetUrl);
             this.Controls.Add(this.tb_Url);
-            this.Name = "CameraTesterForm";
-            this.Text = "CameraTesterForm";
+            this.Name = "StreamUrlForm";
+            this.Text = "Stream Url";
             this.ResumeLayout(false);
             this.PerformLayout();
 

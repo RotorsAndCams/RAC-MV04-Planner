@@ -65,9 +65,9 @@
             this.tb_CamPort = new System.Windows.Forms.TextBox();
             this.lb_CamPort = new System.Windows.Forms.Label();
             this.lb_CamStream = new System.Windows.Forms.Label();
-            this.cb_CamStream = new System.Windows.Forms.ComboBox();
             this.lb_CamIP = new System.Windows.Forms.Label();
             this.tb_CamIP = new System.Windows.Forms.TextBox();
+            this.tb_StreamUrl = new System.Windows.Forms.TextBox();
             this.tlp_Base.SuspendLayout();
             this.tlp_AutoStartCameraStream.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_VideoSegmentLength)).BeginInit();
@@ -84,6 +84,7 @@
             this.tlp_Base.ColumnCount = 2;
             this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150F));
             this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlp_Base.Controls.Add(this.tb_StreamUrl, 1, 9);
             this.tlp_Base.Controls.Add(this.tlp_AutoStartCameraStream, 1, 12);
             this.tlp_Base.Controls.Add(this.numericUpDown_VideoSegmentLength, 1, 0);
             this.tlp_Base.Controls.Add(this.lb_AutoStartCameraStream, 0, 12);
@@ -108,7 +109,6 @@
             this.tlp_Base.Controls.Add(this.tb_CamPort, 1, 8);
             this.tlp_Base.Controls.Add(this.lb_CamPort, 0, 8);
             this.tlp_Base.Controls.Add(this.lb_CamStream, 0, 9);
-            this.tlp_Base.Controls.Add(this.cb_CamStream, 1, 9);
             this.tlp_Base.Controls.Add(this.lb_CamIP, 0, 7);
             this.tlp_Base.Controls.Add(this.tb_CamIP, 1, 7);
             this.tlp_Base.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -571,25 +571,11 @@
             this.lb_CamStream.AutoSize = true;
             this.lb_CamStream.Location = new System.Drawing.Point(3, 269);
             this.lb_CamStream.Name = "lb_CamStream";
-            this.lb_CamStream.Size = new System.Drawing.Size(122, 13);
+            this.lb_CamStream.Size = new System.Drawing.Size(99, 13);
             this.lb_CamStream.TabIndex = 11;
-            this.lb_CamStream.Text = "Kamera stream Csatorna";
+            this.lb_CamStream.Text = "Kamera streamURL";
             this.lb_CamStream.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.lb_CamStream.Visible = false;
-            // 
-            // cb_CamStream
-            // 
-            this.cb_CamStream.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.cb_CamStream.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cb_CamStream.FormattingEnabled = true;
-            this.cb_CamStream.Items.AddRange(new object[] {
-            "0",
-            "1"});
-            this.cb_CamStream.Location = new System.Drawing.Point(153, 265);
-            this.cb_CamStream.Name = "cb_CamStream";
-            this.cb_CamStream.Size = new System.Drawing.Size(244, 21);
-            this.cb_CamStream.TabIndex = 34;
-            this.cb_CamStream.Visible = false;
             // 
             // lb_CamIP
             // 
@@ -611,6 +597,15 @@
             this.tb_CamIP.Size = new System.Drawing.Size(244, 20);
             this.tb_CamIP.TabIndex = 13;
             this.tb_CamIP.Visible = false;
+            // 
+            // tb_StreamUrl
+            // 
+            this.tb_StreamUrl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.tb_StreamUrl.Location = new System.Drawing.Point(153, 265);
+            this.tb_StreamUrl.Name = "tb_StreamUrl";
+            this.tb_StreamUrl.Size = new System.Drawing.Size(244, 20);
+            this.tb_StreamUrl.TabIndex = 39;
+            this.tb_StreamUrl.Visible = false;
             // 
             // uc_CameraSettings
             // 
@@ -668,7 +663,6 @@
         private System.Windows.Forms.RadioButton rb_AutoRecordNo;
         private System.Windows.Forms.RadioButton rb_AutoRecordYes;
         private System.Windows.Forms.Label lb_AutoRecord;
-        private System.Windows.Forms.ComboBox cb_CamStream;
         private System.Windows.Forms.TableLayoutPanel tlp_SYAutoStart;
         private System.Windows.Forms.RadioButton rb_NoSY;
         private System.Windows.Forms.RadioButton rb_YesSY;
@@ -679,5 +673,6 @@
         private System.Windows.Forms.RadioButton rb_AutoStartCameraStream_No;
         private System.Windows.Forms.RadioButton rb_AutoStartCameraStream_Yes;
         private System.Windows.Forms.Label lb_AutoStartCameraStream;
+        private System.Windows.Forms.TextBox tb_StreamUrl;
     }
 }

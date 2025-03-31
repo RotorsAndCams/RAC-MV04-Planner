@@ -171,8 +171,8 @@
     <EmbeddedResource Include="GCSViews\CameraSettingsForm.resx">
       <DependentUpon>CameraSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GCSViews\CameraTesterForm.resx">
-      <DependentUpon>CameraTesterForm.cs</DependentUpon>
+    <EmbeddedResource Include="GCSViews\StreamUrlForm.resx">
+      <DependentUpon>StreamUrlForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\CameraView.resx">
       <DependentUpon>CameraView.cs</DependentUpon>
@@ -950,11 +950,11 @@
     <Compile Include="GCSViews\CameraSettingsForm.Designer.cs">
       <DependentUpon>CameraSettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GCSViews\CameraTesterForm.cs">
+    <Compile Include="GCSViews\StreamUrlForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GCSViews\CameraTesterForm.Designer.cs">
-      <DependentUpon>CameraTesterForm.cs</DependentUpon>
+    <Compile Include="GCSViews\StreamUrlForm.Designer.cs">
+      <DependentUpon>StreamUrlForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\CameraView.cs">
       <SubType>UserControl</SubType>

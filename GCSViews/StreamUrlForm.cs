@@ -10,20 +10,18 @@ using System.Windows.Forms;
 
 namespace MissionPlanner.GCSViews
 {
-    public partial class CameraTesterForm : Form
+    public partial class StreamUrlForm : Form
     {
-        public CameraTesterForm()
+        public StreamUrlForm(string streamUrl)
         {
             InitializeComponent();
+
+            this.tb_Url.Text = streamUrl;
         }
 
         private void btn_SetUrl_Click(object sender, EventArgs e)
         {
-            string url = this.tb_Url.Text;
-
-            CameraView.instance.SetNewURL(url);
-
-            CustomMessageBox.Show("url is set to: " + url);
+            CameraView.instance.SetNewURL(tb_Url.Text);
         }
     }
 }
