@@ -801,7 +801,7 @@ namespace MissionPlanner.Joystick
                                 // p1 = 0 -> Pitch stop
                                 // p1 = 1 -> Pitch up
                                 // p1 = 2 -> Pitch down
-                                CameraHandler.Instance.SetCameraPitch((PitchDirection)(int)Math.Round(but.p1));
+                                CameraHandler.Instance.SetCameraPitch((PitchDirection)(int)Math.Round(but.p1), 0.5f);
                             }
                             catch
                             {
