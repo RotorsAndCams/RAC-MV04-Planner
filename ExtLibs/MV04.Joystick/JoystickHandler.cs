@@ -120,17 +120,15 @@ namespace MV04.Joystick
 
         private static int NoneAxis = 0; // joystickaxis.None
 
-        private static int VirtualAxis = 4; // joystickaxis.ARz
-
         public static Dictionary<int, RCChannel> RCChannels = new Dictionary<int, RCChannel>
         {
             {1, new RCChannel(MV04_JoyRole.UAV_Roll, NoneAxis, "Roll", true)},
             {2, new RCChannel(MV04_JoyRole.UAV_Pitch, NoneAxis, "Pitch", true)},
             {3, new RCChannel(MV04_JoyRole.UAV_Throttle, NoneAxis, "Throttle / Zoom", true)},
-            {4, new RCChannel(MV04_JoyRole.UAV_Yaw, NoneAxis, "UAV Yaw", false)},
-            {5, new RCChannel(MV04_JoyRole.Cam_Zoom, NoneAxis, "Camera Zoom", false)},
-            {6, new RCChannel(MV04_JoyRole.Cam_Pitch, NoneAxis, "Camera Pitch", false)},
-            {7, new RCChannel(MV04_JoyRole.Cam_Yaw, NoneAxis, "Yaw", true)}
+            {4, new RCChannel(MV04_JoyRole.UAV_Yaw, NoneAxis, "Yaw", true)},
+            {5, new RCChannel(MV04_JoyRole.Cam_Zoom, NoneAxis, "Camera Zoom", true)},
+            {6, new RCChannel(MV04_JoyRole.Cam_Pitch, NoneAxis, "Camera Pitch", true)},
+            {7, new RCChannel(MV04_JoyRole.Cam_Yaw, NoneAxis, "Camera Yaw", true)}
         };
 
         #endregion
@@ -158,31 +156,34 @@ namespace MV04.Joystick
         /// </summary>
         public static Dictionary<int, int> GetAxisSet(MV04_JoyFlightMode mode)
         {
-            Dictionary<int, int> result = new Dictionary<int, int> // Manual is the default case
-            {
-                {1, GetAxisForJoyRole(MV04_JoyRole.UAV_Roll)},
-                {2, GetAxisForJoyRole(MV04_JoyRole.UAV_Pitch)},
-                {3, GetAxisForJoyRole(MV04_JoyRole.UAV_Throttle)},
-                {4, VirtualAxis}, // UAV Yaw
-                {5, NoneAxis},    // Cam Pitch
-                {6, NoneAxis},    // Cam Zoom
-                {7, GetAxisForJoyRole(MV04_JoyRole.Cam_Yaw)},
-            };
+            Dictionary<int, int> result = new Dictionary<int, int>(7);
 
             switch (mode)
             {
                 case MV04_JoyFlightMode.TapToFly:
                 case MV04_JoyFlightMode.Auto:
                 case MV04_JoyFlightMode.Follow:
-                    result[1] = NoneAxis; // UAV Roll
-                    result[2] = NoneAxis; // UAV Pitch
-                    result[3] = NoneAxis; // UAV Throttle
-                    result[5] = GetAxisForJoyRole(MV04_JoyRole.UAV_Pitch);    // Cam Pitch
-                    result[6] = GetAxisForJoyRole(MV04_JoyRole.UAV_Throttle); // Cam Zoom
+                    // Cam control only
+                    result[1] = NoneAxis;                                       // UAV Roll
+                    result[2] = NoneAxis;                                       // UAV Pitch
+                    result[3] = NoneAxis;                                       // UAV Throttle
+                    result[4] = NoneAxis;                                       // UAV Yaw
+                    result[5] = GetAxisForJoyRole(MV04_JoyRole.UAV_Pitch);      // Cam Pitch
+                    result[6] = GetAxisForJoyRole(MV04_JoyRole.UAV_Throttle);   // Cam Zoom
+                    result[7] = GetAxisForJoyRole(MV04_JoyRole.UAV_Yaw);        // Cam Yaw
                     break;
+                
                 case MV04_JoyFlightMode.Manual:
                 case MV04_JoyFlightMode.Loiter:
                 default:
+                    // UAV control only
+                    result[1] = GetAxisForJoyRole(MV04_JoyRole.UAV_Roll);       // UAV Roll
+                    result[2] = GetAxisForJoyRole(MV04_JoyRole.UAV_Pitch);      // UAV Pitch
+                    result[3] = GetAxisForJoyRole(MV04_JoyRole.UAV_Throttle);   // UAV Throttle
+                    result[4] = GetAxisForJoyRole(MV04_JoyRole.UAV_Yaw);        // UAV Yaw
+                    result[5] = NoneAxis;                                       // Cam Pitch
+                    result[6] = NoneAxis;                                       // Cam Zoom
+                    result[7] = NoneAxis;                                       // Cam Yaw
                     break;
             }
 

@@ -1328,12 +1328,9 @@ namespace MissionPlanner.Joystick
                         //(ushort)(((int)state.Y / 65.535) + 1000);
                     }
 
-                    int yawChannel = JoystickHandler.RCChannels.Single(ch => ch.Value.Role == MV04_JoyRole.UAV_Yaw).Key;
-
                     for (int i = 3; i <= 18; i++)
                     {
-                        if (getJoystickAxis(i) != joystickaxis.None
-                            && i != yawChannel)
+                        if (getJoystickAxis(i) != joystickaxis.None)
                         {
                             Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo));
                         }
