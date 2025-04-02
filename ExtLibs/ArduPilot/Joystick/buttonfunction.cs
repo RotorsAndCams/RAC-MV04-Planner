@@ -26,6 +26,7 @@ namespace MissionPlanner.Joystick
         MV04_FlightMode = buttonfunction_mv04.MV04_FlightMode,
         MV04_ImageSensor = buttonfunction_mv04.MV04_ImageSensor,
         MV04_Arm = buttonfunction_mv04.MV04_Arm,
+        MV04_Yaw = buttonfunction_mv04.MV04_Yaw,
         MV04_Pitch = buttonfunction_mv04.MV04_Pitch,
         MV04_Zoom = buttonfunction_mv04.MV04_Zoom
     }

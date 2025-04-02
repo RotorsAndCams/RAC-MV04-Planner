@@ -502,6 +502,9 @@ namespace MissionPlanner.Joystick
                 case buttonfunction.MV04_FlightMode:
                     new Joy_MV04_FlightMode((string)cmb.Tag).ShowDialog();
                     break;
+                case buttonfunction.MV04_Yaw:
+                    new Joy_MV04_Yaw((string)cmb.Tag).ShowDialog();
+                    break;
                 case buttonfunction.MV04_Pitch:
                     new Joy_MV04_Pitch((string)cmb.Tag).ShowDialog();
                     break;
