@@ -570,10 +570,6 @@
       <Project>{2a73fa7a-705c-467e-9c31-f1d0978e366e}</Project>
       <Name>MV04.Settings</Name>
     </ProjectReference>
-    <ProjectReference Include="ExtLibs\MV04.SingleYaw\MV04.SingleYaw.csproj">
-      <Project>{2120f332-679f-466c-aef2-524094ef0392}</Project>
-      <Name>MV04.SingleYaw</Name>
-    </ProjectReference>
     <ProjectReference Include="ExtLibs\MV04.State\MV04.State.csproj">
       <Project>{78FD6E54-F55E-46B8-89F9-2A655C031D5A}</Project>
       <Name>MV04.State</Name>

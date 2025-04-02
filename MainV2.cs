@@ -41,7 +41,6 @@ using Newtonsoft.Json;
 using MissionPlanner.GCSViews;
 using MV04.State;
 using MV04.FlightPlanAnalyzer;
-using MV04.SingleYaw;
 using MV04.Settings;
 using MV04.Camera;
 using Microsoft.Scripting.Hosting.Shell;
@@ -1167,18 +1166,8 @@ namespace MissionPlanner
 #endif
 #endif
 
-            //if (Program.IconFile != null)
-            //{
-            //    this.Icon = MissionPlanner.Properties.Resources.drone_takeoff;
-            //}
-
-            //MenuArduPilot.Image = new Bitmap(Properties.Resources._0d92fed790a3a70170e61a86db103f399a595c70,
-            //    (int) (200), 31);
             MenuArduPilot.Width = MenuArduPilot.Image.Width;
             MenuArduPilot.Height = MenuArduPilot.Image.Height+2;
-
-            //if (Program.Logo2 != null)
-            //    MenuArduPilot.Image = Program.Logo2;
 
             Application.DoEvents();
 
@@ -1186,10 +1175,7 @@ namespace MissionPlanner
 
             MainV2.comPort.MavChanged += comPort_MavChanged;
 
-            // save config to test we have write access
             SaveConfig();
-
-            //MessageBox.Show("Give the name");
 
             if (CameraView.instance == null)
             {
@@ -1206,10 +1192,6 @@ namespace MissionPlanner
             StateHandler.MV04StateChange += CheckFlightPlan;
 
             _comPort.ParamListChanged += _comPort_ParamListChanged;
-
-            
-            if (bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw)) && !SingleYawHandler.IsRunning)
-                SingleYawHandler.StartSingleYaw(MainV2.comPort);
 
             this.ShowIcon = false;
             //this.switchicons

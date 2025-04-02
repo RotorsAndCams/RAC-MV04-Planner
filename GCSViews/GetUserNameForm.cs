@@ -51,9 +51,9 @@ namespace MissionPlanner.GCSViews
         private bool CheckInputIsValid()
         {
             if (this.tb_Name.Text.Length < 3 || 
-                this.tb_Name.Text.Equals("Enter your name or badge number"))
+                this.tb_Name.Text.Equals("Felhasználó: "))
             {
-                CustomMessageBox.Show("Enter a valid name");
+                CustomMessageBox.Show("Adjon meg valós felhasználót!");
                 return false;
             }
             UserName = this.tb_Name.Text;
