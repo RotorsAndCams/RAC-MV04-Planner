@@ -12,6 +12,7 @@ namespace MV04.Joystick
         MV04_FlightMode,
         MV04_ImageSensor,
         MV04_Arm,
+        MV04_Yaw,
         MV04_Pitch,
         MV04_Zoom
     }
@@ -36,6 +37,13 @@ namespace MV04.Joystick
         Armed
     }
 
+    public enum buttonfunction_mv04_Yaw_option
+    {
+        Stop,
+        Left,
+        Right
+    }
+
     public enum buttonfunction_mv04_Pitch_option
     {
         Stop,
@@ -53,7 +61,9 @@ namespace MV04.Joystick
     #endregion
 
     #region Axis
+
     #region Enums
+
     public enum MV04_JoyRole
     {
         UAV_Roll,
@@ -73,6 +83,7 @@ namespace MV04.Joystick
         Auto,
         Follow
     }
+
     #endregion
 
     public class RCChannel
@@ -104,6 +115,7 @@ namespace MV04.Joystick
     public static class JoystickHandler
     {
         #region Fields
+
         public static event EventHandler<JoystickModeChangedEventArgs> JoystickModeChanged;
 
         private static int NoneAxis = 0; // joystickaxis.None
@@ -120,14 +132,22 @@ namespace MV04.Joystick
             {6, new RCChannel(MV04_JoyRole.Cam_Pitch, NoneAxis, "Camera Pitch", false)},
             {7, new RCChannel(MV04_JoyRole.Cam_Yaw, NoneAxis, "Yaw", true)}
         };
+
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Get the channel number for the given role
+        /// </summary>
         public static int GetChannelForJoyRole(MV04_JoyRole role)
         {
             return RCChannels.Single(ch => ch.Value.Role == role).Key;
         }
-        
+
+        /// <summary>
+        /// Get the axis number for the given role
+        /// </summary>
         public static int GetAxisForJoyRole(MV04_JoyRole role)
         {
             return RCChannels.Single(ch => ch.Value.Role == role).Value.Axis;
@@ -179,7 +199,9 @@ namespace MV04.Joystick
                 JoystickModeChanged(null, new JoystickModeChangedEventArgs(mode));
             }
         }
+
         #endregion
     }
+
     #endregion
 }
