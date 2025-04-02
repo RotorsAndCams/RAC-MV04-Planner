@@ -791,15 +791,29 @@ namespace MissionPlanner.Joystick
                             }
                         }, null);
                         break;
+                    case buttonfunction.MV04_Yaw:
+                        _context.Send(delegate
+                        {
+                            try
+                            {
+                                // p1 = 0, 1, 2 -> Yaw stop, left, right
+                                // p2 -> Speed
+                                CameraHandler.Instance.SetCameraYaw((YawDirection)(int)Math.Round(but.p1), but.p2);
+                            }
+                            catch
+                            {
+                                CustomMessageBox.Show("Failed to MV04_Yaw");
+                            }
+                        }, null);
+                        break;
                     case buttonfunction.MV04_Pitch:
                         _context.Send(delegate
                         {
                             try
                             {
-                                // p1 = 0 -> Pitch stop
-                                // p1 = 1 -> Pitch up
-                                // p1 = 2 -> Pitch down
-                                CameraHandler.Instance.SetCameraPitch((PitchDirection)(int)Math.Round(but.p1), 0.5f);
+                                // p1 = 0, 1, 2 -> Pitch stop, up, down
+                                // p2 -> Speed
+                                CameraHandler.Instance.SetCameraPitch((PitchDirection)(int)Math.Round(but.p1), but.p2);
                             }
                             catch
                             {
@@ -812,9 +826,7 @@ namespace MissionPlanner.Joystick
                         {
                             try
                             {
-                                // p1 = 0 -> Zoom stop
-                                // p1 = 1 -> Zoom in
-                                // p1 = 2 -> Zoom out
+                                // p1 = 0, 1, 2 -> Zoom stop, in, out
                                 CameraHandler.Instance.SetZoom((ZoomState)Math.Round(but.p1));
                             }
                             catch
