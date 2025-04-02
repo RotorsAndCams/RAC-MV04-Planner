@@ -31,7 +31,6 @@ using System.Windows.Forms;
 using static IronPython.Modules._ast;
 using static MV04.Camera.MavProto;
 using Accord.Video.FFMPEG;
-using MV04.SingleYaw;
 using MV04.FlightPlanAnalyzer;
 using System.Timers;
 using MissionPlanner.Controls;
@@ -154,7 +153,6 @@ namespace MissionPlanner.GCSViews
                 DrawUI();
 
             SetStopButtonVisibility();
-            SetSingleYawButton();
 
             this.SetStyle(ControlStyles.AllPaintingInWmPaint |
                 ControlStyles.UserPaint |
@@ -342,11 +340,6 @@ namespace MissionPlanner.GCSViews
                 {"Test Gstreamer", async () => { new GstreamerTestForm().Show(); }},
                 {"Test GCS Mode", async () => { new GCSModeTesterForm().Show(); }},
                 {"Joystick axis switcher", async () => { new  JoystickAxisSwitcherForm(MainV2.joystick).ShowDialog(); }},
-                {"Start single-yaw (Auto)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Auto); }},
-                {"Start single-yaw (Master)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Master); }},
-                {"Start single-yaw (Slave)", async () => { SingleYawHandler.StartSingleYaw(MainV2.comPort, SingleYawMode.Slave); }},
-                {"Stop single-yaw", async () => { SingleYawHandler.StopSingleYaw(); }},
-                {"Open single-yaw", async () => { new SingleYawForm(MainV2.comPort).Show(); }},
                 {"Feed telemetry", () => { StartFeed(); }},
                 {"Stop Feed telemetry", () => { StopFeed(); }},
                 {"Sync Time", () => { CameraHandler.Instance.SetSystemTimeToCurrent(); }},
@@ -953,28 +946,10 @@ namespace MissionPlanner.GCSViews
                     }
                     catch
                     {
-                        if (MainV2.instance.devmode)
-                            CustomMessageBox.Show("error at record start in reportarrived");
+                        
                     }
                     
 
-                }
-
-                try
-                {
-                    if (bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw)) && !SingleYawHandler.IsRunning)
-                        SingleYawHandler.StartSingleYaw(MainV2.comPort);
-
-                    if (InvokeRequired)
-                        Invoke(new Action(() => { SetSingleYawButton(); }));
-                    else
-                        SetSingleYawButton();
-
-                }
-                catch
-                {
-                    if(MainV2.instance.devmode)
-                        CustomMessageBox.Show("Error: Start single yaw failed");
                 }
 
                 //can not switch off trip until report in case of tripautoconnect
@@ -989,14 +964,7 @@ namespace MissionPlanner.GCSViews
                 try
                 {
                     _cameraState = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report);
-                    if (!MainV2.instance.devmode)
-                    {
-                        if ((int)MainV2.comPort.MAV.cs.alt < 5)
-                        {
-                            CameraHandler.Instance.SetMode(NvSystemModes.Stow);
-                        }
-                    }
-
+                    
                 }
                 catch { }
 
@@ -1399,44 +1367,6 @@ namespace MissionPlanner.GCSViews
         }
 
         #endregion
-
-        private void btn_StartStopSingleYaw_Click(object sender, EventArgs e)
-        {
-            if (SingleYawHandler.IsRunning)
-            {
-                SingleYawHandler.StopSingleYaw();
-                this.btn_StartStopSingleYaw.Text = "Start Single Yaw";
-                this.btn_StartStopSingleYaw.BackColor = Color.Black;
-            }
-            else
-            {
-                SingleYawHandler.StartSingleYaw(MainV2.comPort);
-                if (SingleYawHandler.IsRunning)
-                {
-                    this.btn_StartStopSingleYaw.Text = "Stop Single Yaw";
-                    this.btn_StartStopSingleYaw.BackColor = Color.DarkGreen;
-                }
-            }
-        }
-
-        private void SetSingleYawButton()
-        {
-            if (!SingleYawHandler.IsRunning)
-            {
-                this.btn_StartStopSingleYaw.Text = "Start Single Yaw";
-                this.btn_StartStopSingleYaw.BackColor = Color.Black;
-            }
-            else
-            {
-                this.btn_StartStopSingleYaw.Text = "Stop Single Yaw";
-                this.btn_StartStopSingleYaw.BackColor = Color.DarkGreen;
-            }
-        }
-
-        private void CameraView_VisibleChanged(object sender, EventArgs e)
-        {
-            SetSingleYawButton();
-        }
 
         private void vv_VLC_MouseDoubleClick(object sender, MouseEventArgs e)
         {

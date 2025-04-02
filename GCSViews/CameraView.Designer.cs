@@ -35,7 +35,6 @@
             this.btn_Polarity = new System.Windows.Forms.Button();
             this.btn_Surveillance = new System.Windows.Forms.Button();
             this.btn_ResetZoom = new System.Windows.Forms.Button();
-            this.btn_StartStopSingleYaw = new System.Windows.Forms.Button();
             this.btn_NUC = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
@@ -97,7 +96,6 @@
             this.tlp_Buttonsection2.Controls.Add(this.btn_Polarity, 1, 0);
             this.tlp_Buttonsection2.Controls.Add(this.btn_Surveillance, 0, 1);
             this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 0);
-            this.tlp_Buttonsection2.Controls.Add(this.btn_StartStopSingleYaw, 1, 2);
             this.tlp_Buttonsection2.Controls.Add(this.btn_NUC, 1, 1);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
             // 
@@ -139,15 +137,6 @@
             this.btn_ResetZoom.Name = "btn_ResetZoom";
             this.btn_ResetZoom.UseVisualStyleBackColor = false;
             this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
-            // 
-            // btn_StartStopSingleYaw
-            // 
-            this.btn_StartStopSingleYaw.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_StartStopSingleYaw, "btn_StartStopSingleYaw");
-            this.btn_StartStopSingleYaw.ForeColor = System.Drawing.Color.White;
-            this.btn_StartStopSingleYaw.Name = "btn_StartStopSingleYaw";
-            this.btn_StartStopSingleYaw.UseVisualStyleBackColor = false;
-            this.btn_StartStopSingleYaw.Click += new System.EventHandler(this.btn_StartStopSingleYaw_Click);
             // 
             // btn_NUC
             // 
@@ -360,7 +349,6 @@
             this.BackColor = System.Drawing.Color.Black;
             this.Controls.Add(this.tlp_CVBase);
             this.Name = "CameraView";
-            this.VisibleChanged += new System.EventHandler(this.CameraView_VisibleChanged);
             this.tlp_ControlsBase.ResumeLayout(false);
             this.tlp_Buttonsection2.ResumeLayout(false);
             this.tlp_InfoBase.ResumeLayout(false);
@@ -415,7 +403,6 @@
         private System.Windows.Forms.PictureBox pb_InfraLight;
         private System.Windows.Forms.PictureBox pb_PositionIndicator;
         private System.Windows.Forms.TableLayoutPanel tlp_CVBase;
-        private System.Windows.Forms.Button btn_StartStopSingleYaw;
         private LibVLCSharp.WinForms.VideoView vv_VLC;
         private System.Windows.Forms.Button btn_Surveillance;
         private System.Windows.Forms.Button btn_NUC;

@@ -33,7 +33,6 @@ using LogAnalyzer = MissionPlanner.Utilities.LogAnalyzer;
 using TableLayoutPanelCellPosition = System.Windows.Forms.TableLayoutPanelCellPosition;
 using UnauthorizedAccessException = System.UnauthorizedAccessException;
 using MV04.State;
-using MV04.SingleYaw;
 using IronPython.Modules;
 using static MAVLink;
 

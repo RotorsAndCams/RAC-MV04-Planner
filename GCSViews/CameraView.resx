@@ -246,39 +246,6 @@
   <data name="&gt;&gt;btn_ResetZoom.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
-  <data name="btn_StartStopSingleYaw.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="btn_StartStopSingleYaw.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Stencil, 12pt</value>
-  </data>
-  <data name="btn_StartStopSingleYaw.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="btn_StartStopSingleYaw.Location" type="System.Drawing.Point, System.Drawing">
-    <value>154, 243</value>
-  </data>
-  <data name="btn_StartStopSingleYaw.Size" type="System.Drawing.Size, System.Drawing">
-    <value>146, 116</value>
-  </data>
-  <data name="btn_StartStopSingleYaw.TabIndex" type="System.Int32, mscorlib">
-    <value>8</value>
-  </data>
-  <data name="btn_StartStopSingleYaw.Text" xml:space="preserve">
-    <value>Start Single Yaw</value>
-  </data>
-  <data name="&gt;&gt;btn_StartStopSingleYaw.Name" xml:space="preserve">
-    <value>btn_StartStopSingleYaw</value>
-  </data>
-  <data name="&gt;&gt;btn_StartStopSingleYaw.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btn_StartStopSingleYaw.Parent" xml:space="preserve">
-    <value>tlp_Buttonsection2</value>
-  </data>
-  <data name="&gt;&gt;btn_StartStopSingleYaw.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
   <data name="btn_NUC.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
@@ -310,7 +277,7 @@
     <value>tlp_Buttonsection2</value>
   </data>
   <data name="&gt;&gt;btn_NUC.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>4</value>
   </data>
   <data name="tlp_Buttonsection2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -343,7 +310,7 @@
     <value>0</value>
   </data>
   <data name="tlp_Buttonsection2.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_StopTracking" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_Polarity" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_Surveillance" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_ResetZoom" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_StartStopSingleYaw" Row="2" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_NUC" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,35,2,Percent,31,46667,Percent,33,33333" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_StopTracking" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_Polarity" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_Surveillance" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_ResetZoom" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_NUC" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,35,2,Percent,31,46667,Percent,33,33333" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="tlp_InfoBase.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>

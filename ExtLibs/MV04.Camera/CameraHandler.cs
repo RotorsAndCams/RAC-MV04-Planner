@@ -188,7 +188,7 @@ namespace MV04.Camera
         {
             get
             {
-                return NvSystemModes.Stow;
+                return NvSystemModes.Observation;
             }
         }
 

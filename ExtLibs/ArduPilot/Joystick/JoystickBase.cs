@@ -408,7 +408,6 @@ namespace MissionPlanner.Joystick
                                             StateHandler.CurrentSate = MV04_State.Land;
                                             break;
                                         default:
-                                            //CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
                                             StateHandler.CurrentSate = MV04_State.Unknown;
                                             break;
                                     }
@@ -689,6 +688,9 @@ namespace MissionPlanner.Joystick
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "Loiter");
                                         
                                         StateHandler.CurrentSate = MV04_State.Manual;
+
+                                        CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Stow);
+
                                         break;
                                     
                                     case buttonfunction_mv04_FlightMode_option.TapToFly:
@@ -696,12 +698,6 @@ namespace MissionPlanner.Joystick
                                         #region Tap2Fly
 
                                         MV04_SetRCChannels(MV04_JoyFlightMode.TapToFly);
-
-                                        
-                                        //if (Interface.MAV.cs.mode.ToLower() != "guided")
-                                        //    Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "GUIDED");
-                                        //Thread.Sleep(100);
-
 
                                         var custom_mode = (Interface.MAV.cs.sensors_enabled.motor_control && Interface.MAV.cs.sensors_enabled.seen) ? 1u : 0u;
                                         var set_mode = new MAVLink.mavlink_set_mode_t() { custom_mode = custom_mode, target_system = (byte)Interface.sysidcurrent };
@@ -713,6 +709,8 @@ namespace MissionPlanner.Joystick
 
                                         StateHandler.CurrentSate = MV04_State.TapToFly;
 
+                                        CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Observation);
+
                                         #endregion
 
                                         break;
@@ -723,7 +721,7 @@ namespace MissionPlanner.Joystick
                                         if (Interface.MAV.cs.mode.ToLower() != "auto")
                                             Interface.setMode((byte)Interface.sysidcurrent, (byte)Interface.compidcurrent, "AUTO");
 
-                                        //CameraHandler.Instance.SetMode(MavProto.NvSystemModes.GRR);
+                                        CameraHandler.Instance.SetMode(MavProto.NvSystemModes.Observation);
                                         
                                         StateHandler.CurrentSate = MV04_State.Auto;
                                         break;
