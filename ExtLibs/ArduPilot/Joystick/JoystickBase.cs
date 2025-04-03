@@ -218,7 +218,7 @@ namespace MissionPlanner.Joystick
             // Change axes
             JoystickHandler.GetAxisSet(mode)
                 .Where(ch => ch.Key >= 1
-                    && ch.Key <= getNumAxes()
+                    && ch.Key <= 16
                     && ch.Value >= 0
                     && ch.Value < (int)joystickaxis.UINT16_MAX)
                 .ForEach(ch =>
