@@ -32,10 +32,13 @@
             this.tlp_ControlsBase = new System.Windows.Forms.TableLayoutPanel();
             this.tlp_Buttonsection2 = new System.Windows.Forms.TableLayoutPanel();
             this.btn_StopTracking = new System.Windows.Forms.Button();
-            this.btn_Polarity = new System.Windows.Forms.Button();
+            this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.btn_Surveillance = new System.Windows.Forms.Button();
-            this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.btn_NUC = new System.Windows.Forms.Button();
+            this.btn_ResetZoom = new System.Windows.Forms.Button();
+            this.tlp_Zoom = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_ZoomMinus = new System.Windows.Forms.Button();
+            this.btn_ZoomPlus = new System.Windows.Forms.Button();
             this.tlp_InfoBase = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_SettingsPanel = new System.Windows.Forms.Panel();
             this.btn_Settings = new System.Windows.Forms.Button();
@@ -57,13 +60,14 @@
             this.pb_PositionIndicator = new System.Windows.Forms.PictureBox();
             this.tlp_ButtonSection1 = new System.Windows.Forms.TableLayoutPanel();
             this.btn_TripSwitchOnOff = new System.Windows.Forms.Button();
+            this.btn_Polarity = new System.Windows.Forms.Button();
             this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
             this.btn_FullScreen = new System.Windows.Forms.Button();
-            this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
             this.vv_VLC = new LibVLCSharp.WinForms.VideoView();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
+            this.tlp_Zoom.SuspendLayout();
             this.tlp_InfoBase.SuspendLayout();
             this.pnl_SettingsPanel.SuspendLayout();
             this.pnl_DeviceState.SuspendLayout();
@@ -93,10 +97,11 @@
             // 
             resources.ApplyResources(this.tlp_Buttonsection2, "tlp_Buttonsection2");
             this.tlp_Buttonsection2.Controls.Add(this.btn_StopTracking, 0, 2);
-            this.tlp_Buttonsection2.Controls.Add(this.btn_Polarity, 1, 0);
-            this.tlp_Buttonsection2.Controls.Add(this.btn_Surveillance, 0, 1);
-            this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 0);
-            this.tlp_Buttonsection2.Controls.Add(this.btn_NUC, 1, 1);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_FPVCameraMode, 0, 0);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_Surveillance, 1, 0);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_NUC, 1, 2);
+            this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 1);
+            this.tlp_Buttonsection2.Controls.Add(this.tlp_Zoom, 1, 1);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
             // 
             // btn_StopTracking
@@ -109,15 +114,14 @@
             this.btn_StopTracking.UseVisualStyleBackColor = false;
             this.btn_StopTracking.Click += new System.EventHandler(this.btn_StopTracking_Click);
             // 
-            // btn_Polarity
+            // btn_FPVCameraMode
             // 
-            this.btn_Polarity.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_Polarity, "btn_Polarity");
-            this.btn_Polarity.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btn_Polarity.Image = global::MissionPlanner.Properties.Resources.icons8_invert_50;
-            this.btn_Polarity.Name = "btn_Polarity";
-            this.btn_Polarity.UseVisualStyleBackColor = false;
-            this.btn_Polarity.Click += new System.EventHandler(this.btn_Polarity_Click);
+            this.btn_FPVCameraMode.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_FPVCameraMode, "btn_FPVCameraMode");
+            this.btn_FPVCameraMode.ForeColor = System.Drawing.Color.White;
+            this.btn_FPVCameraMode.Name = "btn_FPVCameraMode";
+            this.btn_FPVCameraMode.UseVisualStyleBackColor = false;
+            this.btn_FPVCameraMode.Click += new System.EventHandler(this.btn_FPVCameraMode_Click);
             // 
             // btn_Surveillance
             // 
@@ -127,6 +131,15 @@
             this.btn_Surveillance.Name = "btn_Surveillance";
             this.btn_Surveillance.UseVisualStyleBackColor = false;
             this.btn_Surveillance.Click += new System.EventHandler(this.btn_Surveillance_Click);
+            // 
+            // btn_NUC
+            // 
+            this.btn_NUC.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_NUC, "btn_NUC");
+            this.btn_NUC.ForeColor = System.Drawing.Color.White;
+            this.btn_NUC.Name = "btn_NUC";
+            this.btn_NUC.UseVisualStyleBackColor = false;
+            this.btn_NUC.Click += new System.EventHandler(this.btn_NUC_Click);
             // 
             // btn_ResetZoom
             // 
@@ -138,14 +151,30 @@
             this.btn_ResetZoom.UseVisualStyleBackColor = false;
             this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
             // 
-            // btn_NUC
+            // tlp_Zoom
             // 
-            this.btn_NUC.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_NUC, "btn_NUC");
-            this.btn_NUC.ForeColor = System.Drawing.Color.White;
-            this.btn_NUC.Name = "btn_NUC";
-            this.btn_NUC.UseVisualStyleBackColor = false;
-            this.btn_NUC.Click += new System.EventHandler(this.btn_NUC_Click);
+            resources.ApplyResources(this.tlp_Zoom, "tlp_Zoom");
+            this.tlp_Zoom.Controls.Add(this.btn_ZoomMinus, 0, 1);
+            this.tlp_Zoom.Controls.Add(this.btn_ZoomPlus, 0, 0);
+            this.tlp_Zoom.Name = "tlp_Zoom";
+            // 
+            // btn_ZoomMinus
+            // 
+            this.btn_ZoomMinus.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_ZoomMinus, "btn_ZoomMinus");
+            this.btn_ZoomMinus.ForeColor = System.Drawing.Color.White;
+            this.btn_ZoomMinus.Name = "btn_ZoomMinus";
+            this.btn_ZoomMinus.UseVisualStyleBackColor = false;
+            this.btn_ZoomMinus.Click += new System.EventHandler(this.btn_ZoomMinus_Click);
+            // 
+            // btn_ZoomPlus
+            // 
+            this.btn_ZoomPlus.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_ZoomPlus, "btn_ZoomPlus");
+            this.btn_ZoomPlus.ForeColor = System.Drawing.Color.White;
+            this.btn_ZoomPlus.Name = "btn_ZoomPlus";
+            this.btn_ZoomPlus.UseVisualStyleBackColor = false;
+            this.btn_ZoomPlus.Click += new System.EventHandler(this.btn_ZoomPlus_Click);
             // 
             // tlp_InfoBase
             // 
@@ -283,9 +312,9 @@
             // 
             resources.ApplyResources(this.tlp_ButtonSection1, "tlp_ButtonSection1");
             this.tlp_ButtonSection1.Controls.Add(this.btn_TripSwitchOnOff, 0, 0);
+            this.tlp_ButtonSection1.Controls.Add(this.btn_Polarity, 0, 1);
             this.tlp_ButtonSection1.Controls.Add(this.btn_ChangeCrosshair, 1, 0);
             this.tlp_ButtonSection1.Controls.Add(this.btn_FullScreen, 1, 1);
-            this.tlp_ButtonSection1.Controls.Add(this.btn_FPVCameraMode, 0, 1);
             this.tlp_ButtonSection1.Name = "tlp_ButtonSection1";
             // 
             // btn_TripSwitchOnOff
@@ -297,6 +326,16 @@
             this.btn_TripSwitchOnOff.Name = "btn_TripSwitchOnOff";
             this.btn_TripSwitchOnOff.UseVisualStyleBackColor = false;
             this.btn_TripSwitchOnOff.Click += new System.EventHandler(this.btn_TripSwitchOnOff_Click);
+            // 
+            // btn_Polarity
+            // 
+            this.btn_Polarity.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_Polarity, "btn_Polarity");
+            this.btn_Polarity.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btn_Polarity.Image = global::MissionPlanner.Properties.Resources.icons8_invert_50;
+            this.btn_Polarity.Name = "btn_Polarity";
+            this.btn_Polarity.UseVisualStyleBackColor = false;
+            this.btn_Polarity.Click += new System.EventHandler(this.btn_Polarity_Click);
             // 
             // btn_ChangeCrosshair
             // 
@@ -317,15 +356,6 @@
             this.btn_FullScreen.Name = "btn_FullScreen";
             this.btn_FullScreen.UseVisualStyleBackColor = false;
             this.btn_FullScreen.Click += new System.EventHandler(this.btn_FullScreen_Click);
-            // 
-            // btn_FPVCameraMode
-            // 
-            this.btn_FPVCameraMode.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_FPVCameraMode, "btn_FPVCameraMode");
-            this.btn_FPVCameraMode.ForeColor = System.Drawing.Color.White;
-            this.btn_FPVCameraMode.Name = "btn_FPVCameraMode";
-            this.btn_FPVCameraMode.UseVisualStyleBackColor = false;
-            this.btn_FPVCameraMode.Click += new System.EventHandler(this.btn_FPVCameraMode_Click);
             // 
             // tlp_CVBase
             // 
@@ -351,6 +381,7 @@
             this.Name = "CameraView";
             this.tlp_ControlsBase.ResumeLayout(false);
             this.tlp_Buttonsection2.ResumeLayout(false);
+            this.tlp_Zoom.ResumeLayout(false);
             this.tlp_InfoBase.ResumeLayout(false);
             this.pnl_SettingsPanel.ResumeLayout(false);
             this.pnl_DeviceState.ResumeLayout(false);
@@ -408,5 +439,8 @@
         private System.Windows.Forms.Button btn_NUC;
         private System.Windows.Forms.Button btn_Polarity;
         private System.Windows.Forms.Button btn_StopTracking;
+        private System.Windows.Forms.TableLayoutPanel tlp_Zoom;
+        private System.Windows.Forms.Button btn_ZoomMinus;
+        private System.Windows.Forms.Button btn_ZoomPlus;
     }
 }

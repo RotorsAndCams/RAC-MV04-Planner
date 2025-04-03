@@ -1512,5 +1512,15 @@ namespace MissionPlanner.GCSViews
                 isPolarityInverted = true;
             }
         }
+
+        private void btn_ZoomPlus_Click(object sender, EventArgs e)
+        {
+            CameraHandler.Instance.SetZoom(ZoomState.In);
+        }
+
+        private void btn_ZoomMinus_Click(object sender, EventArgs e)
+        {
+            CameraHandler.Instance.SetZoom(ZoomState.Out);
+        }
     }
 }
