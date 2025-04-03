@@ -78,7 +78,6 @@ namespace MV04.Joystick
     public enum MV04_JoyFlightMode
     {
         Manual,
-        Loiter,
         TapToFly,
         Auto,
         Follow
@@ -126,9 +125,9 @@ namespace MV04.Joystick
             {2, new RCChannel(MV04_JoyRole.UAV_Pitch, NoneAxis, "Pitch", true)},
             {3, new RCChannel(MV04_JoyRole.UAV_Throttle, NoneAxis, "Throttle / Zoom", true)},
             {4, new RCChannel(MV04_JoyRole.UAV_Yaw, NoneAxis, "Yaw", true)},
-            {5, new RCChannel(MV04_JoyRole.Cam_Zoom, NoneAxis, "Camera Zoom", true)},
-            {6, new RCChannel(MV04_JoyRole.Cam_Pitch, NoneAxis, "Camera Pitch", true)},
-            {7, new RCChannel(MV04_JoyRole.Cam_Yaw, NoneAxis, "Camera Yaw", true)}
+            {5, new RCChannel(MV04_JoyRole.Cam_Zoom, NoneAxis, "Camera Zoom", false)},
+            {6, new RCChannel(MV04_JoyRole.Cam_Pitch, NoneAxis, "Camera Pitch", false)},
+            {7, new RCChannel(MV04_JoyRole.Cam_Yaw, NoneAxis, "Camera Yaw", false)}
         };
 
         #endregion
@@ -156,7 +155,7 @@ namespace MV04.Joystick
         /// </summary>
         public static Dictionary<int, int> GetAxisSet(MV04_JoyFlightMode mode)
         {
-            Dictionary<int, int> result = new Dictionary<int, int>(7);
+            Dictionary<int, int> result = new Dictionary<int, int>();
 
             switch (mode)
             {
@@ -174,7 +173,6 @@ namespace MV04.Joystick
                     break;
                 
                 case MV04_JoyFlightMode.Manual:
-                case MV04_JoyFlightMode.Loiter:
                 default:
                     // UAV control only
                     result[1] = GetAxisForJoyRole(MV04_JoyRole.UAV_Roll);       // UAV Roll

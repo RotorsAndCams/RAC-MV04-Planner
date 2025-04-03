@@ -227,6 +227,7 @@ namespace MissionPlanner.Joystick
                 });
 
             // Notify
+            log.Info($"Joystick config set to {Enum.GetName(typeof(MV04_JoyFlightMode), mode)}");
             JoystickHandler.TriggerJoystickModeChangedEvent(mode);
         }
 
