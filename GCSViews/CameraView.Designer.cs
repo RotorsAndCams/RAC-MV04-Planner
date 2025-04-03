@@ -165,7 +165,8 @@
             this.btn_ZoomMinus.ForeColor = System.Drawing.Color.White;
             this.btn_ZoomMinus.Name = "btn_ZoomMinus";
             this.btn_ZoomMinus.UseVisualStyleBackColor = false;
-            this.btn_ZoomMinus.Click += new System.EventHandler(this.btn_ZoomMinus_Click);
+            this.btn_ZoomMinus.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btn_ZoomMinus_MouseDown);
+            this.btn_ZoomMinus.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btn_ZoomMinus_MouseUp);
             // 
             // btn_ZoomPlus
             // 
@@ -174,7 +175,8 @@
             this.btn_ZoomPlus.ForeColor = System.Drawing.Color.White;
             this.btn_ZoomPlus.Name = "btn_ZoomPlus";
             this.btn_ZoomPlus.UseVisualStyleBackColor = false;
-            this.btn_ZoomPlus.Click += new System.EventHandler(this.btn_ZoomPlus_Click);
+            this.btn_ZoomPlus.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btn_ZoomPlus_MouseDown);
+            this.btn_ZoomPlus.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btn_ZoomPlus_MouseUp);
             // 
             // tlp_InfoBase
             // 
