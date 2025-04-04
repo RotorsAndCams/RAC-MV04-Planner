@@ -218,7 +218,7 @@ namespace MissionPlanner.Joystick
             // Change axes
             JoystickHandler.GetAxisSet(mode)
                 .Where(ch => ch.Key >= 1
-                    && ch.Key <= getNumAxes()
+                    && ch.Key <= 16
                     && ch.Value >= 0
                     && ch.Value < (int)joystickaxis.UINT16_MAX)
                 .ForEach(ch =>
@@ -227,6 +227,7 @@ namespace MissionPlanner.Joystick
                 });
 
             // Notify
+            log.Info($"Joystick config set to {Enum.GetName(typeof(MV04_JoyFlightMode), mode)}");
             JoystickHandler.TriggerJoystickModeChangedEvent(mode);
         }
 
@@ -1328,12 +1329,9 @@ namespace MissionPlanner.Joystick
                         //(ushort)(((int)state.Y / 65.535) + 1000);
                     }
 
-                    int yawChannel = JoystickHandler.RCChannels.Single(ch => ch.Value.Role == MV04_JoyRole.UAV_Yaw).Key;
-
                     for (int i = 3; i <= 18; i++)
                     {
-                        if (getJoystickAxis(i) != joystickaxis.None
-                            && i != yawChannel)
+                        if (getJoystickAxis(i) != joystickaxis.None)
                         {
                             Interface.MAV.cs.GetType().GetField("rcoverridech" + i).SetValue(Interface.MAV.cs, pickchannel(i, JoyChannels[i].axis, JoyChannels[i].reverse, JoyChannels[i].expo));
                         }
