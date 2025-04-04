@@ -1213,7 +1213,6 @@ namespace MissionPlanner
                 }
 
                 this.MenuCamera.Visible = false;
-                this.MenuInitConfig.Visible = false;
                 this.MenuConfigTune.Visible = false;
                 //this.MenuHelp.Visible = false;
 
@@ -1244,6 +1243,12 @@ namespace MissionPlanner
             tsb_ChangeView.Height = 200;
             tsb_ChangeView.BackColor = Color.White;
             tsb_ChangeView.ImageScaling = ToolStripItemImageScaling.None;
+
+            MenuInitConfig.Width = 200;
+            MenuInitConfig.Height = 200;
+            MenuInitConfig.BackColor = Color.White;
+            MenuInitConfig.ImageScaling = ToolStripItemImageScaling.None;
+            MenuInitConfig.Image = global::MissionPlanner.Properties.Resources.icons8_settings_100;
 
             tsb_Error.Width = 200;
             tsb_Error.Height = 200;
