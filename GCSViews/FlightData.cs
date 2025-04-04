@@ -1639,7 +1639,7 @@ namespace MissionPlanner.GCSViews
 
         private void BUT_calib_Click(object sender, EventArgs e)
         {
-            new CalibForm().Show();
+            
         }
 
         private void BUT_setwp_Click(object sender, EventArgs e)
