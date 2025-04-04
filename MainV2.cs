@@ -1207,12 +1207,16 @@ namespace MissionPlanner
             }
             else
             {
+                if(frm.UserName != "simmode")
+                {
+                    this.MenuSimulation.Visible = false;
+                }
+
                 this.MenuCamera.Visible = false;
                 this.MenuInitConfig.Visible = false;
                 this.MenuConfigTune.Visible = false;
                 //this.MenuHelp.Visible = false;
 
-                
             }
 
             MenuFlightData.Width = 200;
