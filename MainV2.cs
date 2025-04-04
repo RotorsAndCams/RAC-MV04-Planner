@@ -1609,7 +1609,7 @@ namespace MissionPlanner
             }
 
             // Open new
-            TRIPOffMessageBox = new YesNoForm("Need to switch off Camera to protect against overheating!\n\nAllow?", "Camera switch off");
+            TRIPOffMessageBox = new YesNoForm("Szükséges lehet a kamera kikapcsolása túlmelegedés miatt!\n\nEngedélyezi?", "Kamera kikapcsolás");
             if (TRIPOffMessageBox.ShowDialog() == DialogResult.Yes)
             {
                 MainV2.instance.SwitchTRIPRelay(false);
@@ -1643,7 +1643,7 @@ namespace MissionPlanner
             catch (Exception ex)
             {
                 //continue normal run
-                CustomMessageBox.Show("Error at write camera heat log");
+                CustomMessageBox.Show("Hiba a kamera kikapcsolás logolásában");
                 this.Close();
             }
         }

@@ -219,7 +219,6 @@ namespace MissionPlanner.GCSViews
             //stop recording
             StopRecording();
 
-            CustomMessageBox.Show("comm closed");
         }
 
         public bool isCameraConnected = false;
@@ -404,11 +403,11 @@ namespace MissionPlanner.GCSViews
             // Check if URL was set
             if (media.Mrl == SettingManager.Get(Setting.CameraStreamUrl))
             {
-                MessageBox.Show("Stream URL set to: " + url);
+                MessageBox.Show("Stream URL a következőre lett állítva: " + url);
             }
             else
             {
-                MessageBox.Show("Stream URL set failed");
+                MessageBox.Show("Stream URL beállítás sikertelen");
             }
         }
 
@@ -425,15 +424,15 @@ namespace MissionPlanner.GCSViews
             //Check track mode
             if (!IsCameraTrackingModeActive || _cameraState != NvSystemModes.Tracking)
             {
-                CustomMessageBox.Show("Camera is not tracking");
+                CustomMessageBox.Show("Camera nincs tracking üzemmódban");
                 StopFeed();
                 return;
             }
 
             if (!MainV2.comPort.MAV.cs.connected || MainV2.comPort.MAV.cs.failsafe)
             {
-                CustomMessageBox.Show("not connected - follow stop");
                 StopFeed();
+                CustomMessageBox.Show("Nincs kapcsolat a követés leállt");
                 return;
             }
 
@@ -455,23 +454,14 @@ namespace MissionPlanner.GCSViews
                     double fenceAltMaxValue = MainV2.comPort.MAV.param["FENCE_ALT_MAX"].Value;
                     if (fenceAltMaxValue < MainV2.comPort.MAV.GuidedMode.z)
                     {
-                        //menjen a fence alt-on
-                        //MainV2.comPort.MAV.GuidedMode.z = (float)fenceAltMaxValue;
-
-                        //if (!followAltModified)
-                        //    CustomMessageBox.Show("Follow altitude limited for: " + MainV2.comPort.MAV.GuidedMode.z + " m");
-
-                        //followAltModified = true;
-
-                        //Ha a fence alt kisebb mint a follow alt akkor stop
-                        CustomMessageBox.Show("Fence alt is lower than follow alt - follow mode stopped");
                         StopFeed();
+                        CustomMessageBox.Show("Fence magasság kisebb mint a követési magasság - a követés leállt");
                     }
                 }
                 catch
                 {
-                    CustomMessageBox.Show("Error - follow mode stopped");
                     StopFeed();
+                    CustomMessageBox.Show("Hiba - a követés leállt");
                     return;
                 }
 
@@ -523,28 +513,6 @@ namespace MissionPlanner.GCSViews
                 IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                 int.Parse(SettingManager.Get(Setting.CameraControlPort)));
 
-                //bool autoStartSingleYaw = bool.Parse(SettingManager.Get(Setting.AutoStartSingleYaw));
-
-                //// Auto start single-yaw loop
-                //if (success && autoStartSingleYaw)
-                //{
-                //    //try
-                //    //{
-                //    //    SingleYawHandler.StartSingleYaw(MainV2.comPort);
-                //    //}
-                //    //catch 
-                //    //{
-                //    //    CustomMessageBox.Show("Error: Start single yaw failed");
-                //    //}
-                //    //try
-                //    //{
-                //    //    if (InvokeRequired)
-                //    //        Invoke(new Action(() => SetSingleYawButton()));
-                //    //    else
-                //    //        SetSingleYawButton();
-                //    //}
-                //    //catch {}
-                //}
             }
 #if DEBUG
             if (success)
@@ -632,7 +600,7 @@ namespace MissionPlanner.GCSViews
             }
             catch
             {
-                CustomMessageBox.Show("Start video record failed");
+                CustomMessageBox.Show("Videó rögzítése sikertelen");
             }
         }
 
@@ -853,7 +821,8 @@ namespace MissionPlanner.GCSViews
             }
             catch
             {
-                CustomMessageBox.Show("Error occured");
+                if(MainV2.instance.devmode)
+                    CustomMessageBox.Show("Teljes képernyős mód hiba");
             }
 
         }
@@ -941,7 +910,7 @@ namespace MissionPlanner.GCSViews
                         {
                             StartRecording();
                             if (MainV2.instance.devmode)
-                                CustomMessageBox.Show("video record started");
+                                CustomMessageBox.Show("A videó rögzítés elindult");
                         }
                     }
                     catch
@@ -1043,8 +1012,7 @@ namespace MissionPlanner.GCSViews
         {
             if (_cameraState != NvSystemModes.Tracking)
             {
-                CustomMessageBox.Show("Camera must tracking before switch to Follow mode! Switch back to the previous set camera Tracking then switch to Follow");
-                //Task.Run(() => ProvideGCSError());
+                CustomMessageBox.Show("A kamerának tracking üzemmódban kell lennie a követés indításához!");
             }
             else
             {
@@ -1054,7 +1022,6 @@ namespace MissionPlanner.GCSViews
 
         private void Execute_RTL_Tasks()
         {
-            //Task.Run(() => Blink());
         }
 
         private void Execute_TakeOff_Tasks()
@@ -1124,8 +1091,7 @@ namespace MissionPlanner.GCSViews
                     }
                     catch
                     {
-                        if (MainV2.instance.devmode)
-                            CustomMessageBox.Show("error at reconnect trip relayswitched event");
+
                     }
                 }
             }
@@ -1152,13 +1118,10 @@ namespace MissionPlanner.GCSViews
                         {
                             break;
                         }
-                        CustomMessageBox.Show("Error in camera connect loop");
+                        log.Error("reconnect loop exception");
                     }
                 }
-                //StartCameraStream();
 
-                //Thread.Sleep(2000);
-                //CameraView.instance.StopVLC();
                 Thread.Sleep(2000);
                 CameraView.instance.StartVideoStreamVLC();
             });
