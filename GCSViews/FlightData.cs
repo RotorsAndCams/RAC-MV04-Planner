@@ -1639,7 +1639,14 @@ namespace MissionPlanner.GCSViews
 
         private void BUT_calib_Click(object sender, EventArgs e)
         {
-            
+            if (MainV2.comPort.BaseStream != null && MainV2.comPort.BaseStream.IsOpen)
+            {
+                MainV2.instance.MenuSetup_Click(null, null);
+            }
+            else
+            {
+                MessageBox.Show("Nincs kapcsolat\nKalibráció nem végezhető", "Calibration");
+            }
         }
 
         private void BUT_setwp_Click(object sender, EventArgs e)
