@@ -11,7 +11,6 @@ using MissionPlanner.GCSViews.ConfigurationView;
 using MissionPlanner.Log;
 using MissionPlanner.Maps;
 using MissionPlanner.Utilities;
-
 using MissionPlanner.Warnings;
 using SkiaSharp;
 using System;
@@ -585,6 +584,8 @@ namespace MissionPlanner
 
         private YesNoForm TRIPOffMessageBox = null;
 
+        public bool devmode { get; private set; } = false;
+
         public void updateLayout(object sender, EventArgs e)
         {
             MenuSimulation.Visible = DisplayConfiguration.displaySimulation;
@@ -726,7 +727,6 @@ namespace MissionPlanner
                 MainV2.instance.FlightPlanner.updateDisplayView();
             }
         }
-
 
         public MainV2()
         {
@@ -1187,16 +1187,11 @@ namespace MissionPlanner
 
             this.Text = "Secop Planner 2" + " " + comPort.MAV.VersionString;
             this.ShowIcon = false;
+            this.ShowInTaskbar = true;
             
-
             StateHandler.MV04StateChange += CheckFlightPlan;
 
             _comPort.ParamListChanged += _comPort_ParamListChanged;
-
-            this.ShowIcon = false;
-            //this.switchicons
-            this.ShowInTaskbar = true;
-            //SetGUI();
 
             this.VisibleChanged += MainV2_VisibleChanged;
 
@@ -1213,72 +1208,64 @@ namespace MissionPlanner
                 }
 
                 this.MenuCamera.Visible = false;
-                this.MenuInitConfig.Visible = false;
                 this.MenuConfigTune.Visible = false;
-                //this.MenuHelp.Visible = false;
-
             }
 
             MenuFlightData.Width = 200;
             MenuFlightData.Height = 200;
             MenuFlightData.BackColor = Color.White;
             MenuFlightData.ImageScaling = ToolStripItemImageScaling.None;
-
-            MenuHelp.Width = 200;
-            MenuHelp.Height = 200;
-            MenuHelp.BackColor = Color.White;
-            MenuHelp.Size = new Size(200, 200);
-            MenuHelp.ImageScaling = ToolStripItemImageScaling.None;
-
-            MenuSimulation.Width = 200;
-            MenuSimulation.Height = 200;
-            MenuSimulation.BackColor = Color.White;
-            MenuSimulation.ImageScaling = ToolStripItemImageScaling.None;
+            MenuFlightData.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
 
             MenuFlightPlanner.Width = 200;
             MenuFlightPlanner.Height = 200;
             MenuFlightPlanner.BackColor = Color.White;
             MenuFlightPlanner.ImageScaling = ToolStripItemImageScaling.None;
+            MenuFlightPlanner.Image = global::MissionPlanner.Properties.Resources.icons8_earth_100;
 
             tsb_ChangeView.Width = 200;
             tsb_ChangeView.Height = 200;
             tsb_ChangeView.BackColor = Color.White;
             tsb_ChangeView.ImageScaling = ToolStripItemImageScaling.None;
 
+            MenuInitConfig.Width = 200;
+            MenuInitConfig.Height = 200;
+            MenuInitConfig.BackColor = Color.White;
+            MenuInitConfig.ImageScaling = ToolStripItemImageScaling.None;
+            MenuInitConfig.Image = global::MissionPlanner.Properties.Resources.icons8_settings_100;
+
+            MenuSimulation.Width = 200;
+            MenuSimulation.Height = 200;
+            MenuSimulation.BackColor = Color.White;
+            MenuSimulation.ImageScaling = ToolStripItemImageScaling.None;
+            MenuSimulation.Image = global::MissionPlanner.Properties.Resources.icons8_simulation_64;
+
+            MenuHelp.Width = 200;
+            MenuHelp.Height = 200;
+            MenuHelp.BackColor = Color.White;
+            MenuHelp.ImageScaling = ToolStripItemImageScaling.None;
+            MenuHelp.Image = global::MissionPlanner.Properties.Resources.icons8_menu_100;
+
             tsb_Error.Width = 200;
             tsb_Error.Height = 200;
             tsb_Error.BackColor = Color.White;
             tsb_Error.ImageScaling = ToolStripItemImageScaling.None;
-
-
-            this.MenuFlightData.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
-
-            this.MenuHelp.Image = global::MissionPlanner.Properties.Resources.icons8_menu_100;
-
-            this.MenuSimulation.Image = global::MissionPlanner.Properties.Resources.icons8_simulation_64;
-
-            this.MenuFlightPlanner.Image = global::MissionPlanner.Properties.Resources.icons8_earth_100;
-
-
-            this.MenuFlightData.Image = this.MenuFlightData.Image;
-
         }
-        public bool devmode = false;
 
         public void HideflightData()
         {
             if (InvokeRequired)
+            {
                 Invoke(new Action(() => DoHideLeftSide()));
+            }
             else
             {
                 DoHideLeftSide();
             }
-
-            
         }
 
-        int spltWidth;
         int pnlWidth;
+
         private void DoHideLeftSide()
         {
             if (CameraView.instance == null)
