@@ -30,13 +30,14 @@
         {
             this.btn_NUC = new System.Windows.Forms.Button();
             this.tlp_Buttons = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_StartStopRecording = new System.Windows.Forms.Button();
             this.btn_DayCamera = new System.Windows.Forms.Button();
             this.btn_Reconnect = new System.Windows.Forms.Button();
             this.btn_NightCamera = new System.Windows.Forms.Button();
             this.btn_EmergencyStop = new System.Windows.Forms.Button();
             this.lb_StopCounter = new System.Windows.Forms.Label();
-            this.btn_StartStopRecording = new System.Windows.Forms.Button();
             this.tlp_Base = new System.Windows.Forms.TableLayoutPanel();
+            this.uc_CameraSettings = new MissionPlanner.GCSViews.uc_CameraSettings();
             this.tlp_Buttons.SuspendLayout();
             this.tlp_Base.SuspendLayout();
             this.SuspendLayout();
@@ -64,8 +65,8 @@
             this.tlp_Buttons.Controls.Add(this.btn_NightCamera, 1, 0);
             this.tlp_Buttons.Controls.Add(this.btn_EmergencyStop, 1, 4);
             this.tlp_Buttons.Controls.Add(this.lb_StopCounter, 1, 3);
-            this.tlp_Buttons.Controls.Add(this.btn_NUC, 0, 2);
             this.tlp_Buttons.Controls.Add(this.btn_StartStopRecording, 0, 1);
+            this.tlp_Buttons.Controls.Add(this.btn_NUC, 0, 2);
             this.tlp_Buttons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlp_Buttons.ForeColor = System.Drawing.Color.White;
             this.tlp_Buttons.Location = new System.Drawing.Point(3, 3);
@@ -78,6 +79,20 @@
             this.tlp_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 19.87952F));
             this.tlp_Buttons.Size = new System.Drawing.Size(296, 460);
             this.tlp_Buttons.TabIndex = 1;
+            // 
+            // btn_StartStopRecording
+            // 
+            this.btn_StartStopRecording.BackColor = System.Drawing.Color.Black;
+            this.btn_StartStopRecording.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btn_StartStopRecording.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btn_StartStopRecording.ForeColor = System.Drawing.Color.White;
+            this.btn_StartStopRecording.Location = new System.Drawing.Point(3, 95);
+            this.btn_StartStopRecording.Name = "btn_StartStopRecording";
+            this.btn_StartStopRecording.Size = new System.Drawing.Size(142, 86);
+            this.btn_StartStopRecording.TabIndex = 0;
+            this.btn_StartStopRecording.Text = "Stop Recording";
+            this.btn_StartStopRecording.UseVisualStyleBackColor = false;
+            this.btn_StartStopRecording.Click += new System.EventHandler(this.btn_StartStopRecording_Click);
             // 
             // btn_DayCamera
             // 
@@ -156,25 +171,12 @@
             this.lb_StopCounter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lb_StopCounter.Visible = false;
             // 
-            // btn_StartStopRecording
-            // 
-            this.btn_StartStopRecording.BackColor = System.Drawing.Color.Black;
-            this.btn_StartStopRecording.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btn_StartStopRecording.ForeColor = System.Drawing.Color.White;
-            this.btn_StartStopRecording.Location = new System.Drawing.Point(3, 95);
-            this.btn_StartStopRecording.Name = "btn_StartStopRecording";
-            this.btn_StartStopRecording.Size = new System.Drawing.Size(142, 86);
-            this.btn_StartStopRecording.TabIndex = 0;
-            this.btn_StartStopRecording.Text = "Stop Recording";
-            this.btn_StartStopRecording.UseVisualStyleBackColor = false;
-            this.btn_StartStopRecording.Visible = false;
-            this.btn_StartStopRecording.Click += new System.EventHandler(this.btn_StartStopRecording_Click);
-            // 
             // tlp_Base
             // 
             this.tlp_Base.ColumnCount = 2;
             this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tlp_Base.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tlp_Base.Controls.Add(this.uc_CameraSettings, 1, 0);
             this.tlp_Base.Controls.Add(this.tlp_Buttons, 0, 0);
             this.tlp_Base.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlp_Base.Location = new System.Drawing.Point(0, 0);
@@ -183,6 +185,14 @@
             this.tlp_Base.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tlp_Base.Size = new System.Drawing.Size(605, 466);
             this.tlp_Base.TabIndex = 2;
+            // 
+            // uc_CameraSettings
+            // 
+            this.uc_CameraSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uc_CameraSettings.Location = new System.Drawing.Point(305, 3);
+            this.uc_CameraSettings.Name = "uc_CameraSettings";
+            this.uc_CameraSettings.Size = new System.Drawing.Size(297, 460);
+            this.uc_CameraSettings.TabIndex = 0;
             // 
             // CameraSettingsForm
             // 
