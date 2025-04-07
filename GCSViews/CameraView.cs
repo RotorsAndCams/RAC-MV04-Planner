@@ -910,6 +910,18 @@ namespace MissionPlanner.GCSViews
                         if (bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream)) && _recordingInProgress == false)
                         {
                             StartRecording();
+
+                            //set recording button
+                            if (InvokeRequired)
+                                Invoke(new Action(() =>
+                                {
+                                    this.btn_Recording.ForeColor = Color.Red;
+                                }));
+                            else
+                            {
+                                this.btn_Recording.ForeColor = Color.Red;
+                            }
+
                             if (MainV2.instance.devmode)
                                 CustomMessageBox.Show("A videó rögzítés elindult");
                         }
@@ -1442,6 +1454,17 @@ namespace MissionPlanner.GCSViews
                     CameraHandler.Instance.SysReportModeToMavProtoMode((SysReport)CameraHandler.Instance.CameraReports[MavReportType.SystemReport]) :
                     NvSystemModes.GRR;
 
+
+            if (InvokeRequired)
+                Invoke(new Action(() =>
+                {
+                    this.btn_FPVCameraMode.BackColor = Color.Black;
+                }));
+            else
+            {
+                this.btn_FPVCameraMode.BackColor = Color.Black;
+            }
+
             if (currentMode == NvSystemModes.GRR)
             {
                 //set to obs
@@ -1454,6 +1477,8 @@ namespace MissionPlanner.GCSViews
                 CameraHandler.Instance.SetMode(NvSystemModes.GRR);
                 this.btn_Surveillance.Text = "Observation";
             }
+
+            _isFPVModeActive = false;
         }
 
         private void btn_NUC_Click(object sender, EventArgs e)
