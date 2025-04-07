@@ -43,7 +43,7 @@
             this.button_Yes.Name = "button_Yes";
             this.button_Yes.Size = new System.Drawing.Size(75, 23);
             this.button_Yes.TabIndex = 1;
-            this.button_Yes.Text = "Yes";
+            this.button_Yes.Text = "Igen";
             this.button_Yes.UseVisualStyleBackColor = true;
             this.button_Yes.Click += new System.EventHandler(this.button_Click);
             // 
@@ -55,7 +55,7 @@
             this.button_No.Name = "button_No";
             this.button_No.Size = new System.Drawing.Size(75, 23);
             this.button_No.TabIndex = 2;
-            this.button_No.Text = "No";
+            this.button_No.Text = "Nem";
             this.button_No.UseVisualStyleBackColor = true;
             this.button_No.Click += new System.EventHandler(this.button_Click);
             // 

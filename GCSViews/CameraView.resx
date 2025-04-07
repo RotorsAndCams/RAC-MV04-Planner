@@ -190,7 +190,7 @@
     <value>Fill</value>
   </data>
   <data name="btn_Surveillance.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Stencil, 20.25pt</value>
+    <value>Stencil, 13.8pt</value>
   </data>
   <data name="btn_Surveillance.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>

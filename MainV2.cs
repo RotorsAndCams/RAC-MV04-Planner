@@ -1609,7 +1609,7 @@ namespace MissionPlanner
             }
 
             // Open new
-            TRIPOffMessageBox = new YesNoForm("Szükséges lehet a kamera kikapcsolása túlmelegedés miatt!\n\nEngedélyezi?", "Kamera kikapcsolás");
+            TRIPOffMessageBox = new YesNoForm("Kikapcsolja a kamerát túlmelegedés miatt?\n\n", "Kamera kikapcsolás");
             if (TRIPOffMessageBox.ShowDialog() == DialogResult.Yes)
             {
                 MainV2.instance.SwitchTRIPRelay(false);
