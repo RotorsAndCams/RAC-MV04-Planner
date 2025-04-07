@@ -186,6 +186,9 @@
   <data name="&gt;&gt;btn_FPVCameraMode.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="btn_Surveillance.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
   <data name="btn_Surveillance.Font" type="System.Drawing.Font, System.Drawing">
     <value>Stencil, 20.25pt</value>
   </data>
@@ -196,7 +199,7 @@
     <value>154, 3</value>
   </data>
   <data name="btn_Surveillance.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 93</value>
+    <value>146, 93</value>
   </data>
   <data name="btn_Surveillance.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -215,6 +218,9 @@
   </data>
   <data name="&gt;&gt;btn_Surveillance.ZOrder" xml:space="preserve">
     <value>2</value>
+  </data>
+  <data name="btn_NUC.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
   </data>
   <data name="btn_NUC.Font" type="System.Drawing.Font, System.Drawing">
     <value>Stencil, 14.25pt</value>
@@ -246,38 +252,11 @@
   <data name="&gt;&gt;btn_NUC.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
-  <data name="btn_ResetZoom.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Segoe UI, 9pt, style=Bold</value>
-  </data>
-  <data name="btn_ResetZoom.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="btn_ResetZoom.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 102</value>
-  </data>
-  <data name="btn_ResetZoom.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 87</value>
-  </data>
-  <data name="btn_ResetZoom.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="btn_ResetZoom.Text" xml:space="preserve">
-    <value>Zoom</value>
-  </data>
-  <data name="&gt;&gt;btn_ResetZoom.Name" xml:space="preserve">
-    <value>btn_ResetZoom</value>
-  </data>
-  <data name="&gt;&gt;btn_ResetZoom.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btn_ResetZoom.Parent" xml:space="preserve">
-    <value>tlp_Buttonsection2</value>
-  </data>
-  <data name="&gt;&gt;btn_ResetZoom.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
   <data name="tlp_Zoom.ColumnCount" type="System.Int32, mscorlib">
     <value>1</value>
+  </data>
+  <data name="btn_ZoomMinus.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
   </data>
   <data name="btn_ZoomMinus.Font" type="System.Drawing.Font, System.Drawing">
     <value>Stencil, 36pt</value>
@@ -308,6 +287,9 @@
   </data>
   <data name="&gt;&gt;btn_ZoomMinus.ZOrder" xml:space="preserve">
     <value>0</value>
+  </data>
+  <data name="btn_ZoomPlus.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
   </data>
   <data name="btn_ZoomPlus.Font" type="System.Drawing.Font, System.Drawing">
     <value>Stencil, 36pt</value>
@@ -364,10 +346,109 @@
     <value>tlp_Buttonsection2</value>
   </data>
   <data name="&gt;&gt;tlp_Zoom.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>4</value>
   </data>
   <data name="tlp_Zoom.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
     <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_ZoomMinus" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_ZoomPlus" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50" /&gt;&lt;Rows Styles="Percent,50,Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="tlp_btnsToFit.ColumnCount" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="btn_Recording.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="btn_Recording.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9pt, style=Bold</value>
+  </data>
+  <data name="btn_Recording.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btn_Recording.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 94</value>
+  </data>
+  <data name="btn_Recording.Size" type="System.Drawing.Size, System.Drawing">
+    <value>139, 86</value>
+  </data>
+  <data name="btn_Recording.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="btn_Recording.Text" xml:space="preserve">
+    <value>Recording</value>
+  </data>
+  <data name="&gt;&gt;btn_Recording.Name" xml:space="preserve">
+    <value>btn_Recording</value>
+  </data>
+  <data name="&gt;&gt;btn_Recording.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btn_Recording.Parent" xml:space="preserve">
+    <value>tlp_btnsToFit</value>
+  </data>
+  <data name="&gt;&gt;btn_Recording.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="btn_ResetZoom.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="btn_ResetZoom.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9pt, style=Bold</value>
+  </data>
+  <data name="btn_ResetZoom.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="btn_ResetZoom.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 3</value>
+  </data>
+  <data name="btn_ResetZoom.Size" type="System.Drawing.Size, System.Drawing">
+    <value>139, 85</value>
+  </data>
+  <data name="btn_ResetZoom.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="btn_ResetZoom.Text" xml:space="preserve">
+    <value>Zoom</value>
+  </data>
+  <data name="&gt;&gt;btn_ResetZoom.Name" xml:space="preserve">
+    <value>btn_ResetZoom</value>
+  </data>
+  <data name="&gt;&gt;btn_ResetZoom.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btn_ResetZoom.Parent" xml:space="preserve">
+    <value>tlp_btnsToFit</value>
+  </data>
+  <data name="&gt;&gt;btn_ResetZoom.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="tlp_btnsToFit.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="tlp_btnsToFit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 102</value>
+  </data>
+  <data name="tlp_btnsToFit.RowCount" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="tlp_btnsToFit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>145, 183</value>
+  </data>
+  <data name="tlp_btnsToFit.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
+  </data>
+  <data name="&gt;&gt;tlp_btnsToFit.Name" xml:space="preserve">
+    <value>tlp_btnsToFit</value>
+  </data>
+  <data name="&gt;&gt;tlp_btnsToFit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tlp_btnsToFit.Parent" xml:space="preserve">
+    <value>tlp_Buttonsection2</value>
+  </data>
+  <data name="&gt;&gt;tlp_btnsToFit.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="tlp_btnsToFit.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_Recording" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_ResetZoom" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50" /&gt;&lt;Rows Styles="Percent,50,Percent,50" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="tlp_Buttonsection2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
@@ -400,7 +481,7 @@
     <value>0</value>
   </data>
   <data name="tlp_Buttonsection2.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_StopTracking" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_FPVCameraMode" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_Surveillance" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_NUC" Row="2" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_ResetZoom" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="tlp_Zoom" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,24,86188,Percent,47,5,Percent,27,75" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="btn_StopTracking" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_FPVCameraMode" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="btn_Surveillance" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="btn_NUC" Row="2" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="tlp_Zoom" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="tlp_btnsToFit" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="Percent,24,86188,Percent,47,5,Percent,27,75" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="tlp_InfoBase.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>

@@ -182,6 +182,7 @@ namespace MissionPlanner.GCSViews
             #endregion
 
             #region recording vlc stream
+            //hol az autostart record?
 
             _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
 
@@ -1494,6 +1495,24 @@ namespace MissionPlanner.GCSViews
         private void btn_ZoomMinus_MouseUp(object sender, MouseEventArgs e)
         {
             CameraHandler.Instance.SetZoom(ZoomState.Stop);
+        }
+
+        private void btn_Recording_Click(object sender, EventArgs e)
+        {
+            if(_recordingInProgress)
+            {
+                StopRecording();
+
+                this.btn_Recording.Text = "Start Recording";
+                this.btn_Recording.ForeColor = Color.Red;
+            }
+            else
+            {
+                StartRecording();
+
+                this.btn_Recording.Text = "Stop Recording";
+                this.btn_Recording.ForeColor = Color.White;
+            }
         }
     }
 }

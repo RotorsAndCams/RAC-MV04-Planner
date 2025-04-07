@@ -35,7 +35,6 @@
             this.btn_FPVCameraMode = new System.Windows.Forms.Button();
             this.btn_Surveillance = new System.Windows.Forms.Button();
             this.btn_NUC = new System.Windows.Forms.Button();
-            this.btn_ResetZoom = new System.Windows.Forms.Button();
             this.tlp_Zoom = new System.Windows.Forms.TableLayoutPanel();
             this.btn_ZoomMinus = new System.Windows.Forms.Button();
             this.btn_ZoomPlus = new System.Windows.Forms.Button();
@@ -65,6 +64,9 @@
             this.btn_FullScreen = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
             this.vv_VLC = new LibVLCSharp.WinForms.VideoView();
+            this.tlp_btnsToFit = new System.Windows.Forms.TableLayoutPanel();
+            this.btn_ResetZoom = new System.Windows.Forms.Button();
+            this.btn_Recording = new System.Windows.Forms.Button();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_Zoom.SuspendLayout();
@@ -83,6 +85,7 @@
             this.tlp_ButtonSection1.SuspendLayout();
             this.tlp_CVBase.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).BeginInit();
+            this.tlp_btnsToFit.SuspendLayout();
             this.SuspendLayout();
             // 
             // tlp_ControlsBase
@@ -100,8 +103,8 @@
             this.tlp_Buttonsection2.Controls.Add(this.btn_FPVCameraMode, 0, 0);
             this.tlp_Buttonsection2.Controls.Add(this.btn_Surveillance, 1, 0);
             this.tlp_Buttonsection2.Controls.Add(this.btn_NUC, 1, 2);
-            this.tlp_Buttonsection2.Controls.Add(this.btn_ResetZoom, 0, 1);
             this.tlp_Buttonsection2.Controls.Add(this.tlp_Zoom, 1, 1);
+            this.tlp_Buttonsection2.Controls.Add(this.tlp_btnsToFit, 0, 1);
             this.tlp_Buttonsection2.Name = "tlp_Buttonsection2";
             // 
             // btn_StopTracking
@@ -140,16 +143,6 @@
             this.btn_NUC.Name = "btn_NUC";
             this.btn_NUC.UseVisualStyleBackColor = false;
             this.btn_NUC.Click += new System.EventHandler(this.btn_NUC_Click);
-            // 
-            // btn_ResetZoom
-            // 
-            this.btn_ResetZoom.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.btn_ResetZoom, "btn_ResetZoom");
-            this.btn_ResetZoom.ForeColor = System.Drawing.Color.White;
-            this.btn_ResetZoom.Image = global::MissionPlanner.Properties.Resources.icons8_reset_50;
-            this.btn_ResetZoom.Name = "btn_ResetZoom";
-            this.btn_ResetZoom.UseVisualStyleBackColor = false;
-            this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
             // 
             // tlp_Zoom
             // 
@@ -374,6 +367,32 @@
             this.vv_VLC.MediaPlayer = null;
             this.vv_VLC.Name = "vv_VLC";
             // 
+            // tlp_btnsToFit
+            // 
+            resources.ApplyResources(this.tlp_btnsToFit, "tlp_btnsToFit");
+            this.tlp_btnsToFit.Controls.Add(this.btn_Recording, 0, 1);
+            this.tlp_btnsToFit.Controls.Add(this.btn_ResetZoom, 0, 0);
+            this.tlp_btnsToFit.Name = "tlp_btnsToFit";
+            // 
+            // btn_ResetZoom
+            // 
+            this.btn_ResetZoom.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_ResetZoom, "btn_ResetZoom");
+            this.btn_ResetZoom.ForeColor = System.Drawing.Color.White;
+            this.btn_ResetZoom.Image = global::MissionPlanner.Properties.Resources.icons8_reset_50;
+            this.btn_ResetZoom.Name = "btn_ResetZoom";
+            this.btn_ResetZoom.UseVisualStyleBackColor = false;
+            this.btn_ResetZoom.Click += new System.EventHandler(this.btn_ResetZoom_Click);
+            // 
+            // btn_Recording
+            // 
+            this.btn_Recording.BackColor = System.Drawing.Color.Black;
+            resources.ApplyResources(this.btn_Recording, "btn_Recording");
+            this.btn_Recording.ForeColor = System.Drawing.Color.White;
+            this.btn_Recording.Name = "btn_Recording";
+            this.btn_Recording.UseVisualStyleBackColor = false;
+            this.btn_Recording.Click += new System.EventHandler(this.btn_Recording_Click);
+            // 
             // CameraView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -403,6 +422,7 @@
             this.tlp_ButtonSection1.ResumeLayout(false);
             this.tlp_CVBase.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).EndInit();
+            this.tlp_btnsToFit.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -410,7 +430,6 @@
         #endregion
         private System.Windows.Forms.TableLayoutPanel tlp_ControlsBase;
         private System.Windows.Forms.TableLayoutPanel tlp_Buttonsection2;
-        private System.Windows.Forms.Button btn_ResetZoom;
         private System.Windows.Forms.TableLayoutPanel tlp_ButtonSection1;
         private System.Windows.Forms.Button btn_TripSwitchOnOff;
         private System.Windows.Forms.Button btn_ChangeCrosshair;
@@ -444,5 +463,8 @@
         private System.Windows.Forms.TableLayoutPanel tlp_Zoom;
         private System.Windows.Forms.Button btn_ZoomMinus;
         private System.Windows.Forms.Button btn_ZoomPlus;
+        private System.Windows.Forms.TableLayoutPanel tlp_btnsToFit;
+        private System.Windows.Forms.Button btn_ResetZoom;
+        private System.Windows.Forms.Button btn_Recording;
     }
 }
