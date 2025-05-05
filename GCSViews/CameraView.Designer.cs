@@ -159,7 +159,7 @@
             this.btn_ZoomMinus.Name = "btn_ZoomMinus";
             this.btn_ZoomMinus.UseVisualStyleBackColor = false;
             this.btn_ZoomMinus.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btn_ZoomMinus_MouseDown);
-            this.btn_ZoomMinus.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btn_ZoomMinus_MouseUp);
+            this.btn_ZoomMinus.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btn_Zoom_MouseUp);
             // 
             // btn_ZoomPlus
             // 
@@ -169,7 +169,7 @@
             this.btn_ZoomPlus.Name = "btn_ZoomPlus";
             this.btn_ZoomPlus.UseVisualStyleBackColor = false;
             this.btn_ZoomPlus.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btn_ZoomPlus_MouseDown);
-            this.btn_ZoomPlus.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btn_ZoomPlus_MouseUp);
+            this.btn_ZoomPlus.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btn_Zoom_MouseUp);
             // 
             // tlp_btnsToFit
             // 

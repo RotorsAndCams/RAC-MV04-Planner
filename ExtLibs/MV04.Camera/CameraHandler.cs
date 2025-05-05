@@ -255,6 +255,37 @@ namespace MV04.Camera
         /// </summary>
         public (float yaw, float pitch) NextMovement { get; private set; }
 
+        // Documented FOV ranges, extended by 0.1
+        public const double MaxDayFOV = 62.4;
+        public const double MinDayFOV = 1.5;
+        public const double MaxNightFOV = 34.6;
+        public const double MinNightFOV = 4.1;
+
+        /// <summary>
+        /// Discrete zoom steps
+        /// </summary>
+        public const int ZoomLevels = 10;
+
+        /// <summary>
+        /// Returns the current discrete zoom level based on the current FOV
+        /// </summary>
+        public int ZoomLevel
+        {
+            get
+            {
+                if (IsCameraControlConnected)
+                {
+                    double fov = ((SysReport)CameraReports[MavReportType.SystemReport]).fov;
+                    bool dayCamera = ((SysReport)CameraReports[MavReportType.SystemReport]).activeSensor == 0;
+                    return ZoomLevelForFOV(fov, dayCamera);
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
         /// <summary>
         /// Store the last zoom command
         /// </summary>
@@ -752,6 +783,22 @@ namespace MV04.Camera
             }
         }
 
+        private double Constrain(double number, double minValue, double maxValue)
+        {
+            if (number < minValue)
+            {
+                return minValue;
+            }
+            else if (number > maxValue)
+            {
+                return maxValue;
+            }
+            else
+            {
+                return number;
+            }
+        }
+
         public int Constrain(int number, int minValue, int maxValue)
         {
             if (number < minValue)
@@ -830,14 +877,45 @@ namespace MV04.Camera
             return false;
         }
 
+        private double FOVForZoomLevel(int zoomLevel, bool dayCamera)
+        {
+            zoomLevel = Constrain(zoomLevel, 0, (ZoomLevels - 1));
+            double minFOV = dayCamera ? MinDayFOV : MinNightFOV;
+            double maxFOV = dayCamera ? MaxDayFOV : MaxNightFOV;
+            double step = (maxFOV - minFOV) / (ZoomLevels - 1);
+            return maxFOV - (step * zoomLevel);
+        }
+
+        private int ZoomLevelForFOV(double fov, bool dayCamera)
+        {
+            double minFOV = dayCamera ? MinDayFOV : MinNightFOV;
+            double maxFOV = dayCamera ? MaxDayFOV : MaxNightFOV;
+            fov = Constrain(fov, minFOV, maxFOV);
+            double step = (maxFOV - minFOV) / (ZoomLevels - 1);
+            double level = (maxFOV - fov) / step;
+            return (int)Math.Round(level);
+        }
+
+        public bool SetZoomLevel(int zoomLevel)
+        {
+            zoomLevel = Constrain(zoomLevel, 0, ZoomLevels - 1);
+            if (IsCameraControlConnected)
+            {
+                bool dayCamera = ((SysReport)CameraReports[MavReportType.SystemReport]).activeSensor == 0;
+                double newFOV = FOVForZoomLevel(zoomLevel, dayCamera);
+                return (mav_error)MavCmdSetFOV(CameraControl.mav_comm, CameraControl.ackCb, (float)newFOV) == mav_error.ok;
+            }
+            return false;
+        }
+
         public bool ResetZoom()
         {
             if (IsCameraControlConnected)
             {
-                MavCmdSetFOV(CameraControl.mav_comm, CameraControl.ackCb, 65);
-                return true;
+                bool dayCamera = ((SysReport)CameraReports[MavReportType.SystemReport]).activeSensor == 0;
+                double fov = dayCamera ? MaxDayFOV : MaxNightFOV;
+                return (mav_error)MavCmdSetFOV(CameraControl.mav_comm, CameraControl.ackCb, (float)fov) == mav_error.ok;
             }
-
             return false;
         }
 
