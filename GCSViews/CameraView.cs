@@ -1504,20 +1504,15 @@ namespace MissionPlanner.GCSViews
 
         private void btn_ZoomPlus_MouseDown(object sender, MouseEventArgs e)
         {
-            CameraHandler.Instance.SetZoom(ZoomState.In);
-        }
-
-        private void btn_ZoomPlus_MouseUp(object sender, MouseEventArgs e)
-        {
-            CameraHandler.Instance.SetZoom(ZoomState.Stop);
+            CameraHandler.Instance.SetZoomLevel(CameraHandler.Instance.ZoomLevel + 1);
         }
 
         private void btn_ZoomMinus_MouseDown(object sender, MouseEventArgs e)
         {
-            CameraHandler.Instance.SetZoom(ZoomState.Out);
+            CameraHandler.Instance.SetZoomLevel(CameraHandler.Instance.ZoomLevel - 1);
         }
 
-        private void btn_ZoomMinus_MouseUp(object sender, MouseEventArgs e)
+        private void btn_Zoom_MouseUp(object sender, MouseEventArgs e)
         {
             CameraHandler.Instance.SetZoom(ZoomState.Stop);
         }
