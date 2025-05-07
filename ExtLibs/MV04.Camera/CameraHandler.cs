@@ -256,10 +256,10 @@ namespace MV04.Camera
         public (float yaw, float pitch) NextMovement { get; private set; }
 
         // Documented FOV ranges, extended by 0.1
-        public const double MaxDayFOV = 62.4;
-        public const double MinDayFOV = 1.5;
-        public const double MaxNightFOV = 34.6;
-        public const double MinNightFOV = 4.1;
+        public const double MaxDayFOV = (62.3 + 0.1);
+        public const double MinDayFOV = (1.6 - 0.1);
+        public const double MaxNightFOV = (34.5 + 0.1);
+        public const double MinNightFOV = (4.2 - 0.1);
 
         /// <summary>
         /// Discrete zoom steps
