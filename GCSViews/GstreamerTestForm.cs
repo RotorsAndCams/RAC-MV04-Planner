@@ -1,5 +1,6 @@
 ﻿using MissionPlanner.Controls;
 using MissionPlanner.Utilities;
+using MV04.Settings;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -70,6 +72,20 @@ namespace MissionPlanner.GCSViews
         private void pb_Gstreamer_MouseClick(object sender, MouseEventArgs e)
         {
             MessageBox.Show("X: " + e.X + ", Y: " + e.Y);
+        }
+
+        private IPAddress GetMV04SettingsStreamAddress()
+        {
+            string streamUrl = SettingManager.Get(Setting.CameraStreamUrl);
+            Uri uri = new Uri(streamUrl);
+            return IPAddress.Parse(uri.Host);
+        }
+
+        private int GetMV04SettingsStreamPort()
+        {
+            string streamUrl = SettingManager.Get(Setting.CameraStreamUrl);
+            Uri uri = new Uri(streamUrl);
+            return uri.Port;
         }
     }
 }
