@@ -213,6 +213,11 @@ namespace MissionPlanner.GCSViews
 
             if(bool.Parse(SettingManager.Get(Setting.AutoConnect)))
                 this.btn_TripSwitchOnOff.Enabled = false;
+
+            
+
+            
+
         }
 
         private void ComPort_CommsClose(object sender, EventArgs e)

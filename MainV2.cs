@@ -1198,7 +1198,6 @@ namespace MissionPlanner
             if(frm.UserName == "devmode")
             {
                 devmode = true;
-                CustomMessageBox.Show("Running in devmode");
             }
             else
             {
