@@ -1,4 +1,5 @@
-﻿using MissionPlanner.Controls;
+﻿using log4net;
+using MissionPlanner.Controls;
 using MissionPlanner.Utilities;
 using MV04.Settings;
 using SkiaSharp;
@@ -9,6 +10,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,7 +26,9 @@ namespace MissionPlanner.GCSViews
             TestGstreamer();
         }
 
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly object _bgimagelock = new object();
+        
         private void TestGstreamer()
         {
             IPAddress streamIP = GetMV04SettingsStreamAddress();
@@ -33,10 +37,12 @@ namespace MissionPlanner.GCSViews
                 && IPAddress.TryParse(inputIp, out IPAddress _streamIP))
             {
                 streamIP = _streamIP;
+                log.Info("Stream IP cím: " + streamIP.ToString());
             }
             else
             {
                 CustomMessageBox.Show("Stream IP cím beállítás sikertelen");
+                log.Error("Stream IP address set failed");
             }
 
             int streamPort = GetMV04SettingsStreamPort();
@@ -45,10 +51,12 @@ namespace MissionPlanner.GCSViews
                 && int.TryParse(inputPort, out int _streamPort))
             {
                 streamPort = _streamPort;
+                log.Info("Stream port: " + streamPort.ToString());
             }
             else
             {
                 CustomMessageBox.Show("Stream port beállítás sikertelen");
+                log.Error("Stream port set failed");
             }
 
             //rtspsrc location=rtsp://192.168.0.203:554/live0 latency=0 ! decodebin ! autovideosink sync=false queue max-size-buffers=1 max-size-bytes=0 max-size-time=0
@@ -57,10 +65,12 @@ namespace MissionPlanner.GCSViews
             try
             {
                 GStreamer.StartA(url);
+                log.Info("Stream started using pipeline " + url);
             }
             catch (Exception ex)
             {
                 CustomMessageBox.Show(ex.ToString(), Strings.ERROR);
+                log.Error("Faled to start stream using pipeline " + url);
             }
 
             GStreamer.onNewImage += (sender, image) =>
