@@ -53,6 +53,7 @@ namespace MissionPlanner.GCSViews
         internal static GMapOverlay poioverlay = new GMapOverlay("POI");
         internal static GMapOverlay rallypointoverlay;
         internal static GMapOverlay tfrpolygons;
+        internal static GMapOverlay droptarget;
         internal GMapMarker CurrentGMapMarker;
 
         internal PointLatLng MouseDownStart;
@@ -2881,6 +2882,102 @@ namespace MissionPlanner.GCSViews
                 //MessageBox.Show("lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 +
                 //    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + " alt: " +
                 //    MainV2.comPort.MAV.GuidedMode.z);
+
+                Locationwp wp = new Locationwp()
+                {
+                    alt = MainV2.comPort.MAV.GuidedMode.z,
+                    lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                };
+
+                for (int i = 0; i <= 5; i++)
+                {
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, wp);
+                }
+
+
+
+                //MainV2.comPort.setGuidedModeWP(new Locationwp
+                //{
+                //    alt = MainV2.comPort.MAV.GuidedMode.z,
+                //    lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                //    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
+                //});
+
+                //for (int i = 0; i <= 5; i++)
+                //{
+                //    MainV2.comPort.setGuidedModeWP(new Locationwp
+                //    {
+                //        alt = MainV2.comPort.MAV.GuidedMode.z,
+                //        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                //        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
+                //    });
+                //}
+
+                //for (int i = 0; i <= 5; i++) 
+                //{
+                //    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
+                //    {
+                //        alt = MainV2.comPort.MAV.GuidedMode.z,
+                //        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
+                //        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
+                //        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
+                //    });
+                //}
+
+            }
+        }
+
+        private void selectDropTargetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string alt = "100";
+
+            if (MainV2.comPort.MAV.cs.firmware == Firmwares.ArduCopter2)
+            {
+                alt = (10 * CurrentState.multiplieralt).ToString("0");
+            }
+            else
+            {
+                alt = (100 * CurrentState.multiplieralt).ToString("0");
+            }
+
+            if (Settings.Instance.ContainsKey("guided_alt"))
+                alt = Settings.Instance["guided_alt"];
+
+            if (DialogResult.Cancel == InputBox.Show("Enter Alt", "Enter Guided Mode Alt", ref alt))
+                return;
+
+            Settings.Instance["guided_alt"] = alt;
+
+            int intalt = (int)(100 * CurrentState.multiplieralt);
+            if (!int.TryParse(alt, out intalt))
+            {
+                CustomMessageBox.Show("Bad Alt");
+                return;
+            }
+
+            if (intalt < 10)
+                intalt = 10;
+
+            MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
+
+            MainV2.comPort.MAV.GuidedMode.x = (int)(MouseDownStart.Lat * 1e7);
+            MainV2.comPort.MAV.GuidedMode.y = (int)(MouseDownStart.Lng * 1e7);
+
+            MainV2.comPort.MAV.GuidedMode.z = intalt / CurrentState.multiplieralt;
+
+            if (MainV2.comPort.MAV.cs.mode.ToLower() == "guided")
+            {
+                CustomMessageBox.Show("lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 +
+                    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + " alt: " +
+                    MainV2.comPort.MAV.GuidedMode.z);
+
+                //if (droptarget != null)
+                //{
+                //    MainMap
+                //}
+
 
                 Locationwp wp = new Locationwp()
                 {

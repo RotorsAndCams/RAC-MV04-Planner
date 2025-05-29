@@ -186,6 +186,7 @@ namespace MissionPlanner.GCSViews
             this.contextMenuStripMap = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.goHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.flyToHereAltToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectDropTargetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.flyToCoordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addPoiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -2422,6 +2423,7 @@ namespace MissionPlanner.GCSViews
             this.contextMenuStripMap.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.goHereToolStripMenuItem,
             this.flyToHereAltToolStripMenuItem,
+            this.selectDropTargetToolStripMenuItem,
             this.flyToCoordsToolStripMenuItem,
             this.addPoiToolStripMenuItem,
             this.pointCameraHereToolStripMenuItem,
@@ -2446,6 +2448,13 @@ namespace MissionPlanner.GCSViews
             this.flyToHereAltToolStripMenuItem.Name = "flyToHereAltToolStripMenuItem";
             resources.ApplyResources(this.flyToHereAltToolStripMenuItem, "flyToHereAltToolStripMenuItem");
             this.flyToHereAltToolStripMenuItem.Click += new System.EventHandler(this.flyToHereAltToolStripMenuItem_Click);
+            // 
+            // selectDropTargetToolStripMenuItem
+            // 
+            this.selectDropTargetToolStripMenuItem.Name = "selectDropTargetToolStripMenuItem";
+            resources.ApplyResources(this.selectDropTargetToolStripMenuItem, "selectDropTargetToolStripMenuItem");
+            this.selectDropTargetToolStripMenuItem.Text = "Select Drop Position";
+            this.selectDropTargetToolStripMenuItem.Click += new System.EventHandler(this.selectDropTargetToolStripMenuItem_Click);
             // 
             // flyToCoordsToolStripMenuItem
             // 
@@ -2937,6 +2946,7 @@ namespace MissionPlanner.GCSViews
         private Controls.QuickView quickView1;
         private Controls.QuickView quickView4;
         private System.Windows.Forms.ToolStripMenuItem flyToHereAltToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem selectDropTargetToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem flightPlannerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem userItemsToolStripMenuItem;
         //private Crom.Controls.Docking.DockContainer dockContainer1;
