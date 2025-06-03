@@ -40,9 +40,6 @@ namespace MissionPlanner.GCSViews
                 this.lb_AutoConnectCam.Visible = true;
                 this.tlp_AutoConnCam.Visible = true;
 
-                this.lb_AutoStartSingleYaw.Visible = true;
-                this.tlp_SYAutoStart.Visible = true;
-
                 this.lb_AutoStartCameraStream.Visible = true;
                 this.tlp_AutoStartCameraStream.Visible = true;
             }
@@ -138,9 +135,6 @@ namespace MissionPlanner.GCSViews
             rb_AutoRecordYes.Checked = bool.Parse(GetValue(returnData, Setting.AutoRecordVideoStream));
             rb_AutoRecordNo.Checked = !rb_AutoRecordYes.Checked;
 
-            rb_YesSY.Checked = bool.Parse(GetValue(returnData, Setting.AutoStartSingleYaw));
-            rb_NoSY.Checked = !rb_YesSY.Checked;
-
             rb_AutoStartCameraStream_Yes.Checked = bool.Parse(GetValue(returnData, Setting.AutoStartCameraStream));
             rb_AutoStartCameraStream_No.Checked = !rb_AutoStartCameraStream_Yes.Checked;
         }
@@ -177,7 +171,6 @@ namespace MissionPlanner.GCSViews
             SetIfValid(returnData, Setting.DistFormat, comboBox_distFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.SpeedFormat, comboBox_speedFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.AutoRecordVideoStream, rb_AutoRecordYes.Checked.ToString());
-            SetIfValid(returnData, Setting.AutoStartSingleYaw, rb_YesSY.Checked.ToString());
             SetIfValid(returnData, Setting.AutoStartCameraStream, rb_AutoStartCameraStream_Yes.Checked.ToString());
 
             SettingManager.Save();
