@@ -381,6 +381,11 @@ namespace MissionPlanner.GCSViews
             polygons = new GMapOverlay("polygons");
             gMapControl1.Overlays.Add(polygons);
 
+            //mod
+            droptarget = new GMapOverlay("drop target");
+            gMapControl1.Overlays.Add(droptarget);
+            //end mod
+
             photosoverlay = new GMapOverlay("photos overlay");
             gMapControl1.Overlays.Add(photosoverlay);
 
@@ -2969,14 +2974,29 @@ namespace MissionPlanner.GCSViews
 
             if (MainV2.comPort.MAV.cs.mode.ToLower() == "guided")
             {
-                CustomMessageBox.Show("lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 +
-                    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + " alt: " +
+                CustomMessageBox.Show("Drop target set at: \n lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 + "\n" +
+                    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + "\n alt: " +
                     MainV2.comPort.MAV.GuidedMode.z);
 
-                //if (droptarget != null)
-                //{
-                //    MainMap
-                //}
+
+
+
+                if (droptarget != null)
+                {
+                    gMapControl1.Overlays.Remove(droptarget);
+                }
+
+                var marker = new GMapMarkerRect(new PointLatLng(MainV2.comPort.MAV.GuidedMode.x / 1e7, MainV2.comPort.MAV.GuidedMode.y / 1e7))
+                {
+                    ToolTipText = "Drop Target",
+                    ToolTipMode = MarkerTooltipMode.OnMouseOver
+                };
+
+                droptarget.Markers.Add(marker);
+                gMapControl1.Overlays.Add(droptarget);
+
+                gMapControl1.Refresh();
+
 
 
                 Locationwp wp = new Locationwp()

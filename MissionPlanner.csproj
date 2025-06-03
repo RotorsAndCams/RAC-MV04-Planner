@@ -927,6 +927,8 @@
     <Compile Include="Controls\YesNoForm.Designer.cs">
       <DependentUpon>YesNoForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="DropSystem\DropManager.cs" />
+    <Compile Include="DropSystem\DropMarkerLayer.cs" />
     <Compile Include="GCSViews\BitMapEventArgs.cs" />
     <Compile Include="GCSViews\CameraFullScreenForm.cs">
       <SubType>Form</SubType>
@@ -1174,6 +1176,7 @@
     <Compile Include="test\FirmwareSelection.xaml.cs">
       <DependentUpon>FirmwareSelection.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\DroppingCalculator.cs" />
     <Compile Include="Utilities\ImageMatch.cs" />
     <Compile Include="Utilities\NativeLibrary.cs" />
     <Compile Include="Utilities\OsdTuningSlotProvider.cs" />
