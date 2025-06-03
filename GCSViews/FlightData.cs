@@ -2840,6 +2840,7 @@ namespace MissionPlanner.GCSViews
 
         private void flyToHereAltToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //haha
             string alt = "100";
 
             if (MainV2.comPort.MAV.cs.firmware == Firmwares.ArduCopter2)
