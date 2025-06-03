@@ -40,9 +40,6 @@ namespace MissionPlanner.GCSViews
                 this.lb_AutoConnectCam.Visible = true;
                 this.tlp_AutoConnCam.Visible = true;
 
-                this.lb_AutoStartSingleYaw.Visible = true;
-                this.tlp_SYAutoStart.Visible = true;
-
                 this.lb_AutoStartCameraStream.Visible = true;
                 this.tlp_AutoStartCameraStream.Visible = true;
             }
@@ -71,6 +68,16 @@ namespace MissionPlanner.GCSViews
 
                 rb_AutoRecordNo.Height = rb_AutoRecordNo.Height * 2;
                 rb_AutoRecordNo.Font = new Font(rb_AutoRecordNo.Font.FontFamily, rb_AutoRecordNo.Font.Size + 4);
+
+                //labels
+                lb_VideoSegmentLengthLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_IRColorModeLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_CoordFormatLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_AltMeasureUnitLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_DistanceMeasureUnitLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_VelocityMeasureUnitLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_AutoRecord.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+
 
 
                 tlp_Base.RowStyles[0].Height = 100;
@@ -111,11 +118,11 @@ namespace MissionPlanner.GCSViews
                 tlp_Base.RowStyles[11].Height = 0;
                 tlp_Base.RowStyles[11].SizeType = SizeType.Percent;
 
-                tlp_Base.RowStyles[12].Height = 0;
+                tlp_Base.RowStyles[12].Height = 100;
                 tlp_Base.RowStyles[12].SizeType = SizeType.Percent;
 
-                tlp_Base.RowStyles[13].Height = 100;
-                tlp_Base.RowStyles[13].SizeType = SizeType.Percent;
+                //tlp_Base.RowStyles[13].Height = 100;
+                //tlp_Base.RowStyles[13].SizeType = SizeType.Percent;
             }
         }
 
@@ -137,9 +144,6 @@ namespace MissionPlanner.GCSViews
 
             rb_AutoRecordYes.Checked = bool.Parse(GetValue(returnData, Setting.AutoRecordVideoStream));
             rb_AutoRecordNo.Checked = !rb_AutoRecordYes.Checked;
-
-            rb_YesSY.Checked = bool.Parse(GetValue(returnData, Setting.AutoStartSingleYaw));
-            rb_NoSY.Checked = !rb_YesSY.Checked;
 
             rb_AutoStartCameraStream_Yes.Checked = bool.Parse(GetValue(returnData, Setting.AutoStartCameraStream));
             rb_AutoStartCameraStream_No.Checked = !rb_AutoStartCameraStream_Yes.Checked;
@@ -177,7 +181,6 @@ namespace MissionPlanner.GCSViews
             SetIfValid(returnData, Setting.DistFormat, comboBox_distFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.SpeedFormat, comboBox_speedFormat.SelectedItem.ToString());
             SetIfValid(returnData, Setting.AutoRecordVideoStream, rb_AutoRecordYes.Checked.ToString());
-            SetIfValid(returnData, Setting.AutoStartSingleYaw, rb_YesSY.Checked.ToString());
             SetIfValid(returnData, Setting.AutoStartCameraStream, rb_AutoStartCameraStream_Yes.Checked.ToString());
 
             SettingManager.Save();
