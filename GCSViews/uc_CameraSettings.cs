@@ -69,6 +69,16 @@ namespace MissionPlanner.GCSViews
                 rb_AutoRecordNo.Height = rb_AutoRecordNo.Height * 2;
                 rb_AutoRecordNo.Font = new Font(rb_AutoRecordNo.Font.FontFamily, rb_AutoRecordNo.Font.Size + 4);
 
+                //labels
+                lb_VideoSegmentLengthLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_IRColorModeLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_CoordFormatLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_AltMeasureUnitLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_DistanceMeasureUnitLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_VelocityMeasureUnitLabel.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+                lb_AutoRecord.Font = new Font(comboBox_IrColorMode.Font.FontFamily, comboBox_IrColorMode.Font.Size + 1);
+
+
 
                 tlp_Base.RowStyles[0].Height = 100;
                 tlp_Base.RowStyles[0].SizeType = SizeType.Percent;
@@ -108,11 +118,11 @@ namespace MissionPlanner.GCSViews
                 tlp_Base.RowStyles[11].Height = 0;
                 tlp_Base.RowStyles[11].SizeType = SizeType.Percent;
 
-                tlp_Base.RowStyles[12].Height = 0;
+                tlp_Base.RowStyles[12].Height = 100;
                 tlp_Base.RowStyles[12].SizeType = SizeType.Percent;
 
-                tlp_Base.RowStyles[13].Height = 100;
-                tlp_Base.RowStyles[13].SizeType = SizeType.Percent;
+                //tlp_Base.RowStyles[13].Height = 100;
+                //tlp_Base.RowStyles[13].SizeType = SizeType.Percent;
             }
         }
 

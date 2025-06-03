@@ -41,17 +41,15 @@
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.button_Cancel = new System.Windows.Forms.Button();
             this.button_Save = new System.Windows.Forms.Button();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
+            this.lb_IRColorModeLabel = new System.Windows.Forms.Label();
             this.comboBox_IrColorMode = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lb_CoordFormatLabel = new System.Windows.Forms.Label();
             this.comboBox_coordFormat = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lb_AltMeasureUnitLabel = new System.Windows.Forms.Label();
             this.comboBox_altFormat = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.lb_DistanceMeasureUnitLabel = new System.Windows.Forms.Label();
+            this.lb_VelocityMeasureUnitLabel = new System.Windows.Forms.Label();
             this.comboBox_speedFormat = new System.Windows.Forms.ComboBox();
-            this.lb_AutoRecord = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.rb_AutoRecordNo = new System.Windows.Forms.RadioButton();
             this.rb_AutoRecordYes = new System.Windows.Forms.RadioButton();
@@ -64,6 +62,8 @@
             this.lb_CamStream = new System.Windows.Forms.Label();
             this.lb_CamIP = new System.Windows.Forms.Label();
             this.tb_CamIP = new System.Windows.Forms.TextBox();
+            this.lb_AutoRecord = new System.Windows.Forms.Label();
+            this.lb_VideoSegmentLengthLabel = new System.Windows.Forms.Label();
             this.tlp_Base.SuspendLayout();
             this.tlp_AutoStartCameraStream.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_VideoSegmentLength)).BeginInit();
@@ -85,17 +85,15 @@
             this.tlp_Base.Controls.Add(this.lb_AutoStartCameraStream, 0, 11);
             this.tlp_Base.Controls.Add(this.tableLayoutPanel2, 1, 4);
             this.tlp_Base.Controls.Add(this.tableLayoutPanel3, 1, 12);
-            this.tlp_Base.Controls.Add(this.label11, 0, 0);
-            this.tlp_Base.Controls.Add(this.label7, 0, 1);
+            this.tlp_Base.Controls.Add(this.lb_IRColorModeLabel, 0, 1);
             this.tlp_Base.Controls.Add(this.comboBox_IrColorMode, 1, 1);
-            this.tlp_Base.Controls.Add(this.label1, 0, 2);
+            this.tlp_Base.Controls.Add(this.lb_CoordFormatLabel, 0, 2);
             this.tlp_Base.Controls.Add(this.comboBox_coordFormat, 1, 2);
-            this.tlp_Base.Controls.Add(this.label2, 0, 3);
+            this.tlp_Base.Controls.Add(this.lb_AltMeasureUnitLabel, 0, 3);
             this.tlp_Base.Controls.Add(this.comboBox_altFormat, 1, 3);
-            this.tlp_Base.Controls.Add(this.label3, 0, 4);
-            this.tlp_Base.Controls.Add(this.label4, 0, 5);
+            this.tlp_Base.Controls.Add(this.lb_DistanceMeasureUnitLabel, 0, 4);
+            this.tlp_Base.Controls.Add(this.lb_VelocityMeasureUnitLabel, 0, 5);
             this.tlp_Base.Controls.Add(this.comboBox_speedFormat, 1, 5);
-            this.tlp_Base.Controls.Add(this.lb_AutoRecord, 0, 6);
             this.tlp_Base.Controls.Add(this.tableLayoutPanel1, 1, 6);
             this.tlp_Base.Controls.Add(this.lb_AutoConnectCam, 0, 10);
             this.tlp_Base.Controls.Add(this.tlp_AutoConnCam, 1, 10);
@@ -104,6 +102,8 @@
             this.tlp_Base.Controls.Add(this.lb_CamStream, 0, 9);
             this.tlp_Base.Controls.Add(this.lb_CamIP, 0, 7);
             this.tlp_Base.Controls.Add(this.tb_CamIP, 1, 7);
+            this.tlp_Base.Controls.Add(this.lb_AutoRecord, 0, 6);
+            this.tlp_Base.Controls.Add(this.lb_VideoSegmentLengthLabel, 0, 0);
             this.tlp_Base.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlp_Base.ForeColor = System.Drawing.Color.White;
             this.tlp_Base.Location = new System.Drawing.Point(0, 0);
@@ -184,13 +184,14 @@
             // 
             // lb_AutoStartCameraStream
             // 
-            this.lb_AutoStartCameraStream.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lb_AutoStartCameraStream.AutoSize = true;
-            this.lb_AutoStartCameraStream.Location = new System.Drawing.Point(3, 350);
+            this.lb_AutoStartCameraStream.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_AutoStartCameraStream.Location = new System.Drawing.Point(3, 341);
             this.lb_AutoStartCameraStream.Name = "lb_AutoStartCameraStream";
-            this.lb_AutoStartCameraStream.Size = new System.Drawing.Size(120, 13);
+            this.lb_AutoStartCameraStream.Size = new System.Drawing.Size(144, 31);
             this.lb_AutoStartCameraStream.TabIndex = 37;
-            this.lb_AutoStartCameraStream.Text = "AutoStartCameraStream";
+            this.lb_AutoStartCameraStream.Text = "Video auto megjelenítés";
+            this.lb_AutoStartCameraStream.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.lb_AutoStartCameraStream.Visible = false;
             // 
             // tableLayoutPanel2
@@ -273,27 +274,16 @@
             this.button_Save.UseVisualStyleBackColor = false;
             this.button_Save.Click += new System.EventHandler(this.button_Save_Click);
             // 
-            // label11
+            // lb_IRColorModeLabel
             // 
-            this.label11.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(3, 9);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(128, 13);
-            this.label11.TabIndex = 24;
-            this.label11.Text = "Videó szegmens hossz (s)";
-            this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // label7
-            // 
-            this.label7.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(3, 40);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(64, 13);
-            this.label7.TabIndex = 14;
-            this.label7.Text = "IR szín mód";
-            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lb_IRColorModeLabel.AutoSize = true;
+            this.lb_IRColorModeLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_IRColorModeLabel.Location = new System.Drawing.Point(3, 31);
+            this.lb_IRColorModeLabel.Name = "lb_IRColorModeLabel";
+            this.lb_IRColorModeLabel.Size = new System.Drawing.Size(144, 31);
+            this.lb_IRColorModeLabel.TabIndex = 14;
+            this.lb_IRColorModeLabel.Text = "IR szín mód";
+            this.lb_IRColorModeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // comboBox_IrColorMode
             // 
@@ -310,16 +300,16 @@
             this.comboBox_IrColorMode.Size = new System.Drawing.Size(244, 21);
             this.comboBox_IrColorMode.TabIndex = 15;
             // 
-            // label1
+            // lb_CoordFormatLabel
             // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 71);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(104, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Koordináta formátum";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lb_CoordFormatLabel.AutoSize = true;
+            this.lb_CoordFormatLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_CoordFormatLabel.Location = new System.Drawing.Point(3, 62);
+            this.lb_CoordFormatLabel.Name = "lb_CoordFormatLabel";
+            this.lb_CoordFormatLabel.Size = new System.Drawing.Size(144, 31);
+            this.lb_CoordFormatLabel.TabIndex = 2;
+            this.lb_CoordFormatLabel.Text = "Koordináta formátum";
+            this.lb_CoordFormatLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // comboBox_coordFormat
             // 
@@ -334,16 +324,16 @@
             this.comboBox_coordFormat.Size = new System.Drawing.Size(244, 21);
             this.comboBox_coordFormat.TabIndex = 6;
             // 
-            // label2
+            // lb_AltMeasureUnitLabel
             // 
-            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 102);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(125, 13);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Magasság mértékegység";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lb_AltMeasureUnitLabel.AutoSize = true;
+            this.lb_AltMeasureUnitLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_AltMeasureUnitLabel.Location = new System.Drawing.Point(3, 93);
+            this.lb_AltMeasureUnitLabel.Name = "lb_AltMeasureUnitLabel";
+            this.lb_AltMeasureUnitLabel.Size = new System.Drawing.Size(144, 31);
+            this.lb_AltMeasureUnitLabel.TabIndex = 3;
+            this.lb_AltMeasureUnitLabel.Text = "Magasság mértékegység";
+            this.lb_AltMeasureUnitLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // comboBox_altFormat
             // 
@@ -358,27 +348,27 @@
             this.comboBox_altFormat.Size = new System.Drawing.Size(244, 21);
             this.comboBox_altFormat.TabIndex = 7;
             // 
-            // label3
+            // lb_DistanceMeasureUnitLabel
             // 
-            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 133);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(120, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Távolság mértékegység";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lb_DistanceMeasureUnitLabel.AutoSize = true;
+            this.lb_DistanceMeasureUnitLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_DistanceMeasureUnitLabel.Location = new System.Drawing.Point(3, 124);
+            this.lb_DistanceMeasureUnitLabel.Name = "lb_DistanceMeasureUnitLabel";
+            this.lb_DistanceMeasureUnitLabel.Size = new System.Drawing.Size(144, 31);
+            this.lb_DistanceMeasureUnitLabel.TabIndex = 4;
+            this.lb_DistanceMeasureUnitLabel.Text = "Távolság mértékegység";
+            this.lb_DistanceMeasureUnitLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // label4
+            // lb_VelocityMeasureUnitLabel
             // 
-            this.label4.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(3, 164);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(123, 13);
-            this.label4.TabIndex = 5;
-            this.label4.Text = "Sebesség mértékegység";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lb_VelocityMeasureUnitLabel.AutoSize = true;
+            this.lb_VelocityMeasureUnitLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_VelocityMeasureUnitLabel.Location = new System.Drawing.Point(3, 155);
+            this.lb_VelocityMeasureUnitLabel.Name = "lb_VelocityMeasureUnitLabel";
+            this.lb_VelocityMeasureUnitLabel.Size = new System.Drawing.Size(144, 31);
+            this.lb_VelocityMeasureUnitLabel.TabIndex = 5;
+            this.lb_VelocityMeasureUnitLabel.Text = "Sebesség mértékegység";
+            this.lb_VelocityMeasureUnitLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // comboBox_speedFormat
             // 
@@ -393,16 +383,6 @@
             this.comboBox_speedFormat.Name = "comboBox_speedFormat";
             this.comboBox_speedFormat.Size = new System.Drawing.Size(244, 21);
             this.comboBox_speedFormat.TabIndex = 9;
-            // 
-            // lb_AutoRecord
-            // 
-            this.lb_AutoRecord.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.lb_AutoRecord.AutoSize = true;
-            this.lb_AutoRecord.Location = new System.Drawing.Point(3, 195);
-            this.lb_AutoRecord.Name = "lb_AutoRecord";
-            this.lb_AutoRecord.Size = new System.Drawing.Size(134, 13);
-            this.lb_AutoRecord.TabIndex = 32;
-            this.lb_AutoRecord.Text = "AutoRecordCameraScreen";
             // 
             // tableLayoutPanel1
             // 
@@ -445,11 +425,11 @@
             // 
             // lb_AutoConnectCam
             // 
-            this.lb_AutoConnectCam.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lb_AutoConnectCam.AutoSize = true;
-            this.lb_AutoConnectCam.Location = new System.Drawing.Point(3, 319);
+            this.lb_AutoConnectCam.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_AutoConnectCam.Location = new System.Drawing.Point(3, 310);
             this.lb_AutoConnectCam.Name = "lb_AutoConnectCam";
-            this.lb_AutoConnectCam.Size = new System.Drawing.Size(92, 13);
+            this.lb_AutoConnectCam.Size = new System.Drawing.Size(144, 31);
             this.lb_AutoConnectCam.TabIndex = 20;
             this.lb_AutoConnectCam.Text = "Auto kapcsolódás";
             this.lb_AutoConnectCam.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -505,11 +485,11 @@
             // 
             // lb_CamPort
             // 
-            this.lb_CamPort.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lb_CamPort.AutoSize = true;
-            this.lb_CamPort.Location = new System.Drawing.Point(3, 257);
+            this.lb_CamPort.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_CamPort.Location = new System.Drawing.Point(3, 248);
             this.lb_CamPort.Name = "lb_CamPort";
-            this.lb_CamPort.Size = new System.Drawing.Size(107, 13);
+            this.lb_CamPort.Size = new System.Drawing.Size(144, 31);
             this.lb_CamPort.TabIndex = 17;
             this.lb_CamPort.Text = "Kamera vezérlés Port";
             this.lb_CamPort.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -517,11 +497,11 @@
             // 
             // lb_CamStream
             // 
-            this.lb_CamStream.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lb_CamStream.AutoSize = true;
-            this.lb_CamStream.Location = new System.Drawing.Point(3, 288);
+            this.lb_CamStream.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_CamStream.Location = new System.Drawing.Point(3, 279);
             this.lb_CamStream.Name = "lb_CamStream";
-            this.lb_CamStream.Size = new System.Drawing.Size(99, 13);
+            this.lb_CamStream.Size = new System.Drawing.Size(144, 31);
             this.lb_CamStream.TabIndex = 11;
             this.lb_CamStream.Text = "Kamera streamURL";
             this.lb_CamStream.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -529,11 +509,11 @@
             // 
             // lb_CamIP
             // 
-            this.lb_CamIP.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lb_CamIP.AutoSize = true;
-            this.lb_CamIP.Location = new System.Drawing.Point(3, 226);
+            this.lb_CamIP.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_CamIP.Location = new System.Drawing.Point(3, 217);
             this.lb_CamIP.Name = "lb_CamIP";
-            this.lb_CamIP.Size = new System.Drawing.Size(56, 13);
+            this.lb_CamIP.Size = new System.Drawing.Size(144, 31);
             this.lb_CamIP.TabIndex = 10;
             this.lb_CamIP.Text = "Kamera IP";
             this.lb_CamIP.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -547,6 +527,28 @@
             this.tb_CamIP.Size = new System.Drawing.Size(244, 20);
             this.tb_CamIP.TabIndex = 13;
             this.tb_CamIP.Visible = false;
+            // 
+            // lb_AutoRecord
+            // 
+            this.lb_AutoRecord.AutoSize = true;
+            this.lb_AutoRecord.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_AutoRecord.Location = new System.Drawing.Point(3, 186);
+            this.lb_AutoRecord.Name = "lb_AutoRecord";
+            this.lb_AutoRecord.Size = new System.Drawing.Size(144, 31);
+            this.lb_AutoRecord.TabIndex = 32;
+            this.lb_AutoRecord.Text = "Video rögzítés";
+            this.lb_AutoRecord.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lb_VideoSegmentLengthLabel
+            // 
+            this.lb_VideoSegmentLengthLabel.AutoSize = true;
+            this.lb_VideoSegmentLengthLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lb_VideoSegmentLengthLabel.Location = new System.Drawing.Point(3, 0);
+            this.lb_VideoSegmentLengthLabel.Name = "lb_VideoSegmentLengthLabel";
+            this.lb_VideoSegmentLengthLabel.Size = new System.Drawing.Size(144, 31);
+            this.lb_VideoSegmentLengthLabel.TabIndex = 24;
+            this.lb_VideoSegmentLengthLabel.Text = "Videó szegmens hossz (s)";
+            this.lb_VideoSegmentLengthLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // uc_CameraSettings
             // 
@@ -582,15 +584,15 @@
         private System.Windows.Forms.ComboBox comboBox_speedFormat;
         private System.Windows.Forms.Label lb_CamIP;
         private System.Windows.Forms.TextBox tb_CamIP;
-        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label lb_VideoSegmentLengthLabel;
         private System.Windows.Forms.Label lb_CamStream;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label lb_IRColorModeLabel;
+        private System.Windows.Forms.Label lb_VelocityMeasureUnitLabel;
         private System.Windows.Forms.Label lb_AutoConnectCam;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lb_DistanceMeasureUnitLabel;
+        private System.Windows.Forms.Label lb_CoordFormatLabel;
         private System.Windows.Forms.Label lb_CamPort;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lb_AltMeasureUnitLabel;
         private System.Windows.Forms.Button button_Save;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Label label13;
