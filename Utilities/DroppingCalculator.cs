@@ -33,9 +33,10 @@ namespace MissionPlanner.Utilities
 
             // Horizontal distance
             double horizontalDistance = ComputeHorizontalDistance(vHoriz, tFall);
+            System.Diagnostics.Debug.WriteLine("horizontalDistance: " + horizontalDistance);
 
             // Copy of the currentLocation (to not modify the caller's)
-            PointLatLng copyLocation = new PointLatLng(horizontalDistance, bearingDeg);
+            PointLatLng copyLocation = new PointLatLng(currentLocation.Lat, currentLocation.Lng);
 
             // offset in m along bearing (void function)
             copyLocation.Offset(horizontalDistance, bearingDeg);

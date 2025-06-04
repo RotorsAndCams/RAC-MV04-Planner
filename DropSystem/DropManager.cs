@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -76,27 +77,46 @@ namespace MissionPlanner.DropSystem
         // A method that handles each timer tick
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            // CustomMessageBox.Show("Timer");
             // no target, do nothing
             if (!TargetLocation.HasValue) return;
 
             // Read telemetry
             double altAGL = MainV2.comPort.MAV.cs.alt;
-            //double vx = CurrentState.vx;
+            double vx = MainV2.comPort.MAV.cs.vx;
+            double vy = MainV2.comPort.MAV.cs.vy;
+            // Horizontal speed
+            double vHoriz = Math.Sqrt(vx * vx + vy * vy);
+            System.Diagnostics.Debug.WriteLine("vHoriz: " + vHoriz);
 
+            double currLat = MainV2.comPort.MAV.cs.lat;
+            double currLng = MainV2.comPort.MAV.cs.lng;
+            var currentLocation = new PointLatLng(currLat, currLng);
+            System.Diagnostics.Debug.WriteLine("currLat: " + currLat);
+            System.Diagnostics.Debug.WriteLine("currLng: " + currLng);
 
+            // Compute flying angle
+            // Degrees needed, 0 deg = North
+            double bearingRad = Math.Atan2(vy, vx);
+            double bearingDeg = 90;// (90 - (bearingRad * 180.0 / Math.PI) + 360.0) % 360;
+            System.Diagnostics.Debug.WriteLine("bearingDeg: " + bearingDeg);
+
+            // Compute impact point
+            var impactPoint = DroppingCalculator.ComputeImpactPoint(
+                currentLocation,
+                altAGL,
+                vHoriz,
+                bearingDeg);
+
+            CurrentImpact = impactPoint;
+            ImpactUpdated?.Invoke(impactPoint);
         }
-         
-
-
-
-
-
-
+        
+        // Dispose (IDisposable)
         public void Dispose()
         {
-            //_timer.Elapsed -= Timer_Elapsed;
-            //_timer.Dispose();
+            _timer.Elapsed -= Timer_Elapsed;
+            _timer.Dispose();
         }
     }
-
 }

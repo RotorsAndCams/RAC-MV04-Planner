@@ -62,6 +62,7 @@ namespace MissionPlanner.GCSViews
             this.BUT_quickauto = new MissionPlanner.Controls.MyButton();
             this.BUT_setmode = new MissionPlanner.Controls.MyButton();
             this.BUT_calib = new MissionPlanner.Controls.MyButton();
+            this.btn_DropDown = new MissionPlanner.Controls.MyButton();
             this.tabPagemessages = new System.Windows.Forms.TabPage();
             this.txt_messagebox = new System.Windows.Forms.TextBox();
             this.tabActionsSimple = new System.Windows.Forms.TabPage();
@@ -654,6 +655,7 @@ namespace MissionPlanner.GCSViews
             this.tableLayoutPanel1.Controls.Add(this.BUT_quickauto, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.BUT_setmode, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.BUT_calib, 1, 4);
+            this.tableLayoutPanel1.Controls.Add(this.btn_DropDown, 5, 1);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             // 
             // BUT_SendMSG
@@ -979,6 +981,18 @@ namespace MissionPlanner.GCSViews
             this.BUT_calib.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
             this.BUT_calib.UseVisualStyleBackColor = true;
             this.BUT_calib.Click += new System.EventHandler(this.BUT_calib_Click);
+            // 
+            // btn_DropDown
+            // 
+            this.btn_DropDown.ColorMouseDown = System.Drawing.Color.Empty;
+            this.btn_DropDown.ColorMouseOver = System.Drawing.Color.Empty;
+            this.btn_DropDown.ColorNotEnabled = System.Drawing.Color.Empty;
+            this.btn_DropDown.Text = "DROP!!";
+            this.btn_DropDown.Name = "btn_DropDown";
+            this.btn_DropDown.Dock = DockStyle.Fill;
+            this.btn_DropDown.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.btn_DropDown.UseVisualStyleBackColor = true;
+            this.btn_DropDown.Click += new System.EventHandler(this.btnDropNow_Click);
             // 
             // tabPagemessages
             // 
@@ -2924,6 +2938,7 @@ namespace MissionPlanner.GCSViews
         private System.Windows.Forms.ComboBox CMB_modes;
         private Controls.MyButton BUT_setmode;
         private Controls.MyButton BUT_calib;
+        private Controls.MyButton btn_DropDown;
         private System.Windows.Forms.ComboBox CMB_setwp;
         private Controls.MyButton BUT_setwp;
         private Controls.MyButton BUT_quickmanual;

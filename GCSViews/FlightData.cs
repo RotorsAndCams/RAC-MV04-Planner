@@ -35,6 +35,12 @@ using UnauthorizedAccessException = System.UnauthorizedAccessException;
 using MV04.State;
 using IronPython.Modules;
 using static MAVLink;
+using LibUsbDotNet.Info;
+
+// mod: Drop System
+using MissionPlanner.DropSystem;
+//using MissionPlanner.Utilities;
+
 
 // written by michael oborne
 
@@ -177,6 +183,10 @@ namespace MissionPlanner.GCSViews
 
         string updateBindingSourceThreadName = "";
 
+        // Drop System
+        private DropManager _dropManager;
+        private DropMarkerLayer _dropMarkerLayer;
+
         public enum actions
         {
             Loiter_Unlim,
@@ -232,7 +242,35 @@ namespace MissionPlanner.GCSViews
 
             InitializeComponent();
 
+            // Drop System --------------------------
+            _dropManager = new DropManager();
+            _dropMarkerLayer = new DropMarkerLayer(gMapControl1);
+
+            // Subscribe to events
+            _dropManager.ImpactUpdated += (impactPoint) =>
+            {
+                //Must marshal back to UI thread if needed
+                this.Invoke(new Action(() =>
+                {
+                    //CustomMessageBox.Show("ShowImpact");
+                    _dropMarkerLayer.ShowImpact(impactPoint);
+                }));
+            };
+
+            _dropManager.OnDropped += (dropPoint) =>
+            {
+                //Must marshal back to UI thread if needed
+                this.Invoke(new Action(() =>
+                {
+                    _dropMarkerLayer.ShowActualDrop(dropPoint);
+                }));
+            };
+
+            // End Drop System -----------------------
+
             log.Info("Components Done");
+
+
 
             instance = this;
 
@@ -2703,6 +2741,8 @@ namespace MissionPlanner.GCSViews
 
             splitContainer1.Panel1Collapsed = true;
 
+            
+
             try
             {
                 thisthread = new Thread(mainloop);
@@ -2980,22 +3020,35 @@ namespace MissionPlanner.GCSViews
                     " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + "\n alt: " +
                     MainV2.comPort.MAV.GuidedMode.z);
 
+                double lat = MainV2.comPort.MAV.GuidedMode.x / 1e7;
+                double lng = MainV2.comPort.MAV.GuidedMode.y / 1e7;
+                var targetPt = new PointLatLng(lat, lng);
+
+                // New fixed landing target
+                _dropManager.SetTarget(targetPt);
+
+                //Clear any other layer (impact or drop)
+                _dropMarkerLayer.ClearAll();
+
+                //Show the red target marker
+                _dropMarkerLayer.ShowTarget(targetPt);
+
+                _dropManager.Start();
 
 
+                //if (droptarget != null)
+                //{
+                //    gMapControl1.Overlays.Remove(droptarget);
+                //}
 
-                if (droptarget != null)
-                {
-                    gMapControl1.Overlays.Remove(droptarget);
-                }
+                //var marker = new GMapMarkerRect(new PointLatLng(MainV2.comPort.MAV.GuidedMode.x / 1e7, MainV2.comPort.MAV.GuidedMode.y / 1e7))
+                //{
+                //    ToolTipText = "Drop Target",
+                //    ToolTipMode = MarkerTooltipMode.OnMouseOver
+                //};
 
-                var marker = new GMapMarkerRect(new PointLatLng(MainV2.comPort.MAV.GuidedMode.x / 1e7, MainV2.comPort.MAV.GuidedMode.y / 1e7))
-                {
-                    ToolTipText = "Drop Target",
-                    ToolTipMode = MarkerTooltipMode.OnMouseOver
-                };
-
-                droptarget.Markers.Add(marker);
-                gMapControl1.Overlays.Add(droptarget);
+                //droptarget.Markers.Add(marker);
+                //gMapControl1.Overlays.Add(droptarget);
 
                 gMapControl1.Refresh();
 
@@ -3045,6 +3098,14 @@ namespace MissionPlanner.GCSViews
                 //}
 
             }
+        }
+
+        // User clicks “Drop Now”
+        private void btnDropNow_Click(object sender, EventArgs e)
+        {
+            _dropManager.DropNow();
+            _dropManager.Stop();
+            CustomMessageBox.Show("Drop manager STOPPED!");
         }
 
         private void gimbalTrackbar_Scroll(object sender, EventArgs e)

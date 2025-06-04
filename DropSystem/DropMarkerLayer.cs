@@ -7,19 +7,20 @@ using System.Threading.Tasks;
 using GMap.NET;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
+using MissionPlanner.Controls;
 
 namespace MissionPlanner.DropSystem
 {
     public class DropMarkerLayer
     {
-        private readonly GMapControl _map;
+        private readonly myGMAP _map;
 
         // Three overlays, one per marker type
         private readonly GMapOverlay _targetOverlay;
         private readonly GMapOverlay _impactOverlay;
         private readonly GMapOverlay _dropOverlay;
     
-        public DropMarkerLayer(GMapControl mapControl)
+        public DropMarkerLayer(myGMAP mapControl)
             {
                 _map = mapControl;
                 _targetOverlay = new GMapOverlay("targetOverlay");
@@ -28,7 +29,7 @@ namespace MissionPlanner.DropSystem
 
                 _map.Overlays.Add( _targetOverlay );
                 _map.Overlays.Add( _impactOverlay );
-                _map.Overlays.Add(_dropOverlay );
+                _map.Overlays.Add( _dropOverlay );
             }
 
         // Clear and redraw the Target marker in red
@@ -48,7 +49,7 @@ namespace MissionPlanner.DropSystem
         public void ShowImpact(PointLatLng impactLoc)
             {
                 _impactOverlay.Markers.Clear();
-                var impMarker = new GMarkerGoogle(impactLoc, GMarkerGoogleType.blue_dot)
+                var impMarker = new GMarkerGoogle(impactLoc, GMarkerGoogleType.red_dot)
                     {
                         ToolTipText = "Predicted Impact",
                         ToolTipMode = MarkerTooltipMode.OnMouseOver
