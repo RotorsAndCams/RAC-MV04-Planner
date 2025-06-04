@@ -49,7 +49,7 @@ namespace MissionPlanner.DropSystem
         public void ShowImpact(PointLatLng impactLoc)
             {
                 _impactOverlay.Markers.Clear();
-                var impMarker = new GMarkerGoogle(impactLoc, GMarkerGoogleType.red_dot)
+                var impMarker = new GMarkerGoogle(impactLoc, GMarkerGoogleType.blue_dot)
                     {
                         ToolTipText = "Predicted Impact",
                         ToolTipMode = MarkerTooltipMode.OnMouseOver

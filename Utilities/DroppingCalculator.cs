@@ -22,6 +22,23 @@ namespace MissionPlanner.Utilities
             return vHoriz * fallTime;
         }
 
+        public static PointLatLng OffsetPoint(PointLatLng origin, double distanceMeters, double bearingDeg)
+        {
+            const double R = 6378137; // Earth radius in meters (WGS-84)
+            double bearingRad = bearingDeg * Math.PI / 180.0;
+
+            double lat1 = origin.Lat * Math.PI / 180.0;
+            double lon1 = origin.Lng * Math.PI / 180.0;
+
+            double lat2 = Math.Asin(Math.Sin(lat1) * Math.Cos(distanceMeters / R) +
+                                    Math.Cos(lat1) * Math.Sin(distanceMeters / R) * Math.Cos(bearingRad));
+
+            double lon2 = lon1 + Math.Atan2(Math.Sin(bearingRad) * Math.Sin(distanceMeters / R) * Math.Cos(lat1),
+                                            Math.Cos(distanceMeters / R) - Math.Sin(lat1) * Math.Sin(lat2));
+
+            return new PointLatLng(lat2 * 180.0 / Math.PI, lon2 * 180.0 / Math.PI);
+        }
+
         public static PointLatLng ComputeImpactPoint(
             PointLatLng currentLocation,
             double altitudeAGL,
@@ -36,12 +53,14 @@ namespace MissionPlanner.Utilities
             System.Diagnostics.Debug.WriteLine("horizontalDistance: " + horizontalDistance);
 
             // Copy of the currentLocation (to not modify the caller's)
-            PointLatLng copyLocation = new PointLatLng(currentLocation.Lat, currentLocation.Lng);
+            //PointLatLng copyLocation = new PointLatLng(currentLocation.Lat, currentLocation.Lng);
 
             // offset in m along bearing (void function)
-            copyLocation.Offset(horizontalDistance, bearingDeg);
+            //copyLocation.Offset(horizontalDistance, bearingDeg);
 
-            return copyLocation;
+            PointLatLng impactPoint = OffsetPoint(currentLocation, horizontalDistance, bearingDeg);
+
+            return impactPoint;
         }
     }
 }

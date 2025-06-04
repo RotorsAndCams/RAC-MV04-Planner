@@ -98,7 +98,7 @@ namespace MissionPlanner.DropSystem
             // Compute flying angle
             // Degrees needed, 0 deg = North
             double bearingRad = Math.Atan2(vy, vx);
-            double bearingDeg = 90;// (90 - (bearingRad * 180.0 / Math.PI) + 360.0) % 360;
+            double bearingDeg = ((bearingRad * 180.0 / Math.PI) + 360.0) % 360;
             System.Diagnostics.Debug.WriteLine("bearingDeg: " + bearingDeg);
 
             // Compute impact point
