@@ -11,6 +11,7 @@ using System.Timers;
 using GMap.NET;
 using MissionPlanner;
 using MissionPlanner.Utilities;
+//using System.Device.Location; // for GeoCoordinate
 
 namespace MissionPlanner.DropSystem
 {
@@ -34,6 +35,13 @@ namespace MissionPlanner.DropSystem
         // Timer
         private readonly Timer _timer;
 
+        // Epsilon range for precision drop (in meters)
+        double epsilonMeters = 2.0;
+
+        // Private, don't want to change it from outside, BUT we need to read it outside: HasDropped function can reach it for readonly
+        private bool _hasDropped = false;
+        public bool HasDropped => _hasDropped;
+
         public DropManager()
         {
             _timer = new Timer(200);
@@ -51,6 +59,7 @@ namespace MissionPlanner.DropSystem
         // Start: starts the internal timer thus ImpactUpdated events fire every 200 ms
         public void Start()
         {
+            _hasDropped = false;
             if (!_timer.Enabled)
                 _timer.Start();
         }
@@ -66,10 +75,13 @@ namespace MissionPlanner.DropSystem
         // Later it will be automated
         public void DropNow()
         {
+            if (_hasDropped) return; //Already dropped, ignore
             if (CurrentImpact.HasValue)
             {
                 ActualDropLocation = CurrentImpact.Value;
+                _hasDropped = true;
                 OnDropped?.Invoke(ActualDropLocation.Value);
+                _timer.Stop();
             }
         }
 
@@ -77,7 +89,6 @@ namespace MissionPlanner.DropSystem
         // A method that handles each timer tick
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            // CustomMessageBox.Show("Timer");
             // no target, do nothing
             if (!TargetLocation.HasValue) return;
 
@@ -109,8 +120,25 @@ namespace MissionPlanner.DropSystem
                 bearingDeg);
 
             CurrentImpact = impactPoint;
+
             ImpactUpdated?.Invoke(impactPoint);
         }
+
+        public bool CheckRange()
+        {
+            if (_hasDropped || !CurrentImpact.HasValue || !TargetLocation.HasValue)
+                return false;
+            double distanceInMeters = DroppingCalculator.HaversineDistance(TargetLocation.Value, CurrentImpact.Value);
+
+            // Acceptable precision radius in meters
+            //const double epsilon = 2.0;
+
+            // If close enough -> DROP => return TRUE
+            //if (distanceInMeters < epsilonMeters) return true;
+            //return false;
+            return distanceInMeters <= epsilonMeters;
+        }
+
         
         // Dispose (IDisposable)
         public void Dispose()

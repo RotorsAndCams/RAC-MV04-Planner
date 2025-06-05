@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using DotSpatial.Projections.Transforms;
 using GMap.NET;
 
 namespace MissionPlanner.Utilities
@@ -37,6 +37,31 @@ namespace MissionPlanner.Utilities
                                             Math.Cos(distanceMeters / R) - Math.Sin(lat1) * Math.Sin(lat2));
 
             return new PointLatLng(lat2 * 180.0 / Math.PI, lon2 * 180.0 / Math.PI);
+        }
+
+        public static double HaversineDistance(PointLatLng p1, PointLatLng p2)
+        {
+            const double R = 6371000; // Earth's radius in meters
+
+            double lat1 = p1.Lat;
+            double lon1 = p1.Lng;
+            double lat2 = p2.Lat;
+            double lon2 = p2.Lng;
+
+            double dLat = ToRadians(lat2 - lat1);
+            double dLon = ToRadians(lon2 - lon1);
+
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                       Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2)) *
+                       Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            return R * c; // Distance in meters
+        }
+        private static double ToRadians(double degrees)
+        {
+            return degrees * Math.PI / 180.0;
         }
 
         public static PointLatLng ComputeImpactPoint(

@@ -186,6 +186,7 @@ namespace MissionPlanner.GCSViews
         // Drop System
         private DropManager _dropManager;
         private DropMarkerLayer _dropMarkerLayer;
+        private PointLatLng? _targetLocation = null;
 
         public enum actions
         {
@@ -252,8 +253,17 @@ namespace MissionPlanner.GCSViews
                 //Must marshal back to UI thread if needed
                 this.Invoke(new Action(() =>
                 {
-                    //CustomMessageBox.Show("ShowImpact");
-                    _dropMarkerLayer.ShowImpact(impactPoint);
+                    if (!_dropManager.HasDropped)
+                    {
+                        if (_dropManager.CheckRange())
+                        {
+                            _dropManager.DropNow();
+                        }
+                        else
+                        {
+                            _dropMarkerLayer.ShowImpact(impactPoint);
+                        }
+                    }
                 }));
             };
 
@@ -263,6 +273,7 @@ namespace MissionPlanner.GCSViews
                 this.Invoke(new Action(() =>
                 {
                     _dropMarkerLayer.ShowActualDrop(dropPoint);
+                    CustomMessageBox.Show("Auto drop!");
                 }));
             };
 
@@ -3050,7 +3061,7 @@ namespace MissionPlanner.GCSViews
                 //droptarget.Markers.Add(marker);
                 //gMapControl1.Overlays.Add(droptarget);
 
-                gMapControl1.Refresh();
+                //gMapControl1.Refresh();
 
 
 
