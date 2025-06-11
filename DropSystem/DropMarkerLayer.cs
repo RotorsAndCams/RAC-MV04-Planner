@@ -71,10 +71,11 @@ namespace MissionPlanner.DropSystem
                 _map.Refresh();
             }
 
-        //public void ClearPredicted()
-        //{
-        //    if 
-        //}
+        public void ClearPredicted()
+        {
+            _impactOverlay.Markers.Clear();
+            _map.Refresh();
+        }
 
         // Remove all three overlays
         public void ClearAll()

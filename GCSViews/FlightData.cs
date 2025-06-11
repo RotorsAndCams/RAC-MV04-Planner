@@ -258,6 +258,7 @@ namespace MissionPlanner.GCSViews
                         if (_dropManager.CheckRange())
                         {
                             _dropManager.DropNow();
+                            
                         }
                         else
                         {
@@ -272,8 +273,9 @@ namespace MissionPlanner.GCSViews
                 //Must marshal back to UI thread if needed
                 this.Invoke(new Action(() =>
                 {
+                    _dropMarkerLayer.ClearPredicted();
                     _dropMarkerLayer.ShowActualDrop(dropPoint);
-                    CustomMessageBox.Show("Auto drop!");
+                    //CustomMessageBox.Show("Auto drop!");
                 }));
             };
 

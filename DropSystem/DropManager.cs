@@ -144,32 +144,37 @@ namespace MissionPlanner.DropSystem
         // PWM signal to servo
         private void TriggerServo()
         {
-            CustomMessageBox.Show("Trigger servo!");
+            //CustomMessageBox.Show("Trigger servo!");
             // Channel 9, pwm 1900
             MainV2.comPort.doCommand(
+                (byte)MainV2.comPort.sysidcurrent,
+                (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
-                9,
-                1900,
-                0, 0, 0, 0, 0
-                );
-            // MainV2.comPort.set_servo(9, 1900);
+                9,     // servo number
+                1900,  // pwm value
+                0, 0, 0, 0, 0);
             //MainV2.comPort.doCommand(
-            //    MAVLink.MAV_CMD.DO_SET_RELAY,
-            //    0, 1, 0, 0, 0, 0, 0 // Relay 0, ON
+            //    MAVLink.MAV_CMD.DO_SET_SERVO,
+            //    9,
+            //    1900,
+            //    0, 0, 0, 0, 0
             //    );
 
             // Reset after delay
             Task.Delay(1000).ContinueWith(_ =>
             {
                 MainV2.comPort.doCommand(
-                    MAVLink.MAV_CMD.DO_SET_SERVO,
-                    9,
-                    1000,
-                    0, 0, 0, 0, 0
-                    );
+                (byte)MainV2.comPort.sysidcurrent,
+                (byte)MainV2.comPort.compidcurrent,
+                MAVLink.MAV_CMD.DO_SET_SERVO,
+                9,     // servo number
+                1000,  // pwm value
+                0, 0, 0, 0, 0);
                 //MainV2.comPort.doCommand(
-                //    MAVLink.MAV_CMD.DO_SET_RELAY,
-                //    0, 0, 0, 0, 0, 0, 0 // Relay 0, OFF
+                //    MAVLink.MAV_CMD.DO_SET_SERVO,
+                //    9,
+                //    1000,
+                //    0, 0, 0, 0, 0
                 //    );
             });
         }
