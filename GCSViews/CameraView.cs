@@ -86,16 +86,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        System.Timers.Timer _videoRecordSegmentTimer = new System.Timers.Timer();
-
-        private static LibVLCSharp.Shared.LibVLC _libVlc;
-        private static MediaPlayer _mediaPlayer;
-        private static Media media;
-
-        LibVLCSharp.Shared.LibVLC _vlcRecord;
-        MediaPlayer _mediaPlayerRecord;
-        Media _mediaRecord;
-
         Panel panelDoubleClick;
 
         System.Timers.Timer _feedTimer;
@@ -182,15 +172,9 @@ namespace MissionPlanner.GCSViews
             #endregion
 
             #region recording vlc stream
-            //hol az autostart record?
+            
 
-            _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
-
-            if (_segmentLength < 60)
-                _segmentLength = 60;
-
-            _videoRecordSegmentTimer.Interval = _segmentLength * 1000;
-            _videoRecordSegmentTimer.Elapsed += _videoRecordSegmentTimer_Tick;
+            
 
             #endregion
 
@@ -218,7 +202,6 @@ namespace MissionPlanner.GCSViews
         private void ComPort_CommsClose(object sender, EventArgs e)
         {
             //stop recording
-            StopRecording();
 
         }
 
@@ -262,8 +245,8 @@ namespace MissionPlanner.GCSViews
                 Invoke(new Action(() =>
                 {
                     tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
-                    vv_VLC.Dock = DockStyle.Fill;
-                    vv_VLC.BringToFront();
+                    pnl_GST.Dock = DockStyle.Fill;
+                    pnl_GST.BringToFront();
                     controlsClosed = false;
                     btn.Text = "Close";
                     MainV2.instance.HideflightData();
@@ -271,8 +254,8 @@ namespace MissionPlanner.GCSViews
             else
             {
                 tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
-                vv_VLC.Dock = DockStyle.Fill;
-                vv_VLC.BringToFront();
+                pnl_GST.Dock = DockStyle.Fill;
+                pnl_GST.BringToFront();
                 controlsClosed = false;
                 btn.Text = "Close";
                 MainV2.instance.HideflightData();
@@ -285,16 +268,16 @@ namespace MissionPlanner.GCSViews
                 Invoke(new Action(() =>
                 {
                     tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
-                    vv_VLC.Dock = DockStyle.Fill;
-                    vv_VLC.BringToFront();
+                    pnl_GST.Dock = DockStyle.Fill;
+                    pnl_GST.BringToFront();
                     controlsClosed = false;
                     btn.Text = "Close";
                 }));
             else
             {
                 tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
-                vv_VLC.Dock = DockStyle.Fill;
-                vv_VLC.BringToFront();
+                pnl_GST.Dock = DockStyle.Fill;
+                pnl_GST.BringToFront();
                 controlsClosed = false;
                 btn.Text = "Close";
             }
@@ -326,8 +309,6 @@ namespace MissionPlanner.GCSViews
                 {"Start stream & control", () => { StartCameraStream(); StartCameraControl(); }},
                 {"Switch crosshairs", () => { ChangeCrossHair(); }},
                 {"Do photo", () => { DoPhoto(); }},
-                {"Start recording", () => { StartRecording(); }},
-                {"Stop recording", () => { StopRecording(); }},
                 {"Set mode", () => { new CameraModeSelectorForm().Show(); }},
                 {"Tracker mode", () => { new TrackerPosForm().Show(); }},
                 {"Camera mover", () => { new CameraMoverForm().Show(); }},
@@ -396,20 +377,16 @@ namespace MissionPlanner.GCSViews
             SettingManager.Save();
             log.Info("Stream URL set to: " + url);
 
-            // Restart VLC
-            CameraView.instance.StopVLC();
-            Thread.Sleep(2000);
-            CameraView.instance.StartVideoStreamVLC();
-
+            //fixme
             // Check if URL was set
-            if (media.Mrl == SettingManager.Get(Setting.CameraStreamUrl))
-            {
-                MessageBox.Show("Stream URL a következőre lett állítva: " + url);
-            }
-            else
-            {
-                MessageBox.Show("Stream URL beállítás sikertelen");
-            }
+            //if (media.Mrl == SettingManager.Get(Setting.CameraStreamUrl))
+            //{
+            //    MessageBox.Show("Stream URL a következőre lett állítva: " + url);
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Stream URL beállítás sikertelen");
+            //}
         }
 
         private void StartFeed()
@@ -502,7 +479,6 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraStream()
         {
-            StartVideoStreamVLC();
         }
 
         public void StartCameraControl()
@@ -561,59 +537,10 @@ namespace MissionPlanner.GCSViews
                 bitmap.Save(CameraHandler.Instance.MediaSavePath + "SnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", ImageFormat.Jpeg);
             }
 
-            _mediaPlayer.TakeSnapshot(0, CameraHandler.Instance.MediaSavePath + "VideoStreamSnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", (uint)vv_VLC.Bounds.Width, (uint)vv_VLC.Bounds.Height);
+            //fixme
+            //_mediaPlayer.TakeSnapshot(0, CameraHandler.Instance.MediaSavePath + "VideoStreamSnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", (uint)vv_VLC.Bounds.Width, (uint)vv_VLC.Bounds.Height);
         }
 
-        private void _videoRecordSegmentTimer_Tick(object sender, EventArgs e)
-        {
-            _mediaPlayerRecord.Stop();
-            StartRecording();
-        }
-
-        private void StartRecording()
-        {
-            try
-            {
-                if (isCameraConnected)
-                {
-                    if (_vlcRecord == null)
-                        _vlcRecord = new LibVLCSharp.Shared.LibVLC();
-
-                    if (_mediaPlayerRecord == null)
-                        _mediaPlayerRecord = new MediaPlayer(_vlcRecord);
-
-                    if (_mediaRecord == null)
-                    {
-                        _mediaRecord = new Media(_vlcRecord, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
-                        _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
-                    }
-                    else
-                    {
-                        _mediaRecord = null;
-                        _mediaRecord = new Media(_vlcRecord, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
-                        _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
-                    }
-
-                    _mediaPlayerRecord.Play(_mediaRecord);
-                    _videoRecordSegmentTimer?.Start();
-                    _recordingInProgress = true;
-                }
-            }
-            catch
-            {
-                CustomMessageBox.Show("Videó rögzítése sikertelen");
-            }
-        }
-
-        public void StopRecording()
-        {
-            _videoRecordSegmentTimer?.Stop();
-
-            if(_mediaPlayerRecord != null)
-                _mediaPlayerRecord.Stop();
-
-            _recordingInProgress = false;
-        }
 
         private async Task ResetZoom()
         {
@@ -769,15 +696,15 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                StopRecording();
-                StopVLC();
+                //fixme - stop camera stream display
+
+
                 _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
                 CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
 
                 _droneStatusTimer.Dispose();
                 _feedTimer.Dispose();
-                _videoRecordSegmentTimer.Dispose();
 
                 GC.Collect();
 
@@ -800,12 +727,8 @@ namespace MissionPlanner.GCSViews
             {
                 if (_fsForm == null)
                 {
-                    this.tlp_CVBase.Controls.Remove(this.vv_VLC);
                     _fsForm = new Form();
-                    _fsForm.Controls.Add(this.vv_VLC);
-                    vv_VLC.Dock = DockStyle.Fill;
-                    vv_VLC.BringToFront();
-                    _mediaPlayer.Fullscreen = true;
+                    
                     _fsForm.WindowState = FormWindowState.Maximized;
 
                     _fsForm.FormClosing += _fsForm_FormClosing;
@@ -814,9 +737,6 @@ namespace MissionPlanner.GCSViews
                 }
                 else
                 {
-                    //_fsForm.Close();
-                    //_fsForm.Dispose();
-                    //_fsForm = null;
                     _fsForm.Show();
                 }
             }
@@ -830,11 +750,6 @@ namespace MissionPlanner.GCSViews
 
         private void _fsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _fsForm.Controls.Remove(vv_VLC);
-            this.tlp_CVBase.Controls.Add(vv_VLC);
-            vv_VLC.Dock = DockStyle.Fill;
-            vv_VLC.BringToFront();
-            _mediaPlayer.Fullscreen = true;
             _fsForm.FormClosing -= _fsForm_FormClosing;
             _fsForm.Dispose();
             _fsForm = null;
@@ -851,15 +766,6 @@ namespace MissionPlanner.GCSViews
             CameraSettingsForm.Instance.ShowDialog();
         }
 
-        private void CameraSettings_event_StartStopRecording(object sender, EventArgs e)
-        {
-            if(_recordingInProgress)
-                StopRecording();
-            else
-                StartRecording();
-
-            CameraSettingsForm.Instance.SetRecordingStatus(_recordingInProgress);
-        }
 
         private void btn_FPVCameraMode_Click(object sender, EventArgs e)
         {
@@ -909,8 +815,6 @@ namespace MissionPlanner.GCSViews
                     {
                         if (bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream)) && _recordingInProgress == false)
                         {
-                            StartRecording();
-
                             //set recording button
                             if (InvokeRequired)
                                 Invoke(new Action(() =>
@@ -1136,7 +1040,6 @@ namespace MissionPlanner.GCSViews
                 }
 
                 Thread.Sleep(2000);
-                CameraView.instance.StartVideoStreamVLC();
             });
         }
 
@@ -1351,77 +1254,9 @@ namespace MissionPlanner.GCSViews
 
             IsCameraTrackingModeActive = true;
 
-            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.vv_VLC.Size);
+            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.pnl_GST.Size);
 
             SetStopButtonVisibility();
-        }
-
-        private void StartVLC()
-        {
-            try
-            {
-                if (_libVlc == null)
-                    _libVlc = new LibVLCSharp.Shared.LibVLC();
-
-                if (_mediaPlayer == null)
-                    _mediaPlayer = new MediaPlayer(_libVlc);
-
-                // media has to be created new, because media.Mrl is read-only otherwise
-                media = new Media(_libVlc, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
-
-                _mediaPlayer.EnableHardwareDecoding = true;
-                _mediaPlayer.NetworkCaching = 300;
-
-                vv_VLC.MediaPlayer = _mediaPlayer;
-                this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
-                vv_VLC.Dock = DockStyle.Fill;
-                _mediaPlayer.Fullscreen = true;
-
-                if (panelDoubleClick == null)
-                {
-                    panelDoubleClick = new Panel();// panel for double click
-                    vv_VLC.Controls.Add(panelDoubleClick);
-                    panelDoubleClick.BringToFront();
-                    panelDoubleClick.Dock = DockStyle.Fill;
-                    panelDoubleClick.BackColor = Color.Transparent;
-                }
-                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
-
-                vv_VLC.ThisReallyVisible();
-                vv_VLC.ChildReallyVisible();
-                _mediaPlayer.Play(media);
-
-                log.Info($"VLC started on {media.Mrl}");
-            }
-            catch (Exception ex)
-            {
-                // No messagebox, because reconnectLoop calls this method repeatedly
-                log.Error($"Error at VLC start: {ex.Message}");
-            }
-        }
-
-        public void StartVideoStreamVLC()
-        {
-            if (InvokeRequired)
-                Invoke(new Action(() => StartVLC()));
-            else
-                StartVLC();
-        }
-
-        public void StopVLC()
-        {
-            if (InvokeRequired)
-                Invoke(new Action(() => {
-                    _mediaPlayer.Stop();
-                    panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
-                }));
-            else
-            {
-                _mediaPlayer.Stop();
-                panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
-            }
-
-            log.Info("VLC stopped");
         }
 
         private void SetTripOnOffButton(bool tripState)
@@ -1519,20 +1354,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_Recording_Click(object sender, EventArgs e)
         {
-            if(_recordingInProgress)
-            {
-                StopRecording();
-
-                this.btn_Recording.Text = "Start Recording";
-                this.btn_Recording.ForeColor = Color.Red;
-            }
-            else
-            {
-                StartRecording();
-
-                this.btn_Recording.Text = "Stop Recording";
-                this.btn_Recording.ForeColor = Color.White;
-            }
+            MessageBox.Show("not implemented");
         }
     }
 }

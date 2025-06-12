@@ -66,7 +66,7 @@
             this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
             this.btn_FullScreen = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
-            this.vv_VLC = new LibVLCSharp.WinForms.VideoView();
+            this.pnl_GST = new System.Windows.Forms.Panel();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_Zoom.SuspendLayout();
@@ -85,7 +85,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb_PositionIndicator)).BeginInit();
             this.tlp_ButtonSection1.SuspendLayout();
             this.tlp_CVBase.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).BeginInit();
             this.SuspendLayout();
             // 
             // tlp_ControlsBase
@@ -382,16 +381,14 @@
             // 
             resources.ApplyResources(this.tlp_CVBase, "tlp_CVBase");
             this.tlp_CVBase.Controls.Add(this.tlp_ControlsBase, 1, 0);
-            this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
+            this.tlp_CVBase.Controls.Add(this.pnl_GST, 0, 0);
             this.tlp_CVBase.Name = "tlp_CVBase";
             // 
-            // vv_VLC
+            // pnl_GST
             // 
-            this.vv_VLC.BackColor = System.Drawing.Color.Black;
-            resources.ApplyResources(this.vv_VLC, "vv_VLC");
-            this.vv_VLC.ForeColor = System.Drawing.Color.Black;
-            this.vv_VLC.MediaPlayer = null;
-            this.vv_VLC.Name = "vv_VLC";
+            this.pnl_GST.BackColor = System.Drawing.Color.Gray;
+            resources.ApplyResources(this.pnl_GST, "pnl_GST");
+            this.pnl_GST.Name = "pnl_GST";
             // 
             // CameraView
             // 
@@ -422,7 +419,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pb_PositionIndicator)).EndInit();
             this.tlp_ButtonSection1.ResumeLayout(false);
             this.tlp_CVBase.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.vv_VLC)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -455,7 +451,6 @@
         private System.Windows.Forms.PictureBox pb_InfraLight;
         private System.Windows.Forms.PictureBox pb_PositionIndicator;
         private System.Windows.Forms.TableLayoutPanel tlp_CVBase;
-        private LibVLCSharp.WinForms.VideoView vv_VLC;
         private System.Windows.Forms.Button btn_Surveillance;
         private System.Windows.Forms.Button btn_NUC;
         private System.Windows.Forms.Button btn_Polarity;
@@ -466,5 +461,6 @@
         private System.Windows.Forms.TableLayoutPanel tlp_btnsToFit;
         private System.Windows.Forms.Button btn_ResetZoom;
         private System.Windows.Forms.Button btn_Recording;
+        private System.Windows.Forms.Panel pnl_GST;
     }
 }
