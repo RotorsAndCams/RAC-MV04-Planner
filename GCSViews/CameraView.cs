@@ -37,11 +37,58 @@ using MissionPlanner.Controls;
 using LibVLCSharp.Shared;
 using Accord.MachineLearning.VectorMachines.Learning;
 using static MAVLink;
+using System.Diagnostics;
 
 namespace MissionPlanner.GCSViews
 {
     public partial class CameraView : MyUserControl//, IActivate, IDeactivate
     {
+        #region GST
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr SetParent(IntPtr hwndChild, IntPtr hwndNewParent);
+
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr MoveWindow(IntPtr hwnd, int x, int y, int nWidth, int nHeight, bool bRepaint);
+
+
+        //extend
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern int GetWindowLong(IntPtr hwnd, int nIndex);
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern int SetWindowLong(IntPtr hwnd, int nIndex, int dwNewLong);
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool SetWindowPos(IntPtr hwnd, IntPtr hwndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+
+        const int GWL_STYLE = -16;
+        const int WS_CAPTION = 0x00C00000;
+        const int WS_THICKFRAME = 0x00040000;
+        const int WS_SYSMENU = 0x00080000;
+        const int WS_MINIMIZEBOX = 0x00020000;
+        const int WS_MAXIMIZEBOX = 0x00010000;
+
+        const int SWP_FRAMECHANGED = 0x0020;
+        const int SWP_NOMOVE = 0x0002;
+        const int SWP_NOSIZE = 0x0001;
+        const int SWP_NOZORDER = 0x0004;
+
+
+        private const string gstLaunchPath = @"C:\gstreamer\1.0\msvc_x86_64\bin\gst-launch-1.0.exe";
+        private const string gstPipeline = "videotestsrc ! videoconvert ! autovideosink"; //window-handle={windowHandle.ToInt64()}";
+
+        private Process gstProcess;
+        private IntPtr windowHandle;
+        IntPtr _gstWindow = IntPtr.Zero;
+
+        private Process gstRecordProcess;
+
+        #endregion
+
         #region Fields
 
         public static CameraView instance;
@@ -171,13 +218,6 @@ namespace MissionPlanner.GCSViews
 
             #endregion
 
-            #region recording vlc stream
-            
-
-            
-
-            #endregion
-
             #region Follow mode
 
             _feedTimer = new System.Timers.Timer();
@@ -197,7 +237,26 @@ namespace MissionPlanner.GCSViews
 
             if(bool.Parse(SettingManager.Get(Setting.AutoConnect)))
                 this.btn_TripSwitchOnOff.Enabled = false;
+
+            pnl_GST.Resize += Pnl_GST_Resize;
+
+            this.VisibleChanged += (s,e) => { InitGST(); };
+
         }
+
+        private void Pnl_GST_Resize(object sender, EventArgs e)
+        {
+            MoveWindow(_gstWindow, 0, 0, pnl_GST.Width, pnl_GST.Height, true);
+        }
+
+        private void InitGST()
+        {
+            if (gstProcess != null && !gstProcess.HasExited)
+                return;
+
+            StartGstreamerExternal();
+        }
+
 
         private void ComPort_CommsClose(object sender, EventArgs e)
         {
@@ -697,7 +756,20 @@ namespace MissionPlanner.GCSViews
             try
             {
                 //fixme - stop camera stream display
+                if (gstProcess != null && !gstProcess.HasExited)
+                {
+                    gstProcess.CloseMainWindow();
+                    gstProcess.Kill();
 
+
+                }
+
+                if (gstRecordProcess != null && !gstRecordProcess.HasExited)
+                {
+                    gstRecordProcess.Kill();
+                    gstRecordProcess.WaitForExit();
+                    //MessageBox.Show("Recording stopped. MP4 file saved.");
+                }
 
                 _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
@@ -1077,7 +1149,6 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-
         private void SetCameraStatusValue(string st)
         {
             this.lb_CameraStatusValue.Text = st;
@@ -1356,5 +1427,120 @@ namespace MissionPlanner.GCSViews
         {
             MessageBox.Show("not implemented");
         }
+
+        #region GSTCode
+
+        private void StartGstreamerExternal()
+        {
+            string args = "videotestsrc ! autovideosink";
+
+            args = gstPipeline; //basic display solution
+
+            //mp4 missing eos
+            //args = "-e videotestsrc is-live=true ! videoconvert ! x264enc tune=zerolatency bitrate=2048 speed-preset=ultrafast ! tee name=t t. ! queue ! decodebin ! videoconvert ! autovideosink t. ! queue ! mp4mux ! filesink location=output.mp4";
+
+            //mkv works
+            args = "videotestsrc is-live=true ! videoconvert ! x264enc tune=zerolatency bitrate=2048 speed-preset=ultrafast ! tee name=t t. ! queue ! decodebin ! videoconvert ! autovideosink t. ! queue ! matroskamux ! filesink location=video_output.mkv";//it works but mkv
+
+            //args = string.Join(" ", new[]
+            //{
+            //    "-e",
+            //    "rtspsrc location=rtsp://192.168.1.100/stream latency=0 !",
+            //    "rtph264depay ! h264parse ! tee name=t",
+            //    "t. ! queue ! avdec_h264 ! videoconvert ! autovideosink",
+            //    "t. ! queue ! mp4mux ! filesink location=video_output.mp4"
+            //});
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = gstLaunchPath,
+                Arguments = args,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+            gstProcess = new Process();
+            gstProcess.StartInfo = startInfo;
+            gstProcess.OutputDataReceived += (s, e) => Debug.WriteLine(e.Data);
+            gstProcess.ErrorDataReceived += (s, e) => Debug.WriteLine("Err: " + e.Data);
+            gstProcess.EnableRaisingEvents = true;
+
+            try
+            {
+                gstProcess.Start();
+
+                //WindowTextGrabber.Get();
+
+                gstProcess.BeginOutputReadLine();
+                gstProcess.BeginErrorReadLine();
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gstreamer not running: " + ex.Message);
+            }
+
+            Task.Run(async () =>
+            {
+                IntPtr gstWindow = IntPtr.Zero;
+
+                for (int i = 0; i < 50; i++)
+                {
+                    await Task.Delay(100);
+                    gstWindow = FindGstWindow();
+                    if (gstWindow != IntPtr.Zero)
+                        break;
+                }
+
+                if (gstWindow != IntPtr.Zero)
+                {
+                    _gstWindow = gstWindow;
+
+                    Invoke(new Action(() =>
+                    {
+                        SetParent(gstWindow, pnl_GST.Handle);
+                        RemoveWindowDecorations(gstWindow);
+                        MoveWindow(gstWindow, 0, 0, pnl_GST.Width, pnl_GST.Height, true);
+                    }));
+                }
+                else
+                {
+                    MessageBox.Show("Gstreamaer window no move");
+                }
+            });
+
+
+        }
+
+        private IntPtr FindGstWindow()
+        {
+            var tmp = FindWindow(null, "OpenGL renderer");
+
+            if (tmp == IntPtr.Zero)
+                tmp = FindWindow(null, "Direct3D11 renderer");
+
+            if (tmp == IntPtr.Zero)
+                tmp = FindWindow(null, "GstGLWindow");
+
+            if (tmp == IntPtr.Zero)
+                tmp = FindWindow(null, "GLFW30");
+
+            //... other ways to implement
+
+            return tmp; // GstGLWindow, GLFW30, Direct3D11 renderer depending on video sink and gstreamer version
+        }
+
+        private void RemoveWindowDecorations(IntPtr hwnd)
+        {
+            int style = GetWindowLong(hwnd, GWL_STYLE);
+            style &= ~(WS_CAPTION | WS_THICKFRAME | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+            SetWindowLong(hwnd, GWL_STYLE, style);
+
+            SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+        }
+
+        #endregion
     }
 }
