@@ -1177,10 +1177,7 @@ namespace MissionPlanner
 
             SaveConfig();
 
-            if (CameraView.instance == null)
-            {
-                cv = new CameraView();
-            }
+            
 
             GetUserNameForm frm = new GetUserNameForm();
             frm.ShowDialog();
@@ -1249,6 +1246,11 @@ namespace MissionPlanner
             tsb_Error.Height = 200;
             tsb_Error.BackColor = Color.White;
             tsb_Error.ImageScaling = ToolStripItemImageScaling.None;
+
+            //if (CameraView.instance == null)
+            //{
+            //    cv = new CameraView();
+            //}
         }
 
         public void HideflightData()
@@ -1702,6 +1704,7 @@ namespace MissionPlanner
             {
             }
         }
+
 
         public void switchicons(menuicons icons)
         {

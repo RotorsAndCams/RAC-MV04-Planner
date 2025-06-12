@@ -240,7 +240,7 @@ namespace MissionPlanner.GCSViews
 
             pnl_GST.Resize += Pnl_GST_Resize;
 
-            this.VisibleChanged += (s,e) => { InitGST(); };
+            
 
         }
 
@@ -538,6 +538,7 @@ namespace MissionPlanner.GCSViews
 
         private void StartCameraStream()
         {
+            InitGST();
         }
 
         public void StartCameraControl()
