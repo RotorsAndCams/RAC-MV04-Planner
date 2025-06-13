@@ -792,7 +792,7 @@ namespace MissionPlanner.GCSViews
             ChangeCrossHair();
         }
 
-        Form _fsForm;
+        FormNoTheme _fsForm;
 
         private void btn_FullScreen_Click(object sender, EventArgs e)
         {
@@ -800,15 +800,58 @@ namespace MissionPlanner.GCSViews
             {
                 if (_fsForm == null)
                 {
+                    // Media player
                     this.tlp_CVBase.Controls.Remove(this.vv_VLC);
-                    _fsForm = new Form();
+                    _fsForm = new FormNoTheme();
                     _fsForm.Controls.Add(this.vv_VLC);
                     vv_VLC.Dock = DockStyle.Fill;
                     vv_VLC.BringToFront();
                     _mediaPlayer.Fullscreen = true;
                     _fsForm.WindowState = FormWindowState.Maximized;
-
                     _fsForm.FormClosing += _fsForm_FormClosing;
+
+                    // Buttons
+                    ButtonNoTheme zoomResetButton = new ButtonNoTheme();
+                    zoomResetButton.Name = "zoomResetButton";
+                    zoomResetButton.Text = btn_ResetZoom.Text;
+                    zoomResetButton.Font = btn_ResetZoom.Font;
+                    zoomResetButton.Image = btn_ResetZoom.Image;
+                    zoomResetButton.ForeColor = btn_ResetZoom.ForeColor;
+                    zoomResetButton.BackColor = btn_ResetZoom.BackColor;
+                    zoomResetButton.Size = btn_ResetZoom.Size;
+                    zoomResetButton.Location = new Point(_fsForm.Width - 215, _fsForm.Height - 520);
+                    zoomResetButton.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
+                    zoomResetButton.Click += btn_ResetZoom_Click;
+                    _fsForm.Controls.Add(zoomResetButton);
+                    zoomResetButton.BringToFront();
+
+                    ButtonNoTheme zoomInButton = new ButtonNoTheme();
+                    zoomInButton.Name = "zoomInButton";
+                    zoomInButton.Text = btn_ZoomPlus.Text;
+                    zoomInButton.Font = btn_ZoomPlus.Font;
+                    zoomInButton.ForeColor = btn_ZoomPlus.ForeColor;
+                    zoomInButton.BackColor = btn_ZoomPlus.BackColor;
+                    zoomInButton.Size = btn_ZoomPlus.Size;
+                    zoomInButton.Location = new Point(_fsForm.Width - 215, _fsForm.Height - 415);
+                    zoomInButton.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
+                    zoomInButton.MouseDown += btn_ZoomPlus_MouseDown;
+                    zoomInButton.MouseUp += btn_Zoom_MouseUp;
+                    _fsForm.Controls.Add(zoomInButton);
+                    zoomInButton.BringToFront();
+
+                    ButtonNoTheme zoomOutButton = new ButtonNoTheme();
+                    zoomOutButton.Name = "zoomOutButton";
+                    zoomOutButton.Text = btn_ZoomMinus.Text;
+                    zoomOutButton.Font = btn_ZoomMinus.Font;
+                    zoomOutButton.ForeColor = btn_ZoomMinus.ForeColor;
+                    zoomOutButton.BackColor = btn_ZoomMinus.BackColor;
+                    zoomOutButton.Size = btn_ZoomMinus.Size;
+                    zoomOutButton.Location = new Point(_fsForm.Width - 215, _fsForm.Height - 310);
+                    zoomOutButton.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
+                    zoomOutButton.MouseDown += btn_ZoomMinus_MouseDown;
+                    zoomOutButton.MouseUp += btn_Zoom_MouseUp;
+                    _fsForm.Controls.Add(zoomOutButton);
+                    zoomOutButton.BringToFront();
 
                     _fsForm.Show();
                 }

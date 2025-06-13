@@ -825,6 +825,9 @@
     <Compile Include="Controls\MavCommandSelection.Designer.cs">
       <DependentUpon>MavCommandSelection.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\NoThemeControls.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Controls\ParamSet.cs">
       <SubType>UserControl</SubType>
     </Compile>
