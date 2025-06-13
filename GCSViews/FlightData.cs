@@ -3116,8 +3116,9 @@ namespace MissionPlanner.GCSViews
         // User clicks “Drop Now”
         private void btnDropNow_Click(object sender, EventArgs e)
         {
-            _dropManager.DropNow();
-            _dropManager.Stop();
+            //_dropManager.DropNow(true);
+            //_dropManager.Stop();
+            _dropManager.TriggerServo();
             CustomMessageBox.Show("Drop manager STOPPED!");
         }
 

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Timers;
+using System.Web.UI.WebControls;
 using GMap.NET;
 using MissionPlanner;
 using MissionPlanner.Utilities;
@@ -75,14 +76,21 @@ namespace MissionPlanner.DropSystem
         // Later it will be automated
         public void DropNow()
         {
-            if (_hasDropped) return; //Already dropped, ignore
+            if (_hasDropped)
+            {
+                System.Diagnostics.Debug.WriteLine("Bomb has already dropped!");
+                return; //Already dropped, ignore
+            }
             if (CurrentImpact.HasValue)
             {
                 ActualDropLocation = CurrentImpact.Value;
-                _hasDropped = true;
                 OnDropped?.Invoke(ActualDropLocation.Value);
+
                 TriggerServo(); // DROP
-                _timer.Stop();
+                MainV2.comPort.setMode(
+                    (byte)MainV2.comPort.sysidcurrent,
+                    (byte)MainV2.comPort.compidcurrent,
+                    "RTL");
             }
         }
 
@@ -142,7 +150,7 @@ namespace MissionPlanner.DropSystem
 
 
         // PWM signal to servo
-        private void TriggerServo()
+        public void TriggerServo()
         {
             //CustomMessageBox.Show("Trigger servo!");
             // Channel 9, pwm 1900
@@ -150,8 +158,8 @@ namespace MissionPlanner.DropSystem
                 (byte)MainV2.comPort.sysidcurrent,
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
-                9,     // servo number
-                1900,  // pwm value
+                6,     // servo number
+                1450,  // pwm value
                 0, 0, 0, 0, 0);
             //MainV2.comPort.doCommand(
             //    MAVLink.MAV_CMD.DO_SET_SERVO,
@@ -167,8 +175,8 @@ namespace MissionPlanner.DropSystem
                 (byte)MainV2.comPort.sysidcurrent,
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
-                9,     // servo number
-                1000,  // pwm value
+                6,     // servo number
+                1800,  // pwm value
                 0, 0, 0, 0, 0);
                 //MainV2.comPort.doCommand(
                 //    MAVLink.MAV_CMD.DO_SET_SERVO,
@@ -177,6 +185,8 @@ namespace MissionPlanner.DropSystem
                 //    0, 0, 0, 0, 0
                 //    );
             });
+            _hasDropped = true;
+            _timer.Stop();
         }
 
         
