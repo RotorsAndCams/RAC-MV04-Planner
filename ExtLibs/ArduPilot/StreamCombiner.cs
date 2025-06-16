@@ -201,7 +201,7 @@ namespace MissionPlanner.Utilities
 
                 try
                 {
-                    var ans = mav.setParam("SYSID_THISMAV", localsysid);
+                    var ans = mav.setParam((byte)mav.sysidcurrent, (byte)mav.compidcurrent, "SYSID_THISMAV", localsysid);
                     Console.WriteLine("this mav set " + ans);
                 }
                 catch

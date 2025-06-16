@@ -5952,15 +5952,15 @@ namespace MissionPlanner.GCSViews
                 ((ProgressReporterDialogue) sender).UpdateProgressAndStatus(95, "Setting params");
 
                 // m
-                port.setParam("WP_RADIUS", float.Parse(TXT_WPRad.Text) / CurrentState.multiplierdist);
+                port.setParam((byte)port.sysidcurrent, (byte)port.compidcurrent, "WP_RADIUS", float.Parse(TXT_WPRad.Text) / CurrentState.multiplierdist);
 
                 // cm's
-                port.setParam("WPNAV_RADIUS", float.Parse(TXT_WPRad.Text) / CurrentState.multiplierdist * 100.0);
+                port.setParam((byte)port.sysidcurrent, (byte)port.compidcurrent, "WPNAV_RADIUS", float.Parse(TXT_WPRad.Text) / CurrentState.multiplierdist * 100.0);
 
                 try
                 {
-                    port.setParam(new[] {"LOITER_RAD", "WP_LOITER_RAD"},
-                        float.Parse(TXT_loiterrad.Text) / CurrentState.multiplierdist);
+                    port.setParam((byte)port.sysidcurrent, (byte)port.compidcurrent, "LOITER_RAD", float.Parse(TXT_loiterrad.Text) / CurrentState.multiplierdist);
+                    port.setParam((byte)port.sysidcurrent, (byte)port.compidcurrent, "WP_LOITER_RAD", float.Parse(TXT_loiterrad.Text) / CurrentState.multiplierdist);
                 }
                 catch
                 {
@@ -6047,7 +6047,7 @@ namespace MissionPlanner.GCSViews
                 }, (byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent);
 
             ((ProgressReporterDialogue) sender).UpdateProgressAndStatus(0, "Set total wps ");
-            MainV2.comPort.setWPTotal(totalwpcountforupload);
+            MainV2.comPort.setWPTotalAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, totalwpcountforupload).ConfigureAwait(false).GetAwaiter().GetResult();
 
             // define the home point
             Locationwp home = new Locationwp();
@@ -6084,7 +6084,7 @@ namespace MissionPlanner.GCSViews
                     {
                         if (sender.doWorkArgs.CancelRequested)
                         {
-                            MainV2.comPort.setWPTotal(0);
+                            MainV2.comPort.setWPTotalAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, 0).ConfigureAwait(false).GetAwaiter().GetResult();
                             MainV2.comPort.UnSubscribeToPacketType(sub1);
                             MainV2.comPort.UnSubscribeToPacketType(sub2);
                             MainV2.comPort.UnSubscribeToPacketType(sub3);
@@ -6110,7 +6110,7 @@ namespace MissionPlanner.GCSViews
                         if (result == MAVLink.MAV_MISSION_RESULT.MAV_MISSION_ERROR)
                         {
                             // resend for partial upload
-                            MainV2.comPort.setWPPartialUpdate((ushort) (reqno), totalwpcountforupload);
+                            MainV2.comPort.setWPPartialUpdateAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, (ushort)reqno, totalwpcountforupload).ConfigureAwait(false).GetAwaiter().GetResult();
                             a = reqno;
                             break;
                         }
@@ -6217,7 +6217,7 @@ namespace MissionPlanner.GCSViews
             MainV2.comPort.UnSubscribeToPacketType(sub2);
             MainV2.comPort.UnSubscribeToPacketType(sub3);
 
-            MainV2.comPort.setWPACK();
+            MainV2.comPort.setWPACK((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent);
 
             _ = MainV2.comPort.getHomePositionAsync((byte) MainV2.comPort.sysidcurrent,
                 (byte) MainV2.comPort.compidcurrent);

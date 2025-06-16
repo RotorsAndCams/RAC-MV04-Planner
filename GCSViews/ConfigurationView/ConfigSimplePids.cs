@@ -188,7 +188,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
             try
             {
-                MainV2.comPort.setParam(rc.Name, value);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, rc.Name, value);
             }
             catch (Exception ex)
             {
@@ -201,7 +201,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
             {
                 try
                 {
-                    MainV2.comPort.setParam(item.paramaname, value * item.multiplier);
+                    MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, item.paramaname, value * item.multiplier);
                     TXT_info.AppendText("set " + item.paramaname + " " + value * item.multiplier + "\r\n");
                 }
                 catch (Exception ex)

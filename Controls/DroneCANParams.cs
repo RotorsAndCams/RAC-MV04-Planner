@@ -353,7 +353,8 @@ namespace MissionPlanner.Controls
             {
                 try
                 {
-                    MainV2.comPort.setParam(new[] { "FORMAT_VERSION", "SYSID_SW_MREV" }, 0);
+                    MainV2.comPort.setParam(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "FORMAT_VERSION", 0);
+                    MainV2.comPort.setParam(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "SYSID_SW_MREV", 0);
                     Thread.Sleep(1000);
                     MainV2.comPort.doReboot(false, true);
                     MainV2.comPort.BaseStream.Close();

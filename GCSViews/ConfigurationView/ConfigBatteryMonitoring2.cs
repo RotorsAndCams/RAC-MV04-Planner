@@ -110,7 +110,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
             try
             {
-                MainV2.comPort.setParam(new[] { "BATT2_VOLT_MULT" }, float.Parse(TXT_divider.Text));
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "BATT2_VOLT_MULT", float.Parse(TXT_divider.Text));
             }
             catch
             {
@@ -124,7 +124,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
                 return;
             try
             {
-                MainV2.comPort.setParam(new[] { "BATT2_VOLT_MULT" }, float.Parse(TXT_divider.Text));
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "BATT2_VOLT_MULT", float.Parse(TXT_divider.Text));
             }
             catch
             {
@@ -138,7 +138,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
                 return;
             try
             {
-                MainV2.comPort.setParam(new[] { "BATT2_AMP_PERVOL" }, float.Parse(TXT_ampspervolt.Text));
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "BATT2_AMP_PERVOL", float.Parse(TXT_ampspervolt.Text));
             }
             catch
             {
@@ -243,7 +243,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
             try
             {
-                MainV2.comPort.setParam(new[] { "BATT2_AMP_PERVOL" }, float.Parse(TXT_ampspervolt.Text));
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "BATT2_AMP_PERVOL", float.Parse(TXT_ampspervolt.Text));
             }
             catch
             {

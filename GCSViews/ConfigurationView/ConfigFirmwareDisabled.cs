@@ -29,7 +29,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
                     "BL Update", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == (int) DialogResult.Yes)
                     try
                     {
-                        if (mav.doCommand(MAVLink.MAV_CMD.FLASH_BOOTLOADER, 0, 0, 0, 0, 290876, 0, 0))
+                        if (mav.doCommand((byte)mav.sysidcurrent, (byte)mav.compidcurrent, MAVLink.MAV_CMD.FLASH_BOOTLOADER, 0, 0, 0, 0, 290876, 0, 0))
                         {
                             CustomMessageBox.Show("Upgraded bootloader");
                         }

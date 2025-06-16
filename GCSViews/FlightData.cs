@@ -1003,7 +1003,7 @@ namespace MissionPlanner.GCSViews
 
             try
             {
-                MainV2.comPort.doAbortLand();
+                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAV_CMD.DO_GO_AROUND, 0, 0, 0, 0, 0, 0, 0);
             }
             catch
             {
@@ -1034,7 +1034,7 @@ namespace MissionPlanner.GCSViews
                         .TrimEnd('\0'));
                     return true;
                 }, (byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent);
-                bool ans = MainV2.comPort.doARM(!isitarmed);
+                bool ans = MainV2.comPort.doARM((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, !isitarmed);
                 MainV2.comPort.UnSubscribeToPacketType(sub);
                 if (ans == false)
                 {
@@ -1045,7 +1045,7 @@ namespace MissionPlanner.GCSViews
                             CustomMessageBox.MessageBoxIcon.Exclamation, "Force " + action, "Cancel") ==
                         CustomMessageBox.DialogResult.Yes)
                     {
-                        ans = MainV2.comPort.doARM(!isitarmed, true);
+                        ans = MainV2.comPort.doARM((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, !isitarmed, true);
                         if (ans == false)
                         {
                             CustomMessageBox.Show(Strings.ErrorRejectedByMAV, Strings.ERROR);
@@ -1399,7 +1399,7 @@ namespace MissionPlanner.GCSViews
             try
             {
                 ((Control) sender).Enabled = false;
-                MainV2.comPort.setMode("Auto");
+                MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "Auto");
             }
             catch
             {
@@ -1418,7 +1418,7 @@ namespace MissionPlanner.GCSViews
                     MainV2.comPort.MAV.cs.firmware == Firmwares.Ateryx ||
                     MainV2.comPort.MAV.cs.firmware == Firmwares.ArduRover ||
                     MainV2.comPort.MAV.cs.firmware == Firmwares.ArduCopter2)
-                    MainV2.comPort.setMode("Loiter");
+                    MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "Loiter");
             }
             catch
             {
@@ -1433,7 +1433,7 @@ namespace MissionPlanner.GCSViews
             try
             {
                 ((Control) sender).Enabled = false;
-                MainV2.comPort.setMode("RTL");
+                MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "RTL");
             }
             catch
             {
@@ -1455,8 +1455,8 @@ namespace MissionPlanner.GCSViews
             trackBarPitch.Value = 0;
             trackBarRoll.Value = 0;
             trackBarYaw.Value = 0;
-            MainV2.comPort.setMountConfigure(MAVLink.MAV_MOUNT_MODE.MAVLINK_TARGETING, false, false, false);
-            MainV2.comPort.setMountControl((float) trackBarPitch.Value * 100.0f, (float) trackBarRoll.Value * 100.0f,
+            MainV2.comPort.doCommand(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, MAV_CMD.DO_MOUNT_CONFIGURE, (byte)MAVLink.MAV_MOUNT_MODE.MAVLINK_TARGETING, 0, 0, 0, 0, 0, 0, false);
+            MainV2.comPort.setMountControl(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, (float) trackBarPitch.Value * 100.0f, (float) trackBarRoll.Value * 100.0f,
                 (float) trackBarYaw.Value * 100.0f, false);
         }
 
@@ -1483,16 +1483,16 @@ namespace MissionPlanner.GCSViews
 
                         // scan and check wp's we are skipping
                         // get our target wp
-                        var lastwpdata = MainV2.comPort.getWP((ushort) lastwpno);
+                        var lastwpdata = MainV2.comPort.getWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, (ushort) lastwpno);
 
                         // get all
                         List<Locationwp> cmds = new List<Locationwp>();
 
-                        var wpcount = MainV2.comPort.getWPCount();
+                        var wpcount = MainV2.comPort.getWPCount((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent);
 
                         for (ushort a = 0; a < wpcount; a++)
                         {
-                            var wpdata = MainV2.comPort.getWP(a);
+                            var wpdata = MainV2.comPort.getWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, a);
 
                             if (a < lastwpno && a != 0) // allow home
                             {
@@ -1509,12 +1509,12 @@ namespace MissionPlanner.GCSViews
 
                         ushort wpno = 0;
                         // upload from wp 0 to end
-                        MainV2.comPort.setWPTotal((ushort) (cmds.Count));
+                        MainV2.comPort.setWPTotalAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, (ushort)(cmds.Count)).ConfigureAwait(false).GetAwaiter().GetResult();
 
                         // add our do commands
                         foreach (var loc in cmds)
                         {
-                            MAVLink.MAV_MISSION_RESULT ans = MainV2.comPort.setWP(loc, wpno,
+                            MAVLink.MAV_MISSION_RESULT ans = MainV2.comPort.setWP(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, loc, wpno,
                                 (MAVLink.MAV_FRAME) (loc.frame));
                             if (ans != MAVLink.MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED)
                             {
@@ -1527,7 +1527,7 @@ namespace MissionPlanner.GCSViews
                             wpno++;
                         }
 
-                        MainV2.comPort.setWPACK();
+                        MainV2.comPort.setWPACK((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent);
 
                         FlightPlanner.instance.BUT_read_Click(this, null);
 
@@ -1538,7 +1538,7 @@ namespace MissionPlanner.GCSViews
                         {
                             while (MainV2.comPort.MAV.cs.mode.ToLower() != "Guided".ToLower())
                             {
-                                MainV2.comPort.setMode("GUIDED");
+                                MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "GUIDED");
                                 Thread.Sleep(1000);
                                 Application.DoEvents();
                                 timeout++;
@@ -1553,7 +1553,7 @@ namespace MissionPlanner.GCSViews
                             timeout = 0;
                             while (!MainV2.comPort.MAV.cs.armed)
                             {
-                                MainV2.comPort.doARM(true);
+                                MainV2.comPort.doARM((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, true);
                                 Thread.Sleep(1000);
                                 Application.DoEvents();
                                 timeout++;
@@ -1589,7 +1589,7 @@ namespace MissionPlanner.GCSViews
                         timeout = 0;
                         while (MainV2.comPort.MAV.cs.mode.ToLower() != "AUTO".ToLower())
                         {
-                            MainV2.comPort.setMode("AUTO");
+                            MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "AUTO");
                             Thread.Sleep(1000);
                             Application.DoEvents();
                             timeout++;
@@ -1634,7 +1634,7 @@ namespace MissionPlanner.GCSViews
                 }
             }
 
-            MainV2.comPort.setMode(CMB_modes.Text);
+            MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, CMB_modes.Text);
         }
 
         private void BUT_calib_Click(object sender, EventArgs e)
@@ -1677,7 +1677,15 @@ namespace MissionPlanner.GCSViews
             {
                 if (CMB_action.Text == actions.Trigger_Camera.ToString())
                 {
-                    MainV2.comPort.setDigicamControl(true);
+                    if (!MainV2.comPort.doCommand(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, MAV_CMD.DO_DIGICAM_CONTROL, 0, 0, 0, 0, 1, 0, 0))
+                    {
+                        MainV2.comPort.generatePacket((byte)MAVLINK_MSG_ID.DIGICAM_CONTROL, new mavlink_digicam_control_t()
+                        {
+                            target_system = MainV2.comPort.MAV.sysid,
+                            target_component = MainV2.comPort.MAV.compid,
+                            shot = 1
+                        }, MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid);
+                    }
                     return;
                 }
             }
@@ -1776,7 +1784,7 @@ namespace MissionPlanner.GCSViews
                     {
                         var custom_mode = (MainV2.comPort.MAV.cs.sensors_enabled.motor_control && MainV2.comPort.MAV.cs.sensors_enabled.seen) ? 1u : 0u;
                         var mode = new MAVLink.mavlink_set_mode_t() { custom_mode = custom_mode, target_system = (byte)MainV2.comPort.sysidcurrent };
-                        MainV2.comPort.setMode(mode, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
+                        MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, mode, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
                         ((Control)sender).Enabled = true;
                         return;
                     }
@@ -1799,7 +1807,7 @@ namespace MissionPlanner.GCSViews
                             "DO_START_" + CMB_action.Text.ToUpper());
                     }
 
-                    if (MainV2.comPort.doCommand(cmd, param1, param2, param3, 0, 0, 0, 0))
+                    if (MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, cmd, param1, param2, param3, 0, 0, 0, 0))
                     {
 
                     }
@@ -2931,7 +2939,7 @@ namespace MissionPlanner.GCSViews
 
         private void gimbalTrackbar_Scroll(object sender, EventArgs e)
         {
-            MainV2.comPort.setMountControl((float) trackBarPitch.Value * 100.0f, (float) trackBarRoll.Value * 100.0f,
+            MainV2.comPort.setMountControl(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, (float) trackBarPitch.Value * 100.0f, (float) trackBarRoll.Value * 100.0f,
                 (float) trackBarYaw.Value * 100.0f, false);
         }
 
@@ -4349,7 +4357,7 @@ namespace MissionPlanner.GCSViews
             int newalt = (int) modifyandSetAlt.Value;
             try
             {
-                MainV2.comPort.setNewWPAlt(new Locationwp {alt = newalt / CurrentState.multiplieralt});
+                MainV2.comPort.setNewWPAlt(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, new Locationwp {alt = newalt / CurrentState.multiplieralt});
             }
             catch
             {
@@ -4363,7 +4371,8 @@ namespace MissionPlanner.GCSViews
 
             try
             {
-                MainV2.comPort.setParam(new[] {"LOITER_RAD", "WP_LOITER_RAD"}, newrad / CurrentState.multiplierdist);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "LOITER_RAD", newrad / CurrentState.multiplierdist);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "WP_LOITER_RAD", newrad / CurrentState.multiplierdist);
             }
             catch
             {
@@ -5328,7 +5337,15 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                MainV2.comPort.setDigicamControl(true);
+                if (!MainV2.comPort.doCommand(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, MAV_CMD.DO_DIGICAM_CONTROL, 0, 0, 0, 0, 1, 0, 0))
+                {
+                    MainV2.comPort.generatePacket((byte)MAVLINK_MSG_ID.DIGICAM_CONTROL, new mavlink_digicam_control_t()
+                    {
+                        target_system = MainV2.comPort.MAV.sysid,
+                        target_component = MainV2.comPort.MAV.compid,
+                        shot = 1
+                    }, MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid);
+                }
             }
             catch
             {
@@ -5906,7 +5923,7 @@ namespace MissionPlanner.GCSViews
 
                 try
                 {
-                    MainV2.comPort.setGuidedModeWP(gotohere);
+                    MainV2.comPort.setGuidedModeWP(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, gotohere);
                 }
                 catch (Exception ex)
                 {
@@ -5930,7 +5947,7 @@ namespace MissionPlanner.GCSViews
 
                 try
                 {
-                    MainV2.comPort.setGuidedModeWP(gotohere);
+                    MainV2.comPort.setGuidedModeWP(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, gotohere);
                 }
                 catch (Exception ex)
                 {
@@ -6284,7 +6301,7 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                MainV2.comPort.doCommand(MAVLink.MAV_CMD.SET_MESSAGE_INTERVAL, (float) MAVLink.MAVLINK_MSG_ID.UAVIONIX_ADSB_OUT_STATUS, (float) 1000000.0, 0, 0, 0, 0, 0);
+                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.SET_MESSAGE_INTERVAL, (float) MAVLink.MAVLINK_MSG_ID.UAVIONIX_ADSB_OUT_STATUS, (float) 1000000.0, 0, 0, 0, 0, 0);
                 var start = DateTime.Now;
                 while (!MainV2.comPort.MAV.cs.xpdr_status_pending && (DateTime.Now - start).TotalSeconds < 3); // wait until we receive a status message
                 if (MainV2.comPort.MAV.cs.xpdr_status_pending)
@@ -6418,7 +6435,7 @@ namespace MissionPlanner.GCSViews
             }
 
             try {
-                if (!MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_JUMP_TAG, tag, 0, 0, 0, 0, 0, 0))
+                if (!MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.DO_JUMP_TAG, tag, 0, 0, 0, 0, 0, 0))
                 {
                     CustomMessageBox.Show(Strings.CommandFailed, Strings.ERROR);
                 }

@@ -745,7 +745,7 @@ namespace MissionPlanner.Utilities
                             };
                             try
                             {
-                                MainV2.comPort.setGuidedModeWP(gwp);
+                                MainV2.comPort.setGuidedModeWP(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, gwp);
                             }
                             catch
                             {
@@ -781,7 +781,7 @@ namespace MissionPlanner.Utilities
                             };
                             try
                             {
-                                MainV2.comPort.setGuidedModeWP(gwp);
+                                MainV2.comPort.setGuidedModeWP(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, gwp);
                             }
                             catch
                             {

@@ -19,6 +19,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using static alglib;
 using Timer = System.Timers.Timer;
 
 namespace MissionPlanner
@@ -1511,7 +1512,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
         {
             foreach (string paramname in paramnames)
             {
-                if (setParam(paramname, value))
+                if (setParam(MAV.sysid, MAV.compid, paramname, value))
                 {
                     return true;
                 }
@@ -2168,13 +2169,13 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
         [Obsolete]
         public float GetParam(string name)
         {
-            return GetParam(name, -1);
+            return GetParam(MAV.sysid, MAV.compid, name, -1);
         }
 
         [Obsolete]
         public float GetParam(short index)
         {
-            return GetParam("", index);
+            return GetParam(MAV.sysid, MAV.compid, "", index);
         }
 
         [Obsolete]
@@ -2426,7 +2427,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
         {
             int param1 = onoff ? 1 : 0;
 
-            var ans1 = doCommand((byte)sysidcurrent, (byte)compidcurrent, MAV_CMD.CONTROL_HIGH_LATENCY,
+            var ans1 = doCommand(MAV.sysid, MAV.compid, MAV_CMD.CONTROL_HIGH_LATENCY,
                     param1, 0, 0, 0, 0, 0, 0);
 
             return ans1;
@@ -2454,7 +2455,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                 var ans2 = false;
                 if (!ans1)
                 {
-                    ans2 = doCommand((byte)sysidcurrent, (byte)compidcurrent, MAV_CMD.PREFLIGHT_REBOOT_SHUTDOWN, 1, 0,
+                    ans2 = doCommand(MAV.sysid, MAV.compid, MAV_CMD.PREFLIGHT_REBOOT_SHUTDOWN, 1, 0,
                     0, 0, 0, 0, 0);
                 }
                 // Successful reboot
@@ -2552,14 +2553,14 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
         [Obsolete]
         public bool doAbortLand()
         {
-            return doCommand(MAV_CMD.DO_GO_AROUND, 0, 0, 0, 0, 0, 0, 0);
+            return doCommand(MAV.sysid, MAV.compid, MAV_CMD.DO_GO_AROUND, 0, 0, 0, 0, 0, 0, 0);
         }
 
         [Obsolete]
         public bool doMotorTest(int motor, MOTOR_TEST_THROTTLE_TYPE thr_type, int throttle, int timeout,
             int motorcount = 0)
         {
-            return doCommand(MAV_CMD.DO_MOTOR_TEST, (float) motor, (float) (byte) thr_type,
+            return doCommand(MAV.sysid, MAV.compid, MAV_CMD.DO_MOTOR_TEST, (float) motor, (float) (byte) thr_type,
                 (float) throttle, (float) timeout, (float) motorcount, 0, 0);
         }
 
@@ -5346,7 +5347,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
 
                             if (BaseStream.IsOpen)
                             {
-                                doCommand((byte)sysidcurrent, (byte)compidcurrent, MAV_CMD.PREFLIGHT_STORAGE, 1, 0, 0,
+                                doCommand(MAV.sysid, MAV.compid, MAV_CMD.PREFLIGHT_STORAGE, 1, 0, 0,
                                     0, 0, 0, 0,
                                     false);
                             }
@@ -5749,14 +5750,14 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             req.target_system = sysid;
 
             // use *all three* methods
-            doCommand(MAVLink.MAV_CMD.REQUEST_MESSAGE,
+            doCommand(MAV.sysid, MAV.compid, MAVLink.MAV_CMD.REQUEST_MESSAGE,
                 (float)MAVLink.MAVLINK_MSG_ID.AUTOPILOT_VERSION,
                 0, 0, 0, 0, 0, 0, false);
 
-	    // MAV_CMD.REQUEST_AUTOPILOT_CAPABILITIES is deprecated
-            doCommand(MAV_CMD.REQUEST_AUTOPILOT_CAPABILITIES, 0, 0, 0, 0, 0, 0, 0, false);
+	        // MAV_CMD.REQUEST_AUTOPILOT_CAPABILITIES is deprecated
+            doCommand(MAV.sysid, MAV.compid, MAV_CMD.REQUEST_AUTOPILOT_CAPABILITIES, 0, 0, 0, 0, 0, 0, 0, false);
 
-	    // AUTOPILOT_VERSION_REQUEST is deprecated
+	        // AUTOPILOT_VERSION_REQUEST is deprecated
             generatePacket((byte) MAVLINK_MSG_ID.AUTOPILOT_VERSION_REQUEST, req);
 
             if (!responcerequired)

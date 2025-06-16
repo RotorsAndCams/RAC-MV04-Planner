@@ -342,7 +342,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
                 return;
             }
 
-            MainV2.comPort.setParam(((Control)sender).Name, tempint);
+            MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, ((Control)sender).Name, tempint);
         }
 
         private void TXT_srvpos1_Validating(object sender, CancelEventArgs e)
@@ -360,7 +360,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
             try
             {
                 MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "H_SV_MAN", 1); // randy request
-                MainV2.comPort.setParam(((Control)sender).Name, test);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, ((Control)sender).Name, test);
                 Thread.Sleep(100);
                 MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "H_SV_MAN", 0); // randy request - last
             }
@@ -385,7 +385,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
             try
             {
                 MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "H_SV_MAN", 1); // randy request
-                MainV2.comPort.setParam(((Control)sender).Name, test);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, ((Control)sender).Name, test);
                 Thread.Sleep(100);
                 MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "H_SV_MAN", 0); // randy request - last
             }
@@ -410,7 +410,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
             try
             {
                 MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "H_SV_MAN", 1); // randy request
-                MainV2.comPort.setParam(((Control)sender).Name, test);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, ((Control)sender).Name, test);
                 Thread.Sleep(100);
                 MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "H_SV_MAN", 0); // randy request - last
             }
@@ -433,7 +433,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
             try
             {
-                MainV2.comPort.setParam(((Control)sender).Name, test);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, ((Control)sender).Name, test);
             }
             catch
             {

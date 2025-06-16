@@ -135,7 +135,7 @@ namespace MissionPlanner
 
         public bool ChangeParam(string param, float value)
         {
-            return MainV2.comPort.setParam(param, value);
+            return MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, param, value);
         }
 
         public float GetParam(string param)
@@ -148,7 +148,7 @@ namespace MissionPlanner
 
         public bool ChangeMode(string mode)
         {
-            MainV2.comPort.setMode(mode);
+            MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, mode);
             return true;
         }
 
