@@ -528,15 +528,7 @@ namespace MissionPlanner.Joystick
                         }, null);
                         break;
                     case buttonfunction.Digicam_Control:
-                        if (!Interface.doCommand(Interface.MAV.sysid, Interface.MAV.compid, MAV_CMD.DO_DIGICAM_CONTROL, 0, 0, 0, 0, 1, 0, 0))
-                        {
-                            Interface.generatePacket((byte)MAVLINK_MSG_ID.DIGICAM_CONTROL, new mavlink_digicam_control_t()
-                            {
-                                target_system = Interface.MAV.sysid,
-                                target_component = Interface.MAV.compid,
-                                shot = 1
-                            }, Interface.MAV.sysid, Interface.MAV.compid);
-                        }
+                        Interface.setDigicamControl(Interface.MAV.sysid, Interface.MAV.compid, true);
                         break;
                     case buttonfunction.Do_Repeat_Relay:
                         _context.Send( delegate

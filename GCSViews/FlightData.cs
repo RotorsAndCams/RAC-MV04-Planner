@@ -1003,7 +1003,7 @@ namespace MissionPlanner.GCSViews
 
             try
             {
-                MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, MAV_CMD.DO_GO_AROUND, 0, 0, 0, 0, 0, 0, 0);
+                MainV2.comPort.doAbortLand(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid);
             }
             catch
             {
@@ -1455,7 +1455,7 @@ namespace MissionPlanner.GCSViews
             trackBarPitch.Value = 0;
             trackBarRoll.Value = 0;
             trackBarYaw.Value = 0;
-            MainV2.comPort.doCommand(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, MAV_CMD.DO_MOUNT_CONFIGURE, (byte)MAVLink.MAV_MOUNT_MODE.MAVLINK_TARGETING, 0, 0, 0, 0, 0, 0, false);
+            MainV2.comPort.setMountConfigure(MAVLink.MAV_MOUNT_MODE.MAVLINK_TARGETING, false, false, false);
             MainV2.comPort.setMountControl(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, (float) trackBarPitch.Value * 100.0f, (float) trackBarRoll.Value * 100.0f,
                 (float) trackBarYaw.Value * 100.0f, false);
         }
@@ -1677,15 +1677,7 @@ namespace MissionPlanner.GCSViews
             {
                 if (CMB_action.Text == actions.Trigger_Camera.ToString())
                 {
-                    if (!MainV2.comPort.doCommand(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, MAV_CMD.DO_DIGICAM_CONTROL, 0, 0, 0, 0, 1, 0, 0))
-                    {
-                        MainV2.comPort.generatePacket((byte)MAVLINK_MSG_ID.DIGICAM_CONTROL, new mavlink_digicam_control_t()
-                        {
-                            target_system = MainV2.comPort.MAV.sysid,
-                            target_component = MainV2.comPort.MAV.compid,
-                            shot = 1
-                        }, MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid);
-                    }
+                    MainV2.comPort.setDigicamControl(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, true);
                     return;
                 }
             }
@@ -5337,15 +5329,7 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                if (!MainV2.comPort.doCommand(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, MAV_CMD.DO_DIGICAM_CONTROL, 0, 0, 0, 0, 1, 0, 0))
-                {
-                    MainV2.comPort.generatePacket((byte)MAVLINK_MSG_ID.DIGICAM_CONTROL, new mavlink_digicam_control_t()
-                    {
-                        target_system = MainV2.comPort.MAV.sysid,
-                        target_component = MainV2.comPort.MAV.compid,
-                        shot = 1
-                    }, MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid);
-                }
+                MainV2.comPort.setDigicamControl(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, true);
             }
             catch
             {

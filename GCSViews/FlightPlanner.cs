@@ -6047,7 +6047,7 @@ namespace MissionPlanner.GCSViews
                 }, (byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent);
 
             ((ProgressReporterDialogue) sender).UpdateProgressAndStatus(0, "Set total wps ");
-            MainV2.comPort.setWPTotalAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, totalwpcountforupload).ConfigureAwait(false).GetAwaiter().GetResult();
+            MainV2.comPort.setWPTotal(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, totalwpcountforupload);
 
             // define the home point
             Locationwp home = new Locationwp();
@@ -6084,7 +6084,7 @@ namespace MissionPlanner.GCSViews
                     {
                         if (sender.doWorkArgs.CancelRequested)
                         {
-                            MainV2.comPort.setWPTotalAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, 0).ConfigureAwait(false).GetAwaiter().GetResult();
+                            MainV2.comPort.setWPTotal(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, 0);
                             MainV2.comPort.UnSubscribeToPacketType(sub1);
                             MainV2.comPort.UnSubscribeToPacketType(sub2);
                             MainV2.comPort.UnSubscribeToPacketType(sub3);
@@ -6110,7 +6110,7 @@ namespace MissionPlanner.GCSViews
                         if (result == MAVLink.MAV_MISSION_RESULT.MAV_MISSION_ERROR)
                         {
                             // resend for partial upload
-                            MainV2.comPort.setWPPartialUpdateAsync(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, (ushort)reqno, totalwpcountforupload).ConfigureAwait(false).GetAwaiter().GetResult();
+                            MainV2.comPort.setWPPartialUpdate(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, (ushort)reqno, totalwpcountforupload);
                             a = reqno;
                             break;
                         }

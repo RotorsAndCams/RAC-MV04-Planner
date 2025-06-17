@@ -2556,6 +2556,11 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             return doCommand(MAV.sysid, MAV.compid, MAV_CMD.DO_GO_AROUND, 0, 0, 0, 0, 0, 0, 0);
         }
 
+        public bool doAbortLand(byte sysid, byte compid)
+        {
+            return doCommand(sysid, compid, MAV_CMD.DO_GO_AROUND, 0, 0, 0, 0, 0, 0, 0);
+        }
+
         [Obsolete]
         public bool doMotorTest(int motor, MOTOR_TEST_THROTTLE_TYPE thr_type, int throttle, int timeout,
             int motorcount = 0)
@@ -3623,6 +3628,12 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                 .GetResult();
         }
 
+        public void setWPPartialUpdate(byte sysid, byte compid, ushort startwp, ushort endwp,
+            MAV_MISSION_TYPE type = MAV_MISSION_TYPE.MISSION)
+        {
+            setWPPartialUpdateAsync(sysid, compid, startwp, endwp, type).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
         /// <summary>
         /// Set start and finish for partial wp upload.
         /// </summary>
@@ -3647,6 +3658,12 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
         public void setWPTotal(ushort wp_total, MAVLink.MAV_MISSION_TYPE type = MAV_MISSION_TYPE.MISSION)
         {
             setWPTotalAsync(MAV.sysid, MAV.compid, wp_total, type).ConfigureAwait(false).GetAwaiter().GetResult();
+            return;
+        }
+
+        public void setWPTotal(byte sysid, byte compid, ushort wp_total, MAVLink.MAV_MISSION_TYPE type = MAV_MISSION_TYPE.MISSION)
+        {
+            setWPTotalAsync(sysid, compid, wp_total, type).ConfigureAwait(false).GetAwaiter().GetResult();
             return;
         }
 
@@ -4477,6 +4494,21 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             if (!doCommand((byte) sysidcurrent, (byte) compidcurrent, MAV_CMD.DO_DIGICAM_CONTROL, 0, 0, 0, 0, 1, 0, 0))
             {
                 generatePacket((byte) MAVLINK_MSG_ID.DIGICAM_CONTROL, req);
+            }
+        }
+
+        public void setDigicamControl(byte sysid, byte compid, bool shot)
+        {
+            mavlink_digicam_control_t req = new mavlink_digicam_control_t()
+            {
+                target_system = sysid,
+                target_component = compid,
+                shot = shot ? (byte)1 : (byte)0
+            };
+
+            if (!doCommand(sysid, compid, MAV_CMD.DO_DIGICAM_CONTROL, 0, 0, 0, 0, 1, 0, 0))
+            {
+                generatePacket((byte)MAVLINK_MSG_ID.DIGICAM_CONTROL, req);
             }
         }
 

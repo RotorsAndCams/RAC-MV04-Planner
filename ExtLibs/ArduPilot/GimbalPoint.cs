@@ -121,11 +121,7 @@ namespace MissionPlanner.Utilities
         public static PointLatLngAlt ProjectPoint(MAVLinkInterface comPort)
         {
             GimbalPoint.comPort = comPort;
-            comPort.generatePacket((byte)MAVLINK_MSG_ID.MOUNT_STATUS, new mavlink_mount_status_t()
-            {
-                target_system = comPort.MAV.sysid,
-                target_component = comPort.MAV.compid
-            }, comPort.MAV.sysid, comPort.MAV.compid);
+            comPort.GetMountStatus();
 
             // this should be looking at rc_channel function
             yawchannel = (int) (float) comPort.MAV.param["MNT_RC_IN_PAN"];
