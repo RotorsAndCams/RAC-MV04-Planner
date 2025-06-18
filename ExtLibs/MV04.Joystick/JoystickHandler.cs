@@ -123,10 +123,10 @@ namespace MV04.Joystick
         {
             {1, new RCChannel(MV04_JoyRole.UAV_Roll, NoneAxis, "Roll", true)},
             {2, new RCChannel(MV04_JoyRole.UAV_Pitch, NoneAxis, "Pitch", true)},
-            {3, new RCChannel(MV04_JoyRole.UAV_Throttle, NoneAxis, "Throttle / Zoom", true)},
+            {3, new RCChannel(MV04_JoyRole.UAV_Throttle, NoneAxis, "Throttle / Zoom", true)}, // Print "Zoom" to indicate camera function
             {4, new RCChannel(MV04_JoyRole.UAV_Yaw, NoneAxis, "Yaw", true)},
-            {5, new RCChannel(MV04_JoyRole.Cam_Zoom, NoneAxis, "Camera Zoom", false)},
-            {6, new RCChannel(MV04_JoyRole.Cam_Pitch, NoneAxis, "Camera Pitch", false)},
+            {5, new RCChannel(MV04_JoyRole.Cam_Pitch, NoneAxis, "Camera Pitch", false)},
+            {6, new RCChannel(MV04_JoyRole.Cam_Zoom, NoneAxis, "Camera Zoom", false)},
             {7, new RCChannel(MV04_JoyRole.Cam_Yaw, NoneAxis, "Camera Yaw", false)}
         };
 
