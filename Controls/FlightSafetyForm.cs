@@ -1,4 +1,5 @@
 ﻿using log4net;
+using MV04.State;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -77,6 +78,11 @@ namespace MissionPlanner.Controls
                     }
                 }
             }
+        }
+
+        private void button_FlightPlanCheck_Click(object sender, EventArgs e)
+        {
+            MainV2.CheckFlightPlan(null, new MV04StateChangeEventArgs() { PreviousState = MV04_State.Manual, NewState = MV04_State.Auto });
         }
     }
 }

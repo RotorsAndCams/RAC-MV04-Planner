@@ -33,8 +33,10 @@
             this.flowLayoutPanel_Buttons = new System.Windows.Forms.FlowLayoutPanel();
             this.tabPage_ParamSet = new System.Windows.Forms.TabPage();
             this.flowLayoutPanel_ParamSet = new System.Windows.Forms.FlowLayoutPanel();
+            this.button_FlightPlanCheck = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage_Buttons.SuspendLayout();
+            this.flowLayoutPanel_Buttons.SuspendLayout();
             this.tabPage_ParamSet.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -63,6 +65,7 @@
             // 
             // flowLayoutPanel_Buttons
             // 
+            this.flowLayoutPanel_Buttons.Controls.Add(this.button_FlightPlanCheck);
             this.flowLayoutPanel_Buttons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel_Buttons.Location = new System.Drawing.Point(3, 3);
             this.flowLayoutPanel_Buttons.Name = "flowLayoutPanel_Buttons";
@@ -89,6 +92,16 @@
             this.flowLayoutPanel_ParamSet.Size = new System.Drawing.Size(790, 422);
             this.flowLayoutPanel_ParamSet.TabIndex = 0;
             // 
+            // button_FlightPlanCheck
+            // 
+            this.button_FlightPlanCheck.Location = new System.Drawing.Point(3, 3);
+            this.button_FlightPlanCheck.Name = "button_FlightPlanCheck";
+            this.button_FlightPlanCheck.Size = new System.Drawing.Size(100, 60);
+            this.button_FlightPlanCheck.TabIndex = 0;
+            this.button_FlightPlanCheck.Text = "Check Flightplan";
+            this.button_FlightPlanCheck.UseVisualStyleBackColor = true;
+            this.button_FlightPlanCheck.Click += new System.EventHandler(this.button_FlightPlanCheck_Click);
+            // 
             // FlightSafetyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -103,6 +116,7 @@
             this.Text = "Flight Safety Config";
             this.tabControl1.ResumeLayout(false);
             this.tabPage_Buttons.ResumeLayout(false);
+            this.flowLayoutPanel_Buttons.ResumeLayout(false);
             this.tabPage_ParamSet.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -115,5 +129,6 @@
         private System.Windows.Forms.TabPage tabPage_ParamSet;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel_ParamSet;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel_Buttons;
+        private System.Windows.Forms.Button button_FlightPlanCheck;
     }
 }
