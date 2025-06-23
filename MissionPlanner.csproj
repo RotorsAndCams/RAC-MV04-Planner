@@ -102,6 +102,9 @@
     <EmbeddedResource Include="Controls\EKFStatus.uk.resx">
       <DependentUpon>EKFStatus.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\FlightSafetyForm.resx">
+      <DependentUpon>FlightSafetyForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\FollowMe.uk.resx">
       <DependentUpon>FollowMe.cs</DependentUpon>
     </EmbeddedResource>
@@ -116,6 +119,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ParamSet.resx">
       <DependentUpon>ParamSet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ParamSet2.resx">
+      <DependentUpon>ParamSet2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\PrearmStatus.resx">
       <DependentUpon>PrearmStatus.cs</DependentUpon>
@@ -819,6 +825,12 @@
     <Compile Include="Controls\DigitalSkyUI.Designer.cs">
       <DependentUpon>DigitalSkyUI.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\FlightSafetyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\FlightSafetyForm.Designer.cs">
+      <DependentUpon>FlightSafetyForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\MavCommandSelection.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -833,6 +845,12 @@
     </Compile>
     <Compile Include="Controls\ParamSet.Designer.cs">
       <DependentUpon>ParamSet.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ParamSet2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ParamSet2.Designer.cs">
+      <DependentUpon>ParamSet2.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\PrearmStatus.cs">
       <SubType>Form</SubType>
