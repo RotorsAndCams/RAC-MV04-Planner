@@ -287,8 +287,7 @@ namespace MissionPlanner.GCSViews
             Button btn_SurveyGrid = new Button();
             btn_SurveyGrid.Text = "SurveyGrid";
             btn_SurveyGrid.Click += this.surveyGridToolStripMenuItem_Click;
-            btn_SurveyGrid.Height = 100;
-            btn_SurveyGrid.Width = 100;
+            btn_SurveyGrid.Size = new Size(100, 60);
             btn_SurveyGrid.BackColor = Color.Yellow;
             btn_SurveyGrid.ForeColor = Color.Black;
             flowLayoutPanel1.Controls.Add(btn_SurveyGrid);
