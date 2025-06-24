@@ -1249,6 +1249,22 @@ namespace MissionPlanner
             tsb_Error.Height = 200;
             tsb_Error.BackColor = Color.White;
             tsb_Error.ImageScaling = ToolStripItemImageScaling.None;
+
+            if (!devmode)
+            {
+                CullControls();
+            }
+        }
+
+        private void CullControls()
+        {
+            // Simplify connection control
+            _connectionControl.CMB_serialport.Visible = false;
+            _connectionControl.CMB_baudrate.Visible = false;
+            _connectionControl.cmb_sysid.Visible = false;
+            _connectionControl.MinimumSize = new Size(50, _connectionControl.MinimumSize.Height);
+            _connectionControl.Width = 50;
+            _connectionControl.Invalidate();
         }
 
         public void HideflightData()
