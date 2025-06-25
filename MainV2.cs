@@ -44,6 +44,8 @@ using MV04.Settings;
 using MV04.Camera;
 using Microsoft.Scripting.Hosting.Shell;
 using System.Timers;
+using MV04.Joystick;
+using static MAVLink;
 
 namespace MissionPlanner
 {
@@ -428,6 +430,19 @@ namespace MissionPlanner
         public delegate void WMDeviceChangeEventHandler(WM_DEVICECHANGE_enum cause);
 
         public event WMDeviceChangeEventHandler DeviceChanged;
+
+        /// <summary>
+        /// Returns true if there is a MAV connected
+        /// </summary>
+        public static bool MavConnected
+        {
+            get
+            {
+                return comPort.BaseStream != null
+                    && comPort.BaseStream.IsOpen
+                    && comPort.MAV.param.Count > 0;
+            }
+        }
 
         /// <summary>
         /// other planes in the area from adsb
@@ -1193,8 +1208,6 @@ namespace MissionPlanner
 
             _comPort.ParamListChanged += _comPort_ParamListChanged;
 
-            this.VisibleChanged += MainV2_VisibleChanged;
-
             if(frm.UserName == "devmode")
             {
                 devmode = true;
@@ -1287,16 +1300,52 @@ namespace MissionPlanner
             }
         }
 
-        private void MainV2_VisibleChanged(object sender, EventArgs e)
-        {
-        }
-
-
         private void _comPort_ParamListChanged(object sender, EventArgs e)
         {
+            // Auto connect to camera if required
             if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
             {
                 SwitchTRIPRelay(true);
+            }
+
+            // Send initial TRIM values to camera RC channels (before joystick enable, to stop top-left drift)
+            if (MavConnected
+                && comPort.MAV.param.ContainsKey("RC1_TRIM")) // We have params
+            {
+                MV04_SendInitRCValues();
+            }
+        }
+
+        private void MV04_SendInitRCValues()
+        {
+            List<int> channels = new List<int>()
+            {
+                JoystickHandler.GetChannelForJoyRole(MV04_JoyRole.Cam_Pitch),
+                JoystickHandler.GetChannelForJoyRole(MV04_JoyRole.Cam_Yaw)
+            };
+            ushort[] rcValues = new ushort[8];
+            for (int i = 0; i < rcValues.Length; i++)
+            {
+                if (channels.Contains(i + 1))
+                {
+                    rcValues[i] = (ushort)MV04_GetTrimForChannel(i + 1);
+                }
+                // All other values are left on 0, which will be ignored by the autopilot
+            }
+
+            comPort.SendRCOverride(comPort.MAV.sysid, comPort.MAV.compid, rcValues[0], rcValues[1], rcValues[2], rcValues[3], rcValues[4], rcValues[5], rcValues[6], rcValues[7]);
+        }
+
+        private int MV04_GetTrimForChannel(int ch, int defaultValue = 1500)
+        {
+            if (MavConnected
+                && comPort.MAV.param.ContainsKey($"RC{ch}_TRIM"))
+            {
+                return (int)Math.Round(comPort.MAV.param[$"RC{ch}_TRIM"].Value);
+            }
+            else
+            {
+                return defaultValue;
             }
         }
 
@@ -1673,6 +1722,7 @@ namespace MissionPlanner
                 }
             }
         }
+
 #if !NETSTANDARD2_0
 #if !NETCOREAPP2_0
         void SystemEvents_PowerModeChanged(object sender, Microsoft.Win32.PowerModeChangedEventArgs e)
