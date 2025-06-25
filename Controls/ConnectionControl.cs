@@ -28,6 +28,15 @@ namespace MissionPlanner.Controls
             get { return this.cmb_Connection; }
         }
 
+        public ComboBox CMB_sysid
+        {
+            get { return this.cmb_sysid; }
+        }
+
+        public LinkLabel Label_connectionstats
+        {
+            get { return this.linkLabel1; }
+        }
 
         /// <summary>
         /// Called from the main form - set whether we are connected or not currently.
