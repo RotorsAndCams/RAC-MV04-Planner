@@ -283,22 +283,50 @@ namespace MissionPlanner.GCSViews
             timer.Start();
             */
 
-            // Quick param setters
-            flowLayoutPanel1.Controls.AddRange(new ParamSet[]
-            {
-                new ParamSet(MainV2.comPort, "RTL_ALT", "RTL altitude", 30, 1000),
-                new ParamSet(MainV2.comPort, "FENCE_ALT_MAX", "Fence maximum altitude", 10, 1000),
-            });
-
             // SurveyGrid button
             Button btn_SurveyGrid = new Button();
             btn_SurveyGrid.Text = "SurveyGrid";
             btn_SurveyGrid.Click += this.surveyGridToolStripMenuItem_Click;
-            btn_SurveyGrid.Height = 100;
-            btn_SurveyGrid.Width = 100;
+            btn_SurveyGrid.Size = new Size(100, 60);
             btn_SurveyGrid.BackColor = Color.Yellow;
             btn_SurveyGrid.ForeColor = Color.Black;
             flowLayoutPanel1.Controls.Add(btn_SurveyGrid);
+
+            // Get quick set param names
+            string quickSetParamsKey = "FP_QUICK_SET_PARAMS";
+            HashSet<string> quickSetParams;
+            if (Settings.Instance.ContainsKey(quickSetParamsKey))
+            {
+                quickSetParams = Settings.Instance.GetList(quickSetParamsKey).ToHashSet();
+            }
+            else
+            {
+                quickSetParams = new HashSet<string>()
+                {
+                    "RTL_ALT",
+                    "FENCE_ALT_MAX"
+                };
+                Settings.Instance.SetList(quickSetParamsKey, quickSetParams);
+
+                log.Info($"Config key \"{quickSetParamsKey}\" not found, using defaults");
+            }
+
+            // Add flight safety form opening button
+            Button btn_FlightSafetyForm = new Button();
+            btn_FlightSafetyForm.Name = "btn_FlightSafetyForm";
+            btn_FlightSafetyForm.Text = "More";
+            btn_FlightSafetyForm.Size = new Size(100, 60);
+            btn_FlightSafetyForm.Click += (sender, e) =>
+            {
+                FlightSafetyForm frm = new FlightSafetyForm(MainV2.comPort, quickSetParams);
+                frm.Show();
+                btn_FlightSafetyForm.Enabled = false;
+                frm.FormClosed += (sender2, e2) =>
+                {
+                    btn_FlightSafetyForm.Enabled = true;
+                };
+            };
+            flowLayoutPanel1.Controls.Add(btn_FlightSafetyForm);
         }
 
         public static FlightPlanner instance { get; set; }
@@ -344,15 +372,6 @@ namespace MissionPlanner.GCSViews
             {
                 CustomMessageBox.Show("Please fix your default alt value");
                 TXT_DefaultAlt.Text = (50 * CurrentState.multiplieralt).ToString("0");
-            }
-
-            // Update quick param setter controls
-            foreach (Control item in flowLayoutPanel1.Controls)
-            {
-                if (item is ParamSet)
-                {
-                    ((ParamSet)item).Reload();
-                }
             }
         }
 

@@ -1203,8 +1203,6 @@ namespace MissionPlanner
             this.Text = "Secop Planner 2" + " " + comPort.MAV.VersionString;
             this.ShowIcon = false;
             this.ShowInTaskbar = true;
-            
-            StateHandler.MV04StateChange += CheckFlightPlan;
 
             _comPort.ParamListChanged += _comPort_ParamListChanged;
 
