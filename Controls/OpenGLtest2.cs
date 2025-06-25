@@ -118,7 +118,7 @@ namespace MissionPlanner.Controls
             var x = ((MouseEventArgs) e).X;
             var y = ((MouseEventArgs) e).Y;
             mouseDownPos = getMousePos(x, y);
-            MainV2.comPort.setGuidedModeWP(
+            MainV2.comPort.setGuidedModeWP(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
                 new Locationwp().Set(mouseDownPos.Lat, mouseDownPos.Lng, MainV2.comPort.MAV.GuidedMode.z,
                     (ushort) MAVLink.MAV_CMD.WAYPOINT), false);
         }

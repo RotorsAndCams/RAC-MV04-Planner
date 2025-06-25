@@ -274,7 +274,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
                     try
                     {
-                        MainV2.comPort.setParam(p.Name, p.Value);
+                        MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, p.Name, p.Value);
                         p.ClearChanged();
                     }
                     catch

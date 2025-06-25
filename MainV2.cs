@@ -3237,7 +3237,7 @@ namespace MissionPlanner
                                     while (comPort.giveComport == true)
                                         Thread.Sleep(100);
 
-                                    MainV2.comPort.MAV.cs.HomeLocation = new PointLatLngAlt(MainV2.comPort.getWP(0));
+                                    MainV2.comPort.MAV.cs.HomeLocation = new PointLatLngAlt(MainV2.comPort.getWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, 0));
                                     if (MyView.current != null && MyView.current.Name == "FlightPlanner")
                                     {
                                         // update home if we are on flight data tab

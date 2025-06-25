@@ -1203,7 +1203,7 @@ namespace MissionPlanner.Log
                                 ushort count = 0;
                                 try
                                 {
-                                    count = mine.getWPCount();
+                                    count = mine.getWPCount((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent);
                                 }
                                 catch
                                 {
@@ -1240,7 +1240,7 @@ namespace MissionPlanner.Log
                                 {
                                     try
                                     {
-                                        Locationwp wp = mine.getWP(a);
+                                        Locationwp wp = mine.getWP((byte)mine.sysidcurrent, (byte)mine.compidcurrent, a);
                                         //sw.WriteLine(item + "\t" + mine.param[item]);
 
                                         sw.Write((a)); // seq

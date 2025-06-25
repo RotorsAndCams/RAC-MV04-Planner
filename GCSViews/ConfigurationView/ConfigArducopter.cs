@@ -388,7 +388,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
                         return;
                     }
 
-                    MainV2.comPort.setParam(value, (float)changes[value]);
+                    MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, value, (float)changes[value]);
 
                     changes.Remove(value);
 
@@ -464,7 +464,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
                 {
                     try
                     {
-                        MainV2.comPort.GetParam(ctl.Name);
+                        MainV2.comPort.GetParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, ctl.Name);
                     }
                     catch
                     {

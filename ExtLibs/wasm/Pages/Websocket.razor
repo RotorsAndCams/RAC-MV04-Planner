@@ -71,7 +71,7 @@
                 <button @onclick=@(async() => { await mav_mission.download(mav, mav.MAV.sysid, mav.MAV.compid, MAVLink.MAV_MISSION_TYPE.MISSION);})>Get Mission</button>
                 <button @onclick=@(async() => { await mav_mission.download(mav, mav.MAV.sysid, mav.MAV.compid, MAVLink.MAV_MISSION_TYPE.FENCE);})>Get Fence</button>
                 <button @onclick=@(async() => { await mav_mission.download(mav, mav.MAV.sysid, mav.MAV.compid, MAVLink.MAV_MISSION_TYPE.RALLY);})>Get Rally</button><br/>
-                <button @onclick=@(async() => { mav.setMode("GUIDED"); await mav.doCommandAsync(mav.MAV.sysid, mav.MAV.compid, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 2); })>TakeOff - 2m</button>
+                <button @onclick=@(async() => { mav.setMode(mav.MAV.sysid, mav.MAV.compid, "GUIDED"); await mav.doCommandAsync(mav.MAV.sysid, mav.MAV.compid, MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 2); })>TakeOff - 2m</button>
             </div>
             <div id="serverStatus" style="width: 100%; overflow-y: auto; flex-grow: 0;"></div>
         </div>

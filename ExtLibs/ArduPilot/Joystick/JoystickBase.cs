@@ -528,7 +528,7 @@ namespace MissionPlanner.Joystick
                         }, null);
                         break;
                     case buttonfunction.Digicam_Control:
-                        Interface.setDigicamControl(true);
+                        Interface.setDigicamControl(Interface.MAV.sysid, Interface.MAV.compid, true);
                         break;
                     case buttonfunction.Do_Repeat_Relay:
                         _context.Send( delegate

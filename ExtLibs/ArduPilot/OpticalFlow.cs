@@ -53,10 +53,7 @@ namespace MissionPlanner.Utilities
 
         public void CalibrationMode(bool on_off = false)
         {
-            if (on_off == true)
-                _mav.setParam("VIDEO_ONLY", 1);
-            else
-                _mav.setParam("VIDEO_ONLY", 0);
+            _mav.setParam(_mav.MAV.sysid, _mav.MAV.compid, "VIDEO_ONLY", on_off ? 1 : 0);
         }
 
         private bool ReceviedPacket(MAVLink.MAVLinkMessage arg)

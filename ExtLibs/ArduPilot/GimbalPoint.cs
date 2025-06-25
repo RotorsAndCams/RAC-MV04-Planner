@@ -1,4 +1,6 @@
 ﻿using System;
+using static alglib;
+using static MAVLink;
 
 namespace MissionPlanner.Utilities
 {

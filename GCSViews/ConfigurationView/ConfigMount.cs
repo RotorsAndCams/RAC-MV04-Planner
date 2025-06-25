@@ -181,7 +181,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
                     if (ans == number)
                     {
-                        MainV2.comPort.setParam(item + "_FUNCTION", 0);
+                        MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, item + "_FUNCTION", 0);
                     }
                 }
             }
@@ -208,7 +208,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
                 else
                 {
                     ensureDisabled(CMB_shuttertype, 10);
-                    MainV2.comPort.setParam(CMB_shuttertype.Text + "_FUNCTION", 10);
+                    MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, CMB_shuttertype.Text + "_FUNCTION", 10);
                     // servo
                     MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "CAM_TRIGG_TYPE", 0);
                 }
@@ -237,7 +237,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
             if (mavlinkComboBoxTilt.Text != "Disable")
             {
-                MainV2.comPort.setParam(mavlinkComboBoxTilt.Text + "_FUNCTION", 7);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, mavlinkComboBoxTilt.Text + "_FUNCTION", 7);
                 //MainV2.MainV2.comPort.setParam(ParamHead+"STAB_TILT", 1);
             }
             else
@@ -265,7 +265,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
             if (mavlinkComboBoxRoll.Text != "Disable")
             {
-                MainV2.comPort.setParam(mavlinkComboBoxRoll.Text + "_FUNCTION", 8);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, mavlinkComboBoxRoll.Text + "_FUNCTION", 8);
                 //MainV2.comPort.setParam(ParamHead+"STAB_ROLL", 1);
             }
             else
@@ -292,7 +292,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
             if (mavlinkComboBoxPan.Text != "Disable")
             {
-                MainV2.comPort.setParam(mavlinkComboBoxPan.Text + "_FUNCTION", 6);
+                MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, mavlinkComboBoxPan.Text + "_FUNCTION", 6);
             }
             else
             {
@@ -357,7 +357,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
                 // enable 3 axis stabilize
                 if (MainV2.comPort.MAV.param.ContainsKey(ParamHead + "MODE"))
-                    MainV2.comPort.setParam(ParamHead + "MODE", 3);
+                    MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, ParamHead + "MODE", 3);
 
                 updateShutter();
                 updatePitch();

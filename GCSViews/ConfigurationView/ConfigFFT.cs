@@ -52,7 +52,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
         private void RangeControl1OnValueChanged(object sender, string name, string value)
         {
-            MainV2.comPort.setParam(name, double.Parse(value));
+            MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, name, double.Parse(value));
         }
 
         public void Activate()

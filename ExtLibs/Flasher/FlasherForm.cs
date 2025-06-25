@@ -483,7 +483,7 @@ namespace Flasher
 
                     mav.getHeartBeat();
 
-                    mav.doCommand(MAVLink.MAV_CMD.FLASH_BOOTLOADER, 0, 0, 0, 0, 290876, 0, 0, false);
+                    mav.doCommand((byte)mav.sysidcurrent, (byte)mav.compidcurrent, MAVLink.MAV_CMD.FLASH_BOOTLOADER, 0, 0, 0, 0, 290876, 0, 0, false);
 
                     mav.getHeartBeat();
                     if (!bldone) mav.getHeartBeat();

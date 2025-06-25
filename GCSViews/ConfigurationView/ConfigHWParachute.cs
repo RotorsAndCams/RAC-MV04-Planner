@@ -51,7 +51,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
             ensureDisabled((ComboBox)sender, 27, mavlinkComboBoxServoNum.Text);
 
-            MainV2.comPort.setParam(mavlinkComboBoxServoNum.Text + "_FUNCTION", 27);
+            MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, mavlinkComboBoxServoNum.Text + "_FUNCTION", 27);
         }
 
         private void ensureDisabled(ComboBox cmb, int number, string exclude = "")
@@ -67,7 +67,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
                     if (ans == number)
                     {
-                        MainV2.comPort.setParam(item + "_FUNCTION", 0);
+                        MainV2.comPort.setParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, item + "_FUNCTION", 0);
                     }
                 }
             }

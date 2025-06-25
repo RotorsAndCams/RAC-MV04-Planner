@@ -618,11 +618,11 @@ namespace MissionPlanner
                 float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
                 Settings.Instance["takeoff_alt"] = takeoffAlt.ToString(CultureInfo.InvariantCulture);
 
-                MainV2.comPort.setMode("Stabilize");
+                MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "Stabilize");
 
-                if (MainV2.comPort.doARM(true))
+                if (MainV2.comPort.doARM((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, true))
                 {
-                    MainV2.comPort.setMode("GUIDED");
+                    MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "GUIDED");
 
                     Thread.Sleep(300);
 
@@ -671,7 +671,7 @@ namespace MissionPlanner
         {
             var paramname = MainV2.comPort.MAV.param.ContainsKey("GND_ABS_PRESS") ? "GND_ABS_PRESS" : "BARO1_GND_PRESS";
 
-            var currentQNH = MainV2.comPort.GetParam(paramname).ToString();
+            var currentQNH = MainV2.comPort.GetParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, paramname).ToString();
 
             if (InputBox.Show("QNH", "Enter the QNH in pascals (103040 = 1030.4 hPa)", ref currentQNH) ==
                 DialogResult.OK)
@@ -1188,7 +1188,7 @@ namespace MissionPlanner
         private void but_disablearmswitch_Click(object sender, EventArgs e)
         {
             if (CustomMessageBox.Show("Are you sure?", "", MessageBoxButtons.YesNo) == (int)DialogResult.Yes)
-                MainV2.comPort.setMode(
+                MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
                     new MAVLink.mavlink_set_mode_t()
                     {
                         custom_mode = (MainV2.comPort.MAV.cs.sensors_enabled.motor_control == true && MainV2.comPort.MAV.cs.sensors_enabled.seen) ? 1u : 0u,
@@ -1249,7 +1249,7 @@ namespace MissionPlanner
         {
             var paramname = MainV2.comPort.MAV.param.ContainsKey("GND_ABS_PRESS") ? "GND_ABS_PRESS" : "BARO1_GND_PRESS";
 
-            var currentQNH = MainV2.comPort.GetParam(paramname).ToString();
+            var currentQNH = MainV2.comPort.GetParam((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, paramname).ToString();
             //338.6388 pa => 100' = 30.48m
             CustomMessageBox.Show("use at your own risk!!!");
 
