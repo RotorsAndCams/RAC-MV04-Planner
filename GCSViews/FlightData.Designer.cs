@@ -189,6 +189,7 @@ namespace MissionPlanner.GCSViews
             this.flyToHereAltToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectDropTargetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.flyToCoordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dropToCoordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addPoiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -2439,6 +2440,7 @@ namespace MissionPlanner.GCSViews
             this.flyToHereAltToolStripMenuItem,
             this.selectDropTargetToolStripMenuItem,
             this.flyToCoordsToolStripMenuItem,
+            this.dropToCoordsToolStripMenuItem,
             this.addPoiToolStripMenuItem,
             this.pointCameraHereToolStripMenuItem,
             this.PointCameraCoordsToolStripMenuItem1,
@@ -2469,6 +2471,13 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.selectDropTargetToolStripMenuItem, "selectDropTargetToolStripMenuItem");
             this.selectDropTargetToolStripMenuItem.Text = "Select Drop Position";
             this.selectDropTargetToolStripMenuItem.Click += new System.EventHandler(this.selectDropTargetToolStripMenuItem_Click);
+            // 
+            // dropToCoordsToolStripMenuItem
+            // 
+            this.dropToCoordsToolStripMenuItem.Name = "dropToCoordsToolStripMenuItem";
+            resources.ApplyResources(this.dropToCoordsToolStripMenuItem, "dropToCoordsToolStripMenuItem");
+            this.dropToCoordsToolStripMenuItem.Text = "Drop To Coords";
+            this.dropToCoordsToolStripMenuItem.Click += new System.EventHandler(this.dropToCoordsToolStripMenuItem_Click);
             // 
             // flyToCoordsToolStripMenuItem
             // 
@@ -3091,6 +3100,7 @@ namespace MissionPlanner.GCSViews
         private Controls.QuickView quickView5;
         private System.Windows.Forms.ToolStripMenuItem poiatcoordsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem flyToCoordsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dropToCoordsToolStripMenuItem;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.ToolStripMenuItem setBatteryCellCountToolStripMenuItem;

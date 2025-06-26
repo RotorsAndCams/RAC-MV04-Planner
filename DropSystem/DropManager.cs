@@ -12,12 +12,18 @@ using System.Web.UI.WebControls;
 using GMap.NET;
 using MissionPlanner;
 using MissionPlanner.Utilities;
+using System.Diagnostics;
 //using System.Device.Location; // for GeoCoordinate
 
 namespace MissionPlanner.DropSystem
 {
     public class DropManager : IDisposable
     {
+        private Stopwatch _cycleStopwatch = new Stopwatch();
+        private int _cycleCounter = 0;
+        private DateTime _lastLogTime = DateTime.Now;
+
+
         // Fixed target position
         public PointLatLng? TargetLocation { get; private set; }
 
@@ -98,6 +104,8 @@ namespace MissionPlanner.DropSystem
         // A method that handles each timer tick
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            //_cycleStopwatch.Restart();
+
             // no target, do nothing
             if (!TargetLocation.HasValue) return;
 
@@ -107,19 +115,19 @@ namespace MissionPlanner.DropSystem
             double vy = MainV2.comPort.MAV.cs.vy;
             // Horizontal speed
             double vHoriz = Math.Sqrt(vx * vx + vy * vy);
-            System.Diagnostics.Debug.WriteLine("vHoriz: " + vHoriz);
+            //System.Diagnostics.Debug.WriteLine("vHoriz: " + vHoriz);
 
             double currLat = MainV2.comPort.MAV.cs.lat;
             double currLng = MainV2.comPort.MAV.cs.lng;
             var currentLocation = new PointLatLng(currLat, currLng);
-            System.Diagnostics.Debug.WriteLine("currLat: " + currLat);
-            System.Diagnostics.Debug.WriteLine("currLng: " + currLng);
+            //System.Diagnostics.Debug.WriteLine("currLat: " + currLat);
+            //System.Diagnostics.Debug.WriteLine("currLng: " + currLng);
 
             // Compute flying angle
             // Degrees needed, 0 deg = North
             double bearingRad = Math.Atan2(vy, vx);
             double bearingDeg = ((bearingRad * 180.0 / Math.PI) + 360.0) % 360;
-            System.Diagnostics.Debug.WriteLine("bearingDeg: " + bearingDeg);
+            //System.Diagnostics.Debug.WriteLine("bearingDeg: " + bearingDeg);
 
             // Compute impact point
             var impactPoint = DroppingCalculator.ComputeImpactPoint(
@@ -131,6 +139,24 @@ namespace MissionPlanner.DropSystem
             CurrentImpact = impactPoint;
 
             ImpactUpdated?.Invoke(impactPoint);
+
+            //if (!_hasDropped)
+            //{
+            //    if (CheckRange())
+            //    {
+            //        DropNow();
+            //    }
+            //}
+
+            //_cycleStopwatch.Stop();
+            //_cycleCounter++;
+
+            //if ((DateTime.Now - _lastLogTime).TotalSeconds >= 1)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"[DropManager] Cycles/sec: {_cycleCounter}, Last cycle time: {_cycleStopwatch.ElapsedMilliseconds} ms");
+            //    _cycleCounter = 0;
+            //    _lastLogTime = DateTime.Now;
+            //}
         }
 
         public bool CheckRange()
@@ -138,7 +164,7 @@ namespace MissionPlanner.DropSystem
             if (_hasDropped || !CurrentImpact.HasValue || !TargetLocation.HasValue)
                 return false;
             double distanceInMeters = DroppingCalculator.HaversineDistance(TargetLocation.Value, CurrentImpact.Value);
-
+            System.Diagnostics.Debug.WriteLine($"[DropManager] Distance to target: {distanceInMeters} m");
             // Acceptable precision radius in meters
             //const double epsilon = 2.0;
 
@@ -158,7 +184,7 @@ namespace MissionPlanner.DropSystem
                 (byte)MainV2.comPort.sysidcurrent,
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
-                6,     // servo number
+                9,     // servo number
                 1450,  // pwm value
                 0, 0, 0, 0, 0);
             //MainV2.comPort.doCommand(
@@ -175,7 +201,7 @@ namespace MissionPlanner.DropSystem
                 (byte)MainV2.comPort.sysidcurrent,
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
-                6,     // servo number
+                9,     // servo number
                 1800,  // pwm value
                 0, 0, 0, 0, 0);
                 //MainV2.comPort.doCommand(

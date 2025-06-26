@@ -87,5 +87,21 @@ namespace MissionPlanner.Utilities
 
             return impactPoint;
         }
+
+        public static double Bearing(PointLatLng p1, PointLatLng p2)
+        {
+            double lat1 = p1.Lat * Math.PI / 180.0;
+            double lon1 = p1.Lng * Math.PI / 180.0;
+            double lat2 = p2.Lat * Math.PI / 180.0;
+            double lon2 = p2.Lng * Math.PI / 180.0;
+
+            double dLon = lon2 - lon1;
+            double y = Math.Sin(dLon) * Math.Cos(lat2);
+            double x = Math.Cos(lat1) * Math.Sin(lat2) -
+                       Math.Sin(lat1) * Math.Cos(lat2) * Math.Cos(dLon);
+
+            double brng = Math.Atan2(y, x);
+            return (brng * 180.0 / Math.PI + 360) % 360;
+        }
     }
 }

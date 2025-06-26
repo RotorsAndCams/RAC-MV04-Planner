@@ -258,7 +258,7 @@ namespace MissionPlanner.GCSViews
                         if (_dropManager.CheckRange())
                         {
                             _dropManager.DropNow();
-                            
+                            //_dropMarkerLayer.ShowImpact(impactPoint);
                         }
                         else
                         {
@@ -2989,6 +2989,71 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+        private void dropToCoordsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var location = "";
+            InputBox.Show("Enter Drop To Coords", "Please enter the coords 'lat;long;alt' or 'lat;long'", ref location);
+
+            var split = location.Split(';');
+
+            if (split.Length == 3)
+            {
+                // Getting target position
+                var targetLat = float.Parse(split[0], CultureInfo.InvariantCulture);
+                var targetLng = float.Parse(split[1], CultureInfo.InvariantCulture);
+                var targetAlt = float.Parse(split[2], CultureInfo.InvariantCulture);
+
+                // Getting target position
+                var targetPt = new PointLatLng(targetLat, targetLng);
+
+                // Getting current drone position
+                double currLat = MainV2.comPort.MAV.cs.lat;
+                double currLng = MainV2.comPort.MAV.cs.lng;
+                var currentLocation = new PointLatLng(currLat, currLng);
+
+                // Calculate bearing and offset
+                double bearing = DroppingCalculator.Bearing(currentLocation, targetPt);
+                double offset = 30; // UAV fly through the drop target position
+                var actualWaypoint = DroppingCalculator.OffsetPoint(targetPt, offset, bearing);
+
+                CustomMessageBox.Show("Drop target set at: \n lat: " + targetLat + "\n" +
+                    " long: " + targetLng + "\n alt: " +
+                    targetAlt);
+
+                // New fixed landing target
+                _dropManager.SetTarget(targetPt);
+                //Clear any other layer (impact or drop)
+                _dropMarkerLayer.ClearAll();
+                //Show the red target marker
+                _dropMarkerLayer.ShowTarget(targetPt);
+                // Start the dropping sequence
+                _dropManager.Start();
+
+                Locationwp gotohere = new Locationwp();
+
+                gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+                gotohere.alt = (float)targetAlt; // back to m
+                gotohere.lat = actualWaypoint.Lat;
+                gotohere.lng = actualWaypoint.Lng;
+
+                try
+                {
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
+                }
+                catch (Exception ex)
+                {
+                    CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+                }
+            }
+            
+            else
+            {
+                CustomMessageBox.Show(Strings.InvalidField, Strings.ERROR);
+            }
+        }
+
+
+
         private void selectDropTargetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string alt = "100";
@@ -3022,30 +3087,46 @@ namespace MissionPlanner.GCSViews
 
             MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
 
-            MainV2.comPort.MAV.GuidedMode.x = (int)(MouseDownStart.Lat * 1e7);
-            MainV2.comPort.MAV.GuidedMode.y = (int)(MouseDownStart.Lng * 1e7);
+            
+
+            //MainV2.comPort.MAV.GuidedMode.x = (int)(MouseDownStart.Lat * 1e7);
+            //MainV2.comPort.MAV.GuidedMode.y = (int)(MouseDownStart.Lng * 1e7);
+
+            // Getting target position
+            double targetLat = MouseDownStart.Lat;
+            double targetLng = MouseDownStart.Lng;
+            var targetPt = new PointLatLng(targetLat, targetLng);
+
+            
+
+            // Getting current drone position
+            double currLat = MainV2.comPort.MAV.cs.lat;
+            double currLng = MainV2.comPort.MAV.cs.lng;
+            var currentLocation = new PointLatLng(currLat, currLng);
+
+            // Calculate bearing and offset
+            double bearing = DroppingCalculator.Bearing(currentLocation, targetPt);
+            double offset = 30; // UAV fly through the drop target position
+            var actualWaypoint = DroppingCalculator.OffsetPoint(targetPt, offset, bearing);
+
+            MainV2.comPort.MAV.GuidedMode.x = (int)(actualWaypoint.Lat * 1e7);
+            MainV2.comPort.MAV.GuidedMode.y = (int)(actualWaypoint.Lng * 1e7);
 
             MainV2.comPort.MAV.GuidedMode.z = intalt / CurrentState.multiplieralt;
 
             if (MainV2.comPort.MAV.cs.mode.ToLower() == "guided")
             {
-                CustomMessageBox.Show("Drop target set at: \n lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 + "\n" +
-                    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + "\n alt: " +
+                CustomMessageBox.Show("Drop target set at: \n lat: " + targetLat + "\n" +
+                    " long: " + targetLng + "\n alt: " +
                     MainV2.comPort.MAV.GuidedMode.z);
-
-                double lat = MainV2.comPort.MAV.GuidedMode.x / 1e7;
-                double lng = MainV2.comPort.MAV.GuidedMode.y / 1e7;
-                var targetPt = new PointLatLng(lat, lng);
 
                 // New fixed landing target
                 _dropManager.SetTarget(targetPt);
-
                 //Clear any other layer (impact or drop)
                 _dropMarkerLayer.ClearAll();
-
                 //Show the red target marker
                 _dropMarkerLayer.ShowTarget(targetPt);
-
+                // Start the dropping sequence
                 _dropManager.Start();
 
 
@@ -6135,6 +6216,8 @@ namespace MissionPlanner.GCSViews
                 CustomMessageBox.Show(Strings.InvalidField, Strings.ERROR);
             }
         }
+
+       
 
         private void poiatcoordsToolStripMenuItem_Click(object sender, EventArgs e)
         {
