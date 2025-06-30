@@ -257,11 +257,13 @@ namespace MissionPlanner.GCSViews
                     {
                         if (_dropManager.CheckRange())
                         {
+                            System.Diagnostics.Debug.WriteLine("Check range()-ben");
                             _dropManager.DropNow();
                             //_dropMarkerLayer.ShowImpact(impactPoint);
                         }
                         else
                         {
+                            System.Diagnostics.Debug.WriteLine("Elseben()");
                             _dropMarkerLayer.ShowImpact(impactPoint);
                         }
                     }
@@ -2989,19 +2991,27 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private void dropToCoordsToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void dropToCoordsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var location = "";
-            InputBox.Show("Enter Drop To Coords", "Please enter the coords 'lat;long;alt' or 'lat;long'", ref location);
+            InputBox.Show("Enter 3 Drop To Coords", "Please enter the coords in a format 'lat1;long1;alt1 | lat2;long2;alt2 | lat3;long3;alt3'", ref location);
 
-            var split = location.Split(';');
+            var allCoords = location.Split('|');
 
-            if (split.Length == 3)
+            if (allCoords.Length > 3)
             {
+                CustomMessageBox.Show("Invalid number of coordinates. Please enter exactly 3 targets.", Strings.ERROR);
+                return;
+            }
+
+            for (int i = 0; i < allCoords.Length; i++)
+            {
+                var split = allCoords[i].Trim().Split(';');
+
                 // Getting target position
-                var targetLat = float.Parse(split[0], CultureInfo.InvariantCulture);
-                var targetLng = float.Parse(split[1], CultureInfo.InvariantCulture);
-                var targetAlt = float.Parse(split[2], CultureInfo.InvariantCulture);
+                float targetLat = float.Parse(split[0], CultureInfo.InvariantCulture);
+                float targetLng = float.Parse(split[1], CultureInfo.InvariantCulture);
+                float targetAlt = float.Parse(split[2], CultureInfo.InvariantCulture);
 
                 // Getting target position
                 var targetPt = new PointLatLng(targetLat, targetLng);
@@ -3011,46 +3021,84 @@ namespace MissionPlanner.GCSViews
                 double currLng = MainV2.comPort.MAV.cs.lng;
                 var currentLocation = new PointLatLng(currLat, currLng);
 
+
                 // Calculate bearing and offset
                 double bearing = DroppingCalculator.Bearing(currentLocation, targetPt);
                 double offset = 30; // UAV fly through the drop target position
                 var actualWaypoint = DroppingCalculator.OffsetPoint(targetPt, offset, bearing);
 
-                CustomMessageBox.Show("Drop target set at: \n lat: " + targetLat + "\n" +
-                    " long: " + targetLng + "\n alt: " +
-                    targetAlt);
-
-                // New fixed landing target
-                _dropManager.SetTarget(targetPt);
-                //Clear any other layer (impact or drop)
-                _dropMarkerLayer.ClearAll();
-                //Show the red target marker
-                _dropMarkerLayer.ShowTarget(targetPt);
-                // Start the dropping sequence
-                _dropManager.Start();
-
-                Locationwp gotohere = new Locationwp();
-
-                gotohere.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
-                gotohere.alt = (float)targetAlt; // back to m
-                gotohere.lat = actualWaypoint.Lat;
-                gotohere.lng = actualWaypoint.Lng;
-
-                try
+                if (MainV2.comPort.MAV.cs.mode.ToLower() == "guided")
                 {
-                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
-                }
-                catch (Exception ex)
-                {
-                    CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
-                }
+                    //CustomMessageBox.Show("Drop target set at: \n lat: " + targetLat + "\n" +
+                    //" long: " + targetLng + "\n alt: " +
+                    //targetAlt);
+
+                    // New fixed landing target
+                    //_dropManager.SetTarget(targetPt);
+                    //Clear any other layer (impact or drop)
+                    _dropMarkerLayer.ClearAll();
+                    //Show the red target marker
+                    _dropMarkerLayer.ShowTarget(targetPt);
+                    // Set servo channel
+                    _dropManager.SetServoChannel(9 + i); //9, 10, 11
+                    // Start the dropping sequence
+                    //_dropManager.Start();
+
+                    _dropManager.SetNextTarget(targetPt, targetAlt);
+
+                    var gotohere = new Locationwp
+                    {
+                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
+                        alt = targetAlt,
+                        lat = actualWaypoint.Lat,
+                        lng = actualWaypoint.Lng
+                    };
+
+                    //try
+                    //{
+                    //    MainV2.comPort.setGuidedModeWP(
+                    //        (byte)MainV2.comPort.sysidcurrent,
+                    //        (byte)MainV2.comPort.compidcurrent,
+                    //        gotohere);
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
+                    //}
+
+                    for (int j = 0; j <= 5; j++)
+                    {
+                        MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
+                    }
+
+                    // now asynchronously wait  
+                    await WaitForDropAsync();
+
+                    // optional delay
+                    await Task.Delay(500);
+                } 
             }
-            
-            else
-            {
-                CustomMessageBox.Show(Strings.InvalidField, Strings.ERROR);
-            }
+                       
+            //else
+            //{
+            //    CustomMessageBox.Show(Strings.InvalidField, Strings.ERROR);
+            //}
         }
+
+        private Task WaitForDropAsync()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            void Handler(PointLatLng p)
+            {
+                _dropManager.OnDropped -= Handler;
+                tcs.TrySetResult(true);
+            }
+
+            _dropManager.OnDropped += Handler;
+            return tcs.Task;
+        }
+
 
 
 

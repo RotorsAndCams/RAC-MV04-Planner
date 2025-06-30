@@ -33,6 +33,10 @@ namespace MissionPlanner.DropSystem
         // The position where the drone dropped
         public PointLatLng? ActualDropLocation { get; private set; }
 
+        // The next position we want to drop to
+        public PointLatLng? NextTarget { get; private set; }
+        public float NextTargetAlt {  get; private set; }
+
         // Fired whenever CurrentImpact is updated
         public event Action<PointLatLng> ImpactUpdated;
 
@@ -48,6 +52,10 @@ namespace MissionPlanner.DropSystem
         // Private, don't want to change it from outside, BUT we need to read it outside: HasDropped function can reach it for readonly
         private bool _hasDropped = false;
         public bool HasDropped => _hasDropped;
+
+        // Servo channel
+        private int _servoChannel = 9;
+
 
         public DropManager()
         {
@@ -93,10 +101,10 @@ namespace MissionPlanner.DropSystem
                 OnDropped?.Invoke(ActualDropLocation.Value);
 
                 TriggerServo(); // DROP
-                MainV2.comPort.setMode(
-                    (byte)MainV2.comPort.sysidcurrent,
-                    (byte)MainV2.comPort.compidcurrent,
-                    "RTL");
+            //    MainV2.comPort.setMode(
+            //        (byte)MainV2.comPort.sysidcurrent,
+            //        (byte)MainV2.comPort.compidcurrent,
+            //        "RTL");
             }
         }
 
@@ -107,7 +115,32 @@ namespace MissionPlanner.DropSystem
             //_cycleStopwatch.Restart();
 
             // no target, do nothing
-            if (!TargetLocation.HasValue) return;
+            //if (!TargetLocation.HasValue) return;
+            if (!NextTarget.HasValue) return;
+
+            // Getting current drone position
+            double currLat = MainV2.comPort.MAV.cs.lat;
+            double currLng = MainV2.comPort.MAV.cs.lng;
+            var currentLocation = new PointLatLng(currLat, currLng);
+
+
+            // Calculate bearing and offset
+            double bearing = DroppingCalculator.Bearing(currentLocation, NextTarget.Value);
+            double offset = 30; // UAV fly through the drop target position
+            var actualWaypoint = DroppingCalculator.OffsetPoint(NextTarget.Value, offset, bearing);
+
+            // 4) Send that as a repeated guided waypoint
+            var wp = new Locationwp
+            {
+                id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
+                alt = NextTargetAlt,
+                lat = actualWaypoint.Lat,
+                lng = actualWaypoint.Lng
+            };
+            MainV2.comPort.setGuidedModeWP(
+                (byte)MainV2.comPort.sysidcurrent,
+                (byte)MainV2.comPort.compidcurrent,
+                wp);
 
             // Read telemetry
             double altAGL = MainV2.comPort.MAV.cs.alt;
@@ -117,9 +150,9 @@ namespace MissionPlanner.DropSystem
             double vHoriz = Math.Sqrt(vx * vx + vy * vy);
             //System.Diagnostics.Debug.WriteLine("vHoriz: " + vHoriz);
 
-            double currLat = MainV2.comPort.MAV.cs.lat;
-            double currLng = MainV2.comPort.MAV.cs.lng;
-            var currentLocation = new PointLatLng(currLat, currLng);
+            //double currLat = MainV2.comPort.MAV.cs.lat;
+            //double currLng = MainV2.comPort.MAV.cs.lng;
+            //var currentLocation = new PointLatLng(currLat, currLng);
             //System.Diagnostics.Debug.WriteLine("currLat: " + currLat);
             //System.Diagnostics.Debug.WriteLine("currLng: " + currLng);
 
@@ -139,7 +172,7 @@ namespace MissionPlanner.DropSystem
             CurrentImpact = impactPoint;
 
             ImpactUpdated?.Invoke(impactPoint);
-
+            System.Diagnostics.Debug.WriteLine("Event raised");
             //if (!_hasDropped)
             //{
             //    if (CheckRange())
@@ -161,9 +194,9 @@ namespace MissionPlanner.DropSystem
 
         public bool CheckRange()
         {
-            if (_hasDropped || !CurrentImpact.HasValue || !TargetLocation.HasValue)
+            if (_hasDropped || !CurrentImpact.HasValue || !NextTarget.HasValue)
                 return false;
-            double distanceInMeters = DroppingCalculator.HaversineDistance(TargetLocation.Value, CurrentImpact.Value);
+            double distanceInMeters = DroppingCalculator.HaversineDistance(NextTarget.Value, CurrentImpact.Value);
             System.Diagnostics.Debug.WriteLine($"[DropManager] Distance to target: {distanceInMeters} m");
             // Acceptable precision radius in meters
             //const double epsilon = 2.0;
@@ -184,7 +217,7 @@ namespace MissionPlanner.DropSystem
                 (byte)MainV2.comPort.sysidcurrent,
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
-                9,     // servo number
+                _servoChannel,     // servo number
                 1450,  // pwm value
                 0, 0, 0, 0, 0);
             //MainV2.comPort.doCommand(
@@ -201,7 +234,7 @@ namespace MissionPlanner.DropSystem
                 (byte)MainV2.comPort.sysidcurrent,
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
-                9,     // servo number
+                _servoChannel,     // servo number
                 1800,  // pwm value
                 0, 0, 0, 0, 0);
                 //MainV2.comPort.doCommand(
@@ -213,6 +246,20 @@ namespace MissionPlanner.DropSystem
             });
             _hasDropped = true;
             _timer.Stop();
+        }
+
+        // Set servo channel
+        public void SetServoChannel(int channel)
+        {
+            _servoChannel = channel;
+        }
+
+        public void SetNextTarget(PointLatLng pt, float alt)
+        {
+            NextTarget = pt;
+            NextTargetAlt = alt;
+            _hasDropped = false;
+            Start();
         }
 
         
