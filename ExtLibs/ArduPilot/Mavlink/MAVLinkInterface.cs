@@ -221,6 +221,8 @@ namespace MissionPlanner
             }
         }
 
+        public event EventHandler<SetModeEventArgs> SetModeEvent;
+
         public static byte gcssysid { get; set; } = 255;
 
         private string lastset = "";
@@ -4521,14 +4523,14 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             setMode(MAV.sysid, MAV.compid, modein);
         }
 
-        public void setMode(byte sysid, byte compid, string modein)
+        public void setMode(byte sysid, byte compid, string modein, bool mv04_camera_mode = false)
         {
             mavlink_set_mode_t mode = new mavlink_set_mode_t();
 
             if (translateMode(sysid, compid, modein, ref mode))
             {
                 log.Info("setMode " + modein + " (" + mode.custom_mode + ")");
-                setMode(sysid, compid, mode);
+                setMode(sysid, compid, mode, 0, mv04_camera_mode);
             }
         }
 
@@ -4538,7 +4540,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             setMode(MAV.sysid, MAV.compid, mode, base_mode);
         }
 
-        public void setMode(byte sysid, byte compid, mavlink_set_mode_t mode, MAV_MODE_FLAG base_mode = 0)
+        public void setMode(byte sysid, byte compid, mavlink_set_mode_t mode, MAV_MODE_FLAG base_mode = 0, bool mv04_camera_mode = false)
         {
             mode.base_mode |= (byte) base_mode;
 
@@ -4549,6 +4551,16 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             generatePacket((byte) (byte) MAVLINK_MSG_ID.SET_MODE, mode, sysid, compid);
             Thread.Sleep(10);
             generatePacket((byte) (byte) MAVLINK_MSG_ID.SET_MODE, mode, sysid, compid);
+
+            TriggerSetModeEvent(mode, mv04_camera_mode);
+        }
+
+        public void TriggerSetModeEvent(mavlink_set_mode_t mode, bool mv04_camera_mode)
+        {
+            if (SetModeEvent != null)
+            {
+                SetModeEvent(null, new SetModeEventArgs(mode, mv04_camera_mode));
+            }
         }
 
         private double t7 = 1.0e7;
@@ -6776,6 +6788,18 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             {
                 log.Info(progress + "% " + status);
             }
+        }
+    }
+
+    public class SetModeEventArgs : EventArgs
+    {
+        public MAVLink.mavlink_set_mode_t Mode { get; set; }
+        public bool MV04CameraMode { get; set; }
+
+        public SetModeEventArgs(MAVLink.mavlink_set_mode_t mode, bool mv04_camera_mode)
+        {
+            Mode = mode;
+            MV04CameraMode = mv04_camera_mode;
         }
     }
 }
