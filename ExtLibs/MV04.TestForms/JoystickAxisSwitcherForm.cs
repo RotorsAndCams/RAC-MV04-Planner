@@ -14,12 +14,12 @@ namespace MV04.TestForms
             InitializeComponent();
             this.joystick = joystick;
 
-            comboBox_Modes.DataSource = Enum.GetNames(typeof(MV04_JoyFlightMode));
+            comboBox_Modes.DataSource = Enum.GetNames(typeof(MV04_JoyMode));
         }
 
         private void button_Set_Click(object sender, EventArgs e)
         {
-            MV04_JoyFlightMode mode = (MV04_JoyFlightMode)comboBox_Modes.SelectedIndex;
+            MV04_JoyMode mode = (MV04_JoyMode)comboBox_Modes.SelectedIndex;
 
             if (joystick.enabled)
             {

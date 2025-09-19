@@ -75,12 +75,10 @@ namespace MV04.Joystick
         Cam_Yaw
     }
 
-    public enum MV04_JoyFlightMode
+    public enum MV04_JoyMode
     {
-        Manual,
-        TapToFly,
-        Auto,
-        Follow
+        UAV,
+        Camera
     }
 
     #endregion
@@ -103,9 +101,9 @@ namespace MV04.Joystick
 
     public class JoystickModeChangedEventArgs: EventArgs
     {
-        public MV04_JoyFlightMode Mode { get; set; }
+        public MV04_JoyMode Mode { get; set; }
 
-        public JoystickModeChangedEventArgs(MV04_JoyFlightMode mode)
+        public JoystickModeChangedEventArgs(MV04_JoyMode mode)
         {
             Mode = mode;
         }
@@ -153,15 +151,13 @@ namespace MV04.Joystick
         /// <summary>
         /// Return a set of joystick axes paired to RC channels for the given mode
         /// </summary>
-        public static Dictionary<int, int> GetAxisSet(MV04_JoyFlightMode mode)
+        public static Dictionary<int, int> GetAxisSet(MV04_JoyMode mode)
         {
             Dictionary<int, int> result = new Dictionary<int, int>();
 
             switch (mode)
             {
-                case MV04_JoyFlightMode.TapToFly:
-                case MV04_JoyFlightMode.Auto:
-                case MV04_JoyFlightMode.Follow:
+                case MV04_JoyMode.Camera:
                     // Cam control only
                     result[1] = NoneAxis;                                       // UAV Roll
                     result[2] = NoneAxis;                                       // UAV Pitch
@@ -172,7 +168,7 @@ namespace MV04.Joystick
                     result[7] = GetAxisForJoyRole(MV04_JoyRole.UAV_Yaw);        // Cam Yaw
                     break;
                 
-                case MV04_JoyFlightMode.Manual:
+                case MV04_JoyMode.UAV:
                 default:
                     // UAV control only
                     result[1] = GetAxisForJoyRole(MV04_JoyRole.UAV_Roll);       // UAV Roll
@@ -191,7 +187,7 @@ namespace MV04.Joystick
         /// <summary>
         /// Trigger a JoystickModeChanged event with the given parameters
         /// </summary>
-        public static void TriggerJoystickModeChangedEvent(MV04_JoyFlightMode mode)
+        public static void TriggerJoystickModeChangedEvent(MV04_JoyMode mode)
         {
             if (JoystickModeChanged != null)
             {
