@@ -618,11 +618,11 @@ namespace MissionPlanner
                 float takeoffAlt = float.Parse(Settings.Instance["takeoff_alt", "10"], CultureInfo.InvariantCulture);
                 Settings.Instance["takeoff_alt"] = takeoffAlt.ToString(CultureInfo.InvariantCulture);
 
-                MainV2.comPort.setMode("Stabilize");
+                MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "Stabilize");
 
                 if (MainV2.comPort.doARM(true))
                 {
-                    MainV2.comPort.setMode("GUIDED");
+                    MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "GUIDED");
 
                     Thread.Sleep(300);
 
@@ -1189,6 +1189,7 @@ namespace MissionPlanner
         {
             if (CustomMessageBox.Show("Are you sure?", "", MessageBoxButtons.YesNo) == (int)DialogResult.Yes)
                 MainV2.comPort.setMode(
+                    MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
                     new MAVLink.mavlink_set_mode_t()
                     {
                         custom_mode = (MainV2.comPort.MAV.cs.sensors_enabled.motor_control == true && MainV2.comPort.MAV.cs.sensors_enabled.seen) ? 1u : 0u,

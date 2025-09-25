@@ -148,7 +148,7 @@ namespace MissionPlanner
 
         public bool ChangeMode(string mode)
         {
-            MainV2.comPort.setMode(mode);
+            MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, mode);
             return true;
         }
 

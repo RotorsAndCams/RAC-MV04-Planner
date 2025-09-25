@@ -1399,7 +1399,7 @@ namespace MissionPlanner.GCSViews
             try
             {
                 ((Control) sender).Enabled = false;
-                MainV2.comPort.setMode("Auto");
+                MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "Auto");
             }
             catch
             {
@@ -1418,7 +1418,7 @@ namespace MissionPlanner.GCSViews
                     MainV2.comPort.MAV.cs.firmware == Firmwares.Ateryx ||
                     MainV2.comPort.MAV.cs.firmware == Firmwares.ArduRover ||
                     MainV2.comPort.MAV.cs.firmware == Firmwares.ArduCopter2)
-                    MainV2.comPort.setMode("Loiter");
+                    MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "Loiter");
             }
             catch
             {
@@ -1433,7 +1433,7 @@ namespace MissionPlanner.GCSViews
             try
             {
                 ((Control) sender).Enabled = false;
-                MainV2.comPort.setMode("RTL");
+                MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "RTL");
             }
             catch
             {
@@ -1538,7 +1538,7 @@ namespace MissionPlanner.GCSViews
                         {
                             while (MainV2.comPort.MAV.cs.mode.ToLower() != "Guided".ToLower())
                             {
-                                MainV2.comPort.setMode("GUIDED");
+                                MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "GUIDED");
                                 Thread.Sleep(1000);
                                 Application.DoEvents();
                                 timeout++;
@@ -1589,7 +1589,7 @@ namespace MissionPlanner.GCSViews
                         timeout = 0;
                         while (MainV2.comPort.MAV.cs.mode.ToLower() != "AUTO".ToLower())
                         {
-                            MainV2.comPort.setMode("AUTO");
+                            MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, "AUTO");
                             Thread.Sleep(1000);
                             Application.DoEvents();
                             timeout++;
@@ -1634,7 +1634,7 @@ namespace MissionPlanner.GCSViews
                 }
             }
 
-            MainV2.comPort.setMode(CMB_modes.Text);
+            MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, CMB_modes.Text);
         }
 
         private void BUT_calib_Click(object sender, EventArgs e)
@@ -1776,7 +1776,7 @@ namespace MissionPlanner.GCSViews
                     {
                         var custom_mode = (MainV2.comPort.MAV.cs.sensors_enabled.motor_control && MainV2.comPort.MAV.cs.sensors_enabled.seen) ? 1u : 0u;
                         var mode = new MAVLink.mavlink_set_mode_t() { custom_mode = custom_mode, target_system = (byte)MainV2.comPort.sysidcurrent };
-                        MainV2.comPort.setMode(mode, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
+                        MainV2.comPort.setMode(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid, mode, MAVLink.MAV_MODE_FLAG.SAFETY_ARMED);
                         ((Control)sender).Enabled = true;
                         return;
                     }
