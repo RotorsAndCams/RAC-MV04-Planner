@@ -198,7 +198,7 @@ namespace MissionPlanner.GCSViews
 
         private void ComPort_CommsClose(object sender, EventArgs e)
         {
-
+            _vlcProc.Close();
         }
 
         public bool isCameraConnected = false;
@@ -460,25 +460,29 @@ namespace MissionPlanner.GCSViews
 
         #region CameraFunctions
 
+        Process _vlcProc = new Process();
+
         private void StartCameraStream()
         {
             string vlcPath = "C:\\Program Files\\VideoLAN\\VLC\\vlc.exe";
             string videoURL = "rtp://192.168.70.100:11024/live0";
 
 
-            var p = new Process();
-            p.StartInfo.FileName = vlcPath;
-            p.StartInfo.Arguments =
+            _vlcProc.StartInfo.FileName = vlcPath;
+            _vlcProc.StartInfo.Arguments =
                 $"{videoURL} " +
                 $"--drawable-hwnd={pnl_TESTVLC.Handle} " +
                 $"--intf dummy " +
                 $"--no-video-title-show " +
                 $"--quiet";
 
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.UseShellExecute = false;
+            _vlcProc.StartInfo.CreateNoWindow = true;
+            _vlcProc.StartInfo.UseShellExecute = false;
 
-            p.Start();
+            _vlcProc.Start();
+
+            this.pnl_TESTVLC.Dock =DockStyle.Fill;
+            this.pnl_TESTVLC.BringToFront();
 
         }
 
@@ -695,6 +699,8 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
+                _vlcProc.Close();
+
                 _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
                 CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
