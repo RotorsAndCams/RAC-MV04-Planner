@@ -86,10 +86,7 @@ namespace MissionPlanner.GCSViews
                 CameraHandler.Instance.CameraControlConnect(
                     IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                     int.Parse(SettingManager.Get(Setting.CameraControlPort)));
-                Thread.Sleep(2000);
-                CameraView.instance.StopVLC();
-                Thread.Sleep(2000);
-                CameraView.instance.StartVideoStreamVLC();
+                
 
                 isReconnecting = false;
             }
@@ -102,7 +99,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_StartStopRecording_Click(object sender, EventArgs e)
         {
-            CameraView.instance.StopRecording();
+            
         }
 
         public void SetRecordingStatus(bool status)
