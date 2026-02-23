@@ -5122,6 +5122,7 @@ namespace MissionPlanner
 
         private void MainV2_FormClosing(object sender, FormClosingEventArgs e)
         {
+            CameraView.instance._vlcProc.Close();
             MyView.Dispose();
         }
 

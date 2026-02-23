@@ -163,7 +163,7 @@ namespace MissionPlanner.GCSViews
                 this.lb_CameraStatusValue.Text = "NoCom";
 
             _droneStatusTimer = new System.Timers.Timer();
-            _droneStatusTimer.Elapsed += _droneStatustimer_Elapsed;
+            //_droneStatusTimer.Elapsed += _droneStatustimer_Elapsed;
             _droneStatusTimer.Interval = 3000;
             _droneStatusTimer.Enabled = true;
 
@@ -192,7 +192,7 @@ namespace MissionPlanner.GCSViews
 
         private void ComPort_CommsClose(object sender, EventArgs e)
         {
-            _vlcProc.Close();
+            //_vlcProc.Close();
         }
 
         public bool isCameraConnected = false;
@@ -454,7 +454,7 @@ namespace MissionPlanner.GCSViews
 
         #region CameraFunctions
 
-        Process _vlcProc = new Process();
+        public Process _vlcProc = new Process();
 
         private void StartCameraStream()
         {
@@ -475,10 +475,10 @@ namespace MissionPlanner.GCSViews
 
             _vlcProc.Start();
 
-            this.pnl_TESTVLC.Dock =DockStyle.Fill;
+            this.pnl_TESTVLC.Dock = DockStyle.Fill;
             this.pnl_TESTVLC.BringToFront();
 
-            
+
 
         }
 
