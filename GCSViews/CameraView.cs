@@ -28,14 +28,10 @@ using System.Security.RightsManagement;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static IronPython.Modules._ast;
 using static MV04.Camera.MavProto;
-using Accord.Video.FFMPEG;
 using MV04.FlightPlanAnalyzer;
 using System.Timers;
 using MissionPlanner.Controls;
-using LibVLCSharp.Shared;
-using Accord.MachineLearning.VectorMachines.Learning;
 using static MAVLink;
 using System.Diagnostics;
 
@@ -131,8 +127,8 @@ namespace MissionPlanner.GCSViews
             if(MainV2.comPort != null)
                 MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
-            CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
-            CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
+            //CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
+            //CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
 
             CameraHandler.Instance.SetEnableCrossHair(_enableCrossHair);
 
@@ -836,35 +832,7 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                if (isCameraConnected == false)
-                {
-                    try
-                    {
-                        if (bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream)) && _recordingInProgress == false)
-                        {
-                            //set recording button
-                            if (InvokeRequired)
-                                Invoke(new Action(() =>
-                                {
-                                    this.btn_Recording.ForeColor = Color.Red;
-                                }));
-                            else
-                            {
-                                this.btn_Recording.ForeColor = Color.Red;
-                            }
-
-                            if (MainV2.instance.devmode)
-                                CustomMessageBox.Show("A videó rögzítés elindult");
-                        }
-                    }
-                    catch
-                    {
-                        
-                    }
-                    
-
-                }
-
+                
                 //can not switch off trip until report in case of tripautoconnect
                 if (InvokeRequired)
                     Invoke(new Action(() => { this.btn_TripSwitchOnOff.Enabled = true; }));

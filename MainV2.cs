@@ -5148,9 +5148,7 @@ namespace MissionPlanner
         private void DisplayCamera()
         {
             FlightData.instance.gMapControl1.Hide();
-            
         }
-
 
         private void tsb_Error_Click(object sender, EventArgs e)
         {
