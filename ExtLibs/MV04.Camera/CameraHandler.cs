@@ -357,7 +357,13 @@ namespace MV04.Camera
                 _IsCameraControlConnected = true;
                 return true;
             }
+            
             return false;
+        }
+
+        public void CloseMAVProto()
+        {
+            _mavProto.MavProtoClose();
         }
 
         public bool StartStream(IPAddress ip, int port, VideoDecoder.RawFrameReadyCB onNewFrame, VideoControl.VideoControlClickDelegate onClick)

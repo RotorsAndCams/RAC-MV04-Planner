@@ -484,6 +484,8 @@ namespace MissionPlanner.GCSViews
             this.pnl_TESTVLC.Dock =DockStyle.Fill;
             this.pnl_TESTVLC.BringToFront();
 
+            
+
         }
 
         public void StartCameraControl()
@@ -506,20 +508,7 @@ namespace MissionPlanner.GCSViews
 
         private void ReconnectCameraStreamAndControl()
         {
-            Task.Factory.StartNew(() => {
-                if (InvokeRequired)
-                    Invoke(new Action(() => {
-                        //StartCameraStream();
-                        StartCameraControl();
-                        CameraHandler.Instance.SetSystemTimeToCurrent();
-                    }));
-                else
-                {
-                    //StartCameraStream();
-                    StartCameraControl();
-                    CameraHandler.Instance.SetSystemTimeToCurrent();
-                }
-            });
+            
         }
 
         #region Crosshair
@@ -1048,55 +1037,11 @@ namespace MissionPlanner.GCSViews
 
         private async void MainV2_RelaySwitched(object sender, MainV2.RelaySwitchEventArgs e)
         {
-            if (e.Channel == MainV2.instance.TRIPRelayChannel)
-            {
-                if (e.State)
-                {
-                    try
-                    {
-                        await Task.Run(() => this.reconnectLoop());
-                    }
-                    catch
-                    {
-
-                    }
-                }
-            }
+            
         }
 
         private int errorCounter = 0;
-        private async Task reconnectLoop()
-        {
-            await Task.Run(async () => {
-                while (!isCameraConnected)
-                {
-                    try
-                    {
-                        await Task.Delay(3000);
-                        StartCameraControl();
-                        _needToResetTime = true;
-                    }
-                    catch
-                    {
-                        errorCounter++;
-
-                        if(errorCounter > 5)
-                        {
-                            break;
-                        }
-                        log.Error("reconnect loop exception");
-                    }
-                }
-
-            });
-        }
-
-        private async Task reconnectControlDelayed()
-        {
-            Task.Delay(3000);
-            StartCameraControl();
-
-        }
+        
 
         #endregion
 

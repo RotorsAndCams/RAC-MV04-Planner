@@ -1192,11 +1192,6 @@ namespace MissionPlanner
 
             SaveConfig();
 
-            if (CameraView.instance == null)
-            {
-                cv = new CameraView();
-            }
-
             GetUserNameForm frm = new GetUserNameForm();
             frm.ShowDialog();
 
@@ -5196,6 +5191,8 @@ namespace MissionPlanner
 
         private void MainV2_FormClosing(object sender, FormClosingEventArgs e)
         {
+            CameraHandler.Instance.CloseMAVProto();
+            cv.Dispose();
             MyView.Dispose();
         }
 
@@ -5211,18 +5208,11 @@ namespace MissionPlanner
             {
                 DisplayMap();
             }
-            //hiddenleft = false;
-
-            //FlightData.MainH.Panel1Collapsed = false;
-            //if (CameraView.instance != null)
-            //    CameraView.instance.ResetMenuCollapse();
         }
 
         private void DisplayMap()
         {
             FlightData.instance.gMapControl1.Show();
-            //FlightData.instance.panelka.Controls.Remove(CameraView.instance);
-            //FlightData.instance.HideCamera();
             if(CameraView.instance != null)
                 CameraView.instance.Hide();
             isMapActive = true;
