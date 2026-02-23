@@ -478,7 +478,24 @@ namespace MissionPlanner.GCSViews
             this.pnl_TESTVLC.Dock = DockStyle.Fill;
             this.pnl_TESTVLC.BringToFront();
 
+        }
 
+        public void StopVLCStream()
+        {
+
+
+            try
+            {
+                if (_vlcProc != null && !_vlcProc.HasExited)
+                {
+                    _vlcProc.CloseMainWindow();  // próbálja „szépen” bezárni
+                    if (!_vlcProc.WaitForExit(1000))
+                    {
+                        _vlcProc.Kill();  // ha nem sikerül => kényszerített leállítás
+                    }
+                }
+            }
+            catch { }
 
         }
 
@@ -682,7 +699,7 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                _vlcProc.Close();
+                StopVLCStream();
 
             }
             catch { }
