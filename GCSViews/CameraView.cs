@@ -173,8 +173,6 @@ namespace MissionPlanner.GCSViews
 
             #endregion
 
-            
-
             #region Follow mode
 
             _feedTimer = new System.Timers.Timer();
@@ -690,16 +688,6 @@ namespace MissionPlanner.GCSViews
             {
                 _vlcProc.Close();
 
-                _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
-                CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
-                CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
-
-                _droneStatusTimer.Dispose();
-                _feedTimer.Dispose();
-
-                GC.Collect();
-
-                this.Dispose();
             }
             catch { }
 

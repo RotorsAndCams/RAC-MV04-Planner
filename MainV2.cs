@@ -1289,24 +1289,6 @@ namespace MissionPlanner
 
         private void DoHideLeftSide()
         {
-            if (CameraView.instance == null)
-                return;
-
-            if (CameraView.instance.controlsClosed)
-            {
-                pnlWidth = FlightData.MainH.Panel1.Width;
-
-                FlightData.MainH.SplitterDistance = 0;
-
-                FlightData.MainH.Panel1Collapsed = true;
-
-            }
-            else
-            {
-                FlightData.MainH.SplitterDistance = pnlWidth;
-
-                FlightData.MainH.Panel1Collapsed = false;
-            }
         }
 
         private void _comPort_ParamListChanged(object sender, EventArgs e)
@@ -1630,8 +1612,7 @@ namespace MissionPlanner
 
         private void TRIPTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (CameraView.instance == null)
-                return;
+            
 
             if (this.IsDisposed)
             {
@@ -1645,11 +1626,6 @@ namespace MissionPlanner
                 return;
             }
 
-            if (CameraView.instance != null)
-            {
-                if (!CameraView.instance.isCameraConnected)
-                    return;
-            }
             
             // Close if open
             if (TRIPOffMessageBox != null)
@@ -1921,8 +1897,7 @@ namespace MissionPlanner
 
         private void MenuFlightData_Click(object sender, EventArgs e)
         {
-            bool b = FlightData.instance.panelka.Controls.Contains(CameraView.instance);
-            MyView.ShowScreen("FlightData", b);
+            
 
             // save config
             SaveConfig();
@@ -1931,8 +1906,6 @@ namespace MissionPlanner
 
             DisplayMap();
 
-            if (CameraView.instance != null)
-                CameraView.instance.ResetMenuCollapse();
         }
 
         private void MenuFlightPlanner_Click(object sender, EventArgs e)
@@ -3485,33 +3458,6 @@ namespace MissionPlanner
             SerialThreadrunner.Set();
         }
 
-        private void DoCameraViewInit()
-        {
-            if ((bool.Parse(SettingManager.Get(Setting.AutoStartCameraStream))))
-            {
-                new Thread(() => 
-                {
-                    try
-                    {
-                        if (InvokeRequired)
-                            Invoke(new Action(() => {
-                                MainSwitcher.Screen nextscreen = MyView.screens.Single(s => s.Name == "CameraView");
-
-                                if (nextscreen.Control == null || nextscreen.Control.IsDisposed)
-                                    MyView.CreateControl(nextscreen);
-                            }));
-                        else
-                        {
-                            MainSwitcher.Screen nextscreen = MyView.screens.Single(s => s.Name == "CameraView");
-
-                            if (nextscreen.Control == null || nextscreen.Control.IsDisposed)
-                                MyView.CreateControl(nextscreen);
-                        }
-                    }
-                    catch { }
-                });
-            }
-        }
         protected override void OnLoad(EventArgs e)
         {
             // check if its defined, and force to show it if not known about
@@ -3531,7 +3477,7 @@ namespace MissionPlanner
             MyView.AddScreen(new MainSwitcher.Screen("FlightData", FlightData, true));
             MyView.AddScreen(new MainSwitcher.Screen("FlightPlanner", FlightPlanner, true));
             MyView.AddScreen(new MainSwitcher.Screen("CameraView", typeof(GCSViews.CameraView), true));
-            //DoCameraViewInit();
+            
             MyView.AddScreen(new MainSwitcher.Screen("HWConfig", typeof(GCSViews.InitialSetup), false));
             MyView.AddScreen(new MainSwitcher.Screen("SWConfig", typeof(GCSViews.SoftwareConfig), false));
             MyView.AddScreen(new MainSwitcher.Screen("Simulation", Simulation, true));
@@ -4401,22 +4347,7 @@ namespace MissionPlanner
 
         private void MenuHelp_Click(object sender, EventArgs e)
         {
-            //
-
-            if (CameraView.instance != null)
-            {
-                CameraView.instance.SetMenu();
-
-                if (CameraView.instance.controlsClosed)
-                {
-                    MenuHelp.Text = "OPEN";
-                }
-                else
-                {
-                    MenuHelp.Text = "HIDE";
-                }
-            }
-
+            
             HideflightData();
         }
 
@@ -5191,8 +5122,6 @@ namespace MissionPlanner
 
         private void MainV2_FormClosing(object sender, FormClosingEventArgs e)
         {
-            CameraHandler.Instance.CloseMAVProto();
-            cv.Dispose();
             MyView.Dispose();
         }
 
@@ -5213,30 +5142,13 @@ namespace MissionPlanner
         private void DisplayMap()
         {
             FlightData.instance.gMapControl1.Show();
-            if(CameraView.instance != null)
-                CameraView.instance.Hide();
+            
             isMapActive = true;
         }
-        CameraView cv;
         private void DisplayCamera()
         {
             FlightData.instance.gMapControl1.Hide();
-            //FlightData.instance.ShowCamera();
-
-            if(CameraView.instance == null)
-            {
-                cv = new CameraView();
-            }
-            if (!FlightData.instance.panelka.Controls.Contains(CameraView.instance))
-            {
-                FlightData.instance.panelka.Controls.Add(CameraView.instance);
-                CameraView.instance.Dock = DockStyle.Fill;
-            }
             
-            //CameraView.instance.Padding = new Padding(5);
-            CameraView.instance.Show();
-            isMapActive = false;
-            CameraView.instance.BringToFront();
         }
 
 
@@ -5244,9 +5156,6 @@ namespace MissionPlanner
         {
             if (InvokeRequired)
                 Invoke(new Action(() => {
-
-                    if(CameraView.instance != null)
-                        CameraView.instance.SetMenu();
 
                     MenuHelp.Text = "HIDE";
                     pnlWidth = FlightData.MainH.Panel1.Width;
@@ -5258,9 +5167,6 @@ namespace MissionPlanner
                 }));
             else
             {
-                if (CameraView.instance != null)
-                    CameraView.instance.SetMenu();
-
                 MenuHelp.Text = "HIDE";
                 pnlWidth = FlightData.MainH.Panel1.Width;
 
