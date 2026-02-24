@@ -70,9 +70,7 @@ namespace MissionPlanner.GCSViews
 
             this.btn_Reconnect.Enabled = false;
 
-            await Task.Run(() => {
-                DoReconnect();
-            });
+            DoReconnect();
 
             this.btn_Reconnect.Enabled = true;
         }
@@ -87,9 +85,9 @@ namespace MissionPlanner.GCSViews
                     IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                     int.Parse(SettingManager.Get(Setting.CameraControlPort)));
                 Thread.Sleep(2000);
-                CameraView.instance.StopVLC();
+                //CameraView.instance.StopVLCStream();
                 Thread.Sleep(2000);
-                CameraView.instance.StartVideoStreamVLC();
+                CameraView.instance.StartCameraStream();
 
                 isReconnecting = false;
             }
@@ -102,7 +100,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_StartStopRecording_Click(object sender, EventArgs e)
         {
-            CameraView.instance.StopRecording();
+            //CameraView.instance.StopRecording();
         }
 
         public void SetRecordingStatus(bool status)
