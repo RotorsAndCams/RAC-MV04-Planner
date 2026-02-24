@@ -128,7 +128,7 @@ namespace MissionPlanner.GCSViews
             if (MainV2.comPort != null)
                 MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
-            //CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
+            CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
             //CameraHandler.Instance.event_DoPhoto += Instance_event_DoPhoto;
 
             CameraHandler.Instance.SetEnableCrossHair(_enableCrossHair);
@@ -466,7 +466,7 @@ namespace MissionPlanner.GCSViews
             if (getVLCPath != null)
                 vlcPath = getVLCPath;
 
-            string videoURL = "rtp://192.168.70.100:11024/live0";
+            string videoURL = SettingManager.Get(Setting.CameraStreamUrl);//"rtp://192.168.70.100:11024/live0";
 
             KillVLCProcesses();
 
