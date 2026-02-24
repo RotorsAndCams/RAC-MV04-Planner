@@ -488,10 +488,10 @@ namespace MissionPlanner.GCSViews
             {
                 if (_vlcProc != null && !_vlcProc.HasExited)
                 {
-                    _vlcProc.CloseMainWindow();  // próbálja „szépen” bezárni
+                    _vlcProc.CloseMainWindow();  //normal close
                     if (!_vlcProc.WaitForExit(1000))
                     {
-                        _vlcProc.Kill();  // ha nem sikerül => kényszerített leállítás
+                        _vlcProc.Kill();  // in case of not success closing
                     }
                 }
             }
