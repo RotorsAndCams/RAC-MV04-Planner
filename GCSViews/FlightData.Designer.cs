@@ -190,6 +190,12 @@ namespace MissionPlanner.GCSViews
             this.selectDropTargetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.flyToCoordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dropToCoordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+
+            this.dropOnMap1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.dropOnMap2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.dropOnMap3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.dropOnMapStartAll = new System.Windows.Forms.ToolStripMenuItem();
+
             this.addPoiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -2441,6 +2447,9 @@ namespace MissionPlanner.GCSViews
             this.selectDropTargetToolStripMenuItem,
             this.flyToCoordsToolStripMenuItem,
             this.dropToCoordsToolStripMenuItem,
+            this.dropOnMap1,
+            this.dropOnMap2,
+            this.dropOnMap3,
             this.addPoiToolStripMenuItem,
             this.pointCameraHereToolStripMenuItem,
             this.PointCameraCoordsToolStripMenuItem1,
@@ -2449,7 +2458,9 @@ namespace MissionPlanner.GCSViews
             this.setHomeHereToolStripMenuItem,
             this.takeOffToolStripMenuItem,
             this.onOffCameraOverlapToolStripMenuItem,
-            this.jumpToTagToolStripMenuItem});
+            this.jumpToTagToolStripMenuItem,
+            this.dropOnMapStartAll
+            });
             this.contextMenuStripMap.Name = "contextMenuStrip1";
             resources.ApplyResources(this.contextMenuStripMap, "contextMenuStripMap");
             // 
@@ -2478,6 +2489,34 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.dropToCoordsToolStripMenuItem, "dropToCoordsToolStripMenuItem");
             this.dropToCoordsToolStripMenuItem.Text = "Drop To Coords";
             this.dropToCoordsToolStripMenuItem.Click += new System.EventHandler(this.dropToCoordsToolStripMenuItem_Click);
+            // 
+            // dropOnMap1
+            // 
+            this.dropOnMap1.Name = "dropOnMap1";
+            resources.ApplyResources(this.dropOnMap1, "dropOnMap1");
+            this.dropOnMap1.Text = "Drop On Map 1";
+            this.dropOnMap1.Click += new System.EventHandler(this.dropOnMap1_Click);
+            // 
+            // dropOnMap2
+            // 
+            this.dropOnMap2.Name = "dropOnMap2";
+            resources.ApplyResources(this.dropOnMap2, "dropOnMap2");
+            this.dropOnMap2.Text = "Drop On Map 2";
+            this.dropOnMap2.Click += new System.EventHandler(this.dropOnMap2_Click);
+            // 
+            // dropOnMap3
+            // 
+            this.dropOnMap3.Name = "dropOnMap3";
+            resources.ApplyResources(this.dropOnMap3, "dropOnMap3");
+            this.dropOnMap3.Text = "Drop On Map 3";
+            this.dropOnMap3.Click += new System.EventHandler(this.dropOnMap3_Click);
+            //
+            // dropOnMapStartAll
+            //
+            this.dropOnMapStartAll.Name = "dropOnMapStartAll";
+            resources.ApplyResources(this.dropOnMapStartAll, "dropOnMapStartAll");
+            this.dropOnMapStartAll.Text = "Start Drop On Map ALL";
+            this.dropOnMapStartAll.Click += new System.EventHandler(this.dropOnMapStartAll_Click);
             // 
             // flyToCoordsToolStripMenuItem
             // 
@@ -3101,6 +3140,13 @@ namespace MissionPlanner.GCSViews
         private System.Windows.Forms.ToolStripMenuItem poiatcoordsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem flyToCoordsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem dropToCoordsToolStripMenuItem;
+
+        //Drop to coords 1-2-3
+        private System.Windows.Forms.ToolStripMenuItem dropOnMap1;
+        private System.Windows.Forms.ToolStripMenuItem dropOnMap2;
+        private System.Windows.Forms.ToolStripMenuItem dropOnMap3;
+        private System.Windows.Forms.ToolStripMenuItem dropOnMapStartAll;
+
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.ToolStripMenuItem setBatteryCellCountToolStripMenuItem;

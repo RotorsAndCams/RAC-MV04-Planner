@@ -100,11 +100,9 @@ namespace MissionPlanner.DropSystem
                 ActualDropLocation = CurrentImpact.Value;
                 OnDropped?.Invoke(ActualDropLocation.Value);
 
-                TriggerServo(); // DROP
-            //    MainV2.comPort.setMode(
-            //        (byte)MainV2.comPort.sysidcurrent,
-            //        (byte)MainV2.comPort.compidcurrent,
-            //        "RTL");
+                TriggerServo();
+
+
             }
         }
 
@@ -112,17 +110,13 @@ namespace MissionPlanner.DropSystem
         // A method that handles each timer tick
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            //_cycleStopwatch.Restart();
-
             // no target, do nothing
-            //if (!TargetLocation.HasValue) return;
             if (!NextTarget.HasValue) return;
 
             // Getting current drone position
             double currLat = MainV2.comPort.MAV.cs.lat;
             double currLng = MainV2.comPort.MAV.cs.lng;
             var currentLocation = new PointLatLng(currLat, currLng);
-
 
             // Calculate bearing and offset
             double bearing = DroppingCalculator.Bearing(currentLocation, NextTarget.Value);
@@ -148,19 +142,11 @@ namespace MissionPlanner.DropSystem
             double vy = MainV2.comPort.MAV.cs.vy;
             // Horizontal speed
             double vHoriz = Math.Sqrt(vx * vx + vy * vy);
-            //System.Diagnostics.Debug.WriteLine("vHoriz: " + vHoriz);
-
-            //double currLat = MainV2.comPort.MAV.cs.lat;
-            //double currLng = MainV2.comPort.MAV.cs.lng;
-            //var currentLocation = new PointLatLng(currLat, currLng);
-            //System.Diagnostics.Debug.WriteLine("currLat: " + currLat);
-            //System.Diagnostics.Debug.WriteLine("currLng: " + currLng);
-
+            
             // Compute flying angle
             // Degrees needed, 0 deg = North
             double bearingRad = Math.Atan2(vy, vx);
             double bearingDeg = ((bearingRad * 180.0 / Math.PI) + 360.0) % 360;
-            //System.Diagnostics.Debug.WriteLine("bearingDeg: " + bearingDeg);
 
             // Compute impact point
             var impactPoint = DroppingCalculator.ComputeImpactPoint(
@@ -171,25 +157,18 @@ namespace MissionPlanner.DropSystem
 
             CurrentImpact = impactPoint;
 
+
+            //DROPNOW - INVOKE
             ImpactUpdated?.Invoke(impactPoint);
-            System.Diagnostics.Debug.WriteLine("Event raised");
-            //if (!_hasDropped)
-            //{
-            //    if (CheckRange())
-            //    {
-            //        DropNow();
-            //    }
-            //}
 
-            //_cycleStopwatch.Stop();
-            //_cycleCounter++;
+            if (!_hasDropped)
+            {
+                if (CheckRange())
+                {
+                    DropNow();
+                }
+            }
 
-            //if ((DateTime.Now - _lastLogTime).TotalSeconds >= 1)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"[DropManager] Cycles/sec: {_cycleCounter}, Last cycle time: {_cycleStopwatch.ElapsedMilliseconds} ms");
-            //    _cycleCounter = 0;
-            //    _lastLogTime = DateTime.Now;
-            //}
         }
 
         public bool CheckRange()
@@ -198,20 +177,19 @@ namespace MissionPlanner.DropSystem
                 return false;
             double distanceInMeters = DroppingCalculator.HaversineDistance(NextTarget.Value, CurrentImpact.Value);
             System.Diagnostics.Debug.WriteLine($"[DropManager] Distance to target: {distanceInMeters} m");
-            // Acceptable precision radius in meters
-            //const double epsilon = 2.0;
 
-            // If close enough -> DROP => return TRUE
-            //if (distanceInMeters < epsilonMeters) return true;
-            //return false;
-            return distanceInMeters <= epsilonMeters;
+            //quadratic error range tolerance -> larger precision error at higher speed
+            double velocityQuadraticOffset = 0.05 * MainV2.comPort.MAV.cs.groundspeed * MainV2.comPort.MAV.cs.groundspeed;
+
+
+            System.Diagnostics.Debug.WriteLine($"[DropManager] epsilonMeters + offset: {epsilonMeters + Math.Min(5.0, velocityQuadraticOffset)} m");
+            return distanceInMeters <= (epsilonMeters + Math.Min(5.0, velocityQuadraticOffset));
         }
 
 
         // PWM signal to servo
         public void TriggerServo()
         {
-            //CustomMessageBox.Show("Trigger servo!");
             // Channel 9, pwm 1900
             MainV2.comPort.doCommand(
                 (byte)MainV2.comPort.sysidcurrent,
@@ -220,13 +198,7 @@ namespace MissionPlanner.DropSystem
                 _servoChannel,     // servo number
                 1450,  // pwm value
                 0, 0, 0, 0, 0);
-            //MainV2.comPort.doCommand(
-            //    MAVLink.MAV_CMD.DO_SET_SERVO,
-            //    9,
-            //    1900,
-            //    0, 0, 0, 0, 0
-            //    );
-
+            
             // Reset after delay
             Task.Delay(1000).ContinueWith(_ =>
             {
@@ -237,12 +209,7 @@ namespace MissionPlanner.DropSystem
                 _servoChannel,     // servo number
                 1800,  // pwm value
                 0, 0, 0, 0, 0);
-                //MainV2.comPort.doCommand(
-                //    MAVLink.MAV_CMD.DO_SET_SERVO,
-                //    9,
-                //    1000,
-                //    0, 0, 0, 0, 0
-                //    );
+                
             });
             _hasDropped = true;
             _timer.Stop();

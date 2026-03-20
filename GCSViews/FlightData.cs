@@ -257,13 +257,14 @@ namespace MissionPlanner.GCSViews
                     {
                         if (_dropManager.CheckRange())
                         {
-                            System.Diagnostics.Debug.WriteLine("Check range()-ben");
+                            
                             _dropManager.DropNow();
                             //_dropMarkerLayer.ShowImpact(impactPoint);
+                            MessageBox.Show("DROP - in the range");
                         }
                         else
                         {
-                            System.Diagnostics.Debug.WriteLine("Elseben()");
+                            //MessageBox.Show("NO DROP - Not in the range");
                             _dropMarkerLayer.ShowImpact(impactPoint);
                         }
                     }
@@ -438,6 +439,10 @@ namespace MissionPlanner.GCSViews
             droptarget = new GMapOverlay("drop target");
             gMapControl1.Overlays.Add(droptarget);
             //end mod
+
+            //
+            
+
 
             photosoverlay = new GMapOverlay("photos overlay");
             gMapControl1.Overlays.Add(photosoverlay);
@@ -2941,10 +2946,6 @@ namespace MissionPlanner.GCSViews
 
             if (MainV2.comPort.MAV.cs.mode.ToLower() == "guided")
             {
-                //MessageBox.Show("lat: " + MainV2.comPort.MAV.GuidedMode.x / 1e7 +
-                //    " long: " + MainV2.comPort.MAV.GuidedMode.y / 1e7 + " alt: " +
-                //    MainV2.comPort.MAV.GuidedMode.z);
-
                 Locationwp wp = new Locationwp()
                 {
                     alt = MainV2.comPort.MAV.GuidedMode.z,
@@ -2958,37 +2959,137 @@ namespace MissionPlanner.GCSViews
                     MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, wp);
                 }
 
-
-
-                //MainV2.comPort.setGuidedModeWP(new Locationwp
-                //{
-                //    alt = MainV2.comPort.MAV.GuidedMode.z,
-                //    lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                //    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
-                //});
-
-                //for (int i = 0; i <= 5; i++)
-                //{
-                //    MainV2.comPort.setGuidedModeWP(new Locationwp
-                //    {
-                //        alt = MainV2.comPort.MAV.GuidedMode.z,
-                //        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                //        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
-                //    });
-                //}
-
-                //for (int i = 0; i <= 5; i++) 
-                //{
-                //    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
-                //    {
-                //        alt = MainV2.comPort.MAV.GuidedMode.z,
-                //        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                //        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
-                //        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                //    });
-                //}
-
             }
+        }
+
+        
+
+        GMapOverlay Drop123_Overlay = new GMapOverlay("Drop123_Overlay");
+
+        PointLatLng drop1;
+        PointLatLng drop2;
+        PointLatLng drop3;
+        int altDrop1;
+        int altDrop2;
+        int altDrop3;
+        int servoDrop1;
+        int servoDrop2;
+        int servoDrop3;
+
+        private void dropOnMap1_Click(object sender, EventArgs e)
+        {
+            #region Get alt
+
+            string alt = "40";
+            if (DialogResult.Cancel == InputBox.Show("Enter Alt", "Enter drop position alt", ref alt))
+                return;
+
+            int intalt = (int)(100 * CurrentState.multiplieralt);
+            if (!int.TryParse(alt, out intalt))
+            {
+                CustomMessageBox.Show("Bad Alt");
+                return;
+            }
+            altDrop1 = intalt;
+
+            #endregion
+
+            #region Get servo
+
+            string servo = "9";
+            if (DialogResult.Cancel == InputBox.Show("Enter servo", "Enter servo channel", ref servo))
+                return;
+
+            int intservo = (int)(100 * CurrentState.multiplieralt);
+            if (!int.TryParse(servo, out intservo))
+            {
+                CustomMessageBox.Show("Bad servo");
+                return;
+            }
+            servoDrop1 = intservo;
+
+            #endregion
+
+            #region Set Point
+
+            var marker_old = Drop123_Overlay.Markers.FirstOrDefault(m => m.ToolTipText.Contains("First drop"));
+
+            Drop123_Overlay.Markers.Remove(marker_old);
+            drop1 = MouseDownStart;
+            //create new marker
+            var marker = new GMarkerGoogle(MouseDownStart, GMarkerGoogleType.orange_small)
+            {
+                ToolTipText = "First drop \nLat:" + MouseDownStart.Lat + "; Lng:" + MouseDownStart.Lng + "\n Alt: " + altDrop1 + "\n Servo channel: " + servoDrop1,
+                ToolTipMode = MarkerTooltipMode.Always
+            };
+
+            //add marker to overlay
+            Drop123_Overlay.Markers.Add(marker);
+
+            //add overlay to map
+            if (!MainV2.instance.FlightData.gMapControl1.Overlays.Contains(Drop123_Overlay))
+                gMapControl1.Overlays.Add(Drop123_Overlay);
+
+            gMapControl1.UpdateMarkerLocalPosition(marker);
+
+            #endregion
+
+            
+
+
+
+
+        }
+
+        private void dropOnMap2_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void dropOnMap3_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void dropOnMapStartAll_Click(object sender, EventArgs e)
+        {
+            StartDropProcess();
+        }
+
+        private async void StartDropProcess()
+        {
+            //Current location of the UAV
+            var currentLocation = new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng);
+
+
+            double bearing = DroppingCalculator.Bearing(currentLocation, drop1);
+            double offset = 30; // UAV fly through the drop target position ??? miért 30
+            var actualWaypoint = DroppingCalculator.OffsetPoint(drop1, offset, bearing);
+
+            _dropMarkerLayer.ClearAll();
+            //Show the red target marker
+            _dropMarkerLayer.ShowTarget(actualWaypoint);
+            // Set servo channel
+            _dropManager.SetServoChannel(servoDrop1);
+
+            _dropManager.SetNextTarget(drop1, altDrop1);
+
+            var gotohere = new Locationwp
+            {
+                id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
+                alt = altDrop1,
+                lat = actualWaypoint.Lat,
+                lng = actualWaypoint.Lng
+            };
+
+            for (int j = 0; j <= 5; j++)
+            {
+                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
+            }
+
+            // now asynchronously wait  
+            //await WaitForDropAsync();
+
         }
 
         private async void dropToCoordsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2998,7 +3099,7 @@ namespace MissionPlanner.GCSViews
 
             var allCoords = location.Split('|');
 
-            if (allCoords.Length > 3)
+            if (allCoords.Length < 3)
             {
                 CustomMessageBox.Show("Invalid number of coordinates. Please enter exactly 3 targets.", Strings.ERROR);
                 return;
@@ -3054,18 +3155,6 @@ namespace MissionPlanner.GCSViews
                         lng = actualWaypoint.Lng
                     };
 
-                    //try
-                    //{
-                    //    MainV2.comPort.setGuidedModeWP(
-                    //        (byte)MainV2.comPort.sysidcurrent,
-                    //        (byte)MainV2.comPort.compidcurrent,
-                    //        gotohere);
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    CustomMessageBox.Show(Strings.CommandFailed + ex.Message, Strings.ERROR);
-                    //}
-
                     for (int j = 0; j <= 5; j++)
                     {
                         MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
@@ -3076,13 +3165,13 @@ namespace MissionPlanner.GCSViews
 
                     // optional delay
                     await Task.Delay(500);
-                } 
+                }
+                else
+                {
+                    MessageBox.Show("Failed - drone need to be in GUIDED mode");
+                }
             }
-                       
-            //else
-            //{
-            //    CustomMessageBox.Show(Strings.InvalidField, Strings.ERROR);
-            //}
+                 
         }
 
         private Task WaitForDropAsync()
@@ -3093,6 +3182,7 @@ namespace MissionPlanner.GCSViews
             {
                 _dropManager.OnDropped -= Handler;
                 tcs.TrySetResult(true);
+                
             }
 
             _dropManager.OnDropped += Handler;
@@ -3134,8 +3224,6 @@ namespace MissionPlanner.GCSViews
                 intalt = 10;
 
             MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
-
-            
 
             //MainV2.comPort.MAV.GuidedMode.x = (int)(MouseDownStart.Lat * 1e7);
             //MainV2.comPort.MAV.GuidedMode.y = (int)(MouseDownStart.Lng * 1e7);
@@ -4195,6 +4283,20 @@ namespace MissionPlanner.GCSViews
                             }
 
                             RegeneratePolygon();
+
+
+                            //ide
+                            ///*
+                            ///
+                            //remove marker
+
+                            ////add overlay to map
+                            //if (MainV2.instance.FlightData.gMapControl1.Overlays.Contains(Drop123_Overlay))
+                            //    gMapControl1.Overlays.Remove(Drop123_Overlay);
+                            //if (!MainV2.instance.FlightData.gMapControl1.Overlays.Contains(Drop123_Overlay))
+                            //    gMapControl1.Overlays.Add(Drop123_Overlay);
+                            ////*/
+
 
                             // update rally points
 
