@@ -120,7 +120,7 @@ namespace MissionPlanner.DropSystem
 
             // Calculate bearing and offset
             double bearing = DroppingCalculator.Bearing(currentLocation, NextTarget.Value);
-            double offset = 30; // UAV fly through the drop target position
+            double offset = 10; // UAV fly through the drop target position
             var actualWaypoint = DroppingCalculator.OffsetPoint(NextTarget.Value, offset, bearing);
 
             // 4) Send that as a repeated guided waypoint
@@ -184,6 +184,32 @@ namespace MissionPlanner.DropSystem
 
             System.Diagnostics.Debug.WriteLine($"[DropManager] epsilonMeters + offset: {epsilonMeters + Math.Min(5.0, velocityQuadraticOffset)} m");
             return distanceInMeters <= (epsilonMeters + Math.Min(5.0, velocityQuadraticOffset));
+        }
+
+        public void TriggerServo(int p_ServoChannel)
+        {
+            MainV2.comPort.doCommand(
+                (byte)MainV2.comPort.sysidcurrent,
+                (byte)MainV2.comPort.compidcurrent,
+                MAVLink.MAV_CMD.DO_SET_SERVO,
+                p_ServoChannel,     // servo number
+                1450,  // pwm value
+                0, 0, 0, 0, 0);
+
+            // Reset after delay
+            Task.Delay(1000).ContinueWith(_ =>
+            {
+                MainV2.comPort.doCommand(
+                (byte)MainV2.comPort.sysidcurrent,
+                (byte)MainV2.comPort.compidcurrent,
+                MAVLink.MAV_CMD.DO_SET_SERVO,
+                p_ServoChannel,     // servo number
+                1800,  // pwm value
+                0, 0, 0, 0, 0);
+
+            });
+            _hasDropped = true;
+            _timer.Stop();
         }
 
 

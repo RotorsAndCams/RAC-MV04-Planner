@@ -3335,7 +3335,26 @@ namespace MissionPlanner.GCSViews
         {
             //_dropManager.DropNow(true);
             //_dropManager.Stop();
-            _dropManager.TriggerServo();
+            //
+
+            //
+
+            #region Get servo
+
+            string servo = "9";
+            if (DialogResult.Cancel == InputBox.Show("Enter servo", "Enter servo channel", ref servo))
+                return;
+
+            int intservo = (int)(100 * CurrentState.multiplieralt);
+            if (!int.TryParse(servo, out intservo))
+            {
+                CustomMessageBox.Show("Bad servo");
+                return;
+            }
+
+            #endregion
+
+            _dropManager.TriggerServo(intservo);
             CustomMessageBox.Show("Drop manager STOPPED!");
         }
 
