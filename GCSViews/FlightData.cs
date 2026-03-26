@@ -3058,6 +3058,8 @@ namespace MissionPlanner.GCSViews
 
         private async void StartDropProcess()
         {
+            MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "GUIDED");
+
             //Current location of the UAV
             var currentLocation = new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng);
 

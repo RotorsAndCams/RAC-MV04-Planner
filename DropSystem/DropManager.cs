@@ -74,6 +74,7 @@ namespace MissionPlanner.DropSystem
         // Start: starts the internal timer thus ImpactUpdated events fire every 200 ms
         public void Start()
         {
+
             _hasDropped = false;
             if (!_timer.Enabled)
                 _timer.Start();
@@ -110,8 +111,15 @@ namespace MissionPlanner.DropSystem
         // A method that handles each timer tick
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            if (_hasDropped)
+                return;
+
             // no target, do nothing
             if (!NextTarget.HasValue) return;
+
+            if (MainV2.comPort.MAV.cs.mode.ToUpper() != "GUIDED")
+                MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "GUIDED");
+
 
             // Getting current drone position
             double currLat = MainV2.comPort.MAV.cs.lat;
@@ -193,23 +201,38 @@ namespace MissionPlanner.DropSystem
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
                 p_ServoChannel,     // servo number
-                1450,  // pwm value
+                (int)1100,  // pwm value
                 0, 0, 0, 0, 0);
 
-            // Reset after delay
-            Task.Delay(1000).ContinueWith(_ =>
-            {
-                MainV2.comPort.doCommand(
+            MainV2.comPort.doCommand(
                 (byte)MainV2.comPort.sysidcurrent,
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
                 p_ServoChannel,     // servo number
-                1800,  // pwm value
+                (int)1100,  // pwm value
                 0, 0, 0, 0, 0);
 
-            });
-            _hasDropped = true;
-            _timer.Stop();
+
+            MainV2.comPort.doCommand(
+                (byte)MainV2.comPort.sysidcurrent,
+                (byte)MainV2.comPort.compidcurrent,
+                MAVLink.MAV_CMD.DO_SET_SERVO,
+                p_ServoChannel,     // servo number
+                (int)1100,  // pwm value
+                0, 0, 0, 0, 0);
+
+            // Reset after delay
+            //Task.Delay(1000).ContinueWith(_ =>
+            //{
+            //    MainV2.comPort.doCommand(
+            //    (byte)MainV2.comPort.sysidcurrent,
+            //    (byte)MainV2.comPort.compidcurrent,
+            //    MAVLink.MAV_CMD.DO_SET_SERVO,
+            //    p_ServoChannel,     // servo number
+            //    1900,  // pwm value
+            //    0, 0, 0, 0, 0);
+
+            //});
         }
 
 
@@ -222,23 +245,44 @@ namespace MissionPlanner.DropSystem
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
                 _servoChannel,     // servo number
-                1450,  // pwm value
+                (int)1100,  // pwm value
                 0, 0, 0, 0, 0);
-            
-            // Reset after delay
-            Task.Delay(1000).ContinueWith(_ =>
-            {
-                MainV2.comPort.doCommand(
+
+            MainV2.comPort.doCommand(
                 (byte)MainV2.comPort.sysidcurrent,
                 (byte)MainV2.comPort.compidcurrent,
                 MAVLink.MAV_CMD.DO_SET_SERVO,
                 _servoChannel,     // servo number
-                1800,  // pwm value
+                (int)1100,  // pwm value
                 0, 0, 0, 0, 0);
-                
-            });
+
+            MainV2.comPort.doCommand(
+                (byte)MainV2.comPort.sysidcurrent,
+                (byte)MainV2.comPort.compidcurrent,
+                MAVLink.MAV_CMD.DO_SET_SERVO,
+                _servoChannel,     // servo number
+                (int)1100,  // pwm value
+                0, 0, 0, 0, 0);
+
+            // Reset after delay
+            //Task.Delay(1000).ContinueWith(_ =>
+            //{
+            //    MainV2.comPort.doCommand(
+            //    (byte)MainV2.comPort.sysidcurrent,
+            //    (byte)MainV2.comPort.compidcurrent,
+            //    MAVLink.MAV_CMD.DO_SET_SERVO,
+            //    _servoChannel,     // servo number
+            //    1900,  // pwm value
+            //    0, 0, 0, 0, 0);
+
+            //});
             _hasDropped = true;
-            _timer.Stop();
+
+            if(_timer != null)
+            {
+                _timer.Stop();
+            }
+            
         }
 
         // Set servo channel
