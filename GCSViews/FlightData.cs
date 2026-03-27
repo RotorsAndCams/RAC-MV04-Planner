@@ -276,9 +276,7 @@ namespace MissionPlanner.GCSViews
                 //Must marshal back to UI thread if needed
                 this.Invoke(new Action(() =>
                 {
-                    _dropMarkerLayer.ClearPredicted();
-                    _dropMarkerLayer.ShowActualDrop(dropPoint);
-                    //CustomMessageBox.Show("Auto drop!");
+                    
                 }));
             };
 
@@ -2975,51 +2973,33 @@ namespace MissionPlanner.GCSViews
         int servoDrop1;
         int servoDrop2;
         int servoDrop3;
-
+        List<DropTarget> _DropTargets = new List<DropTarget>();
         private void dropOnMap1_Click(object sender, EventArgs e)
         {
-            #region Get alt
 
-            string alt = "40";
-            if (DialogResult.Cancel == InputBox.Show("Enter Alt", "Enter drop position alt", ref alt))
-                return;
-
-            int intalt = (int)(100 * CurrentState.multiplieralt);
-            if (!int.TryParse(alt, out intalt))
+            var firstDropTarget = _DropTargets.FirstOrDefault(x => x.Name.Equals("First"));
+            if (firstDropTarget == null)
             {
-                CustomMessageBox.Show("Bad Alt");
-                return;
+                firstDropTarget = new DropTarget("First", Drop123_Overlay);
+                _DropTargets.Add(firstDropTarget);
             }
-            altDrop1 = intalt;
+            
 
-            #endregion
+            firstDropTarget.GetPositionFromInputMessageBox(MouseDownStart);
+            firstDropTarget.GetAltitude();
+            firstDropTarget.GetServoData();
+            //firstDropTarget.DrawOnMapDropTarget();
 
-            #region Get servo
+            #region Draw drop point on map
 
-            string servo = "9";
-            if (DialogResult.Cancel == InputBox.Show("Enter servo", "Enter servo channel", ref servo))
-                return;
-
-            int intservo = (int)(100 * CurrentState.multiplieralt);
-            if (!int.TryParse(servo, out intservo))
-            {
-                CustomMessageBox.Show("Bad servo");
-                return;
-            }
-            servoDrop1 = intservo;
-
-            #endregion
-
-            #region Set Point
-
-            var marker_old = Drop123_Overlay.Markers.FirstOrDefault(m => m.ToolTipText.Contains("First drop"));
+            var marker_old = Drop123_Overlay.Markers.FirstOrDefault(m => m.ToolTipText.Contains("First"));
 
             Drop123_Overlay.Markers.Remove(marker_old);
             drop1 = MouseDownStart;
             //create new marker
             var marker = new GMarkerGoogle(MouseDownStart, GMarkerGoogleType.orange_small)
             {
-                ToolTipText = "First drop \nLat:" + MouseDownStart.Lat + "; Lng:" + MouseDownStart.Lng + "\n Alt: " + altDrop1 + "\n Servo channel: " + servoDrop1,
+                ToolTipText = "First drop \nLat:" + firstDropTarget.DropPosition.Lat + "; Lng:" + firstDropTarget.DropPosition.Lng + "\n Alt: " + firstDropTarget.DropAltitude + "\n Servo channel: " + firstDropTarget.ServoChannel,
                 ToolTipMode = MarkerTooltipMode.Always
             };
 
@@ -3034,21 +3014,86 @@ namespace MissionPlanner.GCSViews
 
             #endregion
 
-            
-
-
-
-
         }
 
         private void dropOnMap2_Click(object sender, EventArgs e)
         {
-            
+            var secondDropTarget = _DropTargets.FirstOrDefault(x => x.Name.Equals("Second"));
+            if (secondDropTarget == null)
+            {
+                secondDropTarget = new DropTarget("Second", Drop123_Overlay);
+                _DropTargets.Add(secondDropTarget);
+            }
+
+
+            secondDropTarget.GetPositionFromInputMessageBox(MouseDownStart);
+            secondDropTarget.GetAltitude();
+            secondDropTarget.GetServoData();
+            //firstDropTarget.DrawOnMapDropTarget();
+
+            #region Draw drop point on map
+
+            var marker_old = Drop123_Overlay.Markers.FirstOrDefault(m => m.ToolTipText.Contains("Second"));
+
+            Drop123_Overlay.Markers.Remove(marker_old);
+            drop1 = MouseDownStart;
+            //create new marker
+            var marker = new GMarkerGoogle(MouseDownStart, GMarkerGoogleType.orange_small)
+            {
+                ToolTipText = "First drop \nLat:" + secondDropTarget.DropPosition.Lat + "; Lng:" + secondDropTarget.DropPosition.Lng + "\n Alt: " + secondDropTarget.DropAltitude + "\n Servo channel: " + secondDropTarget.ServoChannel,
+                ToolTipMode = MarkerTooltipMode.Always
+            };
+
+            //add marker to overlay
+            Drop123_Overlay.Markers.Add(marker);
+
+            //add overlay to map
+            if (!MainV2.instance.FlightData.gMapControl1.Overlays.Contains(Drop123_Overlay))
+                gMapControl1.Overlays.Add(Drop123_Overlay);
+
+            gMapControl1.UpdateMarkerLocalPosition(marker);
+
+            #endregion
         }
 
         private void dropOnMap3_Click(object sender, EventArgs e)
         {
-            
+            var thirdDropTarget = _DropTargets.FirstOrDefault(x => x.Name.Equals("Third"));
+            if (thirdDropTarget == null)
+            {
+                thirdDropTarget = new DropTarget("Third", Drop123_Overlay);
+                _DropTargets.Add(thirdDropTarget);
+            }
+
+
+            thirdDropTarget.GetPositionFromInputMessageBox(MouseDownStart);
+            thirdDropTarget.GetAltitude();
+            thirdDropTarget.GetServoData();
+            //firstDropTarget.DrawOnMapDropTarget();
+
+            #region Draw drop point on map
+
+            var marker_old = Drop123_Overlay.Markers.FirstOrDefault(m => m.ToolTipText.Contains("Third"));
+
+            Drop123_Overlay.Markers.Remove(marker_old);
+            drop1 = MouseDownStart;
+            //create new marker
+            var marker = new GMarkerGoogle(MouseDownStart, GMarkerGoogleType.orange_small)
+            {
+                ToolTipText = "First drop \nLat:" + thirdDropTarget.DropPosition.Lat + "; Lng:" + thirdDropTarget.DropPosition.Lng + "\n Alt: " + thirdDropTarget.DropAltitude + "\n Servo channel: " + thirdDropTarget.ServoChannel,
+                ToolTipMode = MarkerTooltipMode.Always
+            };
+
+            //add marker to overlay
+            Drop123_Overlay.Markers.Add(marker);
+
+            //add overlay to map
+            if (!MainV2.instance.FlightData.gMapControl1.Overlays.Contains(Drop123_Overlay))
+                gMapControl1.Overlays.Add(Drop123_Overlay);
+
+            gMapControl1.UpdateMarkerLocalPosition(marker);
+
+            #endregion
         }
 
         private void dropOnMapStartAll_Click(object sender, EventArgs e)
@@ -3060,37 +3105,43 @@ namespace MissionPlanner.GCSViews
         {
             MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "GUIDED");
 
-            //Current location of the UAV
-            var currentLocation = new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng);
-
-
-            double bearing = DroppingCalculator.Bearing(currentLocation, drop1);
-            double offset = 30; // UAV fly through the drop target position ??? miért 30
-            var actualWaypoint = DroppingCalculator.OffsetPoint(drop1, offset, bearing);
-
-            _dropMarkerLayer.ClearAll();
-            //Show the red target marker
-            _dropMarkerLayer.ShowTarget(actualWaypoint);
-            // Set servo channel
-            _dropManager.SetServoChannel(servoDrop1);
-
-            _dropManager.SetNextTarget(drop1, altDrop1);
-
-            var gotohere = new Locationwp
+            foreach (var dropTarget in _DropTargets)
             {
-                id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
-                alt = altDrop1,
-                lat = actualWaypoint.Lat,
-                lng = actualWaypoint.Lng
-            };
+                //Current location of the UAV
+                var currentLocation = new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng);
 
-            for (int j = 0; j <= 5; j++)
-            {
-                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
+
+                double bearing = DroppingCalculator.Bearing(currentLocation, drop1);
+                double offset = 30; // UAV fly through the drop target position ??? miért 30
+                var actualWaypoint = DroppingCalculator.OffsetPoint(drop1, offset, bearing);
+
+                _dropMarkerLayer.ClearAll();
+                //Show the red target marker
+                _dropMarkerLayer.ShowTarget(actualWaypoint);
+                // Set servo channel
+                _dropManager.SetServoChannel(dropTarget.ServoChannel);
+
+                _dropManager.SetNextTarget(dropTarget.DropPosition, dropTarget.DropAltitude);
+
+                var gotohere = new Locationwp
+                {
+                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
+                    alt = dropTarget.DropAltitude,
+                    lat = actualWaypoint.Lat,
+                    lng = actualWaypoint.Lng
+                };
+
+                for (int j = 0; j <= 5; j++)
+                {
+                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
+                }
+
+                await WaitForDropAsync();
+
+                // optional delay
+                await Task.Delay(500);
             }
 
-            // now asynchronously wait  
-            //await WaitForDropAsync();
 
         }
 
@@ -3341,23 +3392,25 @@ namespace MissionPlanner.GCSViews
 
             //
 
-            #region Get servo
+            //#region Get servo
 
-            string servo = "9";
-            if (DialogResult.Cancel == InputBox.Show("Enter servo", "Enter servo channel", ref servo))
-                return;
+            //string servo = "9";
+            //if (DialogResult.Cancel == InputBox.Show("Enter servo", "Enter servo channel", ref servo))
+            //    return;
 
-            int intservo = (int)(100 * CurrentState.multiplieralt);
-            if (!int.TryParse(servo, out intservo))
-            {
-                CustomMessageBox.Show("Bad servo");
-                return;
-            }
+            //int intservo = (int)(100 * CurrentState.multiplieralt);
+            //if (!int.TryParse(servo, out intservo))
+            //{
+            //    CustomMessageBox.Show("Bad servo");
+            //    return;
+            //}
 
-            #endregion
+            //#endregion
 
-            _dropManager.TriggerServo(intservo);
-            CustomMessageBox.Show("Drop manager STOPPED!");
+            //_dropManager.TriggerServo(intservo);
+            //CustomMessageBox.Show("Drop manager STOPPED!");
+
+            _dropManager.Stop();
         }
 
         private void gimbalTrackbar_Scroll(object sender, EventArgs e)

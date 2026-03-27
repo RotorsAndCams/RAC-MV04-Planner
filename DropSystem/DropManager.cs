@@ -83,8 +83,14 @@ namespace MissionPlanner.DropSystem
         // Stop: stop the impact calculation
         public void Stop()
         {
-            if (_timer.Enabled)
-                _timer.Stop();
+            try
+            {
+                if (_timer != null)
+                {
+                    _timer.Stop();
+                }
+            }
+            catch {  }
         }
 
         // DropNow: is called when the operator decides to drop now
