@@ -58,8 +58,8 @@ namespace MissionPlanner.DropSystem
             string[] parts = position.Split(';');
 
             if (parts.Length == 2 &&
-                float.TryParse(parts[0], NumberStyles.Number, CultureInfo.InvariantCulture, out float a) &&
-                float.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out float b))
+                float.TryParse(parts[0], NumberStyles.Number, new CultureInfo("hu-HU"), out float a) &&
+                float.TryParse(parts[1], NumberStyles.Number, new CultureInfo("hu-HU"), out float b))
             {
                 DropPosition = new PointLatLng(a, b);
             }

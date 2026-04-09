@@ -261,6 +261,18 @@ namespace MissionPlanner.GCSViews
                             _dropManager.DropNow();
                             //_dropMarkerLayer.ShowImpact(impactPoint);
                             MessageBox.Show("DROP - in the range");
+
+                            _dropManager.Stop();
+
+                            Task.Delay(300);
+
+                            if(_DropTargets.Count > 0)
+                            {
+                                DropTarget dt = _DropTargets.Dequeue();
+                                StartDropProcess(dt);
+                            }
+
+                            
                         }
                         else
                         {
@@ -2963,17 +2975,9 @@ namespace MissionPlanner.GCSViews
         
 
         GMapOverlay Drop123_Overlay = new GMapOverlay("Drop123_Overlay");
+        Queue<DropTarget> _DropTargets = new Queue<DropTarget>();
 
-        PointLatLng drop1;
-        PointLatLng drop2;
-        PointLatLng drop3;
-        int altDrop1;
-        int altDrop2;
-        int altDrop3;
-        int servoDrop1;
-        int servoDrop2;
-        int servoDrop3;
-        List<DropTarget> _DropTargets = new List<DropTarget>();
+
         private void dropOnMap1_Click(object sender, EventArgs e)
         {
 
@@ -2981,7 +2985,7 @@ namespace MissionPlanner.GCSViews
             if (firstDropTarget == null)
             {
                 firstDropTarget = new DropTarget("First", Drop123_Overlay);
-                _DropTargets.Add(firstDropTarget);
+                _DropTargets.Enqueue(firstDropTarget);
             }
             
 
@@ -2995,7 +2999,7 @@ namespace MissionPlanner.GCSViews
             var marker_old = Drop123_Overlay.Markers.FirstOrDefault(m => m.ToolTipText.Contains("First"));
 
             Drop123_Overlay.Markers.Remove(marker_old);
-            drop1 = MouseDownStart;
+
             //create new marker
             var marker = new GMarkerGoogle(MouseDownStart, GMarkerGoogleType.orange_small)
             {
@@ -3022,7 +3026,7 @@ namespace MissionPlanner.GCSViews
             if (secondDropTarget == null)
             {
                 secondDropTarget = new DropTarget("Second", Drop123_Overlay);
-                _DropTargets.Add(secondDropTarget);
+                _DropTargets.Enqueue(secondDropTarget);
             }
 
 
@@ -3036,7 +3040,7 @@ namespace MissionPlanner.GCSViews
             var marker_old = Drop123_Overlay.Markers.FirstOrDefault(m => m.ToolTipText.Contains("Second"));
 
             Drop123_Overlay.Markers.Remove(marker_old);
-            drop1 = MouseDownStart;
+
             //create new marker
             var marker = new GMarkerGoogle(MouseDownStart, GMarkerGoogleType.orange_small)
             {
@@ -3062,7 +3066,7 @@ namespace MissionPlanner.GCSViews
             if (thirdDropTarget == null)
             {
                 thirdDropTarget = new DropTarget("Third", Drop123_Overlay);
-                _DropTargets.Add(thirdDropTarget);
+                _DropTargets.Enqueue(thirdDropTarget);
             }
 
 
@@ -3076,7 +3080,7 @@ namespace MissionPlanner.GCSViews
             var marker_old = Drop123_Overlay.Markers.FirstOrDefault(m => m.ToolTipText.Contains("Third"));
 
             Drop123_Overlay.Markers.Remove(marker_old);
-            drop1 = MouseDownStart;
+
             //create new marker
             var marker = new GMarkerGoogle(MouseDownStart, GMarkerGoogleType.orange_small)
             {
@@ -3098,50 +3102,80 @@ namespace MissionPlanner.GCSViews
 
         private void dropOnMapStartAll_Click(object sender, EventArgs e)
         {
-            StartDropProcess();
+            DropTarget dt = _DropTargets.Dequeue();
+            StartDropProcess(dt);
         }
 
-        private async void StartDropProcess()
+        private void StartDropProcess(DropTarget p_dropTarget)
         {
             MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "GUIDED");
 
-            foreach (var dropTarget in _DropTargets)
+            if (p_dropTarget == null)
+                return;
+
+            var currentLocation = new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng);
+
+            double bearing = DroppingCalculator.Bearing(currentLocation, p_dropTarget.DropPosition);
+            double offset = 30; // UAV fly through the drop target position ??? miért 30
+            var actualWaypoint = DroppingCalculator.OffsetPoint(p_dropTarget.DropPosition, offset, bearing);
+
+            _dropMarkerLayer.ClearAll();
+            //Show the red target marker
+            _dropMarkerLayer.ShowTarget(actualWaypoint);
+            // Set servo channel
+            _dropManager.SetServoChannel(p_dropTarget.ServoChannel);
+
+            _dropManager.SetNextTarget(p_dropTarget.DropPosition, p_dropTarget.DropAltitude);
+
+            var gotohere = new Locationwp
             {
-                //Current location of the UAV
-                var currentLocation = new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng);
+                id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
+                alt = p_dropTarget.DropAltitude,
+                lat = actualWaypoint.Lat,
+                lng = actualWaypoint.Lng
+            };
 
-
-                double bearing = DroppingCalculator.Bearing(currentLocation, drop1);
-                double offset = 30; // UAV fly through the drop target position ??? miért 30
-                var actualWaypoint = DroppingCalculator.OffsetPoint(drop1, offset, bearing);
-
-                _dropMarkerLayer.ClearAll();
-                //Show the red target marker
-                _dropMarkerLayer.ShowTarget(actualWaypoint);
-                // Set servo channel
-                _dropManager.SetServoChannel(dropTarget.ServoChannel);
-
-                _dropManager.SetNextTarget(dropTarget.DropPosition, dropTarget.DropAltitude);
-
-                var gotohere = new Locationwp
-                {
-                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
-                    alt = dropTarget.DropAltitude,
-                    lat = actualWaypoint.Lat,
-                    lng = actualWaypoint.Lng
-                };
-
-                for (int j = 0; j <= 5; j++)
-                {
-                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
-                }
-
-                await WaitForDropAsync();
-
-                // optional delay
-                await Task.Delay(500);
+            for (int j = 0; j <= 5; j++)
+            {
+                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
             }
 
+            
+            //foreach (var dropTarget in _DropTargets)
+            //{
+            //    //Current location of the UAV
+            //    var currentLocation = new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng);
+
+            //    double bearing = DroppingCalculator.Bearing(currentLocation, dropTarget.DropPosition);
+            //    double offset = 30; // UAV fly through the drop target position ??? miért 30
+            //    var actualWaypoint = DroppingCalculator.OffsetPoint(dropTarget.DropPosition, offset, bearing);
+
+            //    _dropMarkerLayer.ClearAll();
+            //    //Show the red target marker
+            //    _dropMarkerLayer.ShowTarget(actualWaypoint);
+            //    // Set servo channel
+            //    _dropManager.SetServoChannel(dropTarget.ServoChannel);
+
+            //    _dropManager.SetNextTarget(dropTarget.DropPosition, dropTarget.DropAltitude);
+
+            //    var gotohere = new Locationwp
+            //    {
+            //        id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
+            //        alt = dropTarget.DropAltitude,
+            //        lat = actualWaypoint.Lat,
+            //        lng = actualWaypoint.Lng
+            //    };
+
+            //    for (int j = 0; j <= 5; j++)
+            //    {
+            //        MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
+            //    }
+
+            //    await WaitForDropAsync();
+
+            //    // optional delay
+            //    await Task.Delay(500);
+            //}
 
         }
 

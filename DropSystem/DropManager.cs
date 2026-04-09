@@ -23,6 +23,8 @@ namespace MissionPlanner.DropSystem
         private int _cycleCounter = 0;
         private DateTime _lastLogTime = DateTime.Now;
 
+        public event EventHandler DropProcessOverEvent;
+
 
         // Fixed target position
         public PointLatLng? TargetLocation { get; private set; }
@@ -121,16 +123,13 @@ namespace MissionPlanner.DropSystem
                 return;
 
             // no target, do nothing
-            if (!NextTarget.HasValue) return;
+            if (!NextTarget.HasValue)
+                return;
 
             if (MainV2.comPort.MAV.cs.mode.ToUpper() != "GUIDED")
                 MainV2.comPort.setMode((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, "GUIDED");
 
-
-            // Getting current drone position
-            double currLat = MainV2.comPort.MAV.cs.lat;
-            double currLng = MainV2.comPort.MAV.cs.lng;
-            var currentLocation = new PointLatLng(currLat, currLng);
+            var currentLocation = new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng);
 
             // Calculate bearing and offset
             double bearing = DroppingCalculator.Bearing(currentLocation, NextTarget.Value);
@@ -145,7 +144,7 @@ namespace MissionPlanner.DropSystem
                 lat = actualWaypoint.Lat,
                 lng = actualWaypoint.Lng
             };
-            MainV2.comPort.setGuidedModeWP(
+            MainV2.comPort.setGuidedModeWP_NoErrorMSG(
                 (byte)MainV2.comPort.sysidcurrent,
                 (byte)MainV2.comPort.compidcurrent,
                 wp);
@@ -171,7 +170,6 @@ namespace MissionPlanner.DropSystem
 
             CurrentImpact = impactPoint;
 
-
             //DROPNOW - INVOKE
             ImpactUpdated?.Invoke(impactPoint);
 
@@ -194,7 +192,6 @@ namespace MissionPlanner.DropSystem
 
             //quadratic error range tolerance -> larger precision error at higher speed
             double velocityQuadraticOffset = 0.05 * MainV2.comPort.MAV.cs.groundspeed * MainV2.comPort.MAV.cs.groundspeed;
-
 
             System.Diagnostics.Debug.WriteLine($"[DropManager] epsilonMeters + offset: {epsilonMeters + Math.Min(5.0, velocityQuadraticOffset)} m");
             return distanceInMeters <= (epsilonMeters + Math.Min(5.0, velocityQuadraticOffset));
@@ -287,6 +284,9 @@ namespace MissionPlanner.DropSystem
             if(_timer != null)
             {
                 _timer.Stop();
+
+                if (DropProcessOverEvent != null)
+                    DropProcessOverEvent(null,null);
             }
             
         }
