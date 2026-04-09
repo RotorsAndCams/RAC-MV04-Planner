@@ -187,9 +187,7 @@ namespace MissionPlanner.GCSViews
             this.contextMenuStripMap = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.goHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.flyToHereAltToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.selectDropTargetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.flyToCoordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dropToCoordsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 
             this.dropOnMap1 = new System.Windows.Forms.ToolStripMenuItem();
             this.dropOnMap2 = new System.Windows.Forms.ToolStripMenuItem();
@@ -2444,9 +2442,7 @@ namespace MissionPlanner.GCSViews
             this.contextMenuStripMap.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.goHereToolStripMenuItem,
             this.flyToHereAltToolStripMenuItem,
-            this.selectDropTargetToolStripMenuItem,
             this.flyToCoordsToolStripMenuItem,
-            this.dropToCoordsToolStripMenuItem,
             this.dropOnMap1,
             this.dropOnMap2,
             this.dropOnMap3,
@@ -2476,25 +2472,12 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.flyToHereAltToolStripMenuItem, "flyToHereAltToolStripMenuItem");
             this.flyToHereAltToolStripMenuItem.Click += new System.EventHandler(this.flyToHereAltToolStripMenuItem_Click);
             // 
-            // selectDropTargetToolStripMenuItem
-            // 
-            this.selectDropTargetToolStripMenuItem.Name = "selectDropTargetToolStripMenuItem";
-            resources.ApplyResources(this.selectDropTargetToolStripMenuItem, "selectDropTargetToolStripMenuItem");
-            this.selectDropTargetToolStripMenuItem.Text = "Select Drop Position";
-            this.selectDropTargetToolStripMenuItem.Click += new System.EventHandler(this.selectDropTargetToolStripMenuItem_Click);
-            // 
-            // dropToCoordsToolStripMenuItem
-            // 
-            this.dropToCoordsToolStripMenuItem.Name = "dropToCoordsToolStripMenuItem";
-            resources.ApplyResources(this.dropToCoordsToolStripMenuItem, "dropToCoordsToolStripMenuItem");
-            this.dropToCoordsToolStripMenuItem.Text = "Drop To Coords";
-            this.dropToCoordsToolStripMenuItem.Click += new System.EventHandler(this.dropToCoordsToolStripMenuItem_Click);
-            // 
             // dropOnMap1
             // 
             this.dropOnMap1.Name = "dropOnMap1";
             resources.ApplyResources(this.dropOnMap1, "dropOnMap1");
             this.dropOnMap1.Text = "Drop On Map 1";
+            this.dropOnMap1.Font = new System.Drawing.Font("Segoe UI", 16f, System.Drawing.FontStyle.Bold);
             this.dropOnMap1.Click += new System.EventHandler(this.dropOnMap1_Click);
             // 
             // dropOnMap2
@@ -2502,6 +2485,7 @@ namespace MissionPlanner.GCSViews
             this.dropOnMap2.Name = "dropOnMap2";
             resources.ApplyResources(this.dropOnMap2, "dropOnMap2");
             this.dropOnMap2.Text = "Drop On Map 2";
+            this.dropOnMap2.Font = new System.Drawing.Font("Segoe UI", 16f, System.Drawing.FontStyle.Bold);
             this.dropOnMap2.Click += new System.EventHandler(this.dropOnMap2_Click);
             // 
             // dropOnMap3
@@ -2509,6 +2493,7 @@ namespace MissionPlanner.GCSViews
             this.dropOnMap3.Name = "dropOnMap3";
             resources.ApplyResources(this.dropOnMap3, "dropOnMap3");
             this.dropOnMap3.Text = "Drop On Map 3";
+            this.dropOnMap3.Font = new System.Drawing.Font("Segoe UI", 16f, System.Drawing.FontStyle.Bold);
             this.dropOnMap3.Click += new System.EventHandler(this.dropOnMap3_Click);
             //
             // dropOnMapStartAll
@@ -2516,6 +2501,7 @@ namespace MissionPlanner.GCSViews
             this.dropOnMapStartAll.Name = "dropOnMapStartAll";
             resources.ApplyResources(this.dropOnMapStartAll, "dropOnMapStartAll");
             this.dropOnMapStartAll.Text = "Start Drop On Map ALL";
+            this.dropOnMapStartAll.Font = new System.Drawing.Font("Segoe UI", 16f, System.Drawing.FontStyle.Bold);
             this.dropOnMapStartAll.Click += new System.EventHandler(this.dropOnMapStartAll_Click);
             // 
             // flyToCoordsToolStripMenuItem
@@ -3009,7 +2995,6 @@ namespace MissionPlanner.GCSViews
         private Controls.QuickView quickView1;
         private Controls.QuickView quickView4;
         private System.Windows.Forms.ToolStripMenuItem flyToHereAltToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem selectDropTargetToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem flightPlannerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem userItemsToolStripMenuItem;
         //private Crom.Controls.Docking.DockContainer dockContainer1;
@@ -3139,7 +3124,6 @@ namespace MissionPlanner.GCSViews
         private Controls.QuickView quickView5;
         private System.Windows.Forms.ToolStripMenuItem poiatcoordsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem flyToCoordsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem dropToCoordsToolStripMenuItem;
 
         //Drop to coords 1-2-3
         private System.Windows.Forms.ToolStripMenuItem dropOnMap1;

@@ -89,9 +89,8 @@ namespace MissionPlanner.DropSystem
 
         }
 
-        public void GetServoData()
+        public void GetServoData(string servo = "6")
         {
-            string servo = "6";
             if (DialogResult.Cancel == InputBox.Show("Enter servo", "Enter servo channel", ref servo))
                 return;
 

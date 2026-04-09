@@ -2972,7 +2972,12 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        
+
+
+
+
+
+
 
         GMapOverlay Drop123_Overlay = new GMapOverlay("Drop123_Overlay");
         Queue<DropTarget> _DropTargets = new Queue<DropTarget>();
@@ -2991,7 +2996,7 @@ namespace MissionPlanner.GCSViews
 
             firstDropTarget.GetPositionFromInputMessageBox(MouseDownStart);
             firstDropTarget.GetAltitude();
-            firstDropTarget.GetServoData();
+            firstDropTarget.GetServoData("6");
             //firstDropTarget.DrawOnMapDropTarget();
 
             #region Draw drop point on map
@@ -3032,7 +3037,7 @@ namespace MissionPlanner.GCSViews
 
             secondDropTarget.GetPositionFromInputMessageBox(MouseDownStart);
             secondDropTarget.GetAltitude();
-            secondDropTarget.GetServoData();
+            secondDropTarget.GetServoData("7");
             //firstDropTarget.DrawOnMapDropTarget();
 
             #region Draw drop point on map
@@ -3044,7 +3049,7 @@ namespace MissionPlanner.GCSViews
             //create new marker
             var marker = new GMarkerGoogle(MouseDownStart, GMarkerGoogleType.orange_small)
             {
-                ToolTipText = "First drop \nLat:" + secondDropTarget.DropPosition.Lat + "; Lng:" + secondDropTarget.DropPosition.Lng + "\n Alt: " + secondDropTarget.DropAltitude + "\n Servo channel: " + secondDropTarget.ServoChannel,
+                ToolTipText = "Second drop \nLat:" + secondDropTarget.DropPosition.Lat + "; Lng:" + secondDropTarget.DropPosition.Lng + "\n Alt: " + secondDropTarget.DropAltitude + "\n Servo channel: " + secondDropTarget.ServoChannel,
                 ToolTipMode = MarkerTooltipMode.Always
             };
 
@@ -3072,7 +3077,7 @@ namespace MissionPlanner.GCSViews
 
             thirdDropTarget.GetPositionFromInputMessageBox(MouseDownStart);
             thirdDropTarget.GetAltitude();
-            thirdDropTarget.GetServoData();
+            thirdDropTarget.GetServoData("8");
             //firstDropTarget.DrawOnMapDropTarget();
 
             #region Draw drop point on map
@@ -3084,7 +3089,7 @@ namespace MissionPlanner.GCSViews
             //create new marker
             var marker = new GMarkerGoogle(MouseDownStart, GMarkerGoogleType.orange_small)
             {
-                ToolTipText = "First drop \nLat:" + thirdDropTarget.DropPosition.Lat + "; Lng:" + thirdDropTarget.DropPosition.Lng + "\n Alt: " + thirdDropTarget.DropAltitude + "\n Servo channel: " + thirdDropTarget.ServoChannel,
+                ToolTipText = "Third drop \nLat:" + thirdDropTarget.DropPosition.Lat + "; Lng:" + thirdDropTarget.DropPosition.Lng + "\n Alt: " + thirdDropTarget.DropAltitude + "\n Servo channel: " + thirdDropTarget.ServoChannel,
                 ToolTipMode = MarkerTooltipMode.Always
             };
 
@@ -3102,6 +3107,7 @@ namespace MissionPlanner.GCSViews
 
         private void dropOnMapStartAll_Click(object sender, EventArgs e)
         {
+            //Start with the first -> event triggers more drop from queue
             DropTarget dt = _DropTargets.Dequeue();
             StartDropProcess(dt);
         }
@@ -3123,7 +3129,7 @@ namespace MissionPlanner.GCSViews
             //Show the red target marker
             _dropMarkerLayer.ShowTarget(actualWaypoint);
             // Set servo channel
-            _dropManager.SetServoChannel(p_dropTarget.ServoChannel);
+            _dropManager.ServoChannel = p_dropTarget.ServoChannel;
 
             _dropManager.SetNextTarget(p_dropTarget.DropPosition, p_dropTarget.DropAltitude);
 
@@ -3140,281 +3146,6 @@ namespace MissionPlanner.GCSViews
                 MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
             }
 
-            
-            //foreach (var dropTarget in _DropTargets)
-            //{
-            //    //Current location of the UAV
-            //    var currentLocation = new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng);
-
-            //    double bearing = DroppingCalculator.Bearing(currentLocation, dropTarget.DropPosition);
-            //    double offset = 30; // UAV fly through the drop target position ??? miért 30
-            //    var actualWaypoint = DroppingCalculator.OffsetPoint(dropTarget.DropPosition, offset, bearing);
-
-            //    _dropMarkerLayer.ClearAll();
-            //    //Show the red target marker
-            //    _dropMarkerLayer.ShowTarget(actualWaypoint);
-            //    // Set servo channel
-            //    _dropManager.SetServoChannel(dropTarget.ServoChannel);
-
-            //    _dropManager.SetNextTarget(dropTarget.DropPosition, dropTarget.DropAltitude);
-
-            //    var gotohere = new Locationwp
-            //    {
-            //        id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
-            //        alt = dropTarget.DropAltitude,
-            //        lat = actualWaypoint.Lat,
-            //        lng = actualWaypoint.Lng
-            //    };
-
-            //    for (int j = 0; j <= 5; j++)
-            //    {
-            //        MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
-            //    }
-
-            //    await WaitForDropAsync();
-
-            //    // optional delay
-            //    await Task.Delay(500);
-            //}
-
-        }
-
-        private async void dropToCoordsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var location = "";
-            InputBox.Show("Enter 3 Drop To Coords", "Please enter the coords in a format 'lat1;long1;alt1 | lat2;long2;alt2 | lat3;long3;alt3'", ref location);
-
-            var allCoords = location.Split('|');
-
-            if (allCoords.Length < 3)
-            {
-                CustomMessageBox.Show("Invalid number of coordinates. Please enter exactly 3 targets.", Strings.ERROR);
-                return;
-            }
-
-            for (int i = 0; i < allCoords.Length; i++)
-            {
-                var split = allCoords[i].Trim().Split(';');
-
-                // Getting target position
-                float targetLat = float.Parse(split[0], CultureInfo.InvariantCulture);
-                float targetLng = float.Parse(split[1], CultureInfo.InvariantCulture);
-                float targetAlt = float.Parse(split[2], CultureInfo.InvariantCulture);
-
-                // Getting target position
-                var targetPt = new PointLatLng(targetLat, targetLng);
-
-                // Getting current drone position
-                double currLat = MainV2.comPort.MAV.cs.lat;
-                double currLng = MainV2.comPort.MAV.cs.lng;
-                var currentLocation = new PointLatLng(currLat, currLng);
-
-
-                // Calculate bearing and offset
-                double bearing = DroppingCalculator.Bearing(currentLocation, targetPt);
-                double offset = 30; // UAV fly through the drop target position
-                var actualWaypoint = DroppingCalculator.OffsetPoint(targetPt, offset, bearing);
-
-                if (MainV2.comPort.MAV.cs.mode.ToLower() == "guided")
-                {
-                    //CustomMessageBox.Show("Drop target set at: \n lat: " + targetLat + "\n" +
-                    //" long: " + targetLng + "\n alt: " +
-                    //targetAlt);
-
-                    // New fixed landing target
-                    //_dropManager.SetTarget(targetPt);
-                    //Clear any other layer (impact or drop)
-                    _dropMarkerLayer.ClearAll();
-                    //Show the red target marker
-                    _dropMarkerLayer.ShowTarget(targetPt);
-                    // Set servo channel
-                    _dropManager.SetServoChannel(9 + i); //9, 10, 11
-                    // Start the dropping sequence
-                    //_dropManager.Start();
-
-                    _dropManager.SetNextTarget(targetPt, targetAlt);
-
-                    var gotohere = new Locationwp
-                    {
-                        id = (ushort)MAVLink.MAV_CMD.WAYPOINT,
-                        alt = targetAlt,
-                        lat = actualWaypoint.Lat,
-                        lng = actualWaypoint.Lng
-                    };
-
-                    for (int j = 0; j <= 5; j++)
-                    {
-                        MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
-                    }
-
-                    // now asynchronously wait  
-                    await WaitForDropAsync();
-
-                    // optional delay
-                    await Task.Delay(500);
-                }
-                else
-                {
-                    MessageBox.Show("Failed - drone need to be in GUIDED mode");
-                }
-            }
-                 
-        }
-
-        private Task WaitForDropAsync()
-        {
-            var tcs = new TaskCompletionSource<bool>();
-
-            void Handler(PointLatLng p)
-            {
-                _dropManager.OnDropped -= Handler;
-                tcs.TrySetResult(true);
-                
-            }
-
-            _dropManager.OnDropped += Handler;
-            return tcs.Task;
-        }
-
-
-
-
-        private void selectDropTargetToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            string alt = "100";
-
-            if (MainV2.comPort.MAV.cs.firmware == Firmwares.ArduCopter2)
-            {
-                alt = (10 * CurrentState.multiplieralt).ToString("0");
-            }
-            else
-            {
-                alt = (100 * CurrentState.multiplieralt).ToString("0");
-            }
-
-            if (Settings.Instance.ContainsKey("guided_alt"))
-                alt = Settings.Instance["guided_alt"];
-
-            if (DialogResult.Cancel == InputBox.Show("Enter Alt", "Enter Guided Mode Alt", ref alt))
-                return;
-
-            Settings.Instance["guided_alt"] = alt;
-
-            int intalt = (int)(100 * CurrentState.multiplieralt);
-            if (!int.TryParse(alt, out intalt))
-            {
-                CustomMessageBox.Show("Bad Alt");
-                return;
-            }
-
-            if (intalt < 10)
-                intalt = 10;
-
-            MainV2.comPort.MAV.GuidedMode.command = (byte)MAV_CMD.WAYPOINT;
-
-            //MainV2.comPort.MAV.GuidedMode.x = (int)(MouseDownStart.Lat * 1e7);
-            //MainV2.comPort.MAV.GuidedMode.y = (int)(MouseDownStart.Lng * 1e7);
-
-            // Getting target position
-            double targetLat = MouseDownStart.Lat;
-            double targetLng = MouseDownStart.Lng;
-            var targetPt = new PointLatLng(targetLat, targetLng);
-
-            
-
-            // Getting current drone position
-            double currLat = MainV2.comPort.MAV.cs.lat;
-            double currLng = MainV2.comPort.MAV.cs.lng;
-            var currentLocation = new PointLatLng(currLat, currLng);
-
-            // Calculate bearing and offset
-            double bearing = DroppingCalculator.Bearing(currentLocation, targetPt);
-            double offset = 30; // UAV fly through the drop target position
-            var actualWaypoint = DroppingCalculator.OffsetPoint(targetPt, offset, bearing);
-
-            MainV2.comPort.MAV.GuidedMode.x = (int)(actualWaypoint.Lat * 1e7);
-            MainV2.comPort.MAV.GuidedMode.y = (int)(actualWaypoint.Lng * 1e7);
-
-            MainV2.comPort.MAV.GuidedMode.z = intalt / CurrentState.multiplieralt;
-
-            if (MainV2.comPort.MAV.cs.mode.ToLower() == "guided")
-            {
-                CustomMessageBox.Show("Drop target set at: \n lat: " + targetLat + "\n" +
-                    " long: " + targetLng + "\n alt: " +
-                    MainV2.comPort.MAV.GuidedMode.z);
-
-                // New fixed landing target
-                _dropManager.SetTarget(targetPt);
-                //Clear any other layer (impact or drop)
-                _dropMarkerLayer.ClearAll();
-                //Show the red target marker
-                _dropMarkerLayer.ShowTarget(targetPt);
-                // Start the dropping sequence
-                _dropManager.Start();
-
-
-                //if (droptarget != null)
-                //{
-                //    gMapControl1.Overlays.Remove(droptarget);
-                //}
-
-                //var marker = new GMapMarkerRect(new PointLatLng(MainV2.comPort.MAV.GuidedMode.x / 1e7, MainV2.comPort.MAV.GuidedMode.y / 1e7))
-                //{
-                //    ToolTipText = "Drop Target",
-                //    ToolTipMode = MarkerTooltipMode.OnMouseOver
-                //};
-
-                //droptarget.Markers.Add(marker);
-                //gMapControl1.Overlays.Add(droptarget);
-
-                //gMapControl1.Refresh();
-
-
-
-                Locationwp wp = new Locationwp()
-                {
-                    alt = MainV2.comPort.MAV.GuidedMode.z,
-                    lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
-                    id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                };
-
-                for (int i = 0; i <= 5; i++)
-                {
-                    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, wp);
-                }
-
-
-
-                //MainV2.comPort.setGuidedModeWP(new Locationwp
-                //{
-                //    alt = MainV2.comPort.MAV.GuidedMode.z,
-                //    lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                //    lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
-                //});
-
-                //for (int i = 0; i <= 5; i++)
-                //{
-                //    MainV2.comPort.setGuidedModeWP(new Locationwp
-                //    {
-                //        alt = MainV2.comPort.MAV.GuidedMode.z,
-                //        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                //        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7
-                //    });
-                //}
-
-                //for (int i = 0; i <= 5; i++) 
-                //{
-                //    MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, new Locationwp()
-                //    {
-                //        alt = MainV2.comPort.MAV.GuidedMode.z,
-                //        lat = MainV2.comPort.MAV.GuidedMode.x / 1e7,
-                //        lng = MainV2.comPort.MAV.GuidedMode.y / 1e7,
-                //        id = (ushort)MAVLink.MAV_CMD.WAYPOINT
-                //    });
-                //}
-
-            }
         }
 
         // User clicks “Drop Now”
@@ -3446,6 +3177,15 @@ namespace MissionPlanner.GCSViews
 
             _dropManager.Stop();
         }
+
+
+
+
+
+
+
+
+
 
         private void gimbalTrackbar_Scroll(object sender, EventArgs e)
         {
