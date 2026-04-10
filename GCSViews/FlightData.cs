@@ -264,8 +264,6 @@ namespace MissionPlanner.GCSViews
 
                             _dropManager.Stop();
 
-                            Task.Delay(300);
-
                             if(_DropTargets.Count > 0)
                             {
                                 DropTarget dt = _DropTargets.Dequeue();

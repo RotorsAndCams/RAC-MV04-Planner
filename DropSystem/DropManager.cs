@@ -97,6 +97,7 @@ namespace MissionPlanner.DropSystem
         /// <param name="alt"></param>
         public void SetNextTarget(PointLatLng pt, float alt)
         {
+            Stop();
             NextTarget = pt;
             NextTargetAlt = alt;
             HasDropped = false;
