@@ -259,8 +259,6 @@ namespace MissionPlanner.GCSViews
                         {
                             
                             _dropManager.DropNow();
-                            //_dropMarkerLayer.ShowImpact(impactPoint);
-                            MessageBox.Show("DROP - in the range");
 
                             _dropManager.Stop();
 
