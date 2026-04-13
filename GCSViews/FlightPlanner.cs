@@ -1647,7 +1647,13 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                var existing = overlay.Markers.Where(a => a.Tag == tag);
+                if (overlay == null)
+                    return;
+
+                if (overlay.Markers == null)
+                    return;
+
+                var existing = overlay.Markers.Where(a => Equals(a.Tag, tag));
                 if (existing.Count() > 0)
                 {
                     var item = existing.First();
@@ -1657,7 +1663,7 @@ namespace MissionPlanner.GCSViews
                     item.Position = pos;
                     item.ToolTipText = tag + " : " + alt;
 
-                    var rect = overlay.Markers.OfType<GMapMarkerRect>().Where(a => a.InnerMarker == item);
+                    var rect = overlay.Markers.OfType<GMapMarkerRect>().Where(a => Equals(a.InnerMarker, item));
                     var mBorders = rect.First();
                     mBorders.Position = pos;
 

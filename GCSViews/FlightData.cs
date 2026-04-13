@@ -247,6 +247,22 @@ namespace MissionPlanner.GCSViews
             _dropManager = new DropManager();
             _dropMarkerLayer = new DropMarkerLayer(gMapControl1);
 
+            _dropManager.event_DropFinished += (a,b) => {
+
+                this.Invoke(new Action(() =>
+                {
+                    _dropManager.Stop();
+
+                    if (_DropTargets.Count > 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine("[DropManager flightdata] --- start drop process next dt");
+                        DropTarget dt = _DropTargets.Dequeue();
+                        StartDropProcess(dt);
+                    }
+                }));
+
+            };
+
             // Subscribe to events
             _dropManager.ImpactUpdated += (impactPoint) =>
             {
@@ -257,36 +273,26 @@ namespace MissionPlanner.GCSViews
                     {
                         if (_dropManager.CheckRange())
                         {
-                            
+                            System.Diagnostics.Debug.WriteLine("[DropManager flightdata] --- dropnow from impactupdated");
                             _dropManager.DropNow();
-
-                            _dropManager.Stop();
-
-                            if(_DropTargets.Count > 0)
-                            {
-                                DropTarget dt = _DropTargets.Dequeue();
-                                StartDropProcess(dt);
-                            }
-
-                            
                         }
                         else
                         {
-                            //MessageBox.Show("NO DROP - Not in the range");
                             _dropMarkerLayer.ShowImpact(impactPoint);
+
                         }
                     }
                 }));
             };
 
-            _dropManager.OnDropped += (dropPoint) =>
-            {
-                //Must marshal back to UI thread if needed
-                this.Invoke(new Action(() =>
-                {
+            //_dropManager.OnDropped += (dropPoint) =>
+            //{
+            //    //Must marshal back to UI thread if needed
+            //    this.Invoke(new Action(() =>
+            //    {
                     
-                }));
-            };
+            //    }));
+            //};
 
             // End Drop System -----------------------
 
@@ -523,6 +529,12 @@ namespace MissionPlanner.GCSViews
             
 
         }
+
+        private void _dropManager_event_DropFinished(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         public SplitContainer spltContainer;
 
         private int _sliderAltitude;
@@ -2977,7 +2989,7 @@ namespace MissionPlanner.GCSViews
 
         GMapOverlay Drop123_Overlay = new GMapOverlay("Drop123_Overlay");
         Queue<DropTarget> _DropTargets = new Queue<DropTarget>();
-
+        
 
         private void dropOnMap1_Click(object sender, EventArgs e)
         {
@@ -3103,9 +3115,12 @@ namespace MissionPlanner.GCSViews
 
         private void dropOnMapStartAll_Click(object sender, EventArgs e)
         {
-            //Start with the first -> event triggers more drop from queue
-            DropTarget dt = _DropTargets.Dequeue();
-            StartDropProcess(dt);
+            if (_DropTargets.Count > 0)
+            {
+                DropTarget dt = _DropTargets.Dequeue();
+                StartDropProcess(dt);
+            }
+
         }
 
         private void StartDropProcess(DropTarget p_dropTarget)
@@ -3120,6 +3135,8 @@ namespace MissionPlanner.GCSViews
             double bearing = DroppingCalculator.Bearing(currentLocation, p_dropTarget.DropPosition);
             double offset = 30; // UAV fly through the drop target position ??? miért 30
             var actualWaypoint = DroppingCalculator.OffsetPoint(p_dropTarget.DropPosition, offset, bearing);
+
+            _dropManager.setFinalWayPoint(actualWaypoint);
 
             _dropMarkerLayer.ClearAll();
             //Show the red target marker
@@ -3137,11 +3154,11 @@ namespace MissionPlanner.GCSViews
                 lng = actualWaypoint.Lng
             };
 
-            for (int j = 0; j <= 5; j++)
-            {
-                MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
-            }
 
+
+            
+            MainV2.comPort.setGuidedModeWP((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, gotohere);
+            
         }
 
         // User clicks “Drop Now”

@@ -97,6 +97,7 @@ namespace MissionPlanner.DropSystem
         /// <param name="alt"></param>
         public void SetNextTarget(PointLatLng pt, float alt)
         {
+            System.Diagnostics.Debug.WriteLine("[DropManager] --- set next target");
             Stop();
             NextTarget = pt;
             NextTargetAlt = alt;
@@ -110,12 +111,12 @@ namespace MissionPlanner.DropSystem
             if (HasDropped || !CurrentImpact.HasValue || !NextTarget.HasValue)
                 return false;
             double distanceInMeters = DroppingCalculator.HaversineDistance(NextTarget.Value, CurrentImpact.Value);
-            System.Diagnostics.Debug.WriteLine($"[DropManager] Distance to target: {distanceInMeters} m");
+            //System.Diagnostics.Debug.WriteLine($"[DropManager] Distance to target: {distanceInMeters} m");
 
             //quadratic error range tolerance -> larger precision error at higher speed
             double velocityQuadraticOffset = 0.05 * MainV2.comPort.MAV.cs.groundspeed * MainV2.comPort.MAV.cs.groundspeed;
 
-            System.Diagnostics.Debug.WriteLine($"[DropManager] epsilonMeters + offset: {epsilonMeters + Math.Min(5.0, velocityQuadraticOffset)} m");
+            //System.Diagnostics.Debug.WriteLine($"[DropManager] epsilonMeters + offset: {epsilonMeters + Math.Min(5.0, velocityQuadraticOffset)} m");
             return distanceInMeters <= (epsilonMeters + Math.Min(5.0, velocityQuadraticOffset));
         }
 
@@ -168,6 +169,14 @@ namespace MissionPlanner.DropSystem
 
             if (_timer != null)
                 _timer.Stop();
+
+            System.Diagnostics.Debug.WriteLine("[DropManager] --- triggerservo + timer stop");
+        }
+
+        PointLatLng _finalWP;
+        public void setFinalWayPoint(PointLatLng p_FinalWP)
+        {
+            _finalWP = p_FinalWP;
         }
 
         #endregion
@@ -253,13 +262,31 @@ namespace MissionPlanner.DropSystem
             {
                 if (CheckRange())
                 {
+                    System.Diagnostics.Debug.WriteLine("[DropManager] --- elapsed checkrange");
                     DropNow();
                 }
             }
 
+            
+            double distanceInMeters = DroppingCalculator.HaversineDistance(new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng), _finalWP);
+
+            if (distanceInMeters < 5 || HasDropped)
+            {
+                // akkor vagy sikerült már a dobás vagy nem sikerült de már közel van a célhoz és nem is lesz dobás
+
+                System.Diagnostics.Debug.WriteLine("[DropManager] --- event drop finished");
+
+                if (event_DropFinished != null)
+                    event_DropFinished(null, null);
+            }
+
         }
+
+
 
         #endregion
 
+
+        public event EventHandler event_DropFinished;
     }
 }
