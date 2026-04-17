@@ -992,7 +992,7 @@ namespace MissionPlanner.GCSViews
             this.btn_DropDown.ColorMouseDown = System.Drawing.Color.Empty;
             this.btn_DropDown.ColorMouseOver = System.Drawing.Color.Empty;
             this.btn_DropDown.ColorNotEnabled = System.Drawing.Color.Empty;
-            this.btn_DropDown.Text = "DROP!!";
+            this.btn_DropDown.Text = "Stop Drop";
             this.btn_DropDown.Name = "btn_DropDown";
             this.btn_DropDown.Dock = DockStyle.Fill;
             this.btn_DropDown.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
