@@ -794,6 +794,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Antenna\TrackerGeneric.cs" />
+    <Compile Include="StreamViewer\CameraStreamOptions.cs" />
+    <Compile Include="StreamViewer\FfplayFanoutCameraStreamPlayer.cs" />
+    <Compile Include="StreamViewer\ICameraStreamPlayer.cs" />
+    <Compile Include="StreamViewer\UdpPacketFanOut.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="Controls\ColorSlider.cs">
       <SubType>Component</SubType>
