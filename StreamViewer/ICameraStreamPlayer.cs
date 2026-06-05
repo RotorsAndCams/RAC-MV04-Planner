@@ -5,7 +5,8 @@ namespace MissionPlanner.StreamViewer
 {
     public interface ICameraStreamPlayer : IDisposable
     {
-        bool IsRunning { get; }
+        bool IsConnected { get; }
+        bool IsDisplayRunning { get; }
         bool IsSegmentRecording { get; }
 
         event EventHandler<string> StatusChanged;
@@ -15,6 +16,8 @@ namespace MissionPlanner.StreamViewer
 
         Task StartAsync(IntPtr hostWindowHandle);
         Task RestartAsync(IntPtr hostWindowHandle);
+
+        void StopDisplay();
         void Stop();
 
         void Resize(int hostWidth, int hostHeight);

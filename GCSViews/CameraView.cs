@@ -116,6 +116,16 @@ namespace MissionPlanner.GCSViews
         private bool _autoStartupApplied;
         private bool _startupCheckScheduled;
 
+        private bool _videoResizePending;
+        private bool _videoDisplayStartupCompleted;
+        private int _lastAppliedVideoWidth;
+        private int _lastAppliedVideoHeight;
+        private System.Windows.Forms.Timer _videoResizeDebounceTimer;
+
+        private bool _videoResizeScheduled;
+        private int _lastVideoPanelWidth;
+        private int _lastVideoPanelHeight;
+
         //end of ffplay video player fields
         public float SlantRange
         {
@@ -169,6 +179,10 @@ namespace MissionPlanner.GCSViews
             WireVideoStartupEvents();
             ScheduleVideoStartupCheck();            
             StartCameraControl();
+
+            _videoResizeDebounceTimer = new System.Windows.Forms.Timer();
+            _videoResizeDebounceTimer.Interval = 250;
+            _videoResizeDebounceTimer.Tick += VideoResizeDebounceTimer_Tick;
 
             // Snapshot & video save location
             CameraHandler.Instance.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
@@ -237,7 +251,7 @@ namespace MissionPlanner.GCSViews
             SetDroneStatusValue();
 
             MainV2.comPort.CommsClose += ComPort_CommsClose;
-
+            pnl_VideoView.MouseDoubleClick += vv_VLC_MouseDoubleClick;
             if(bool.Parse(SettingManager.Get(Setting.AutoConnect)))
                 this.btn_TripSwitchOnOff.Enabled = false;
         }
@@ -654,7 +668,7 @@ namespace MissionPlanner.GCSViews
             options.HideConsoleWindow = true;
 
             options.RestartDelayMs = 300;
-            options.WindowFindTimeoutMs = 10000;
+            options.WindowFindTimeoutMs = 15000;
             options.SilentRetryDelayMs = 5000;
 
             options.RecordWithStreamCopy = true;
@@ -669,8 +683,8 @@ namespace MissionPlanner.GCSViews
             options.AutoDisplayStream = AutoDisplayStream;
             options.AutoStartRecording = AutoStartRecording;
 
-            options.AutoRecordingDirectory = _recordingDirectory;
-            options.AutoRecordingSegmentSeconds = _recordingSegmentSeconds;
+            options.AutoRecordingDirectory = SettingManager.Get(Setting.MediaSaveFolder);
+            options.AutoRecordingSegmentSeconds = Int32.Parse(SettingManager.Get(Setting.VideoSegmentLength));
             options.AutoRecordingFilePrefix = "camera";
 
             options.ShowDebugMessageBoxes = false;
@@ -695,6 +709,15 @@ namespace MissionPlanner.GCSViews
             _cameraStreamPlayer.ErrorOccurred += CameraStreamPlayer_ErrorOccurred;
 
             pnl_VideoView.Resize += Pnl_VideoView_Resize;
+            pnl_VideoView.SizeChanged += Pnl_VideoView_SizeChanged;
+            pnl_VideoView.ClientSizeChanged += Pnl_VideoView_ClientSizeChanged;
+            pnl_VideoView.VisibleChanged += Pnl_VideoView_VisibleChanged;
+            pnl_VideoView.Paint += Pnl_VideoView_Paint;
+
+            this.Resize += CameraView_Resize;
+            this.SizeChanged += CameraView_SizeChanged;
+            this.VisibleChanged += CameraView_VisibleChanged;
+            this.ParentChanged += CameraView_ParentChanged;
 
             System.Diagnostics.Debug.WriteLine("Video stream initialized.");
         }
@@ -838,7 +861,7 @@ namespace MissionPlanner.GCSViews
 
                 EnsureVideoStreamPlayer();
 
-                if (_cameraStreamPlayer != null && _cameraStreamPlayer.IsRunning)
+                if (_cameraStreamPlayer != null && _cameraStreamPlayer.IsDisplayRunning)
                 {
                     VideoLog("StartVideoStream ignored: display is already running.");
                     return;
@@ -866,23 +889,19 @@ namespace MissionPlanner.GCSViews
                 );
 
                 _cameraStreamPlayer
-                    .StartAsync(pnl_VideoView.Handle)
-                    .ContinueWith(delegate (Task task)
-                    {
-                        _videoStreamStartInProgress = false;
+    .StartAsync(pnl_VideoView.Handle)
+    .ContinueWith(delegate (Task task)
+    {
+        _videoStreamStartInProgress = false;
 
-                        if (task.Exception != null)
-                        {
-                            HandleVideoStreamException(task.Exception.GetBaseException());
-                            return;
-                        }
+        if (task.Exception != null)
+        {
+            HandleVideoStreamException(task.Exception.GetBaseException());
+            return;
+        }
 
-                        RunOnUiThread(delegate
-                        {
-                            VideoLog("StartVideoStream completed. Resizing video stream.");
-                            ResizeVideoStream();
-                        });
-                    });
+        VideoLog("StartVideoStream completed.");
+    });
             }
             catch (Exception ex)
             {
@@ -897,9 +916,14 @@ namespace MissionPlanner.GCSViews
             {
                 _videoStreamStartRequested = false;
                 _videoStreamStartInProgress = false;
+                _videoDisplayStartupCompleted = false;
+                _videoResizePending = false;
+
+                if (_videoResizeDebounceTimer != null)
+                    _videoResizeDebounceTimer.Stop();
 
                 if (_cameraStreamPlayer != null)
-                    _cameraStreamPlayer.Stop();
+                    _cameraStreamPlayer.StopDisplay();
             }
             catch (Exception ex)
             {
@@ -972,7 +996,7 @@ namespace MissionPlanner.GCSViews
 
                 if (string.IsNullOrWhiteSpace(outputPath))
                 {
-                    string directory = CameraHandler.Instance.MediaSavePath;
+                    string directory = SettingManager.Get(Setting.MediaSaveFolder);
                     Directory.CreateDirectory(directory);
 
                     outputPath = Path.Combine(
@@ -1005,13 +1029,6 @@ namespace MissionPlanner.GCSViews
             {
                 HandleVideoStreamException(ex);
             }
-        }
-
-        private void _videoRecordSegmentTimer_Tick(object sender, EventArgs e)
-        {
-            //_mediaPlayerRecord.Stop();
-            StopRecording();
-            StartRecording();
         }
 
         private void StartRecording()
@@ -1096,7 +1113,7 @@ namespace MissionPlanner.GCSViews
             if (_cameraStreamPlayer == null)
                 return;
 
-            if (pnl_VideoView.Width <= 0 || pnl_VideoView.Height <= 0)
+            if (pnl_VideoView.ClientSize.Width <= 0 || pnl_VideoView.ClientSize.Height <= 0)
                 return;
 
             _cameraStreamPlayer.Resize(
@@ -1105,13 +1122,55 @@ namespace MissionPlanner.GCSViews
             );
         }
 
+        private void ApplyVideoResizeForce()
+        {
+            try
+            {
+                if (_cameraStreamPlayer == null)
+                    return;
+
+                if (!_cameraStreamPlayer.IsDisplayRunning)
+                    return;
+
+                if (pnl_VideoView == null || !pnl_VideoView.IsHandleCreated)
+                    return;
+
+                int width = pnl_VideoView.ClientSize.Width;
+                int height = pnl_VideoView.ClientSize.Height;
+
+                if (width <= 0 || height <= 0)
+                    return;
+
+                pnl_VideoView.Visible = true;
+                pnl_VideoView.BringToFront();
+
+                _lastAppliedVideoWidth = width;
+                _lastAppliedVideoHeight = height;
+
+                _cameraStreamPlayer.Resize(width, height);
+
+                pnl_VideoView.Invalidate();
+                pnl_VideoView.Update();
+
+                VideoLog("Video force resize applied: " + width + "x" + height);
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
+        }
+
         private void DisposeVideoStream()
         {
             try
             {
                 _videoStreamStartRequested = false;
                 _videoStreamStartInProgress = false;
-                _startupCheckScheduled = false;
+                _videoDisplayStartupCompleted = false;
+                _videoResizePending = false;
+
+                if (_videoResizeDebounceTimer != null)
+                    _videoResizeDebounceTimer.Stop();
 
                 if (_cameraStreamPlayer != null)
                 {
@@ -1154,29 +1213,35 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private void Pnl_VideoView_Resize(object sender, EventArgs e)
-        {
-            System.Diagnostics.Debug.WriteLine(
-                "pnl_VideoView resized: " +
-                pnl_VideoView.Width +
-                "x" +
-                pnl_VideoView.Height
-            );
-
-            ResizeVideoStream();
-
-            if (_videoStreamStartRequested &&
-                _cameraStreamPlayer != null &&
-                !_cameraStreamPlayer.IsRunning &&
-                IsVideoHostReady())
-            {
-                ScheduleVideoStartupCheck();
-            }
-        }
-
         private void CameraStreamPlayer_StatusChanged(object sender, string message)
         {
-            System.Diagnostics.Debug.WriteLine("Video stream status: " + message);
+            VideoLog("Video stream status: " + message);
+
+            if (message != null &&
+                message.IndexOf("Display streaming", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                RunOnUiThread(delegate
+                {
+                    _videoDisplayStartupCompleted = true;
+
+                    _lastAppliedVideoWidth = -1;
+                    _lastAppliedVideoHeight = -1;
+
+                    ApplyVideoResizeForce();
+
+                    System.Windows.Forms.Timer oneShotTimer = new System.Windows.Forms.Timer();
+                    oneShotTimer.Interval = 500;
+                    oneShotTimer.Tick += delegate
+                    {
+                        oneShotTimer.Stop();
+                        oneShotTimer.Dispose();
+
+                        ApplyVideoResizeForce();
+                    };
+
+                    oneShotTimer.Start();
+                });
+            }
         }
 
         private void CameraStreamPlayer_ErrorOccurred(object sender, Exception ex)
@@ -1368,7 +1433,7 @@ namespace MissionPlanner.GCSViews
             {
                 if (_fsForm == null)
                 {
-                    //TODO IDE VALAHOGY FULLSCREEN LESZ talán megvan?
+
                     // Media player
                     this.tlp_CVBase.Controls.Remove(this.pnl_VideoView);
                     _fsForm = new FormNoTheme();
@@ -1378,7 +1443,7 @@ namespace MissionPlanner.GCSViews
                     _fsForm.WindowState = FormWindowState.Maximized;
                     _fsForm.FormClosing += _fsForm_FormClosing;
 
-                    // Buttons
+                    // Buttonsdev
                     ButtonNoTheme zoomResetButton = new ButtonNoTheme();
                     zoomResetButton.Name = "zoomResetButton";
                     zoomResetButton.Text = btn_ResetZoom.Text;
@@ -1439,6 +1504,84 @@ namespace MissionPlanner.GCSViews
 
         }
 
+        private void VideoResizeDebounceTimer_Tick(object sender, EventArgs e)
+        {
+            _videoResizeDebounceTimer.Stop();
+            ApplyVideoResizeIfNeeded();
+        }
+
+        private void ScheduleVideoResize()
+        {
+            try
+            {
+                if (!_videoDisplayStartupCompleted)
+                    return;
+
+                if (_cameraStreamPlayer == null)
+                    return;
+
+                if (!_cameraStreamPlayer.IsDisplayRunning)
+                    return;
+
+                if (pnl_VideoView == null || !pnl_VideoView.IsHandleCreated)
+                    return;
+
+                if (pnl_VideoView.ClientSize.Width <= 0 || pnl_VideoView.ClientSize.Height <= 0)
+                    return;
+
+                _videoResizePending = true;
+
+                _videoResizeDebounceTimer.Stop();
+                _videoResizeDebounceTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
+        }
+
+        private void ApplyVideoResizeIfNeeded()
+        {
+            try
+            {
+                if (!_videoResizePending)
+                    return;
+
+                _videoResizePending = false;
+
+                if (_cameraStreamPlayer == null)
+                    return;
+
+                if (!_cameraStreamPlayer.IsDisplayRunning)
+                    return;
+
+                if (pnl_VideoView == null || !pnl_VideoView.IsHandleCreated)
+                    return;
+
+                int width = pnl_VideoView.ClientSize.Width;
+                int height = pnl_VideoView.ClientSize.Height;
+
+                if (width <= 0 || height <= 0)
+                    return;
+
+                if (width == _lastAppliedVideoWidth && height == _lastAppliedVideoHeight)
+                    return;
+
+                _lastAppliedVideoWidth = width;
+                _lastAppliedVideoHeight = height;
+
+                _cameraStreamPlayer.Resize(width, height);
+
+                pnl_VideoView.Invalidate();
+
+                VideoLog("Video resize applied: " + width + "x" + height);
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
+        }
+
         private void CameraView_Load(object sender, EventArgs e)
         {
             VideoLog("CameraView_Load");
@@ -1455,12 +1598,14 @@ namespace MissionPlanner.GCSViews
         {
             VideoLog("CameraView_VisibleChanged: " + Visible);
             ScheduleVideoStartupCheck();
+            ScheduleVideoResize();
         }
 
         private void CameraView_ParentChanged(object sender, EventArgs e)
         {
             VideoLog("CameraView_ParentChanged");
             ScheduleVideoStartupCheck();
+            ScheduleVideoResize();
         }
 
         private void Pnl_VideoView_HandleCreated(object sender, EventArgs e)
@@ -1469,10 +1614,44 @@ namespace MissionPlanner.GCSViews
             ScheduleVideoStartupCheck();
         }
 
+        private void Pnl_VideoView_Resize(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
+        }
+
+        private void Pnl_VideoView_SizeChanged(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
+        }
+
+        private void Pnl_VideoView_ClientSizeChanged(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
+        }
+
         private void Pnl_VideoView_VisibleChanged(object sender, EventArgs e)
         {
-            VideoLog("pnl_VideoView VisibleChanged: " + pnl_VideoView.Visible);
             ScheduleVideoStartupCheck();
+            ScheduleVideoResize();
+        }
+
+        private void Pnl_VideoView_Paint(object sender, PaintEventArgs e)
+        {
+            ScheduleVideoResize();
+        }
+
+        private void CameraView_Resize(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
+            _cameraStreamPlayer.Resize(
+                pnl_VideoView.ClientSize.Width,
+                pnl_VideoView.ClientSize.Height
+            );
+        }
+
+        private void CameraView_SizeChanged(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
         }
 
         private void _fsForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -1779,7 +1958,6 @@ namespace MissionPlanner.GCSViews
                     {
                         await Task.Delay(3000);
                         StartCameraControl();
-                        //await reconnectControlDelayed();
                         _needToResetTime = true;
                     }
                     catch
@@ -1795,15 +1973,7 @@ namespace MissionPlanner.GCSViews
                 }
 
                 Thread.Sleep(2000);
-                //CameraView.instance.StartVideoStream();
             });
-        }
-
-        private async Task reconnectControlDelayed()
-        {
-            Task.Delay(3000);
-            StartCameraControl();
-
         }
 
         #endregion
