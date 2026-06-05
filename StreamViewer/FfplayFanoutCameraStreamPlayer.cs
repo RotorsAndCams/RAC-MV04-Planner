@@ -4,8 +4,11 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace MissionPlanner.StreamViewer
 {
@@ -26,6 +29,18 @@ namespace MissionPlanner.StreamViewer
 
         private int _hostWidth;
         private int _hostHeight;
+
+        private volatile bool _desiredDisplayRunning;
+        private volatile bool _displayStartInProgress;
+        private volatile bool _retryLoopRunning;
+
+        private readonly object _displayLock = new object();
+
+        private readonly object _recordingLock = new object();
+        private volatile bool _recordingStartInProgress;
+        private int _activeRecordingRtpPort = -1;
+
+        private DateTime _lastDebugMessageBoxUtc = DateTime.MinValue;
 
         public event EventHandler<string> StatusChanged;
         public event EventHandler<Exception> ErrorOccurred;
@@ -54,81 +69,52 @@ namespace MissionPlanner.StreamViewer
         public FfplayFanoutCameraStreamPlayer(CameraStreamOptions options)
         {
             if (options == null)
-                throw new ArgumentNullException("options");
+                options = new CameraStreamOptions();
 
             _options = options;
         }
 
-        public async Task StartAsync(IntPtr hostWindowHandle)
+        public Task ConnectAsync()
         {
-            if (hostWindowHandle == IntPtr.Zero)
-                throw new ArgumentException("Host window handle cannot be zero.", "hostWindowHandle");
-
-            _hostWindowHandle = hostWindowHandle;
-
-            if (!File.Exists(_options.FfplayPath))
-                throw new FileNotFoundException("ffplay.exe was not found.", _options.FfplayPath);
-
             try
             {
                 StartFanOutIfNeeded();
-
-                StopDisplayOnly();
-
-                StartFfplayDisplay();
-
-                _ffplayWindow = await WaitForVisibleFfplayWindowAsync(
-                    _ffplayProcess,
-                    _options.WindowFindTimeoutMs
-                );
-
-                if (_ffplayWindow == IntPtr.Zero)
-                {
-                    StopDisplayOnly();
-
-                    string packetInfo =
-                        "RTP packets received: " + (_rtpFanOut != null ? _rtpFanOut.ReceivedPacketCount : 0) +
-                        ", forwarded: " + (_rtpFanOut != null ? _rtpFanOut.ForwardedPacketCount : 0) +
-                        ", dropped: " + (_rtpFanOut != null ? _rtpFanOut.DroppedPacketCount : 0);
-
-                    throw new InvalidOperationException(
-                        "Could not find ffplay video window after starting local fan-out.\n\n" +
-                        packetInfo + "\n\n" +
-                        "If RTP packets are 0, the camera is not reaching the C# fan-out.\n" +
-                        "If RTP packets are increasing but ffplay has no window, the local forwarded RTP stream is not being recognized by ffplay."
-                    );
-                }
-
-                EmbedWindow(_ffplayWindow, _hostWindowHandle);
-                Resize(_hostWidth, _hostHeight);
-
-                if (IsSegmentRecording)
-                    RaiseStatus("Display streaming and recording.");
-                else
-                    RaiseStatus("Display streaming.");
+                RaiseStatus("Stream receiver connected.");
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("ConnectAsync failed: " + ex);
                 RaiseError(ex);
-                throw;
             }
+
+            return Task.FromResult(0);
+        }
+
+        public async Task StartAsync(IntPtr hostWindowHandle)
+        {
+            _hostWindowHandle = hostWindowHandle;
+            _desiredDisplayRunning = true;
+
+            await SafeStartDisplayAttemptAsync();
         }
 
         public async Task RestartAsync(IntPtr hostWindowHandle)
         {
+            _hostWindowHandle = hostWindowHandle;
+            _desiredDisplayRunning = true;
+
             StopDisplayOnly();
 
             if (_options.RestartDelayMs > 0)
-            {
-                RaiseStatus("Restarting display...");
                 await Task.Delay(_options.RestartDelayMs);
-            }
 
-            await StartAsync(hostWindowHandle);
+            await SafeStartDisplayAttemptAsync();
         }
 
         public void Stop()
         {
+            _desiredDisplayRunning = false;
+
             StopSegmentRecording();
             StopDisplayOnly();
             StopFanOut();
@@ -147,44 +133,14 @@ namespace MissionPlanner.StreamViewer
             if (hostWidth <= 0 || hostHeight <= 0)
                 return;
 
-            int targetX = 0;
-            int targetY = 0;
-            int targetWidth = hostWidth;
-            int targetHeight = hostHeight;
-
-            if (_options.FitMode == VideoFitMode.OriginalStreamSize)
-            {
-                targetWidth = _options.StreamWidth;
-                targetHeight = _options.StreamHeight;
-                targetX = Math.Max(0, (hostWidth - targetWidth) / 2);
-                targetY = Math.Max(0, (hostHeight - targetHeight) / 2);
-            }
-            else if (_options.FitMode == VideoFitMode.FitKeepAspectRatio)
-            {
-                double streamAspect = (double)_options.StreamWidth / _options.StreamHeight;
-                double panelAspect = (double)hostWidth / hostHeight;
-
-                if (panelAspect > streamAspect)
-                {
-                    targetHeight = hostHeight;
-                    targetWidth = (int)(targetHeight * streamAspect);
-                }
-                else
-                {
-                    targetWidth = hostWidth;
-                    targetHeight = (int)(targetWidth / streamAspect);
-                }
-
-                targetX = (hostWidth - targetWidth) / 2;
-                targetY = (hostHeight - targetHeight) / 2;
-            }
+            Rectangle target = GetContainedVideoRectangle(hostWidth, hostHeight);
 
             MoveWindow(
                 _ffplayWindow,
-                targetX,
-                targetY,
-                targetWidth,
-                targetHeight,
+                target.X,
+                target.Y,
+                target.Width,
+                target.Height,
                 true
             );
 
@@ -193,43 +149,57 @@ namespace MissionPlanner.StreamViewer
 
         public async Task CaptureCurrentFrameAsync(string outputFilePath)
         {
-            if (_hostWindowHandle == IntPtr.Zero)
-                throw new InvalidOperationException("Cannot capture frame because the host window is not available.");
-
-            if (string.IsNullOrWhiteSpace(outputFilePath))
-                throw new ArgumentException("Output file path cannot be empty.", "outputFilePath");
-
-            string directory = Path.GetDirectoryName(outputFilePath);
-
-            if (!string.IsNullOrWhiteSpace(directory))
-                Directory.CreateDirectory(directory);
-
-            await Task.Run(delegate
+            try
             {
-                Rectangle bounds = GetWindowRectangle(_hostWindowHandle);
+                if (_hostWindowHandle == IntPtr.Zero)
+                    return;
 
-                if (bounds.Width <= 0 || bounds.Height <= 0)
-                    throw new InvalidOperationException("Cannot capture frame because the host window has invalid size.");
+                if (string.IsNullOrWhiteSpace(outputFilePath))
+                    return;
 
-                using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format24bppRgb))
+                string directory = Path.GetDirectoryName(outputFilePath);
+
+                if (!string.IsNullOrWhiteSpace(directory))
+                    Directory.CreateDirectory(directory);
+
+                await Task.Run(delegate
                 {
-                    using (Graphics graphics = Graphics.FromImage(bitmap))
+                    Rectangle bounds = GetWindowRectangle(_hostWindowHandle);
+
+                    if (bounds.Width <= 0 || bounds.Height <= 0)
+                        return;
+
+                    using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format24bppRgb))
                     {
-                        graphics.CopyFromScreen(
-                            bounds.Left,
-                            bounds.Top,
-                            0,
-                            0,
-                            bounds.Size,
-                            CopyPixelOperation.SourceCopy
-                        );
+                        using (Graphics graphics = Graphics.FromImage(bitmap))
+                        {
+                            graphics.CopyFromScreen(
+                                bounds.Left,
+                                bounds.Top,
+                                0,
+                                0,
+                                bounds.Size,
+                                CopyPixelOperation.SourceCopy
+                            );
+                        }
+
+                        SaveBitmapByExtension(bitmap, outputFilePath);
                     }
+                });
 
-                    SaveBitmapByExtension(bitmap, outputFilePath);
-                }
-            });
+                RaiseStatus("Frame captured: " + outputFilePath);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("CaptureCurrentFrameAsync failed: " + ex);
+                RaiseError(ex);
 
-            RaiseStatus("Frame captured: " + outputFilePath);
+                ShowDebugMessageBox(
+                    "Stream debug - capture failed",
+                    ex.ToString(),
+                    false
+                );
+            }
         }
 
         public Task StartSegmentRecordingAsync(
@@ -237,40 +207,79 @@ namespace MissionPlanner.StreamViewer
             int segmentLengthSeconds,
             string filePrefix)
         {
-            if (IsSegmentRecording)
-                throw new InvalidOperationException("Segment recording is already running.");
+            lock (_recordingLock)
+            {
+                if (_recordingStartInProgress)
+                {
+                    Debug.WriteLine("Recording start ignored: recording is already starting.");
+                    return Task.FromResult(0);
+                }
 
-            if (!File.Exists(_options.FfmpegPath))
-                throw new FileNotFoundException("ffmpeg.exe was not found.", _options.FfmpegPath);
+                if (IsProcessAlive(_recordingProcess))
+                {
+                    Debug.WriteLine("Recording start ignored: recording process is already running.");
+                    return Task.FromResult(0);
+                }
 
-            if (segmentLengthSeconds <= 0)
-                throw new ArgumentOutOfRangeException("segmentLengthSeconds", "Segment length must be greater than zero.");
+                _recordingStartInProgress = true;
+            }
 
-            if (string.IsNullOrWhiteSpace(outputDirectory))
-                throw new ArgumentException("Output directory cannot be empty.", "outputDirectory");
-
-            Directory.CreateDirectory(outputDirectory);
+            bool endpointAdded = false;
 
             try
             {
+                if (string.IsNullOrWhiteSpace(_options.FfmpegPath) || !File.Exists(_options.FfmpegPath))
+                {
+                    RaiseStatus("Recording not started: ffmpeg path is invalid.");
+
+                    ShowDebugMessageBox(
+                        "Stream debug - invalid ffmpeg path",
+                        "ffmpeg path:\n" + _options.FfmpegPath,
+                        true
+                    );
+
+                    return Task.FromResult(0);
+                }
+
+                if (segmentLengthSeconds <= 0)
+                    segmentLengthSeconds = 10;
+
+                if (string.IsNullOrWhiteSpace(outputDirectory))
+                {
+                    RaiseStatus("Recording not started: output directory is empty.");
+                    return Task.FromResult(0);
+                }
+
+                Directory.CreateDirectory(outputDirectory);
+
                 StartFanOutIfNeeded();
 
-                if (_rtpFanOut != null && _recordingRtpEndpoint != null)
-                    _rtpFanOut.AddOutputEndpoint(_recordingRtpEndpoint);
+                IPAddress localAddress;
+
+                if (!IPAddress.TryParse(_options.LocalHost, out localAddress))
+                    localAddress = IPAddress.Loopback;
+
+                int selectedRecordingPort = FindAvailableUdpPort(
+                    _options.LocalRecordingRtpPort,
+                    50
+                );
+
+                _activeRecordingRtpPort = selectedRecordingPort;
+                _recordingRtpEndpoint = new IPEndPoint(localAddress, selectedRecordingPort);
 
                 string args = BuildSegmentRecordingArguments(
                     outputDirectory,
                     segmentLengthSeconds,
-                    filePrefix
+                    string.IsNullOrWhiteSpace(filePrefix) ? "camera" : filePrefix,
+                    selectedRecordingPort
                 );
 
-                RaiseStatus("Starting segment recording...");
-
-                Debug.WriteLine("========== STARTING FFMPEG SEGMENT RECORDING ==========");
+                Debug.WriteLine("========== STARTING FFMPEG RECORDING ==========");
                 Debug.WriteLine("Path: " + _options.FfmpegPath);
-                Debug.WriteLine("Working Directory: " + GetFfmpegWorkingDirectory());
+                Debug.WriteLine("Working directory: " + GetFfmpegWorkingDirectory());
+                Debug.WriteLine("Recording local RTP port: " + selectedRecordingPort);
                 Debug.WriteLine("Args: " + args);
-                Debug.WriteLine("=======================================================");
+                Debug.WriteLine("===============================================");
 
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
@@ -298,19 +307,51 @@ namespace MissionPlanner.StreamViewer
 
                 bool started = _recordingProcess.Start();
 
-                if (!started)
-                    throw new InvalidOperationException("Could not start ffmpeg recording process.");
+                if (started)
+                {
+                    _recordingProcess.BeginErrorReadLine();
+                    _recordingProcess.BeginOutputReadLine();
 
-                _recordingProcess.BeginErrorReadLine();
-                _recordingProcess.BeginOutputReadLine();
+                    RaiseStatus(
+                        "Recording segments. Segment length: " +
+                        segmentLengthSeconds +
+                        "s, port: " +
+                        selectedRecordingPort
+                    );
+                }
+                else
+                {
+                    RaiseStatus("Recording not started: ffmpeg process did not start.");
 
-                RaiseStatus("Recording segments. Segment length: " + segmentLengthSeconds + "s");
+                    if (endpointAdded && _rtpFanOut != null && _recordingRtpEndpoint != null)
+                        _rtpFanOut.RemoveOutputEndpoint(_recordingRtpEndpoint);
+
+                    ShowDebugMessageBox(
+                        "Stream debug - recording did not start",
+                        "ffmpeg process Start() returned false.",
+                        true
+                    );
+                }
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("StartSegmentRecordingAsync failed: " + ex);
+                RaiseError(ex);                
+
+                ShowDebugMessageBox(
+                    "Stream debug - StartSegmentRecordingAsync exception",
+                    ex.ToString(),
+                    true
+                );
+
                 StopSegmentRecording();
-                RaiseError(ex);
-                throw;
+            }
+            finally
+            {
+                lock (_recordingLock)
+                {
+                    _recordingStartInProgress = false;
+                }
             }
 
             return Task.FromResult(0);
@@ -320,38 +361,45 @@ namespace MissionPlanner.StreamViewer
         {
             try
             {
-                if (_recordingProcess != null && !_recordingProcess.HasExited)
-                {
-                    try
-                    {
-                        _recordingProcess.StandardInput.WriteLine("q");
-                        _recordingProcess.StandardInput.Flush();
-                    }
-                    catch
-                    {
-                    }
-
-                    if (!_recordingProcess.WaitForExit(2000))
-                    {
-                        _recordingProcess.Kill();
-                        _recordingProcess.WaitForExit(1000);
-                    }
-                }
+                StopProcess(_recordingProcess, "ffmpeg recording");
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine("StopSegmentRecording failed: " + ex);
+                RaiseError(ex);
             }
             finally
             {
                 if (_recordingProcess != null)
                 {
-                    _recordingProcess.Dispose();
+                    try
+                    {
+                        _recordingProcess.ErrorDataReceived -= RecordingProcess_ErrorDataReceived;
+                        _recordingProcess.OutputDataReceived -= RecordingProcess_OutputDataReceived;
+                        _recordingProcess.Exited -= RecordingProcess_Exited;
+                    }
+                    catch
+                    {
+                    }
+
+                    try
+                    {
+                        _recordingProcess.Dispose();
+                    }
+                    catch
+                    {
+                    }
+
                     _recordingProcess = null;
                 }
-            }
 
-            if (_rtpFanOut != null && _recordingRtpEndpoint != null)
-                _rtpFanOut.RemoveOutputEndpoint(_recordingRtpEndpoint);
+                lock (_recordingLock)
+                {
+                    _recordingStartInProgress = false;
+                }
+            }           
+
+            _activeRecordingRtpPort = -1;
 
             if (IsRunning)
                 RaiseStatus("Recording stopped. Display still running.");
@@ -364,32 +412,231 @@ namespace MissionPlanner.StreamViewer
             Stop();
         }
 
-        private void StartFanOutIfNeeded()
+        private async Task SafeStartDisplayAttemptAsync()
         {
-            if (_rtpFanOut != null && _rtpFanOut.IsRunning)
+            if (_displayStartInProgress)
                 return;
 
-            StopFanOut();
+            lock (_displayLock)
+            {
+                if (_displayStartInProgress)
+                    return;
 
-            IPAddress localAddress = IPAddress.Parse(_options.LocalHost);
+                _displayStartInProgress = true;
+            }
 
-            _displayRtpEndpoint = new IPEndPoint(localAddress, _options.LocalDisplayRtpPort);
-            _recordingRtpEndpoint = new IPEndPoint(localAddress, _options.LocalRecordingRtpPort);
+            try
+            {
+                StartFanOutIfNeeded();
 
-            _rtpFanOut = new UdpPacketFanOut(
-                "RTP",
-                _options.CameraRtpPort,
-                _options.FanOutReceiveBufferBytes,
-                _options.FanOutSoftDropEnabled,
-                _options.FanOutBacklogDropThresholdBytes,
-                _options.FanOutMaxDrainPackets,
-                _displayRtpEndpoint
-            );
+                if (!_desiredDisplayRunning)
+                    return;
 
-            _rtpFanOut.StatusChanged += FanOut_StatusChanged;
-            _rtpFanOut.ErrorOccurred += FanOut_ErrorOccurred;
+                if (_hostWindowHandle == IntPtr.Zero)
+                {
+                    RaiseStatus("Display waiting for host window handle.");
+                    StartRetryLoopIfNeeded();
+                    return;
+                }
 
-            _rtpFanOut.Start();
+                if (string.IsNullOrWhiteSpace(_options.FfplayPath) || !File.Exists(_options.FfplayPath))
+                {
+                    string message =
+                        "Display not started: ffplay path is invalid.\n\n" +
+                        "ffplay path:\n" +
+                        _options.FfplayPath;
+
+                    Debug.WriteLine(message);
+                    RaiseStatus(message);
+
+                    ShowDebugMessageBox("Stream debug - invalid ffplay path", message, true);
+
+                    StartRetryLoopIfNeeded();
+                    return;
+                }
+
+                StopDisplayOnly();
+
+                string ffplayArgs = BuildFfplayArguments();
+
+                Debug.WriteLine("========== STARTING FFPLAY DISPLAY ==========");
+                Debug.WriteLine("Path: " + _options.FfplayPath);
+                Debug.WriteLine("Working directory: " + GetFfplayWorkingDirectory());
+                Debug.WriteLine("Args: " + ffplayArgs);
+                Debug.WriteLine("=============================================");
+
+                StartFfplayDisplay();
+
+                if (_ffplayProcess == null)
+                {
+                    RaiseStatus("ffplay process did not start.");
+                    StartRetryLoopIfNeeded();
+                    return;
+                }
+
+                _ffplayWindow = await WaitForVisibleFfplayWindowAsync(
+                    _ffplayProcess,
+                    _options.WindowFindTimeoutMs
+                );
+
+                if (_ffplayWindow == IntPtr.Zero)
+                {
+                    string packetInfo =
+                        "RTP packets received: " + (_rtpFanOut != null ? _rtpFanOut.ReceivedPacketCount : 0) +
+                        ", forwarded: " + (_rtpFanOut != null ? _rtpFanOut.ForwardedPacketCount : 0) +
+                        ", dropped: " + (_rtpFanOut != null ? _rtpFanOut.DroppedPacketCount : 0) +
+                        ", ignored: " + (_rtpFanOut != null ? _rtpFanOut.IgnoredPacketCount : 0);
+
+                    string message =
+                        "Visible ffplay window was not found.\n\n" +
+                        packetInfo + "\n\n" +
+                        "ffplay args:\n" + ffplayArgs + "\n\n" +
+                        "ffplay will be restarted after the retry delay.";
+
+                    Debug.WriteLine(message);
+                    RaiseStatus("Waiting for camera stream...");
+
+                    StopDisplayOnly();
+                    StartRetryLoopIfNeeded();
+                    return;
+                }
+
+                AdoptFfplayWindow(_ffplayWindow);
+
+                if (IsSegmentRecording)
+                    RaiseStatus("Display streaming and recording.");
+                else
+                    RaiseStatus("Display streaming.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("SafeStartDisplayAttemptAsync failed: " + ex);
+                RaiseError(ex);
+
+                ShowDebugMessageBox(
+                    "Stream debug - SafeStartDisplayAttemptAsync exception",
+                    ex.ToString(),
+                    true
+                );
+
+                StopDisplayOnly();
+                StartRetryLoopIfNeeded();
+            }
+            finally
+            {
+                _displayStartInProgress = false;
+            }
+        }
+
+        private void StartRetryLoopIfNeeded()
+        {
+            if (_retryLoopRunning)
+                return;
+
+            _retryLoopRunning = true;
+
+            Task.Run(async delegate
+            {
+                try
+                {
+                    while (_desiredDisplayRunning && !IsRunning)
+                    {
+                        int delay = _options.SilentRetryDelayMs > 0
+                            ? _options.SilentRetryDelayMs
+                            : 3000;
+
+                        await Task.Delay(delay);
+
+                        if (!_desiredDisplayRunning || IsRunning)
+                            break;
+
+                        await SafeStartDisplayAttemptAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Retry loop failed: " + ex);
+                    RaiseError(ex);
+
+                    ShowDebugMessageBox(
+                        "Stream debug - retry loop exception",
+                        ex.ToString(),
+                        true
+                    );
+                }
+                finally
+                {
+                    _retryLoopRunning = false;
+
+                    if (_desiredDisplayRunning && !IsRunning)
+                        StartRetryLoopIfNeeded();
+                }
+            });
+        }
+
+        private void StartFanOutIfNeeded()
+        {
+            try
+            {
+                if (_rtpFanOut != null && _rtpFanOut.IsRunning)
+                    return;
+
+                StopFanOut();
+
+                IPAddress localAddress;
+
+                if (!IPAddress.TryParse(_options.LocalHost, out localAddress))
+                    localAddress = IPAddress.Loopback;
+
+                _displayRtpEndpoint = new IPEndPoint(localAddress, _options.LocalDisplayRtpPort);
+                _recordingRtpEndpoint = new IPEndPoint(localAddress, _options.LocalRecordingRtpPort);
+
+                string message =
+                    "Starting RTP fan-out.\n\n" +
+                    "Local bind IP: " + _options.LocalBindIpAddress + "\n" +
+                    "Camera source IP filter: " + _options.CameraSourceIpAddress + "\n" +
+                    "Camera RTP port: " + _options.CameraRtpPort + "\n" +
+                    "Display endpoint: " + _displayRtpEndpoint + "\n" +
+                    "Recording endpoint: " + _recordingRtpEndpoint + "\n" +
+                    "Receive buffer: " + _options.FanOutReceiveBufferBytes + "\n" +
+                    "Soft drop enabled: " + _options.FanOutSoftDropEnabled + "\n" +
+                    "Backlog threshold: " + _options.FanOutBacklogDropThresholdBytes + "\n" +
+                    "Max drain packets: " + _options.FanOutMaxDrainPackets;
+
+                Debug.WriteLine(message);
+
+                // Important:
+                // Match the old working behavior: always forward to BOTH display and recording ports.
+                // UDP forwarding to the recording port is harmless even before ffmpeg starts.
+                _rtpFanOut = new UdpPacketFanOut(
+                    "RTP",
+                    _options.LocalBindIpAddress,
+                    _options.CameraSourceIpAddress,
+                    _options.CameraRtpPort,
+                    _options.FanOutReceiveBufferBytes,
+                    _options.FanOutSoftDropEnabled,
+                    _options.FanOutBacklogDropThresholdBytes,
+                    _options.FanOutMaxDrainPackets,
+                    _displayRtpEndpoint,
+                    _recordingRtpEndpoint
+                );
+
+                _rtpFanOut.StatusChanged += FanOut_StatusChanged;
+                _rtpFanOut.ErrorOccurred += FanOut_ErrorOccurred;
+
+                _rtpFanOut.Start();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("StartFanOutIfNeeded failed: " + ex);
+                RaiseError(ex);
+
+                ShowDebugMessageBox(
+                    "Stream debug - StartFanOutIfNeeded exception",
+                    ex.ToString(),
+                    true
+                );
+            }
         }
 
         private void StopFanOut()
@@ -399,8 +646,10 @@ namespace MissionPlanner.StreamViewer
                 if (_rtpFanOut != null)
                     _rtpFanOut.Dispose();
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine("StopFanOut failed: " + ex);
+                RaiseError(ex);
             }
 
             _rtpFanOut = null;
@@ -408,69 +657,323 @@ namespace MissionPlanner.StreamViewer
 
         private void StartFfplayDisplay()
         {
-            string args = BuildFfplayArguments();
-
-            Debug.WriteLine("========== STARTING FFPLAY DISPLAY ==========");
-            Debug.WriteLine("Path: " + _options.FfplayPath);
-            Debug.WriteLine("Working Directory: " + GetFfplayWorkingDirectory());
-            Debug.WriteLine("Args: " + args);
-            Debug.WriteLine("=============================================");
-
-            ProcessStartInfo psi = new ProcessStartInfo
+            try
             {
-                FileName = _options.FfplayPath,
-                Arguments = args,
-                WorkingDirectory = GetFfplayWorkingDirectory(),
+                string args = BuildFfplayArguments();
 
-                UseShellExecute = false,
-                CreateNoWindow = _options.HideConsoleWindow,
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = _options.FfplayPath,
+                    Arguments = args,
+                    WorkingDirectory = GetFfplayWorkingDirectory(),
 
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
-            };
+                    UseShellExecute = false,
+                    CreateNoWindow = _options.HideConsoleWindow,
 
-            _ffplayProcess = new Process
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true
+                };
+
+                _ffplayProcess = new Process
+                {
+                    StartInfo = psi,
+                    EnableRaisingEvents = true
+                };
+
+                _ffplayProcess.ErrorDataReceived += FfplayProcess_ErrorDataReceived;
+                _ffplayProcess.OutputDataReceived += FfplayProcess_OutputDataReceived;
+                _ffplayProcess.Exited += FfplayProcess_Exited;
+
+                bool started = _ffplayProcess.Start();
+
+                if (started)
+                {
+                    _ffplayProcess.BeginErrorReadLine();
+                    _ffplayProcess.BeginOutputReadLine();
+
+                    Debug.WriteLine("ffplay process started. PID=" + _ffplayProcess.Id);
+                }
+                else
+                {
+                    RaiseStatus("Display not started: ffplay process did not start.");
+
+                    ShowDebugMessageBox(
+                        "Stream debug - ffplay did not start",
+                        "ffplay process Start() returned false.",
+                        true
+                    );
+                }
+            }
+            catch (Exception ex)
             {
-                StartInfo = psi,
-                EnableRaisingEvents = true
-            };
+                Debug.WriteLine("StartFfplayDisplay failed: " + ex);
+                RaiseError(ex);
 
-            _ffplayProcess.ErrorDataReceived += FfplayProcess_ErrorDataReceived;
-            _ffplayProcess.OutputDataReceived += FfplayProcess_OutputDataReceived;
-            _ffplayProcess.Exited += FfplayProcess_Exited;
-
-            bool started = _ffplayProcess.Start();
-
-            if (!started)
-                throw new InvalidOperationException("Could not start ffplay display process.");
-
-            _ffplayProcess.BeginErrorReadLine();
-            _ffplayProcess.BeginOutputReadLine();
+                ShowDebugMessageBox(
+                    "Stream debug - StartFfplayDisplay exception",
+                    ex.ToString(),
+                    true
+                );
+            }
         }
 
         private void StopDisplayOnly()
         {
             try
             {
-                if (_ffplayProcess != null && !_ffplayProcess.HasExited)
-                {
-                    _ffplayProcess.Kill();
-                    _ffplayProcess.WaitForExit(1000);
-                }
+                StopProcess(_ffplayProcess, "ffplay");
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine("StopDisplayOnly failed: " + ex);
+                RaiseError(ex);
             }
             finally
             {
                 if (_ffplayProcess != null)
                 {
-                    _ffplayProcess.Dispose();
+                    try
+                    {
+                        _ffplayProcess.ErrorDataReceived -= FfplayProcess_ErrorDataReceived;
+                        _ffplayProcess.OutputDataReceived -= FfplayProcess_OutputDataReceived;
+                        _ffplayProcess.Exited -= FfplayProcess_Exited;
+                    }
+                    catch
+                    {
+                    }
+
+                    try
+                    {
+                        _ffplayProcess.Dispose();
+                    }
+                    catch
+                    {
+                    }
+
                     _ffplayProcess = null;
                 }
 
                 _ffplayWindow = IntPtr.Zero;
             }
+        }
+
+        private void StopProcess(Process process, string processName)
+        {
+            if (process == null)
+                return;
+
+            try
+            {
+                if (process.HasExited)
+                    return;
+
+                try
+                {
+                    if (process.StartInfo != null && process.StartInfo.RedirectStandardInput)
+                    {
+                        process.StandardInput.WriteLine("q");
+                        process.StandardInput.Flush();
+                    }
+                }
+                catch
+                {
+                }
+
+                if (process.WaitForExit(1000))
+                    return;
+
+                try
+                {
+                    process.Kill();
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    process.WaitForExit(1000);
+                }
+                catch
+                {
+                }
+
+                if (!process.HasExited)
+                    Debug.WriteLine(processName + " did not exit after Kill().");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("StopProcess failed for " + processName + ": " + ex);
+                RaiseError(ex);
+            }
+        }
+
+        private bool IsProcessAlive(Process process)
+        {
+            try
+            {
+                return process != null && !process.HasExited;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private int FindAvailableUdpPort(int preferredPort, int maxAttempts)
+        {
+            if (preferredPort <= 0)
+                preferredPort = 12002;
+
+            if (maxAttempts <= 0)
+                maxAttempts = 50;
+
+            int port = preferredPort;
+
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                if (IsUdpPortAvailable(port))
+                    return port;
+
+                Debug.WriteLine("UDP port " + port + " is busy, trying next recording port.");
+
+                port += 2;
+            }
+
+            return preferredPort;
+        }
+
+        private bool IsUdpPortAvailable(int port)
+        {
+            Socket socket = null;
+
+            try
+            {
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                socket.ExclusiveAddressUse = false;
+
+                socket.SetSocketOption(
+                    SocketOptionLevel.Socket,
+                    SocketOptionName.ReuseAddress,
+                    true
+                );
+
+                socket.Bind(new IPEndPoint(IPAddress.Any, port));
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                try
+                {
+                    if (socket != null)
+                        socket.Close();
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    if (socket != null)
+                        socket.Dispose();
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private void AdoptFfplayWindow(IntPtr windowHandle)
+        {
+            try
+            {
+                if (windowHandle == IntPtr.Zero)
+                    return;
+
+                if (_hostWindowHandle == IntPtr.Zero)
+                    return;
+
+                EmbedWindow(windowHandle, _hostWindowHandle);
+
+                if (_hostWidth <= 0 || _hostHeight <= 0)
+                {
+                    RECT hostRect;
+
+                    if (GetWindowRect(_hostWindowHandle, out hostRect))
+                    {
+                        _hostWidth = Math.Max(1, hostRect.Right - hostRect.Left);
+                        _hostHeight = Math.Max(1, hostRect.Bottom - hostRect.Top);
+                    }
+                }
+
+                Resize(_hostWidth, _hostHeight);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("AdoptFfplayWindow failed: " + ex);
+                RaiseError(ex);
+
+                ShowDebugMessageBox(
+                    "Stream debug - AdoptFfplayWindow exception",
+                    ex.ToString(),
+                    true
+                );
+            }
+        }
+
+        private Rectangle GetContainedVideoRectangle(int hostWidth, int hostHeight)
+        {
+            if (_options.FitMode == VideoFitMode.Stretch)
+                return new Rectangle(0, 0, hostWidth, hostHeight);
+
+            if (_options.FitMode == VideoFitMode.OriginalStreamSize)
+            {
+                int originalX = (hostWidth - _options.StreamWidth) / 2;
+                int originalY = (hostHeight - _options.StreamHeight) / 2;
+
+                return new Rectangle(
+                    originalX,
+                    originalY,
+                    _options.StreamWidth,
+                    _options.StreamHeight
+                );
+            }
+
+            int sourceWidth = _options.StreamWidth > 0 ? _options.StreamWidth : hostWidth;
+            int sourceHeight = _options.StreamHeight > 0 ? _options.StreamHeight : hostHeight;
+
+            double sourceAspect = (double)sourceWidth / sourceHeight;
+            double hostAspect = (double)hostWidth / hostHeight;
+
+            int targetWidth;
+            int targetHeight;
+
+            if (hostAspect > sourceAspect)
+            {
+                targetHeight = hostHeight;
+                targetWidth = (int)(targetHeight * sourceAspect);
+            }
+            else
+            {
+                targetWidth = hostWidth;
+                targetHeight = (int)(targetWidth / sourceAspect);
+            }
+
+            if (targetWidth < 1)
+                targetWidth = 1;
+
+            if (targetHeight < 1)
+                targetHeight = 1;
+
+            int targetX = (hostWidth - targetWidth) / 2;
+            int targetY = (hostHeight - targetHeight) / 2;
+
+            return new Rectangle(targetX, targetY, targetWidth, targetHeight);
         }
 
         private string BuildFfplayArguments()
@@ -513,9 +1016,10 @@ namespace MissionPlanner.StreamViewer
         private string BuildSegmentRecordingArguments(
             string outputDirectory,
             int segmentLengthSeconds,
-            string filePrefix)
+            string filePrefix,
+            int recordingRtpPort)
         {
-            string recordUrl = "rtp://0.0.0.0:" + _options.LocalRecordingRtpPort;
+            string recordUrl = "rtp://0.0.0.0:" + recordingRtpPort;
 
             string safePrefix = MakeSafeFileName(filePrefix);
             string extension = string.IsNullOrWhiteSpace(_options.RecordingExtension)
@@ -524,7 +1028,7 @@ namespace MissionPlanner.StreamViewer
 
             string outputPattern = Path.Combine(
                 outputDirectory,
-                safePrefix + "_%Y%m%d_%H%M%S." + extension
+                safePrefix + "_%03d." + extension
             );
 
             string args =
@@ -536,19 +1040,14 @@ namespace MissionPlanner.StreamViewer
                 "-an ";
 
             if (_options.RecordWithStreamCopy)
-            {
                 args += "-c:v copy ";
-            }
             else
-            {
                 args += "-c:v libx264 -preset ultrafast -tune zerolatency ";
-            }
 
             args +=
                 "-f segment " +
                 "-segment_time " + segmentLengthSeconds + " " +
                 "-reset_timestamps 1 " +
-                "-strftime 1 " +
                 "\"" + outputPattern + "\"";
 
             return args;
@@ -556,17 +1055,37 @@ namespace MissionPlanner.StreamViewer
 
         private async Task<IntPtr> WaitForVisibleFfplayWindowAsync(Process process, int timeoutMs)
         {
+            if (process == null)
+                return IntPtr.Zero;
+
             Stopwatch sw = Stopwatch.StartNew();
 
             while (sw.ElapsedMilliseconds < timeoutMs)
             {
-                if (process.HasExited)
-                    return IntPtr.Zero;
+                try
+                {
+                    if (process.HasExited)
+                        return IntPtr.Zero;
 
-                IntPtr visibleWindow = FindVisibleWindowForProcess(process.Id);
+                    process.Refresh();
 
-                if (visibleWindow != IntPtr.Zero)
-                    return visibleWindow;
+                    IntPtr mainWindow = process.MainWindowHandle;
+
+                    if (mainWindow != IntPtr.Zero && IsWindowVisible(mainWindow))
+                    {
+                        Debug.WriteLine("ffplay MainWindowHandle found: " + mainWindow);
+                        return mainWindow;
+                    }
+
+                    IntPtr bestWindow = FindVisibleWindowForProcess(process.Id);
+
+                    if (bestWindow != IntPtr.Zero)
+                        return bestWindow;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("WaitForVisibleFfplayWindowAsync polling failed: " + ex.Message);
+                }
 
                 await Task.Delay(50);
             }
@@ -578,47 +1097,91 @@ namespace MissionPlanner.StreamViewer
         {
             IntPtr foundWindow = IntPtr.Zero;
 
-            EnumWindows(delegate (IntPtr hWnd, IntPtr lParam)
+            try
             {
-                int windowProcessId;
-                GetWindowThreadProcessId(hWnd, out windowProcessId);
-
-                if (windowProcessId != processId)
-                    return true;
-
-                if (!IsWindowVisible(hWnd))
-                    return true;
-
-                if (GetParent(hWnd) == IntPtr.Zero)
+                EnumWindows(delegate (IntPtr hWnd, IntPtr lParam)
                 {
-                    foundWindow = hWnd;
-                    return false;
-                }
+                    int windowProcessId;
+                    GetWindowThreadProcessId(hWnd, out windowProcessId);
 
-                return true;
-            }, IntPtr.Zero);
+                    if (windowProcessId != processId)
+                        return true;
+
+                    bool visible = IsWindowVisible(hWnd);
+                    IntPtr parent = GetParent(hWnd);
+                    string className = GetClassNameSafe(hWnd);
+                    string title = GetWindowTextSafe(hWnd);
+
+                    Debug.WriteLine(
+                        "ffplay window candidate: handle=" + hWnd +
+                        ", visible=" + visible +
+                        ", parent=" + parent +
+                        ", class='" + className +
+                        "', title='" + title + "'"
+                    );
+
+                    if (!visible)
+                        return true;
+
+                    if (className.IndexOf("SDL", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        foundWindow = hWnd;
+                        return false;
+                    }
+
+                    if (parent == IntPtr.Zero)
+                    {
+                        foundWindow = hWnd;
+                        return false;
+                    }
+
+                    return true;
+                }, IntPtr.Zero);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("FindVisibleWindowForProcess failed: " + ex);
+                RaiseError(ex);
+            }
 
             return foundWindow;
         }
 
         private void EmbedWindow(IntPtr childHandle, IntPtr parentHandle)
         {
-            ShowWindow(childHandle, SW_RESTORE);
-            ShowWindow(childHandle, SW_SHOW);
+            try
+            {
+                if (childHandle == IntPtr.Zero || parentHandle == IntPtr.Zero)
+                    return;
 
-            SetParent(childHandle, parentHandle);
+                ShowWindow(childHandle, SW_RESTORE);
+                ShowWindow(childHandle, SW_SHOW);
 
-            IntPtr stylePtr = GetWindowLongPtr(childHandle, GWL_STYLE);
-            long style = stylePtr.ToInt64();
+                SetParent(childHandle, parentHandle);
 
-            style &= ~WS_POPUP;
-            style |= WS_CHILD;
-            style |= WS_VISIBLE;
+                IntPtr stylePtr = GetWindowLongPtr(childHandle, GWL_STYLE);
+                long style = stylePtr.ToInt64();
 
-            SetWindowLongPtr(childHandle, GWL_STYLE, new IntPtr(style));
+                style &= ~WS_POPUP;
+                style |= WS_CHILD;
+                style |= WS_VISIBLE;
 
-            ShowWindow(childHandle, SW_SHOW);
-            UpdateWindow(childHandle);
+                SetWindowLongPtr(childHandle, GWL_STYLE, new IntPtr(style));
+
+                ShowWindow(childHandle, SW_SHOW);
+                UpdateWindow(childHandle);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("EmbedWindow failed: " + ex);
+                RaiseError(ex);
+
+                ShowDebugMessageBox(
+                    "Stream debug - EmbedWindow exception",
+                    ex.ToString(),
+                    true
+                );
+            }
         }
 
         private static Rectangle GetWindowRectangle(IntPtr hWnd)
@@ -626,7 +1189,7 @@ namespace MissionPlanner.StreamViewer
             RECT rect;
 
             if (!GetWindowRect(hWnd, out rect))
-                throw new InvalidOperationException("Could not get host window rectangle.");
+                return Rectangle.Empty;
 
             return Rectangle.FromLTRB(rect.Left, rect.Top, rect.Right, rect.Bottom);
         }
@@ -659,9 +1222,7 @@ namespace MissionPlanner.StreamViewer
             char[] invalidChars = Path.GetInvalidFileNameChars();
 
             for (int i = 0; i < invalidChars.Length; i++)
-            {
                 value = value.Replace(invalidChars[i], '_');
-            }
 
             return value;
         }
@@ -669,6 +1230,7 @@ namespace MissionPlanner.StreamViewer
         private string GetFfplayWorkingDirectory()
         {
             string directory = Path.GetDirectoryName(_options.FfplayPath);
+
             return string.IsNullOrWhiteSpace(directory)
                 ? AppDomain.CurrentDomain.BaseDirectory
                 : directory;
@@ -677,9 +1239,37 @@ namespace MissionPlanner.StreamViewer
         private string GetFfmpegWorkingDirectory()
         {
             string directory = Path.GetDirectoryName(_options.FfmpegPath);
+
             return string.IsNullOrWhiteSpace(directory)
                 ? AppDomain.CurrentDomain.BaseDirectory
                 : directory;
+        }
+
+        private void ShowDebugMessageBox(string title, string message, bool important)
+        {
+            try
+            {
+                if (!_options.ShowDebugMessageBoxes)
+                    return;
+
+                if (!important)
+                    return;
+
+                if ((DateTime.UtcNow - _lastDebugMessageBoxUtc).TotalSeconds < 2)
+                    return;
+
+                _lastDebugMessageBoxUtc = DateTime.UtcNow;
+
+                MessageBox.Show(
+                    message,
+                    title,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+            }
+            catch
+            {
+            }
         }
 
         private void FanOut_StatusChanged(object sender, string message)
@@ -691,12 +1281,39 @@ namespace MissionPlanner.StreamViewer
         {
             Debug.WriteLine("FANOUT ERROR: " + ex);
             RaiseError(ex);
+
+            ShowDebugMessageBox(
+                "Stream debug - fan-out error",
+                ex.ToString(),
+                true
+            );
         }
 
         private void FfplayProcess_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(e.Data))
-                Debug.WriteLine("FFPLAY STDERR: " + e.Data);
+            if (string.IsNullOrWhiteSpace(e.Data))
+                return;
+
+            Debug.WriteLine("FFPLAY STDERR: " + e.Data);
+
+            string lower = e.Data.ToLowerInvariant();
+
+            bool fatalStartupError =
+                lower.Contains("bind") ||
+                lower.Contains("address already in use") ||
+                lower.Contains("no such file") ||
+                lower.Contains("permission denied") ||
+                lower.Contains("error opening input") ||
+                lower.Contains("could not open");
+
+            if (fatalStartupError)
+            {
+                ShowDebugMessageBox(
+                    "ffplay fatal stderr",
+                    e.Data,
+                    true
+                );
+            }
         }
 
         private void FfplayProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
@@ -707,13 +1324,44 @@ namespace MissionPlanner.StreamViewer
 
         private void FfplayProcess_Exited(object sender, EventArgs e)
         {
-            RaiseStatus("Display stopped.");
+            _ffplayWindow = IntPtr.Zero;
+
+            if (_desiredDisplayRunning)
+            {
+                RaiseStatus("Display exited. Retrying...");
+                StartRetryLoopIfNeeded();
+            }
+            else
+            {
+                RaiseStatus("Display stopped.");
+            }
         }
 
         private void RecordingProcess_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(e.Data))
-                Debug.WriteLine("FFMPEG RECORD STDERR: " + e.Data);
+            if (string.IsNullOrWhiteSpace(e.Data))
+                return;
+
+            Debug.WriteLine("FFMPEG RECORD STDERR: " + e.Data);
+
+            string lower = e.Data.ToLowerInvariant();
+
+            bool fatalStartupError =
+                lower.Contains("bind") ||
+                lower.Contains("address already in use") ||
+                lower.Contains("no such file") ||
+                lower.Contains("permission denied") ||
+                lower.Contains("error opening input") ||
+                lower.Contains("could not open");
+
+            if (fatalStartupError)
+            {
+                ShowDebugMessageBox(
+                    "ffmpeg recording fatal stderr",
+                    e.Data,
+                    true
+                );
+            }
         }
 
         private void RecordingProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
@@ -724,7 +1372,42 @@ namespace MissionPlanner.StreamViewer
 
         private void RecordingProcess_Exited(object sender, EventArgs e)
         {
+            lock (_recordingLock)
+            {
+                _recordingStartInProgress = false;
+            }
+
+            _activeRecordingRtpPort = -1;
+
             RaiseStatus("Segment recording stopped.");
+        }
+
+        private string GetClassNameSafe(IntPtr hWnd)
+        {
+            try
+            {
+                StringBuilder builder = new StringBuilder(256);
+                GetClassName(hWnd, builder, builder.Capacity);
+                return builder.ToString();
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private string GetWindowTextSafe(IntPtr hWnd)
+        {
+            try
+            {
+                StringBuilder builder = new StringBuilder(512);
+                GetWindowText(hWnd, builder, builder.Capacity);
+                return builder.ToString();
+            }
+            catch
+            {
+                return "";
+            }
         }
 
         private void RaiseStatus(string message)
@@ -739,7 +1422,7 @@ namespace MissionPlanner.StreamViewer
         {
             EventHandler<Exception> handler = ErrorOccurred;
 
-            if (handler != null)
+            if (handler != null && ex != null)
                 handler(this, ex);
         }
 
@@ -796,6 +1479,12 @@ namespace MissionPlanner.StreamViewer
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
         private static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
         {

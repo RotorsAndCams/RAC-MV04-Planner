@@ -16,6 +16,8 @@ namespace MissionPlanner.StreamViewer
         private readonly bool _softDropEnabled;
         private readonly int _backlogDropThresholdBytes;
         private readonly int _maxDrainPackets;
+        private readonly IPAddress _bindAddress;
+        private readonly IPAddress _acceptedSourceAddress;
 
         private readonly object _endpointLock = new object();
         private readonly List<IPEndPoint> _outputEndpoints = new List<IPEndPoint>();
@@ -29,6 +31,7 @@ namespace MissionPlanner.StreamViewer
         private long _receivedPacketCount;
         private long _forwardedPacketCount;
         private long _droppedPacketCount;
+        private long _ignoredPacketCount;
 
         public event EventHandler<string> StatusChanged;
         public event EventHandler<Exception> ErrorOccurred;
@@ -65,8 +68,18 @@ namespace MissionPlanner.StreamViewer
             }
         }
 
+        public long IgnoredPacketCount
+        {
+            get
+            {
+                return Interlocked.Read(ref _ignoredPacketCount);
+            }
+        }
+
         public UdpPacketFanOut(
             string name,
+            string localBindIpAddress,
+            string acceptedSourceIpAddress,
             int listenPort,
             int receiveBufferBytes,
             bool softDropEnabled,
@@ -74,28 +87,31 @@ namespace MissionPlanner.StreamViewer
             int maxDrainPackets,
             params IPEndPoint[] outputEndpoints)
         {
-            if (listenPort <= 0)
-                throw new ArgumentOutOfRangeException("listenPort");
-
-            if (outputEndpoints == null || outputEndpoints.Length == 0)
-                throw new ArgumentException("At least one output endpoint is required.", "outputEndpoints");
-
             _name = string.IsNullOrWhiteSpace(name) ? "UDP" : name;
-            _listenPort = listenPort;
+            _listenPort = listenPort > 0 ? listenPort : 11024;
 
             _receiveBufferBytes = receiveBufferBytes <= 0 ? 1024 * 1024 : receiveBufferBytes;
             _softDropEnabled = softDropEnabled;
             _backlogDropThresholdBytes = backlogDropThresholdBytes <= 0 ? 512 * 1024 : backlogDropThresholdBytes;
             _maxDrainPackets = maxDrainPackets <= 0 ? 16 : maxDrainPackets;
 
-            for (int i = 0; i < outputEndpoints.Length; i++)
-                _outputEndpoints.Add(outputEndpoints[i]);
+            _bindAddress = ParseIpOrDefault(localBindIpAddress, IPAddress.Any);
+            _acceptedSourceAddress = ParseOptionalSourceIp(acceptedSourceIpAddress);
+
+            if (outputEndpoints != null)
+            {
+                for (int i = 0; i < outputEndpoints.Length; i++)
+                {
+                    if (outputEndpoints[i] != null)
+                        _outputEndpoints.Add(outputEndpoints[i]);
+                }
+            }
         }
 
         public void AddOutputEndpoint(IPEndPoint endpoint)
         {
             if (endpoint == null)
-                throw new ArgumentNullException("endpoint");
+                return;
 
             lock (_endpointLock)
             {
@@ -135,41 +151,55 @@ namespace MissionPlanner.StreamViewer
 
             Stop();
 
-            _stopRequested = false;
-            _receivedPacketCount = 0;
-            _forwardedPacketCount = 0;
-            _droppedPacketCount = 0;
+            try
+            {
+                _stopRequested = false;
+                _receivedPacketCount = 0;
+                _forwardedPacketCount = 0;
+                _droppedPacketCount = 0;
+                _ignoredPacketCount = 0;
 
-            _receiveSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            _receiveSocket.ExclusiveAddressUse = false;
-            _receiveSocket.ReceiveBufferSize = _receiveBufferBytes;
+                _receiveSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                _receiveSocket.ExclusiveAddressUse = false;
+                _receiveSocket.ReceiveBufferSize = _receiveBufferBytes;
 
-            _receiveSocket.SetSocketOption(
-                SocketOptionLevel.Socket,
-                SocketOptionName.ReuseAddress,
-                true
-            );
+                _receiveSocket.SetSocketOption(
+                    SocketOptionLevel.Socket,
+                    SocketOptionName.ReuseAddress,
+                    true
+                );
 
-            _receiveSocket.Bind(new IPEndPoint(IPAddress.Any, _listenPort));
+                _receiveSocket.Bind(new IPEndPoint(_bindAddress, _listenPort));
 
-            _sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            _sendSocket.SendBufferSize = 256 * 1024;
+                _sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                _sendSocket.SendBufferSize = 256 * 1024;
 
-            _workerTask = Task.Run(new Action(Run));
+                _workerTask = Task.Run(new Action(Run));
 
-            RaiseStatus(
-                _name +
-                " fan-out listening on 0.0.0.0:" +
-                _listenPort +
-                ", receiveBuffer=" +
-                _receiveBufferBytes +
-                ", softDrop=" +
-                _softDropEnabled +
-                ", backlogThreshold=" +
-                _backlogDropThresholdBytes +
-                ", maxDrain=" +
-                _maxDrainPackets
-            );
+                string sourceText = _acceptedSourceAddress == null
+                    ? "any"
+                    : _acceptedSourceAddress.ToString();
+
+                RaiseStatus(
+                    _name +
+                    " fan-out listening on " +
+                    _bindAddress +
+                    ":" +
+                    _listenPort +
+                    ", acceptedSource=" +
+                    sourceText +
+                    ", receiveBuffer=" +
+                    _receiveBufferBytes +
+                    ", softDrop=" +
+                    _softDropEnabled
+                );
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(_name + " fan-out start failed: " + ex);
+                RaiseError(ex);
+                Stop();
+            }
         }
 
         public void Stop()
@@ -242,6 +272,14 @@ namespace MissionPlanner.StreamViewer
                     if (packetLength <= 0)
                         continue;
 
+                    IPEndPoint remoteIpEndPoint = remoteEndPoint as IPEndPoint;
+
+                    if (!IsAcceptedSource(remoteIpEndPoint))
+                    {
+                        Interlocked.Increment(ref _ignoredPacketCount);
+                        continue;
+                    }
+
                     Interlocked.Increment(ref _receivedPacketCount);
 
                     int newestPacketLength = packetLength;
@@ -260,6 +298,14 @@ namespace MissionPlanner.StreamViewer
                             if (drainedLength <= 0)
                                 break;
 
+                            IPEndPoint drainIpEndPoint = drainRemoteEndPoint as IPEndPoint;
+
+                            if (!IsAcceptedSource(drainIpEndPoint))
+                            {
+                                Interlocked.Increment(ref _ignoredPacketCount);
+                                continue;
+                            }
+
                             Interlocked.Increment(ref _receivedPacketCount);
 
                             newestPacketLength = drainedLength;
@@ -277,18 +323,26 @@ namespace MissionPlanner.StreamViewer
 
                     long received = Interlocked.Read(ref _receivedPacketCount);
 
-                    if (received == 1 || received % 500 == 0)
+                    if (received == 1 || received % 100 == 0)
                     {
+                        string remoteText = remoteEndPoint != null
+                            ? remoteEndPoint.ToString()
+                            : "unknown";
+
                         Debug.WriteLine(
                             _name +
-                            " packets received=" +
+                            " received=" +
                             ReceivedPacketCount +
                             ", forwarded=" +
                             ForwardedPacketCount +
                             ", dropped=" +
                             DroppedPacketCount +
-                            ", socketAvailable=" +
-                            (_receiveSocket != null ? _receiveSocket.Available : 0)
+                            ", ignored=" +
+                            IgnoredPacketCount +
+                            ", available=" +
+                            (_receiveSocket != null ? _receiveSocket.Available : 0) +
+                            ", lastRemote=" +
+                            remoteText
                         );
                     }
                 }
@@ -314,8 +368,22 @@ namespace MissionPlanner.StreamViewer
             }
         }
 
+        private bool IsAcceptedSource(IPEndPoint remoteEndPoint)
+        {
+            if (_acceptedSourceAddress == null)
+                return true;
+
+            if (remoteEndPoint == null)
+                return false;
+
+            return remoteEndPoint.Address.Equals(_acceptedSourceAddress);
+        }
+
         private void ForwardPacket(byte[] packet, int packetLength)
         {
+            if (_sendSocket == null)
+                return;
+
             IPEndPoint[] endpoints;
 
             lock (_endpointLock)
@@ -334,12 +402,47 @@ namespace MissionPlanner.StreamViewer
                 {
                     Debug.WriteLine(_name + " send error to " + endpoints[i] + ": " + ex.Message);
                 }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(_name + " send error: " + ex.Message);
+                }
             }
         }
 
         public void Dispose()
         {
             Stop();
+        }
+
+        private static IPAddress ParseIpOrDefault(string value, IPAddress defaultAddress)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return defaultAddress;
+
+            IPAddress parsed;
+
+            if (IPAddress.TryParse(value.Trim(), out parsed))
+                return parsed;
+
+            return defaultAddress;
+        }
+
+        private static IPAddress ParseOptionalSourceIp(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            string trimmed = value.Trim();
+
+            if (trimmed == "0.0.0.0" || trimmed == "*")
+                return null;
+
+            IPAddress parsed;
+
+            if (IPAddress.TryParse(trimmed, out parsed))
+                return parsed;
+
+            return null;
         }
 
         private void RaiseStatus(string message)
@@ -354,7 +457,7 @@ namespace MissionPlanner.StreamViewer
         {
             EventHandler<Exception> handler = ErrorOccurred;
 
-            if (handler != null)
+            if (handler != null && ex != null)
                 handler(this, ex);
         }
     }

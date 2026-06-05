@@ -87,9 +87,9 @@ namespace MissionPlanner.GCSViews
                     IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                     int.Parse(SettingManager.Get(Setting.CameraControlPort)));
                 Thread.Sleep(2000);
-                CameraView.instance.StopVideoStream();
+                //CameraView.instance.StopVideoStream();
                 Thread.Sleep(2000);
-                CameraView.instance.StartVideoStream();
+                //CameraView.instance.StartVideoStream();
 
                 isReconnecting = false;
             }

@@ -18,6 +18,17 @@
         public string FfplayPath { get; set; }
         public string FfmpegPath { get; set; }
 
+        // Example input after parsing:
+        // CameraSourceIpAddress = "192.168.73.100"
+        // CameraRtpPort = 11024
+        //
+        // For debugging, you may set CameraSourceIpAddress = ""
+        // to accept packets from any sender.
+        public string CameraSourceIpAddress { get; set; }
+
+        // Usually keep this as "0.0.0.0".
+        public string LocalBindIpAddress { get; set; }
+
         public int CameraRtpPort { get; set; }
 
         public int LocalDisplayRtpPort { get; set; }
@@ -40,27 +51,35 @@
 
         public int RestartDelayMs { get; set; }
         public int WindowFindTimeoutMs { get; set; }
+        public int SilentRetryDelayMs { get; set; }
 
         public string RecordingExtension { get; set; }
         public bool RecordWithStreamCopy { get; set; }
 
-        // Larger than before. This reduces excessive drops.
         public int FanOutReceiveBufferBytes { get; set; }
-
-        // Soft dropping means:
-        // forward every packet normally, only drop if socket backlog grows too large.
         public bool FanOutSoftDropEnabled { get; set; }
-
-        // If socket.Available exceeds this, the fan-out drains a few old packets.
         public int FanOutBacklogDropThresholdBytes { get; set; }
-
-        // Maximum packets to drain when backlog is too high.
         public int FanOutMaxDrainPackets { get; set; }
+
+        public bool AutoConnectStream { get; set; }
+        public bool AutoDisplayStream { get; set; }
+        public bool AutoStartRecording { get; set; }
+
+        public string AutoRecordingDirectory { get; set; }
+        public int AutoRecordingSegmentSeconds { get; set; }
+        public string AutoRecordingFilePrefix { get; set; }
+
+        // Temporary debug switch.
+        // Set false for production.
+        public bool ShowDebugMessageBoxes { get; set; }
 
         public CameraStreamOptions()
         {
-            FfplayPath = @"C:\Users\zoltan.kovacs\Downloads\ffmpeg-8.1.1-full_build\ffmpeg-8.1.1-full_build\bin\ffplay.exe";
-            FfmpegPath = @"C:\Users\zoltan.kovacs\Downloads\ffmpeg-8.1.1-full_build\ffmpeg-8.1.1-full_build\bin\ffmpeg.exe";
+            FfplayPath = "";
+            FfmpegPath = "";
+
+            CameraSourceIpAddress = "";
+            LocalBindIpAddress = "0.0.0.0";
 
             CameraRtpPort = 11024;
 
@@ -83,16 +102,26 @@
             HideConsoleWindow = true;
 
             RestartDelayMs = 300;
-            WindowFindTimeoutMs = 10000;
+            WindowFindTimeoutMs = 3000;
+            SilentRetryDelayMs = 3000;
 
             RecordingExtension = "mkv";
             RecordWithStreamCopy = true;
 
-            // Softer defaults.
             FanOutReceiveBufferBytes = 1024 * 1024;
             FanOutSoftDropEnabled = true;
             FanOutBacklogDropThresholdBytes = 512 * 1024;
             FanOutMaxDrainPackets = 16;
+
+            AutoConnectStream = false;
+            AutoDisplayStream = false;
+            AutoStartRecording = false;
+
+            AutoRecordingDirectory = "";
+            AutoRecordingSegmentSeconds = 10;
+            AutoRecordingFilePrefix = "camera";
+
+            ShowDebugMessageBoxes = false;
         }
     }
 }

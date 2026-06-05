@@ -11,6 +11,8 @@ namespace MissionPlanner.StreamViewer
         event EventHandler<string> StatusChanged;
         event EventHandler<Exception> ErrorOccurred;
 
+        Task ConnectAsync();
+
         Task StartAsync(IntPtr hostWindowHandle);
         Task RestartAsync(IntPtr hostWindowHandle);
         void Stop();
