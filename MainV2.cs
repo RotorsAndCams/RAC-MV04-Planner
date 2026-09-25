@@ -601,6 +601,15 @@ namespace MissionPlanner
 
         public bool devmode { get; private set; } = false;
 
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        const int SW_RESTORE = 9;
+        const int SW_MAXIMIZE = 3;
+
         public void updateLayout(object sender, EventArgs e)
         {
             MenuSimulation.Visible = DisplayConfiguration.displaySimulation;
@@ -5306,30 +5315,16 @@ namespace MissionPlanner
             }
         }
 
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        [DllImport("user32.dll")]
-        static extern bool SetForegroundWindow(IntPtr hWnd);
-
-
-        const int SW_RESTORE = 9;
-        const int SW_MAXIMIZE = 3;
-
-
-
         private void MenuAdams_Click(object sender, EventArgs e)
         {
             string _switch_to_exe = SettingManager.Get(Setting.ConnectedApplication);
 
-            // in devmode ask for the .exe to switch and store it in the config file
+            // In devmode ask for the process name and store it in MV04_settings
             if (devmode)
             {
-                MessageBox.Show(_switch_to_exe);
-
-                _switch_to_exe = Prompt("Enter landing zone name:", $"{_switch_to_exe}");
+                _switch_to_exe = Prompt("Enter the process name of the ADAMS:", $"{_switch_to_exe}");
                 
+                // Exit if input is not valid
                 if (_switch_to_exe == null || _switch_to_exe =="")
                     return;
 
@@ -5337,11 +5332,7 @@ namespace MissionPlanner
                 SettingManager.Save();
             }
 
-            // Try to switch to the other application
-            MessageBox.Show($"switch to: {_switch_to_exe}");
-
             Process[] processes = Process.GetProcessesByName(_switch_to_exe);
-
             if (processes.Length > 0)
             {
                 // Minimize current WinForms app
