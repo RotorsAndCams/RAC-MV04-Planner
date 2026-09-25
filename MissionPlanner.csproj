@@ -5064,6 +5064,7 @@
     <None Include="Resources\icons8-error-64.png" />
     <None Include="Resources\icons8-simulation-64.png" />
     <None Include="Resources\icons8-power-64-green.png" />
+    <None Include="Resources\adams icon szines.png" />
     <Content Include="rotmat.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -5305,5 +5305,101 @@ namespace MissionPlanner
                 ++_blinkCounter;
             }
         }
+
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
+
+        const int SW_RESTORE = 9;
+        const int SW_MAXIMIZE = 3;
+
+
+
+        private void MenuAdams_Click(object sender, EventArgs e)
+        {
+            string _switch_to_exe = SettingManager.Get(Setting.ConnectedApplication);
+
+            // in devmode ask for the .exe to switch and store it in the config file
+            if (devmode)
+            {
+                MessageBox.Show(_switch_to_exe);
+
+                _switch_to_exe = Prompt("Enter landing zone name:", $"{_switch_to_exe}");
+                
+                if (_switch_to_exe == null || _switch_to_exe =="")
+                    return;
+
+                SettingManager.Set(Setting.ConnectedApplication, _switch_to_exe);
+                SettingManager.Save();
+            }
+
+            // Try to switch to the other application
+            MessageBox.Show($"switch to: {_switch_to_exe}");
+
+            Process[] processes = Process.GetProcessesByName(_switch_to_exe);
+
+            if (processes.Length > 0)
+            {
+                // Minimize current WinForms app
+                this.WindowState = FormWindowState.Minimized;
+
+                IntPtr hWnd = processes[0].MainWindowHandle;
+
+                ShowWindow(hWnd, SW_RESTORE); // Restore if minimized
+                ShowWindow(hWnd, SW_MAXIMIZE); // Maximize
+                SetForegroundWindow(hWnd); // Bring to front
+            }
+        }
+
+        public static string Prompt(string text, string caption)
+        {
+            using (Form form = new Form())
+            using (TextBox textBox = new TextBox())
+            using (Button buttonOk = new Button())
+            using (Button buttonCancel = new Button())
+            {
+                form.Text = caption;
+                form.Width = 300;
+                form.Height = 140;
+
+                var label = new Label()
+                {
+                    Left = 10,
+                    Top = 10,
+                    Width = 260,
+                    Text = text
+                };
+
+                textBox.Left = 10;
+                textBox.Top = 35;
+                textBox.Width = 260;
+
+                buttonOk.Text = "OK";
+                buttonOk.Left = 110;
+                buttonOk.Top = 65;
+                buttonOk.DialogResult = DialogResult.OK;
+
+                buttonCancel.Text = "Cancel";
+                buttonCancel.Left = 195;
+                buttonCancel.Top = 65;
+                buttonCancel.DialogResult = DialogResult.Cancel;
+
+                form.Controls.Add(label);
+                form.Controls.Add(textBox);
+                form.Controls.Add(buttonOk);
+                form.Controls.Add(buttonCancel);
+
+                form.AcceptButton = buttonOk;
+                form.CancelButton = buttonCancel;
+
+                return form.ShowDialog() == DialogResult.OK
+                ? textBox.Text
+                : null;
+            }
+        }
     }
 }

@@ -43,7 +43,7 @@ namespace MissionPlanner
             this.readonlyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectionOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectionListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuFlightData = new System.Windows.Forms.ToolStripButton();
+            this.MenuAdams = new System.Windows.Forms.ToolStripButton();
             this.MenuFlightPlanner = new System.Windows.Forms.ToolStripButton();
             this.tsb_ChangeView = new System.Windows.Forms.ToolStripButton();
             this.MenuCamera = new System.Windows.Forms.ToolStripButton();
@@ -55,6 +55,7 @@ namespace MissionPlanner
             this.MenuConnect = new System.Windows.Forms.ToolStripButton();
             this.toolStripConnectionControl = new MissionPlanner.Controls.ToolStripConnectionControl();
             this.MenuArduPilot = new System.Windows.Forms.ToolStripButton();
+            this.MenuFlightData = new System.Windows.Forms.ToolStripButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.status1 = new MissionPlanner.Controls.Status();
             this.MainMenu.SuspendLayout();
@@ -80,7 +81,8 @@ namespace MissionPlanner
             this.tsb_Error,
             this.MenuConnect,
             this.toolStripConnectionControl,
-            this.MenuArduPilot});
+            this.MenuArduPilot,
+            this.MenuAdams});
             this.MainMenu.Name = "MainMenu";
             this.MainMenu.ShowItemToolTips = true;
             this.MainMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.MainMenu_ItemClicked);
@@ -131,14 +133,14 @@ namespace MissionPlanner
             resources.ApplyResources(this.connectionListToolStripMenuItem, "connectionListToolStripMenuItem");
             this.connectionListToolStripMenuItem.Click += new System.EventHandler(this.connectionListToolStripMenuItem_Click);
             // 
-            // MenuFlightData
+            // MenuAdams
             // 
-            this.MenuFlightData.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.MenuFlightData.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
-            resources.ApplyResources(this.MenuFlightData, "MenuFlightData");
-            this.MenuFlightData.Margin = new System.Windows.Forms.Padding(0);
-            this.MenuFlightData.Name = "MenuFlightData";
-            this.MenuFlightData.Click += new System.EventHandler(this.MenuFlightData_Click);
+            this.MenuAdams.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.MenuAdams.Image = global::MissionPlanner.Properties.Resources.adams_icon_szines;
+            resources.ApplyResources(this.MenuAdams, "MenuAdams");
+            this.MenuAdams.Margin = new System.Windows.Forms.Padding(0);
+            this.MenuAdams.Name = "MenuAdams";
+            this.MenuAdams.Click += new System.EventHandler(this.MenuAdams_Click);
             // 
             // MenuFlightPlanner
             // 
@@ -241,6 +243,15 @@ namespace MissionPlanner
             this.MenuArduPilot.Name = "MenuArduPilot";
             this.MenuArduPilot.Click += new System.EventHandler(this.MenuArduPilot_Click);
             // 
+            // MenuFlightData
+            // 
+            this.MenuFlightData.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.MenuFlightData.Image = global::MissionPlanner.Properties.Resources.icons8_flight_64__1_;
+            resources.ApplyResources(this.MenuFlightData, "MenuFlightData");
+            this.MenuFlightData.Margin = new System.Windows.Forms.Padding(0);
+            this.MenuFlightData.Name = "MenuFlightData";
+            this.MenuFlightData.Click += new System.EventHandler(this.MenuFlightData_Click);
+            // 
             // panel1
             // 
             this.panel1.Controls.Add(this.status1);
@@ -299,5 +310,6 @@ namespace MissionPlanner
         public Controls.Status status1;
         public System.Windows.Forms.ToolStripButton tsb_ChangeView;
         public System.Windows.Forms.ToolStripButton tsb_Error;
+        public System.Windows.Forms.ToolStripButton MenuAdams;
     }
 }

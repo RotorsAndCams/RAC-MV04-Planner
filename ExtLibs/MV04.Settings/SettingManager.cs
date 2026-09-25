@@ -24,7 +24,8 @@ namespace MV04.Settings
         SpeedFormat,
         AutoRecordVideoStream,
         AutoStartSingleYaw,
-        AutoStartCameraStream
+        AutoStartCameraStream,
+        ConnectedApplication
     }
 
     public class SettingItem
@@ -145,6 +146,9 @@ namespace MV04.Settings
                                 true.ToString(),
                                 false.ToString()
                             }.Contains(value)
+                        ),
+                        new SettingItem(Setting.ConnectedApplication, $"adams", value =>
+                            !string.IsNullOrWhiteSpace(value)
                         ),
                     };
 
