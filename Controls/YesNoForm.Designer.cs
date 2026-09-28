@@ -39,9 +39,10 @@
             // 
             this.button_Yes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button_Yes.DialogResult = System.Windows.Forms.DialogResult.Yes;
-            this.button_Yes.Location = new System.Drawing.Point(116, 78);
+            this.button_Yes.Location = new System.Drawing.Point(16, 261);
+            this.button_Yes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_Yes.Name = "button_Yes";
-            this.button_Yes.Size = new System.Drawing.Size(75, 23);
+            this.button_Yes.Size = new System.Drawing.Size(196, 109);
             this.button_Yes.TabIndex = 1;
             this.button_Yes.Text = "Igen";
             this.button_Yes.UseVisualStyleBackColor = true;
@@ -51,9 +52,10 @@
             // 
             this.button_No.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button_No.DialogResult = System.Windows.Forms.DialogResult.No;
-            this.button_No.Location = new System.Drawing.Point(197, 78);
+            this.button_No.Location = new System.Drawing.Point(513, 261);
+            this.button_No.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_No.Name = "button_No";
-            this.button_No.Size = new System.Drawing.Size(75, 23);
+            this.button_No.Size = new System.Drawing.Size(196, 109);
             this.button_No.TabIndex = 2;
             this.button_No.Text = "Nem";
             this.button_No.UseVisualStyleBackColor = true;
@@ -64,8 +66,9 @@
             this.label_Text.AutoSize = true;
             this.label_Text.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label_Text.Location = new System.Drawing.Point(0, 0);
+            this.label_Text.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label_Text.Name = "label_Text";
-            this.label_Text.Size = new System.Drawing.Size(35, 13);
+            this.label_Text.Size = new System.Drawing.Size(44, 16);
             this.label_Text.TabIndex = 3;
             this.label_Text.Text = "label1";
             this.label_Text.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -76,22 +79,24 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.Controls.Add(this.label_Text);
-            this.panel1.Location = new System.Drawing.Point(12, 12);
+            this.panel1.Location = new System.Drawing.Point(16, 15);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(260, 60);
+            this.panel1.Size = new System.Drawing.Size(693, 238);
             this.panel1.TabIndex = 4;
             // 
             // YesNoForm
             // 
             this.AcceptButton = this.button_Yes;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.button_No;
-            this.ClientSize = new System.Drawing.Size(284, 113);
+            this.ClientSize = new System.Drawing.Size(722, 385);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.button_No);
             this.Controls.Add(this.button_Yes);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "YesNoForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "YesNoForm";
