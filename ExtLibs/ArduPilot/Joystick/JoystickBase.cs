@@ -95,7 +95,7 @@ namespace MissionPlanner.Joystick
             MV04_JoyMode joyMode = e.MV04CameraMode ? MV04_JoyMode.Camera : MV04_JoyMode.UAV;
 
             // Do RC channel reconfig
-            MV04_SetRCChannels(joyMode);
+            //MV04_SetRCChannels(joyMode);
         }
 
         public void loadconfig(string joystickconfigbuttonin = "joystickbuttons.xml",
@@ -228,7 +228,7 @@ namespace MissionPlanner.Joystick
         public void MV04_SetRCChannels(MV04_JoyMode mode)
         {
             // Change axes
-            JoystickHandler.GetAxisSet(mode)
+            /*JoystickHandler.GetAxisSet(mode)
                 .Where(ch => ch.Key >= 1
                     && ch.Key <= 16
                     && ch.Value >= 0
@@ -237,7 +237,7 @@ namespace MissionPlanner.Joystick
                 {
                     setAxis(ch.Key, (joystickaxis)ch.Value);
                 });
-
+            */
             // Notify
             log.Info($"Joystick config set to {Enum.GetName(typeof(MV04_JoyMode), mode)}");
             JoystickHandler.TriggerJoystickModeChangedEvent(mode);
