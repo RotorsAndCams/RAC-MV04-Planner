@@ -271,6 +271,7 @@ namespace MissionPlanner.Controls
             objBitmap.MakeTransparent();
 
             graphicsObject = this;
+            // disable HUD
             graphicsObjectGDIP = new GdiGraphics(Graphics.FromImage(objBitmap));
         }
 
@@ -1929,6 +1930,8 @@ namespace MissionPlanner.Controls
                 {
                     objBitmap = new Bitmap(this.Width, this.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                     objBitmap.MakeTransparent();
+                    
+                    // Disable HUD
                     graphicsObjectGDIP = new GdiGraphics(Graphics.FromImage(objBitmap));
 
                     graphicsObjectGDIP.SmoothingMode = SmoothingMode.HighSpeed;
@@ -3714,6 +3717,7 @@ namespace MissionPlanner.Controls
                 }
             }
 
+            // Disable HUD
             graphicsObjectGDIP = new GdiGraphics(Graphics.FromImage(objBitmap));
 
             try

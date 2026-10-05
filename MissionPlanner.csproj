@@ -174,6 +174,9 @@
     <EmbeddedResource Include="GCSViews\CameraSettingsForm.resx">
       <DependentUpon>CameraSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GCSViews\CreoSetup.resx">
+      <DependentUpon>CreoSetup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GCSViews\StreamUrlForm.resx">
       <DependentUpon>StreamUrlForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -960,6 +963,12 @@
     </Compile>
     <Compile Include="GCSViews\CameraSettingsForm.Designer.cs">
       <DependentUpon>CameraSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GCSViews\CreoSetup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GCSViews\CreoSetup.Designer.cs">
+      <DependentUpon>CreoSetup.cs</DependentUpon>
     </Compile>
     <Compile Include="GCSViews\StreamUrlForm.cs">
       <SubType>Form</SubType>
