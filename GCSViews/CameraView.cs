@@ -98,11 +98,17 @@ namespace MissionPlanner.GCSViews
         private const int FanOutBacklogDropThresholdBytes = 512 * 1024;
         private const int FanOutMaxDrainPackets = 16;
 
-        private string _ffplayPath =
-            @"C:\Users\zoltan.kovacs\Downloads\ffmpeg-8.1.1-full_build\ffmpeg-8.1.1-full_build\bin\ffplay.exe";
+        private string _ffplayPath = Path.Combine(
+                                            AppDomain.CurrentDomain.BaseDirectory,
+                                            "ffmpeg-8.1.1-full_build",
+                                            "bin",
+                                            "ffplay.exe");
 
-        private string _ffmpegPath =
-            @"C:\Users\zoltan.kovacs\Downloads\ffmpeg-8.1.1-full_build\ffmpeg-8.1.1-full_build\bin\ffmpeg.exe";
+        private string _ffmpegPath = Path.Combine(
+                                            AppDomain.CurrentDomain.BaseDirectory,
+                                            "ffmpeg-8.1.1-full_build",
+                                            "bin",
+                                            "ffmpeg.exe");
 
         private string _recordingDirectory =
             @"C:\VideoSegments";
