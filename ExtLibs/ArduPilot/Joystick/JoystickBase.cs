@@ -227,6 +227,9 @@ namespace MissionPlanner.Joystick
 
         public void MV04_SetRCChannels(MV04_JoyMode mode)
         {
+            // Test to not disable rc chanels
+            return;
+
             // Change axes
             JoystickHandler.GetAxisSet(mode)
                 .Where(ch => ch.Key >= 1
