@@ -1016,9 +1016,9 @@ namespace MissionPlanner.StreamViewer
                 "-fflags nobuffer " +
                 "-flags low_delay " +
                 "-framedrop " +
-                "-sync " + syncMode + " " +
-                "-x " + _options.StreamWidth + " " +
-                "-y " + _options.StreamHeight + " ";
+                "-sync " + syncMode + " ";// +
+                //"-x " + _options.StreamWidth + " " +
+                //"-y " + _options.StreamHeight + " ";
 
             if (_options.DisableAudio)
                 args += "-an ";
