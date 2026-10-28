@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static MissionPlanner.Log.LogBrowse;
 
 namespace MissionPlanner.StreamViewer
 {
@@ -676,7 +677,7 @@ namespace MissionPlanner.StreamViewer
                     Arguments = args,
                     WorkingDirectory = GetWorkingDirectory(_options.FfplayPath),
                     UseShellExecute = false,
-                    CreateNoWindow = _options.HideConsoleWindow,
+                    CreateNoWindow = true,
                     RedirectStandardError = true,
                     RedirectStandardOutput = true
                 };
@@ -1016,23 +1017,29 @@ namespace MissionPlanner.StreamViewer
                 "-fflags nobuffer " +
                 "-flags low_delay " +
                 "-framedrop " +
-                "-sync " + syncMode + " ";// +
-                //"-x " + _options.StreamWidth + " " +
-                //"-y " + _options.StreamHeight + " ";
+                "-sync ext " +
+                "-an -sn " +
+                "-fs " +
+                "-max_delay 0 " +
+                " \"" + displayUrl + "\"";
 
-            if (_options.DisableAudio)
-                args += "-an ";
+            //"-sync " + syncMode + " ";// +
+            //"-x " + _options.StreamWidth + " " +
+            //"-y " + _options.StreamHeight + " ";
 
-            if (_options.UseAvioDirect)
-                args += "-avioflags direct ";
+            //if (_options.DisableAudio)
+            //args += "-an ";
 
-            if (_options.UseMaxDelayZero)
-                args += "-max_delay 0 ";
+            //if (_options.UseAvioDirect)
+            //   args += "-avioflags direct ";
 
-            if (_options.UseSetPtsZero)
-                args += "-vf \"setpts=0\" ";
+            //if (_options.UseMaxDelayZero)
+            //   args += "-max_delay 0 ";
 
-            args += "-noborder \"" + displayUrl + "\"";
+            //if (_options.UseSetPtsZero)
+            //    args += "-vf \"setpts=0\" ";
+
+            //args += "-noborder \"" + displayUrl + "\"";
 
             return args;
         }
