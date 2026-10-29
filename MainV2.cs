@@ -1192,6 +1192,7 @@ namespace MissionPlanner
 
             SaveConfig();
 
+            KillExistingFFplayProcesses();
             if (CameraView.instance == null)
             {
                 cv = new CameraView();
@@ -5305,5 +5306,42 @@ namespace MissionPlanner
                 ++_blinkCounter;
             }
         }
+
+        private void KillExistingFFplayProcesses()
+        {
+            try
+            {
+                Process[] processes = Process.GetProcessesByName("ffplay");
+
+                foreach (Process process in processes)
+                {
+                    try
+                    {
+                        Debug.WriteLine($"Found existing FFplay process. PID={process.Id}");
+
+                        if (!process.HasExited)
+                        {
+                            process.Kill();
+                            process.WaitForExit(3000);
+
+                            Debug.WriteLine($"FFplay terminated. PID={process.Id}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Failed to kill PID={process.Id}: {ex.Message}");
+                    }
+                    finally
+                    {
+                        process.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"KillExistingFFplayProcesses() failed: {ex}");
+            }
+        }
+
     }
 }

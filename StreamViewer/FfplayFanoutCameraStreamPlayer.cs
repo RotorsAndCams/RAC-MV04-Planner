@@ -472,7 +472,7 @@ namespace MissionPlanner.StreamViewer
             }
 
             try
-            {
+            { 
                 StartFanOutIfNeeded();
 
                 if (!_desiredDisplayRunning)
