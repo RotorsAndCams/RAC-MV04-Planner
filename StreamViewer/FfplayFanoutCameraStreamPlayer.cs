@@ -8,7 +8,6 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static MissionPlanner.Log.LogBrowse;
 
 namespace MissionPlanner.StreamViewer
 {
@@ -46,7 +45,6 @@ namespace MissionPlanner.StreamViewer
         private const uint RDW_INVALIDATE = 0x0001;
         private const uint RDW_UPDATENOW = 0x0100;
         private const uint RDW_ALLCHILDREN = 0x0080;
-
 
         private volatile bool _desiredDisplayRunning;
         private volatile bool _displayStartInProgress;
@@ -1011,6 +1009,8 @@ namespace MissionPlanner.StreamViewer
 
             string displayUrl = "rtp://0.0.0.0:" + _options.LocalDisplayRtpPort;
 
+            /*
+            // Baseline
             string args =
                 "-hide_banner " +
                 "-loglevel warning " +
@@ -1022,6 +1022,21 @@ namespace MissionPlanner.StreamViewer
                 "-fs " +
                 "-max_delay 0 " +
                 " \"" + displayUrl + "\"";
+            */
+
+            // Seems ok need test pic
+            string args =
+                "-hide_banner " +
+                "-loglevel warning " +
+                "-fflags nobuffer " +
+                "-flags low_delay " +
+                "-framedrop " +
+                "-sync ext " +
+                "-max_delay 0 " +
+                "-reorder_queue_size 0 " +
+                "-an -sn " +
+                "-fs " +
+                "\"" + displayUrl + "\"";
 
             //"-sync " + syncMode + " ";// +
             //"-x " + _options.StreamWidth + " " +
@@ -1084,6 +1099,7 @@ namespace MissionPlanner.StreamViewer
             return args;
         }
 
+        #region Utility methods
         private IPAddress GetLocalForwardAddress()
         {
             IPAddress localAddress;
@@ -1329,7 +1345,9 @@ namespace MissionPlanner.StreamViewer
             if (handler != null && ex != null)
                 handler(this, ex);
         }
+        #endregion
 
+        #region consts, dlls, pointers
         private const int GWL_STYLE = -16;
 
         private const long WS_CHILD = 0x40000000L;
@@ -1341,7 +1359,7 @@ namespace MissionPlanner.StreamViewer
 
         private const uint SWP_NOSIZE = 0x0001;
         private const uint SWP_NOMOVE = 0x0002;
-        private const uint SWP_NOZORDER = 0x0004;        
+        private const uint SWP_NOZORDER = 0x0004;
 
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
@@ -1454,5 +1472,6 @@ namespace MissionPlanner.StreamViewer
 
         [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
         private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+        #endregion
     }
 }
