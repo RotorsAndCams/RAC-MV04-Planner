@@ -66,7 +66,7 @@
             this.btn_ChangeCrosshair = new System.Windows.Forms.Button();
             this.btn_FullScreen = new System.Windows.Forms.Button();
             this.tlp_CVBase = new System.Windows.Forms.TableLayoutPanel();
-            this.pnl_VideoView = new System.Windows.Forms.Panel();
+            this.pnl_VideoView = new MissionPlanner.GCSViews.VideoHostPanel();
             this.tlp_ControlsBase.SuspendLayout();
             this.tlp_Buttonsection2.SuspendLayout();
             this.tlp_Zoom.SuspendLayout();
@@ -460,6 +460,6 @@
         private System.Windows.Forms.TableLayoutPanel tlp_btnsToFit;
         private System.Windows.Forms.Button btn_ResetZoom;
         private System.Windows.Forms.Button btn_Recording;
-        private System.Windows.Forms.Panel pnl_VideoView;
+        private MissionPlanner.GCSViews.VideoHostPanel pnl_VideoView;
     }
 }

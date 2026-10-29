@@ -676,8 +676,8 @@ namespace MissionPlanner.StreamViewer
                     WorkingDirectory = GetWorkingDirectory(_options.FfplayPath),
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true
+                    //RedirectStandardError = true,
+                    //RedirectStandardOutput = true
                 };
 
                 _ffplayProcess = new Process
@@ -686,14 +686,14 @@ namespace MissionPlanner.StreamViewer
                     EnableRaisingEvents = true
                 };
 
-                _ffplayProcess.ErrorDataReceived += FfplayProcess_ErrorDataReceived;
-                _ffplayProcess.OutputDataReceived += FfplayProcess_OutputDataReceived;
+                //_ffplayProcess.ErrorDataReceived += FfplayProcess_ErrorDataReceived;
+                //_ffplayProcess.OutputDataReceived += FfplayProcess_OutputDataReceived;
                 _ffplayProcess.Exited += FfplayProcess_Exited;
 
                 if (_ffplayProcess.Start())
                 {
-                    _ffplayProcess.BeginErrorReadLine();
-                    _ffplayProcess.BeginOutputReadLine();
+                    //_ffplayProcess.BeginErrorReadLine();
+                    //_ffplayProcess.BeginOutputReadLine();
 
                     Debug.WriteLine("ffplay started. PID=" + _ffplayProcess.Id);
                 }
