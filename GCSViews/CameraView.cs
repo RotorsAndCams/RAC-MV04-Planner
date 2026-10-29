@@ -2301,5 +2301,24 @@ namespace MissionPlanner.GCSViews
                 this.btn_Recording.ForeColor = Color.White;
             }
         }
+
+        private void pnl_VideoView_VideoClick(object sender, VideoClickEventArgs e)
+        {
+            if (e.X <= 0 || e.Y <= 0 || e.Width <= 0 || e.Height <= 0)
+                return;
+
+            IsCameraTrackingModeActive = true;
+
+            Task.Run(() =>
+            {
+                bool success = CameraHandler.Instance.StartTracking(
+                    new Point(e.X, e.Y),
+                    new Size(e.Width, e.Height));
+
+                Debug.WriteLine(success ? "Track OK" : "Track Failed");
+            });
+
+            SetStopButtonVisibility();
+        }
     }
 }

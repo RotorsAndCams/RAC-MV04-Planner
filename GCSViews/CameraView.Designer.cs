@@ -388,6 +388,7 @@
             // 
             resources.ApplyResources(this.pnl_VideoView, "pnl_VideoView");
             this.pnl_VideoView.Name = "pnl_VideoView";
+            this.pnl_VideoView.VideoClick += new System.EventHandler<MissionPlanner.GCSViews.VideoClickEventArgs>(this.pnl_VideoView_VideoClick);
             // 
             // CameraView
             // 
