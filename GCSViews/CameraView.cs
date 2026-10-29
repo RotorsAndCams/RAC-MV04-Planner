@@ -257,7 +257,7 @@ namespace MissionPlanner.GCSViews
             SetDroneStatusValue();
 
             MainV2.comPort.CommsClose += ComPort_CommsClose;
-            pnl_VideoView.MouseDoubleClick += vv_VLC_MouseDoubleClick;
+            //pnl_VideoView.MouseDoubleClick += vv_VLC_MouseDoubleClick;
             if(bool.Parse(SettingManager.Get(Setting.AutoConnect)))
                 this.btn_TripSwitchOnOff.Enabled = false;
         }

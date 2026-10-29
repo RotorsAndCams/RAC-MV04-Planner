@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace MissionPlanner.GCSViews
 {
@@ -125,12 +119,7 @@ namespace MissionPlanner.GCSViews
 
         public MouseButtons Button { get; }
 
-        public VideoClickEventArgs(
-            MouseButtons button,
-            int x,
-            int y,
-            int width,
-            int height)
+        public VideoClickEventArgs(MouseButtons button, int x, int y, int width, int height)
         {
             Button = button;
             X = x;
