@@ -107,6 +107,11 @@ namespace MissionPlanner.GCSViews
                     height);
             }
         }
+
+        public Rectangle GetVideoRect()
+        {
+            return GetVideoRect(this.Width, this.Height, ASPECTRATIO);
+        }
     }
 
     public class VideoClickEventArgs : EventArgs

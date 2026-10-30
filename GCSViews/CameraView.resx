@@ -1252,7 +1252,7 @@
     <value>pnl_VideoView</value>
   </data>
   <data name="&gt;&gt;pnl_VideoView.Type" xml:space="preserve">
-    <value>MissionPlanner.GCSViews.VideoHostPanel, MissionPlanner, Version=1.3.9798.21355, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.GCSViews.VideoHostPanel, MissionPlanner, Version=1.3.9799.19008, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;pnl_VideoView.Parent" xml:space="preserve">
     <value>tlp_CVBase</value>

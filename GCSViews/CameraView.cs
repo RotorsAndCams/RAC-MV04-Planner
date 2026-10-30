@@ -1,45 +1,24 @@
-﻿using Accord.MachineLearning.VectorMachines.Learning;
-using Accord.Video.FFMPEG;
-using CoordinateSharp;
-using GMap.NET;
-using LibVLCSharp.Shared;
-using log4net;
-using log4net.Repository.Hierarchy;
-using Microsoft.CodeAnalysis;
+﻿using log4net;
 using MissionPlanner.Controls;
 using MissionPlanner.StreamViewer;
 using MissionPlanner.Utilities;
 using MV04.Camera;
-using MV04.FlightPlanAnalyzer;
 using MV04.Settings;
 using MV04.State;
 using MV04.TestForms;
-using NetTopologySuite.Operation.Valid;
-using NextVisionVideoControlLibrary;
-using OpenTK.Graphics.ES11;
-using RestSharp.Extensions;
-using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Drawing.Text;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.RightsManagement;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
-using static IronPython.Modules._ast;
 using static MAVLink;
 using static MV04.Camera.MavProto;
 
@@ -67,7 +46,7 @@ namespace MissionPlanner.GCSViews
 
         public const int _maxAllowedAltitudeValue = 500;
         public const int _minAllowedAltitudeValue = 50;
-        
+
 
         bool _recordingInProgress = false;
         int _segmentLength;
@@ -147,7 +126,7 @@ namespace MissionPlanner.GCSViews
         }
 
         System.Timers.Timer _videoRecordSegmentTimer = new System.Timers.Timer();
-        
+
         Panel panelDoubleClick;
 
         System.Timers.Timer _feedTimer;
@@ -183,7 +162,7 @@ namespace MissionPlanner.GCSViews
 
             InitializeVideoStream();
             WireVideoStartupEvents();
-            ScheduleVideoStartupCheck();            
+            ScheduleVideoStartupCheck();
             StartCameraControl();
 
             _videoResizeDebounceTimer = new System.Windows.Forms.Timer();
@@ -196,7 +175,7 @@ namespace MissionPlanner.GCSViews
             // SysID for camera functions
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
 
-            if(MainV2.comPort != null)
+            if (MainV2.comPort != null)
                 MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
@@ -209,7 +188,7 @@ namespace MissionPlanner.GCSViews
             #region UI config
 
             // Draw UI
-            if(MainV2.instance.devmode)
+            if (MainV2.instance.devmode)
                 DrawUI();
 
             SetStopButtonVisibility();
@@ -258,7 +237,7 @@ namespace MissionPlanner.GCSViews
 
             MainV2.comPort.CommsClose += ComPort_CommsClose;
             //pnl_VideoView.MouseDoubleClick += vv_VLC_MouseDoubleClick;
-            if(bool.Parse(SettingManager.Get(Setting.AutoConnect)))
+            if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
                 this.btn_TripSwitchOnOff.Enabled = false;
         }
 
@@ -577,9 +556,11 @@ namespace MissionPlanner.GCSViews
 
         private void ReconnectCameraStreamAndControl()
         {
-            Task.Factory.StartNew(() => {
+            Task.Factory.StartNew(() =>
+            {
                 if (InvokeRequired)
-                    Invoke(new Action(() => {
+                    Invoke(new Action(() =>
+                    {
                         StartVideoStream();
                         StartCameraControl();
                         CameraHandler.Instance.SetSystemTimeToCurrent();
@@ -640,7 +621,7 @@ namespace MissionPlanner.GCSViews
         private void videoPanelLoaded(object sender, EventArgs e)
         {
             ScheduleVideoStartupCheck();
-        }        
+        }
 
         private CameraStreamOptions BuildVideoStreamOptions()
         {
@@ -992,6 +973,24 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+        [DllImport("user32.dll")]
+        private static extern uint GetDpiForSystem();
+
+        [DllImport("user32.dll")]
+        private static extern uint GetDpiForWindow(IntPtr hwnd);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr MonitorFromWindow(
+    IntPtr hwnd,
+    uint dwFlags);
+
+        [DllImport("shcore.dll")]
+        private static extern int GetDpiForMonitor(
+    IntPtr hmonitor,
+    int dpiType,
+    out uint dpiX,
+    out uint dpiY);
+
         private void DoPhoto(string path = null)
         {
             try
@@ -1005,10 +1004,8 @@ namespace MissionPlanner.GCSViews
                     string directory = SettingManager.Get(Setting.MediaSaveFolder);
                     Directory.CreateDirectory(directory);
 
-                    outputPath = Path.Combine(
-                        directory,
-                        "SnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".png"
-                    );
+                    outputPath = Path.Combine(directory,
+                                              "SnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
                 }
                 else
                 {
@@ -1018,18 +1015,27 @@ namespace MissionPlanner.GCSViews
                         Directory.CreateDirectory(directory);
                 }
 
-                _cameraStreamPlayer
-                    .CaptureCurrentFrameAsync(outputPath)
-                    .ContinueWith(delegate (Task task)
-                    {
-                        if (task.Exception != null)
-                        {
-                            HandleVideoStreamException(task.Exception.GetBaseException());
-                            return;
-                        }
+                float scaling = (float)GetDpiForWindow(this.Handle) / 96f;
 
-                        System.Diagnostics.Debug.WriteLine("Photo saved: " + outputPath);
-                    });
+                Point topLeft = pnl_VideoView.PointToScreen(Point.Empty);
+                Rectangle videoRect = pnl_VideoView.GetVideoRect();
+
+                videoRect.X += topLeft.X;
+                videoRect.Y += topLeft.Y;
+                //videoRect.Width = (int)(videoRect.Width * scaling);
+                //videoRect.Height = (int)(videoRect.Height * scaling);
+
+                _cameraStreamPlayer.CaptureCurrentFrameAsync(outputPath, videoRect)
+                                   .ContinueWith(delegate (Task task)
+                {
+                    if (task.Exception != null)
+                    {
+                        HandleVideoStreamException(task.Exception.GetBaseException());
+                        return;
+                    }
+
+                    System.Diagnostics.Debug.WriteLine("Photo saved: " + outputPath);
+                });
             }
             catch (Exception ex)
             {
@@ -1445,7 +1451,7 @@ namespace MissionPlanner.GCSViews
                     _fsForm = new FormNoTheme();
                     _fsForm.Controls.Add(this.pnl_VideoView);
                     pnl_VideoView.Dock = DockStyle.Fill;
-                    pnl_VideoView.BringToFront();                    
+                    pnl_VideoView.BringToFront();
                     _fsForm.WindowState = FormWindowState.Maximized;
                     _fsForm.FormClosing += _fsForm_FormClosing;
 
@@ -1504,7 +1510,7 @@ namespace MissionPlanner.GCSViews
             }
             catch
             {
-                if(MainV2.instance.devmode)
+                if (MainV2.instance.devmode)
                     CustomMessageBox.Show("Teljes képernyős mód hiba");
             }
 
@@ -1665,7 +1671,7 @@ namespace MissionPlanner.GCSViews
             _fsForm.Controls.Remove(pnl_VideoView);
             this.tlp_CVBase.Controls.Add(pnl_VideoView);
             pnl_VideoView.Dock = DockStyle.Fill;
-            pnl_VideoView.BringToFront();            
+            pnl_VideoView.BringToFront();
             _fsForm.FormClosing -= _fsForm_FormClosing;
             _fsForm.Dispose();
             _fsForm = null;
@@ -1684,7 +1690,7 @@ namespace MissionPlanner.GCSViews
 
         private void CameraSettings_event_StartStopRecording(object sender, EventArgs e)
         {
-            if(_recordingInProgress)
+            if (_recordingInProgress)
                 StopRecording();
             else
                 StartRecording();
@@ -1772,9 +1778,9 @@ namespace MissionPlanner.GCSViews
                     }
                     catch
                     {
-                        
+
                     }
-                    
+
 
                 }
 
@@ -1790,7 +1796,7 @@ namespace MissionPlanner.GCSViews
                 try
                 {
                     _cameraState = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report);
-                    
+
                 }
                 catch { }
 
@@ -1957,7 +1963,8 @@ namespace MissionPlanner.GCSViews
         private int errorCounter = 0;
         private async Task reconnectLoop()
         {
-            await Task.Run(async () => {
+            await Task.Run(async () =>
+            {
                 while (!isCameraConnected)
                 {
                     try
@@ -1970,7 +1977,7 @@ namespace MissionPlanner.GCSViews
                     {
                         errorCounter++;
 
-                        if(errorCounter > 5)
+                        if (errorCounter > 5)
                         {
                             break;
                         }
@@ -1992,7 +1999,8 @@ namespace MissionPlanner.GCSViews
             {
                 if (InvokeRequired)
                 {
-                    Invoke(new Action(() => {
+                    Invoke(new Action(() =>
+                    {
                         if (IsCameraTrackingModeActive)
                             btn_StopTracking.Visible = true;
                         else
@@ -2083,7 +2091,7 @@ namespace MissionPlanner.GCSViews
             switch (StateHandler.CurrentSate)
             {
                 case MV04_State.Manual:
-                    if(  MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
+                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
                     {
                         Task.Run(() => ProvideDroneError());
                     }
@@ -2166,7 +2174,7 @@ namespace MissionPlanner.GCSViews
             else
                 this.pb_DroneTakeOff.Visible = false;
             //IR
-            if(position_IR == enum_PositionLEDState_IR.On)
+            if (position_IR == enum_PositionLEDState_IR.On)
                 this.pb_InfraLight.Visible = true;
             else
                 this.pb_InfraLight.Visible = false;
@@ -2189,7 +2197,7 @@ namespace MissionPlanner.GCSViews
             var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.pnl_VideoView.Size);
 
             SetStopButtonVisibility();
-        }     
+        }
 
         private void SetTripOnOffButton(bool tripState)
         {
@@ -2286,7 +2294,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_Recording_Click(object sender, EventArgs e)
         {
-            if(_recordingInProgress)
+            if (_recordingInProgress)
             {
                 StopRecording();
 

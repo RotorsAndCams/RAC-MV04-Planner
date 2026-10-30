@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace MissionPlanner.StreamViewer
 {
@@ -22,7 +23,7 @@ namespace MissionPlanner.StreamViewer
 
         void Resize(int hostWidth, int hostHeight);
 
-        Task CaptureCurrentFrameAsync(string outputFilePath);
+        Task CaptureCurrentFrameAsync(string outputFilePath, Rectangle captureWindow);
 
         Task StartSegmentRecordingAsync(
             string outputDirectory,

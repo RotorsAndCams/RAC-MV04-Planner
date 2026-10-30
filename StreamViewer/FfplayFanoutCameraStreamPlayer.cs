@@ -232,7 +232,7 @@ namespace MissionPlanner.StreamViewer
             }
         }
 
-        public async Task CaptureCurrentFrameAsync(string outputFilePath)
+        public async Task CaptureCurrentFrameAsync(string outputFilePath, Rectangle captureWindow)
         {
             try
             {
@@ -249,23 +249,20 @@ namespace MissionPlanner.StreamViewer
 
                 await Task.Run(delegate
                 {
-                    Rectangle bounds = GetWindowRectangle(_hostWindowHandle);
-
-                    if (bounds.Width <= 0 || bounds.Height <= 0)
+                    if (captureWindow.Width <= 0 || captureWindow.Height <= 0)
                         return;
 
-                    using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format24bppRgb))
+                    using (Bitmap bitmap = new Bitmap(captureWindow.Width, captureWindow.Height, PixelFormat.Format24bppRgb))
                     {
                         using (Graphics graphics = Graphics.FromImage(bitmap))
                         {
                             graphics.CopyFromScreen(
-                                bounds.Left,
-                                bounds.Top,
+                                captureWindow.X,
+                                captureWindow.Y,
                                 0,
                                 0,
-                                bounds.Size,
-                                CopyPixelOperation.SourceCopy
-                            );
+                                captureWindow.Size,
+                                CopyPixelOperation.SourceCopy);
                         }
 
                         SaveBitmapByExtension(bitmap, outputFilePath);
@@ -1190,6 +1187,27 @@ namespace MissionPlanner.StreamViewer
             return Rectangle.FromLTRB(rect.Left, rect.Top, rect.Right, rect.Bottom);
         }
 
+        private static Rectangle GetClientRectangle(IntPtr hWnd)
+        {
+            GetClientRect(hWnd, out RECT rc);
+
+            POINT pt = new POINT
+            {
+                X = rc.Left,
+                Y = rc.Top
+            };
+
+            ClientToScreen(hWnd, ref pt);
+
+            Rectangle rect = new Rectangle(
+                pt.X,
+                pt.Y,
+                rc.Right - rc.Left,
+                rc.Bottom - rc.Top);
+
+            return rect;
+        }
+
         private static void SaveBitmapByExtension(Bitmap bitmap, string outputFilePath)
         {
             string extension = Path.GetExtension(outputFilePath).ToLowerInvariant();
@@ -1372,6 +1390,13 @@ namespace MissionPlanner.StreamViewer
             public int Bottom;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
@@ -1382,8 +1407,7 @@ namespace MissionPlanner.StreamViewer
             int Y,
             int nWidth,
             int nHeight,
-            bool bRepaint
-        );
+            bool bRepaint);
 
         [DllImport("user32.dll")]
         private static extern bool UpdateWindow(IntPtr hWnd);
@@ -1406,6 +1430,12 @@ namespace MissionPlanner.StreamViewer
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
+        [DllImport("user32.dll")]
+        static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+
+        [DllImport("user32.dll")]
+        static extern bool ClientToScreen(IntPtr hWnd, ref POINT lpPoint);
+
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
@@ -1414,30 +1444,27 @@ namespace MissionPlanner.StreamViewer
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool SetWindowPos(
-    IntPtr hWnd,
-    IntPtr hWndInsertAfter,
-    int X,
-    int Y,
-    int cx,
-    int cy,
-    uint uFlags
-);
+            IntPtr hWnd,
+            IntPtr hWndInsertAfter,
+            int X,
+            int Y,
+            int cx,
+            int cy,
+            uint uFlags);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SendMessage(
             IntPtr hWnd,
             int Msg,
             IntPtr wParam,
-            IntPtr lParam
-        );
+            IntPtr lParam);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool RedrawWindow(
             IntPtr hWnd,
             IntPtr lprcUpdate,
             IntPtr hrgnUpdate,
-            uint flags
-        );
+            uint flags);
 
         private static IntPtr MakeLParam(int lowWord, int highWord)
         {
