@@ -991,6 +991,11 @@ namespace MissionPlanner.GCSViews
     out uint dpiX,
     out uint dpiY);
 
+        [DllImport("shcore.dll")]
+        private static extern int GetScaleFactorForMonitor(
+    IntPtr hMonitor,
+    out int pScale);
+
         private void DoPhoto(string path = null)
         {
             try
@@ -1015,15 +1020,25 @@ namespace MissionPlanner.GCSViews
                         Directory.CreateDirectory(directory);
                 }
 
-                float scaling = (float)GetDpiForWindow(this.Handle) / 96f;
+
+                IntPtr monitor = MonitorFromWindow(this.Handle, 2);
+
+                int result = GetScaleFactorForMonitor(monitor, out int scale);
+
+                if (result != 0)
+                    scale = 100; // 100%, not 96
+
+                float scaling = scale / 100f;
 
                 Point topLeft = pnl_VideoView.PointToScreen(Point.Empty);
                 Rectangle videoRect = pnl_VideoView.GetVideoRect();
 
-                videoRect.X += topLeft.X;
-                videoRect.Y += topLeft.Y;
-                //videoRect.Width = (int)(videoRect.Width * scaling);
-                //videoRect.Height = (int)(videoRect.Height * scaling);
+                // Convert logical screen coordinates to physical pixels
+                videoRect.X = (int)Math.Round((topLeft.X + videoRect.X) * scaling);
+                videoRect.Y = (int)Math.Round((topLeft.Y + videoRect.Y) * scaling);
+
+                videoRect.Width = (int)Math.Round(videoRect.Width * scaling);
+                videoRect.Height = (int)Math.Round(videoRect.Height * scaling);
 
                 _cameraStreamPlayer.CaptureCurrentFrameAsync(outputPath, videoRect)
                                    .ContinueWith(delegate (Task task)
