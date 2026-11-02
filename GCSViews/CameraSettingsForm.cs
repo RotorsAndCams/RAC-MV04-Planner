@@ -1,13 +1,8 @@
 ﻿using MV04.Camera;
 using MV04.Settings;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -70,7 +65,8 @@ namespace MissionPlanner.GCSViews
 
             this.btn_Reconnect.Enabled = false;
 
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 DoReconnect();
             });
 
@@ -82,7 +78,7 @@ namespace MissionPlanner.GCSViews
             try
             {
                 isReconnecting = true;
-                
+
                 CameraHandler.Instance.CameraControlConnect(
                     IPAddress.Parse(SettingManager.Get(Setting.CameraIP)),
                     int.Parse(SettingManager.Get(Setting.CameraControlPort)));
