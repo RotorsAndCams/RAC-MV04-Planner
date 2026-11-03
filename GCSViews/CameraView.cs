@@ -1,42 +1,26 @@
-﻿using CoordinateSharp;
-using GMap.NET;
-using log4net;
-using log4net.Repository.Hierarchy;
+﻿using log4net;
+using MissionPlanner.Controls;
+using MissionPlanner.StreamViewer;
 using MissionPlanner.Utilities;
 using MV04.Camera;
 using MV04.Settings;
 using MV04.State;
 using MV04.TestForms;
-using NetTopologySuite.Operation.Valid;
-using NextVisionVideoControlLibrary;
-using OpenTK.Graphics.ES11;
-using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Drawing.Text;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.RightsManagement;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using static IronPython.Modules._ast;
-using static MV04.Camera.MavProto;
-using Accord.Video.FFMPEG;
-using MV04.FlightPlanAnalyzer;
 using System.Timers;
-using MissionPlanner.Controls;
-using LibVLCSharp.Shared;
-using Accord.MachineLearning.VectorMachines.Learning;
+using System.Windows.Forms;
 using static MAVLink;
+using static MV04.Camera.MavProto;
 
 namespace MissionPlanner.GCSViews
 {
@@ -63,7 +47,6 @@ namespace MissionPlanner.GCSViews
         public const int _maxAllowedAltitudeValue = 500;
         public const int _minAllowedAltitudeValue = 50;
 
-        Bitmap _actualCameraImage;
 
         bool _recordingInProgress = false;
         int _segmentLength;
@@ -73,6 +56,60 @@ namespace MissionPlanner.GCSViews
         NvSystemModes _cameraState = NvSystemModes.Stow;
         bool isPolarityInverted = false;
 
+        //ffplay video player fields
+        private ICameraStreamPlayer _cameraStreamPlayer;
+        private CameraStreamOptions _streamOptions;
+
+        private const bool StreamUseSetPtsZero = true;
+        private const bool StreamUseMaxDelayZero = true;
+        private const bool StreamUseAvioDirect = false;
+
+        private const int StreamWidth = 1920;
+        private const int StreamHeight = 1080;
+
+        private const int CameraRtpPort = 11024;
+        private const int LocalDisplayRtpPort = 12000;
+        private const int LocalRecordingRtpPort = 12002;
+
+        private const int FanOutReceiveBufferBytes = 1024 * 1024;
+        private const bool FanOutSoftDropEnabled = true;
+        private const int FanOutBacklogDropThresholdBytes = 512 * 1024;
+        private const int FanOutMaxDrainPackets = 16;
+
+        private readonly string _ffplayPath = Path.Combine(
+                                            AppDomain.CurrentDomain.BaseDirectory,
+                                            "ffmpeg-8.1.1-full_build",
+                                            "bin",
+                                            "ffplay.exe");
+
+        private readonly string _ffmpegPath = Path.Combine(
+                                            AppDomain.CurrentDomain.BaseDirectory,
+                                            "ffmpeg-8.1.1-full_build",
+                                            "bin",
+                                            "ffmpeg.exe");
+
+        private string _recordingDirectory = @"C:\VideoSegments";
+
+        private int _recordingSegmentSeconds = 60;
+        private string _recordingFilePrefix = "streamRecord";
+
+        private bool _videoStreamInitialized;
+        private bool _videoStreamStartRequested;
+        private bool _videoStreamStartInProgress;
+        private bool _autoStartupApplied;
+        private bool _startupCheckScheduled;
+
+        private bool _videoResizePending;
+        private bool _videoDisplayStartupCompleted;
+        private int _lastAppliedVideoWidth;
+        private int _lastAppliedVideoHeight;
+        private System.Windows.Forms.Timer _videoResizeDebounceTimer;
+
+        private bool _videoResizeScheduled;
+        private int _lastVideoPanelWidth;
+        private int _lastVideoPanelHeight;
+
+        //end of ffplay video player fields
         public float SlantRange
         {
             get
@@ -88,19 +125,13 @@ namespace MissionPlanner.GCSViews
 
         System.Timers.Timer _videoRecordSegmentTimer = new System.Timers.Timer();
 
-        private static LibVLCSharp.Shared.LibVLC _libVlc;
-        private static MediaPlayer _mediaPlayer;
-        private static Media media;
-
-        LibVLCSharp.Shared.LibVLC _vlcRecord;
-        MediaPlayer _mediaPlayerRecord;
-        Media _mediaRecord;
-
         Panel panelDoubleClick;
 
         System.Timers.Timer _feedTimer;
         ElapsedEventHandler handler = null;
-
+        private const bool AutoConnectStream = true;
+        private const bool AutoDisplayStream = true;
+        private const bool AutoStartRecording = false;
         private object lckStart = new object();
         bool _enableCrossHair = true;
         private const int MAXBLINK = 10;
@@ -127,8 +158,14 @@ namespace MissionPlanner.GCSViews
             CameraControlDLLVersion = CameraHandler.Instance.CameraControlDLLVersion;
             CameraIP = SettingManager.Get(Setting.CameraIP);
 
-            StartCameraStream();
+            InitializeVideoStream();
+            WireVideoStartupEvents();
+            ScheduleVideoStartupCheck();
             StartCameraControl();
+
+            _videoResizeDebounceTimer = new System.Windows.Forms.Timer();
+            _videoResizeDebounceTimer.Interval = 250;
+            _videoResizeDebounceTimer.Tick += VideoResizeDebounceTimer_Tick;
 
             // Snapshot & video save location
             CameraHandler.Instance.MediaSavePath = MissionPlanner.Utilities.Settings.GetUserDataDirectory() + "MV04_media" + Path.DirectorySeparatorChar;
@@ -136,7 +173,7 @@ namespace MissionPlanner.GCSViews
             // SysID for camera functions
             CameraHandler.sysID = MainV2.comPort.sysidcurrent;
 
-            if(MainV2.comPort != null)
+            if (MainV2.comPort != null)
                 MainV2.comPort.MavChanged += (sender, eventArgs) => CameraHandler.sysID = MainV2.comPort.sysidcurrent; // Update sysID on new connection
 
             CameraHandler.Instance.event_ReportArrived += CameraHandler_event_ReportArrived;
@@ -149,7 +186,7 @@ namespace MissionPlanner.GCSViews
             #region UI config
 
             // Draw UI
-            if(MainV2.instance.devmode)
+            if (MainV2.instance.devmode)
                 DrawUI();
 
             SetStopButtonVisibility();
@@ -181,19 +218,6 @@ namespace MissionPlanner.GCSViews
 
             #endregion
 
-            #region recording vlc stream
-            //hol az autostart record?
-
-            _segmentLength = int.Parse(SettingManager.Get(Setting.VideoSegmentLength));
-
-            if (_segmentLength < 60)
-                _segmentLength = 60;
-
-            _videoRecordSegmentTimer.Interval = _segmentLength * 1000;
-            _videoRecordSegmentTimer.Elapsed += _videoRecordSegmentTimer_Tick;
-
-            #endregion
-
             #region Follow mode
 
             _feedTimer = new System.Timers.Timer();
@@ -210,11 +234,21 @@ namespace MissionPlanner.GCSViews
             SetDroneStatusValue();
 
             MainV2.comPort.CommsClose += ComPort_CommsClose;
-
-            if(bool.Parse(SettingManager.Get(Setting.AutoConnect)))
+            //pnl_VideoView.MouseDoubleClick += vv_VLC_MouseDoubleClick;
+            if (bool.Parse(SettingManager.Get(Setting.AutoConnect)))
                 this.btn_TripSwitchOnOff.Enabled = false;
         }
 
+        private void WireVideoStartupEvents()
+        {
+            this.Load += CameraView_Load;
+            this.HandleCreated += CameraView_HandleCreated;
+            this.VisibleChanged += CameraView_VisibleChanged;
+            this.ParentChanged += CameraView_ParentChanged;
+
+            pnl_VideoView.HandleCreated += Pnl_VideoView_HandleCreated;
+            pnl_VideoView.VisibleChanged += Pnl_VideoView_VisibleChanged;
+        }
         private void ComPort_CommsClose(object sender, EventArgs e)
         {
             //stop recording
@@ -262,8 +296,8 @@ namespace MissionPlanner.GCSViews
                 Invoke(new Action(() =>
                 {
                     tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
-                    vv_VLC.Dock = DockStyle.Fill;
-                    vv_VLC.BringToFront();
+                    //vv_VLC.Dock = DockStyle.Fill;
+                    //vv_VLC.BringToFront();
                     controlsClosed = false;
                     btn.Text = "Close";
                     MainV2.instance.HideflightData();
@@ -271,8 +305,8 @@ namespace MissionPlanner.GCSViews
             else
             {
                 tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
-                vv_VLC.Dock = DockStyle.Fill;
-                vv_VLC.BringToFront();
+                //vv_VLC.Dock = DockStyle.Fill;
+                //vv_VLC.BringToFront();
                 controlsClosed = false;
                 btn.Text = "Close";
                 MainV2.instance.HideflightData();
@@ -285,16 +319,16 @@ namespace MissionPlanner.GCSViews
                 Invoke(new Action(() =>
                 {
                     tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
-                    vv_VLC.Dock = DockStyle.Fill;
-                    vv_VLC.BringToFront();
+                    //vv_VLC.Dock = DockStyle.Fill;
+                    //vv_VLC.BringToFront();
                     controlsClosed = false;
                     btn.Text = "Close";
                 }));
             else
             {
                 tlp_CVBase.ColumnStyles[tlp_CVBase.ColumnStyles.Count - 1].Width = columnWidth;
-                vv_VLC.Dock = DockStyle.Fill;
-                vv_VLC.BringToFront();
+                //vv_VLC.Dock = DockStyle.Fill;
+                //vv_VLC.BringToFront();
                 controlsClosed = false;
                 btn.Text = "Close";
             }
@@ -321,9 +355,9 @@ namespace MissionPlanner.GCSViews
             Dictionary<string, Action> testFunctions = new Dictionary<string, Action>
             {
                 {"Open settings", () => { SettingManager.OpenDialog(); }},
-                {"Start stream", () => { StartCameraStream(); }},
+                {"Start stream", () => { StartVideoStream(); }},
                 {"Start control", () => { StartCameraControl(); }},
-                {"Start stream & control", () => { StartCameraStream(); StartCameraControl(); }},
+                {"Start stream & control", () => { StartVideoStream(); StartCameraControl(); }},
                 {"Switch crosshairs", () => { ChangeCrossHair(); }},
                 {"Do photo", () => { DoPhoto(); }},
                 {"Start recording", () => { StartRecording(); }},
@@ -391,25 +425,9 @@ namespace MissionPlanner.GCSViews
 
         public void SetNewURL(string url)
         {
-            // Set new URL
             SettingManager.Set(Setting.CameraStreamUrl, url);
             SettingManager.Save();
             log.Info("Stream URL set to: " + url);
-
-            // Restart VLC
-            CameraView.instance.StopVLC();
-            Thread.Sleep(2000);
-            CameraView.instance.StartVideoStreamVLC();
-
-            // Check if URL was set
-            if (media.Mrl == SettingManager.Get(Setting.CameraStreamUrl))
-            {
-                MessageBox.Show("Stream URL a következőre lett állítva: " + url);
-            }
-            else
-            {
-                MessageBox.Show("Stream URL beállítás sikertelen");
-            }
         }
 
         private void StartFeed()
@@ -500,11 +518,6 @@ namespace MissionPlanner.GCSViews
 
         #region CameraFunctions
 
-        private void StartCameraStream()
-        {
-            StartVideoStreamVLC();
-        }
-
         public void StartCameraControl()
         {
             bool success;
@@ -525,16 +538,18 @@ namespace MissionPlanner.GCSViews
 
         private void ReconnectCameraStreamAndControl()
         {
-            Task.Factory.StartNew(() => {
+            Task.Factory.StartNew(() =>
+            {
                 if (InvokeRequired)
-                    Invoke(new Action(() => {
-                        //StartCameraStream();
+                    Invoke(new Action(() =>
+                    {
+                        StartVideoStream();
                         StartCameraControl();
                         CameraHandler.Instance.SetSystemTimeToCurrent();
                     }));
                 else
                 {
-                    //StartCameraStream();
+                    StartVideoStream();
                     StartCameraControl();
                     CameraHandler.Instance.SetSystemTimeToCurrent();
                 }
@@ -551,68 +566,700 @@ namespace MissionPlanner.GCSViews
 
         #endregion
 
-        private void DoPhoto(string path = null)
+        private void ApplyCameraStreamAddress(CameraStreamOptions options, string cameraStreamAddress)
         {
-            Rectangle bounds = Screen.PrimaryScreen.Bounds;
-            using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height))
-            using (Graphics g = Graphics.FromImage(bitmap))
-            {
-                g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
-                bitmap.Save(CameraHandler.Instance.MediaSavePath + "SnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", ImageFormat.Jpeg);
-            }
+            if (options == null)
+                return;
 
-            _mediaPlayer.TakeSnapshot(0, CameraHandler.Instance.MediaSavePath + "VideoStreamSnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg", (uint)vv_VLC.Bounds.Width, (uint)vv_VLC.Bounds.Height);
+            if (string.IsNullOrWhiteSpace(cameraStreamAddress))
+                return;
+
+            try
+            {
+                Uri uri = new Uri(cameraStreamAddress.Trim());
+
+                if (!string.Equals(uri.Scheme, "rtp", StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                if (!string.IsNullOrWhiteSpace(uri.Host))
+                    options.CameraSourceIpAddress = uri.Host;
+
+                if (uri.Port > 0)
+                    options.CameraRtpPort = uri.Port;
+
+                options.LocalBindIpAddress = "0.0.0.0";
+
+                System.Diagnostics.Debug.WriteLine("Camera stream address input: " + cameraStreamAddress);
+                System.Diagnostics.Debug.WriteLine("Parsed CameraSourceIpAddress: " + options.CameraSourceIpAddress);
+                System.Diagnostics.Debug.WriteLine("Parsed CameraRtpPort: " + options.CameraRtpPort);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Invalid camera stream address: " + cameraStreamAddress);
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
         }
 
-        private void _videoRecordSegmentTimer_Tick(object sender, EventArgs e)
+        private void videoPanelLoaded(object sender, EventArgs e)
         {
-            _mediaPlayerRecord.Stop();
-            StartRecording();
+            ScheduleVideoStartupCheck();
+        }
+
+        private CameraStreamOptions BuildVideoStreamOptions()
+        {
+            CameraStreamOptions options = new CameraStreamOptions();
+
+            options.FfplayPath = _ffplayPath;
+            options.FfmpegPath = _ffmpegPath;
+
+            ApplyCameraStreamAddress(options, SettingManager.Get(Setting.CameraStreamUrl));
+
+            // Safer while integrating.
+            options.CameraSourceIpAddress = "";
+
+            options.LocalBindIpAddress = "0.0.0.0";
+
+            options.LocalHost = "127.0.0.1";
+            options.LocalDisplayRtpPort = LocalDisplayRtpPort;
+            options.LocalRecordingRtpPort = LocalRecordingRtpPort;
+
+            options.StreamWidth = StreamWidth;
+            options.StreamHeight = StreamHeight;
+
+            options.FitMode = VideoFitMode.FitKeepAspectRatio;
+            options.SyncMode = FfplaySyncMode.External;
+
+            options.UseSetPtsZero = StreamUseSetPtsZero;
+            options.UseMaxDelayZero = StreamUseMaxDelayZero;
+            options.UseAvioDirect = StreamUseAvioDirect;
+
+            options.DisableAudio = true;
+            options.HideConsoleWindow = true;
+
+            options.RestartDelayMs = 300;
+            options.WindowFindTimeoutMs = 15000;
+            options.SilentRetryDelayMs = 5000;
+
+            options.RecordWithStreamCopy = true;
+            options.RecordingExtension = "mkv";
+
+            options.FanOutReceiveBufferBytes = FanOutReceiveBufferBytes;
+            options.FanOutSoftDropEnabled = FanOutSoftDropEnabled;
+            options.FanOutBacklogDropThresholdBytes = FanOutBacklogDropThresholdBytes;
+            options.FanOutMaxDrainPackets = FanOutMaxDrainPackets;
+
+            options.AutoConnectStream = AutoConnectStream;
+            options.AutoDisplayStream = AutoDisplayStream;
+            options.AutoStartRecording = AutoStartRecording;
+
+            options.AutoRecordingDirectory = SettingManager.Get(Setting.MediaSaveFolder);
+            options.AutoRecordingSegmentSeconds = Int32.Parse(SettingManager.Get(Setting.VideoSegmentLength));
+            options.AutoRecordingFilePrefix = "camera";
+
+            options.ShowDebugMessageBoxes = false;
+
+            return options;
+        }
+
+
+
+        private void InitializeVideoStream()
+        {
+            if (_videoStreamInitialized)
+                return;
+
+            _videoStreamInitialized = true;
+
+            _streamOptions = BuildVideoStreamOptions();
+
+            _cameraStreamPlayer = new FfplayFanoutCameraStreamPlayer(_streamOptions);
+
+            _cameraStreamPlayer.StatusChanged += CameraStreamPlayer_StatusChanged;
+            _cameraStreamPlayer.ErrorOccurred += CameraStreamPlayer_ErrorOccurred;
+
+            pnl_VideoView.Resize += Pnl_VideoView_Resize;
+            pnl_VideoView.SizeChanged += Pnl_VideoView_SizeChanged;
+            pnl_VideoView.ClientSizeChanged += Pnl_VideoView_ClientSizeChanged;
+            pnl_VideoView.VisibleChanged += Pnl_VideoView_VisibleChanged;
+            pnl_VideoView.Paint += Pnl_VideoView_Paint;
+
+            this.Resize += CameraView_Resize;
+            this.SizeChanged += CameraView_SizeChanged;
+            this.VisibleChanged += CameraView_VisibleChanged;
+            this.ParentChanged += CameraView_ParentChanged;
+
+            System.Diagnostics.Debug.WriteLine("Video stream initialized.");
+        }
+
+        private void ScheduleVideoStartupCheck()
+        {
+            if (_startupCheckScheduled)
+            {
+                VideoLog("ScheduleVideoStartupCheck ignored: already scheduled.");
+                return;
+            }
+
+            _startupCheckScheduled = true;
+
+            try
+            {
+                VideoLog("ScheduleVideoStartupCheck scheduled.");
+
+                BeginInvoke(new Action(delegate
+                {
+                    _startupCheckScheduled = false;
+                    VideoLog("ScheduleVideoStartupCheck executing.");
+                    TryApplyAutoStreamStartup();
+                }));
+            }
+            catch (Exception ex)
+            {
+                _startupCheckScheduled = false;
+                VideoLog("ScheduleVideoStartupCheck failed: " + ex.Message);
+            }
+        }
+
+        private void TryApplyAutoStreamStartup()
+        {
+            if (_autoStartupApplied)
+                return;
+
+            if (!IsVideoHostReady())
+            {
+                VideoLog(
+                    "Video startup delayed. " +
+                    "ControlHandle=" + IsHandleCreated +
+                    ", PanelHandle=" + pnl_VideoView.IsHandleCreated +
+                    ", ControlVisible=" + Visible +
+                    ", PanelVisible=" + pnl_VideoView.Visible +
+                    ", PanelSize=" + pnl_VideoView.Width + "x" + pnl_VideoView.Height
+                );
+
+                ScheduleVideoStartupCheck();
+                return;
+            }
+
+            VideoLog("Video host ready. Applying auto stream startup.");
+
+            ApplyAutoStreamStartup();
+
+            // Mark this after ApplyAutoStreamStartup was called.
+            _autoStartupApplied = true;
+        }
+
+        private bool IsVideoHostReady()
+        {
+            if (IsDisposed)
+                return false;
+
+            if (!IsHandleCreated)
+                return false;
+
+            if (!pnl_VideoView.IsHandleCreated)
+                return false;
+
+            if (!Visible)
+                return false;
+
+            if (!pnl_VideoView.Visible)
+                return false;
+
+            if (pnl_VideoView.Width <= 0 || pnl_VideoView.Height <= 0)
+                return false;
+
+            Form form = FindForm();
+
+            if (form != null)
+            {
+                if (!form.Visible)
+                    return false;
+
+                if (!form.IsHandleCreated)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private void ApplyAutoStreamStartup()
+        {
+            try
+            {
+                EnsureVideoStreamPlayer();
+
+                if (_streamOptions.AutoConnectStream)
+                {
+                    _cameraStreamPlayer
+                        .ConnectAsync()
+                        .ContinueWith(delegate (Task task)
+                        {
+                            if (task.Exception != null)
+                                HandleVideoStreamException(task.Exception.GetBaseException());
+                        });
+                }
+
+                if (_streamOptions.AutoDisplayStream)
+                {
+                    StartVideoStream();
+                }
+
+                if (_streamOptions.AutoStartRecording)
+                {
+                    StartRecording();
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
+        }
+
+        private void StartVideoStream()
+        {
+            try
+            {
+                VideoLog("StartVideoStream called.");
+
+                _videoStreamStartRequested = true;
+
+                if (_videoStreamStartInProgress)
+                {
+                    VideoLog("StartVideoStream ignored: display start is already in progress.");
+                    return;
+                }
+
+                EnsureVideoStreamPlayer();
+
+                if (_cameraStreamPlayer != null && _cameraStreamPlayer.IsDisplayRunning)
+                {
+                    VideoLog("StartVideoStream ignored: display is already running.");
+                    return;
+                }
+
+                if (_cameraStreamPlayer == null)
+                {
+                    VideoLog("StartVideoStream delayed: _cameraStreamPlayer is null.");
+                    ScheduleVideoStartupCheck();
+                    return;
+                }
+
+                if (!IsVideoHostReady())
+                {
+                    VideoLog("StartVideoStream delayed: video host is not ready.");
+                    ScheduleVideoStartupCheck();
+                    return;
+                }
+
+                _videoStreamStartInProgress = true;
+
+                pnl_VideoView.Visible = true;
+                pnl_VideoView.BringToFront();
+
+                VideoLog("Starting video stream. Panel handle=" +
+                        pnl_VideoView.Handle +
+                        ", size=" +
+                        pnl_VideoView.Width +
+                        "x" +
+                        pnl_VideoView.Height);
+
+                _cameraStreamPlayer.StartAsync(pnl_VideoView.Handle)
+                                   .ContinueWith(delegate (Task task)
+                {
+                    _videoStreamStartInProgress = false;
+
+                    if (task.Exception != null)
+                    {
+                        HandleVideoStreamException(task.Exception.GetBaseException());
+                        return;
+                    }
+
+                    VideoLog("StartVideoStream completed.");
+                });
+            }
+            catch (Exception ex)
+            {
+                _videoStreamStartInProgress = false;
+                HandleVideoStreamException(ex);
+            }
+        }
+
+        private void StopVideoStream()
+        {
+            try
+            {
+                _videoStreamStartRequested = false;
+                _videoStreamStartInProgress = false;
+                _videoDisplayStartupCompleted = false;
+                _videoResizePending = false;
+
+                if (_videoResizeDebounceTimer != null)
+                    _videoResizeDebounceTimer.Stop();
+
+                if (_cameraStreamPlayer != null)
+                    _cameraStreamPlayer.StopDisplay();
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
+        }
+
+        private void RestartVideoStream()
+        {
+            try
+            {
+                _videoStreamStartRequested = true;
+                _videoStreamStartInProgress = false;
+
+                EnsureVideoStreamPlayer();
+
+                if (!IsVideoHostReady())
+                {
+                    System.Diagnostics.Debug.WriteLine("RestartVideoStream delayed: video host is not ready.");
+                    ScheduleVideoStartupCheck();
+                    return;
+                }
+
+                pnl_VideoView.Visible = true;
+                pnl_VideoView.BringToFront();
+
+                System.Diagnostics.Debug.WriteLine(
+                    "Restarting video stream. Panel handle=" +
+                    pnl_VideoView.Handle +
+                    ", size=" +
+                    pnl_VideoView.Width +
+                    "x" +
+                    pnl_VideoView.Height
+                );
+
+                _videoStreamStartInProgress = true;
+
+                _cameraStreamPlayer
+                    .RestartAsync(pnl_VideoView.Handle)
+                    .ContinueWith(delegate (Task task)
+                    {
+                        _videoStreamStartInProgress = false;
+
+                        if (task.Exception != null)
+                        {
+                            HandleVideoStreamException(task.Exception.GetBaseException());
+                            return;
+                        }
+
+                        RunOnUiThread(delegate
+                        {
+                            ResizeVideoStream();
+                        });
+                    });
+            }
+            catch (Exception ex)
+            {
+                _videoStreamStartInProgress = false;
+                HandleVideoStreamException(ex);
+            }
+        }
+
+        [DllImport("user32.dll")]
+        private static extern uint GetDpiForSystem();
+
+        [DllImport("user32.dll")]
+        private static extern uint GetDpiForWindow(IntPtr hwnd);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr MonitorFromWindow(
+    IntPtr hwnd,
+    uint dwFlags);
+
+        [DllImport("shcore.dll")]
+        private static extern int GetDpiForMonitor(
+    IntPtr hmonitor,
+    int dpiType,
+    out uint dpiX,
+    out uint dpiY);
+
+        [DllImport("shcore.dll")]
+        private static extern int GetScaleFactorForMonitor(
+    IntPtr hMonitor,
+    out int pScale);
+
+        private void DoPhoto(string path = null)
+        {
+            try
+            {
+                EnsureVideoStreamPlayer();
+
+                string outputPath = path;
+
+                if (string.IsNullOrWhiteSpace(outputPath))
+                {
+                    string directory = SettingManager.Get(Setting.MediaSaveFolder);
+                    Directory.CreateDirectory(directory);
+
+                    outputPath = Path.Combine(directory,
+                                              "SnapShot" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
+                }
+                else
+                {
+                    string directory = Path.GetDirectoryName(outputPath);
+
+                    if (!string.IsNullOrWhiteSpace(directory))
+                        Directory.CreateDirectory(directory);
+                }
+
+
+                IntPtr monitor = MonitorFromWindow(this.Handle, 2);
+
+                int result = GetScaleFactorForMonitor(monitor, out int scale);
+
+                if (result != 0)
+                    scale = 100; // 100%, not 96
+
+                float scaling = scale / 100f;
+
+                Point topLeft = pnl_VideoView.PointToScreen(Point.Empty);
+                Rectangle videoRect = pnl_VideoView.GetVideoRect();
+
+                // Convert logical screen coordinates to physical pixels
+                videoRect.X = (int)Math.Round((topLeft.X + videoRect.X) * scaling);
+                videoRect.Y = (int)Math.Round((topLeft.Y + videoRect.Y) * scaling);
+
+                videoRect.Width = (int)Math.Round(videoRect.Width * scaling);
+                videoRect.Height = (int)Math.Round(videoRect.Height * scaling);
+
+                _cameraStreamPlayer.CaptureCurrentFrameAsync(outputPath, videoRect)
+                                   .ContinueWith(delegate (Task task)
+                {
+                    if (task.Exception != null)
+                    {
+                        HandleVideoStreamException(task.Exception.GetBaseException());
+                        return;
+                    }
+
+                    System.Diagnostics.Debug.WriteLine("Photo saved: " + outputPath);
+                });
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
         }
 
         private void StartRecording()
         {
             try
             {
-                if (isCameraConnected)
-                {
-                    if (_vlcRecord == null)
-                        _vlcRecord = new LibVLCSharp.Shared.LibVLC();
+                if (_recordingInProgress)
+                    return;
 
-                    if (_mediaPlayerRecord == null)
-                        _mediaPlayerRecord = new MediaPlayer(_vlcRecord);
+                _recordingInProgress = true;
 
-                    if (_mediaRecord == null)
+                EnsureVideoStreamPlayer();
+
+                string recordingDirectory = _streamOptions.AutoRecordingDirectory;
+                int segmentSeconds = _streamOptions.AutoRecordingSegmentSeconds;
+                string filePrefix = "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                if (string.IsNullOrWhiteSpace(recordingDirectory))
+                    recordingDirectory = _recordingDirectory;
+
+                if (segmentSeconds <= 0)
+                    segmentSeconds = _recordingSegmentSeconds;
+
+                Directory.CreateDirectory(recordingDirectory);
+
+                _cameraStreamPlayer
+                    .StartSegmentRecordingAsync(
+                        recordingDirectory,
+                        segmentSeconds,
+                        filePrefix
+                    )
+                    .ContinueWith(delegate (Task task)
                     {
-                        _mediaRecord = new Media(_vlcRecord, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
-                        _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
-                    }
-                    else
-                    {
-                        _mediaRecord = null;
-                        _mediaRecord = new Media(_vlcRecord, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
-                        _mediaRecord.AddOption(":sout=#transcode{vcodec=mp4v,acodec=none,vb=128,deinterlace}:std{access=file,mux=mp4,dst=" + CameraHandler.Instance.MediaSavePath + "streamRecord" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".mp4" + "}");
-                    }
+                        if (task.Exception != null)
+                        {
+                            _recordingInProgress = false;
+                            HandleVideoStreamException(task.Exception.GetBaseException());
+                            return;
+                        }
 
-                    _mediaPlayerRecord.Play(_mediaRecord);
-                    _videoRecordSegmentTimer?.Start();
-                    _recordingInProgress = true;
-                }
+                        System.Diagnostics.Debug.WriteLine("Recording started: " + recordingDirectory);
+                    });
             }
-            catch
+            catch (Exception ex)
             {
-                CustomMessageBox.Show("Videó rögzítése sikertelen");
+                _recordingInProgress = false;
+                HandleVideoStreamException(ex);
             }
         }
 
         public void StopRecording()
         {
-            _videoRecordSegmentTimer?.Stop();
+            try
+            {
+                _recordingInProgress = false;
 
-            if(_mediaPlayerRecord != null)
-                _mediaPlayerRecord.Stop();
+                if (_cameraStreamPlayer != null)
+                    _cameraStreamPlayer.StopSegmentRecording();
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
+        }
 
-            _recordingInProgress = false;
+
+        private void EnsureVideoStreamPlayer()
+        {
+            if (_cameraStreamPlayer != null)
+                return;
+
+            _streamOptions = BuildVideoStreamOptions();
+
+            _cameraStreamPlayer = new FfplayFanoutCameraStreamPlayer(_streamOptions);
+
+            _cameraStreamPlayer.StatusChanged += CameraStreamPlayer_StatusChanged;
+            _cameraStreamPlayer.ErrorOccurred += CameraStreamPlayer_ErrorOccurred;
+        }
+
+        private void ResizeVideoStream()
+        {
+            if (_cameraStreamPlayer == null)
+                return;
+
+            if (pnl_VideoView.ClientSize.Width <= 0 || pnl_VideoView.ClientSize.Height <= 0)
+                return;
+
+            _cameraStreamPlayer.Resize(
+                pnl_VideoView.ClientSize.Width,
+                pnl_VideoView.ClientSize.Height
+            );
+        }
+
+        private void ApplyVideoResizeForce()
+        {
+            try
+            {
+                if (_cameraStreamPlayer == null)
+                    return;
+
+                if (!_cameraStreamPlayer.IsDisplayRunning)
+                    return;
+
+                if (pnl_VideoView == null || !pnl_VideoView.IsHandleCreated)
+                    return;
+
+                int width = pnl_VideoView.ClientSize.Width;
+                int height = pnl_VideoView.ClientSize.Height;
+
+                if (width <= 0 || height <= 0)
+                    return;
+
+                pnl_VideoView.Visible = true;
+                pnl_VideoView.BringToFront();
+
+                _lastAppliedVideoWidth = width;
+                _lastAppliedVideoHeight = height;
+
+                _cameraStreamPlayer.Resize(width, height);
+
+                pnl_VideoView.Invalidate();
+                pnl_VideoView.Update();
+
+                VideoLog("Video force resize applied: " + width + "x" + height);
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
+        }
+
+        private void DisposeVideoStream()
+        {
+            try
+            {
+                _videoStreamStartRequested = false;
+                _videoStreamStartInProgress = false;
+                _videoDisplayStartupCompleted = false;
+                _videoResizePending = false;
+
+                if (_videoResizeDebounceTimer != null)
+                    _videoResizeDebounceTimer.Stop();
+
+                if (_cameraStreamPlayer != null)
+                {
+                    _cameraStreamPlayer.Stop();
+                    _cameraStreamPlayer.Dispose();
+                    _cameraStreamPlayer = null;
+                }
+            }
+            catch
+            {
+            }
+        }
+
+
+        private void HandleVideoStreamException(Exception ex)
+        {
+            if (ex == null)
+                return;
+            System.Diagnostics.Debug.WriteLine("Video stream error: " + ex);
+        }
+
+        private void RunOnUiThread(Action action)
+        {
+            if (IsDisposed)
+                return;
+
+            if (InvokeRequired)
+            {
+                try
+                {
+                    BeginInvoke(action);
+                }
+                catch
+                {
+                }
+            }
+            else
+            {
+                action();
+            }
+        }
+
+        private void CameraStreamPlayer_StatusChanged(object sender, string message)
+        {
+            VideoLog("Video stream status: " + message);
+
+            if (message != null &&
+                message.IndexOf("Display streaming", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                RunOnUiThread(delegate
+                {
+                    _videoDisplayStartupCompleted = true;
+
+                    _lastAppliedVideoWidth = -1;
+                    _lastAppliedVideoHeight = -1;
+
+                    ApplyVideoResizeForce();
+
+                    System.Windows.Forms.Timer oneShotTimer = new System.Windows.Forms.Timer();
+                    oneShotTimer.Interval = 500;
+                    oneShotTimer.Tick += delegate
+                    {
+                        oneShotTimer.Stop();
+                        oneShotTimer.Dispose();
+
+                        ApplyVideoResizeForce();
+                    };
+
+                    oneShotTimer.Start();
+                });
+            }
+        }
+
+        private void CameraStreamPlayer_ErrorOccurred(object sender, Exception ex)
+        {
+            HandleVideoStreamException(ex);
         }
 
         private async Task ResetZoom()
@@ -770,7 +1417,9 @@ namespace MissionPlanner.GCSViews
             try
             {
                 StopRecording();
-                StopVLC();
+                StopVideoStream();
+                DisposeVideoStream();
+
                 _droneStatusTimer.Elapsed -= _droneStatustimer_Elapsed;
                 CameraHandler.Instance.event_ReportArrived -= CameraHandler_event_ReportArrived;
                 CameraHandler.Instance.event_DoPhoto -= Instance_event_DoPhoto;
@@ -778,13 +1427,10 @@ namespace MissionPlanner.GCSViews
                 _droneStatusTimer.Dispose();
                 _feedTimer.Dispose();
                 _videoRecordSegmentTimer.Dispose();
-
-                GC.Collect();
-
-                this.Dispose();
             }
-            catch { }
-
+            catch
+            {
+            }
         }
 
         private void btn_ChangeCrosshair_Click(object sender, EventArgs e)
@@ -800,17 +1446,17 @@ namespace MissionPlanner.GCSViews
             {
                 if (_fsForm == null)
                 {
+
                     // Media player
-                    this.tlp_CVBase.Controls.Remove(this.vv_VLC);
+                    this.tlp_CVBase.Controls.Remove(this.pnl_VideoView);
                     _fsForm = new FormNoTheme();
-                    _fsForm.Controls.Add(this.vv_VLC);
-                    vv_VLC.Dock = DockStyle.Fill;
-                    vv_VLC.BringToFront();
-                    _mediaPlayer.Fullscreen = true;
+                    _fsForm.Controls.Add(this.pnl_VideoView);
+                    pnl_VideoView.Dock = DockStyle.Fill;
+                    pnl_VideoView.BringToFront();
                     _fsForm.WindowState = FormWindowState.Maximized;
                     _fsForm.FormClosing += _fsForm_FormClosing;
 
-                    // Buttons
+                    // Buttonsdev
                     ButtonNoTheme zoomResetButton = new ButtonNoTheme();
                     zoomResetButton.Name = "zoomResetButton";
                     zoomResetButton.Text = btn_ResetZoom.Text;
@@ -865,19 +1511,168 @@ namespace MissionPlanner.GCSViews
             }
             catch
             {
-                if(MainV2.instance.devmode)
+                if (MainV2.instance.devmode)
                     CustomMessageBox.Show("Teljes képernyős mód hiba");
             }
 
         }
 
+        private void VideoResizeDebounceTimer_Tick(object sender, EventArgs e)
+        {
+            _videoResizeDebounceTimer.Stop();
+            ApplyVideoResizeIfNeeded();
+        }
+
+        private void ScheduleVideoResize()
+        {
+            try
+            {
+                if (!_videoDisplayStartupCompleted)
+                    return;
+
+                if (_cameraStreamPlayer == null)
+                    return;
+
+                if (!_cameraStreamPlayer.IsDisplayRunning)
+                    return;
+
+                if (pnl_VideoView == null || !pnl_VideoView.IsHandleCreated)
+                    return;
+
+                if (pnl_VideoView.ClientSize.Width <= 0 || pnl_VideoView.ClientSize.Height <= 0)
+                    return;
+
+                _videoResizePending = true;
+
+                _videoResizeDebounceTimer.Stop();
+                _videoResizeDebounceTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
+        }
+
+        private void ApplyVideoResizeIfNeeded()
+        {
+            try
+            {
+                if (!_videoResizePending)
+                    return;
+
+                _videoResizePending = false;
+
+                if (_cameraStreamPlayer == null)
+                    return;
+
+                if (!_cameraStreamPlayer.IsDisplayRunning)
+                    return;
+
+                if (pnl_VideoView == null || !pnl_VideoView.IsHandleCreated)
+                    return;
+
+                int width = pnl_VideoView.ClientSize.Width;
+                int height = pnl_VideoView.ClientSize.Height;
+
+                if (width <= 0 || height <= 0)
+                    return;
+
+                if (width == _lastAppliedVideoWidth && height == _lastAppliedVideoHeight)
+                    return;
+
+                _lastAppliedVideoWidth = width;
+                _lastAppliedVideoHeight = height;
+
+                _cameraStreamPlayer.Resize(width, height);
+
+                pnl_VideoView.Invalidate();
+
+                VideoLog("Video resize applied: " + width + "x" + height);
+            }
+            catch (Exception ex)
+            {
+                HandleVideoStreamException(ex);
+            }
+        }
+
+        private void CameraView_Load(object sender, EventArgs e)
+        {
+            VideoLog("CameraView_Load");
+            ScheduleVideoStartupCheck();
+        }
+
+        private void CameraView_HandleCreated(object sender, EventArgs e)
+        {
+            VideoLog("CameraView_HandleCreated");
+            ScheduleVideoStartupCheck();
+        }
+
+        private void CameraView_VisibleChanged(object sender, EventArgs e)
+        {
+            VideoLog("CameraView_VisibleChanged: " + Visible);
+            ScheduleVideoStartupCheck();
+            ScheduleVideoResize();
+        }
+
+        private void CameraView_ParentChanged(object sender, EventArgs e)
+        {
+            VideoLog("CameraView_ParentChanged");
+            ScheduleVideoStartupCheck();
+            ScheduleVideoResize();
+        }
+
+        private void Pnl_VideoView_HandleCreated(object sender, EventArgs e)
+        {
+            VideoLog("pnl_VideoView HandleCreated");
+            ScheduleVideoStartupCheck();
+        }
+
+        private void Pnl_VideoView_Resize(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
+        }
+
+        private void Pnl_VideoView_SizeChanged(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
+        }
+
+        private void Pnl_VideoView_ClientSizeChanged(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
+        }
+
+        private void Pnl_VideoView_VisibleChanged(object sender, EventArgs e)
+        {
+            ScheduleVideoStartupCheck();
+            ScheduleVideoResize();
+        }
+
+        private void Pnl_VideoView_Paint(object sender, PaintEventArgs e)
+        {
+            ScheduleVideoResize();
+        }
+
+        private void CameraView_Resize(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
+            _cameraStreamPlayer.Resize(
+                pnl_VideoView.ClientSize.Width,
+                pnl_VideoView.ClientSize.Height
+            );
+        }
+
+        private void CameraView_SizeChanged(object sender, EventArgs e)
+        {
+            ScheduleVideoResize();
+        }
+
         private void _fsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _fsForm.Controls.Remove(vv_VLC);
-            this.tlp_CVBase.Controls.Add(vv_VLC);
-            vv_VLC.Dock = DockStyle.Fill;
-            vv_VLC.BringToFront();
-            _mediaPlayer.Fullscreen = true;
+            _fsForm.Controls.Remove(pnl_VideoView);
+            this.tlp_CVBase.Controls.Add(pnl_VideoView);
+            pnl_VideoView.Dock = DockStyle.Fill;
+            pnl_VideoView.BringToFront();
             _fsForm.FormClosing -= _fsForm_FormClosing;
             _fsForm.Dispose();
             _fsForm = null;
@@ -896,7 +1691,7 @@ namespace MissionPlanner.GCSViews
 
         private void CameraSettings_event_StartStopRecording(object sender, EventArgs e)
         {
-            if(_recordingInProgress)
+            if (_recordingInProgress)
                 StopRecording();
             else
                 StartRecording();
@@ -942,41 +1737,23 @@ namespace MissionPlanner.GCSViews
         }
 
 
+        private void VideoLog(string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message);
+
+            try
+            {
+                log.Info("[VideoStream] " + message);
+            }
+            catch
+            {
+            }
+        }
+
         private void CameraHandler_event_ReportArrived(object sender, ReportEventArgs e)
         {
             try
             {
-                if (isCameraConnected == false)
-                {
-                    try
-                    {
-                        if (bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream)) && _recordingInProgress == false)
-                        {
-                            StartRecording();
-
-                            //set recording button
-                            if (InvokeRequired)
-                                Invoke(new Action(() =>
-                                {
-                                    this.btn_Recording.ForeColor = Color.Red;
-                                }));
-                            else
-                            {
-                                this.btn_Recording.ForeColor = Color.Red;
-                            }
-
-                            if (MainV2.instance.devmode)
-                                CustomMessageBox.Show("A videó rögzítés elindult");
-                        }
-                    }
-                    catch
-                    {
-                        
-                    }
-                    
-
-                }
-
                 //can not switch off trip until report in case of tripautoconnect
                 if (InvokeRequired)
                     Invoke(new Action(() => { this.btn_TripSwitchOnOff.Enabled = true; }));
@@ -989,7 +1766,7 @@ namespace MissionPlanner.GCSViews
                 try
                 {
                     _cameraState = CameraHandler.Instance.SysReportModeToMavProtoMode(e.Report);
-                    
+
                 }
                 catch { }
 
@@ -1156,21 +1933,21 @@ namespace MissionPlanner.GCSViews
         private int errorCounter = 0;
         private async Task reconnectLoop()
         {
-            await Task.Run(async () => {
+            await Task.Run(async () =>
+            {
                 while (!isCameraConnected)
                 {
                     try
                     {
                         await Task.Delay(3000);
                         StartCameraControl();
-                        //await reconnectControlDelayed();
                         _needToResetTime = true;
                     }
                     catch
                     {
                         errorCounter++;
 
-                        if(errorCounter > 5)
+                        if (errorCounter > 5)
                         {
                             break;
                         }
@@ -1179,15 +1956,7 @@ namespace MissionPlanner.GCSViews
                 }
 
                 Thread.Sleep(2000);
-                CameraView.instance.StartVideoStreamVLC();
             });
-        }
-
-        private async Task reconnectControlDelayed()
-        {
-            Task.Delay(3000);
-            StartCameraControl();
-
         }
 
         #endregion
@@ -1200,7 +1969,8 @@ namespace MissionPlanner.GCSViews
             {
                 if (InvokeRequired)
                 {
-                    Invoke(new Action(() => {
+                    Invoke(new Action(() =>
+                    {
                         if (IsCameraTrackingModeActive)
                             btn_StopTracking.Visible = true;
                         else
@@ -1291,7 +2061,7 @@ namespace MissionPlanner.GCSViews
             switch (StateHandler.CurrentSate)
             {
                 case MV04_State.Manual:
-                    if(  MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
+                    if (MainV2.comPort.MAV.cs.mode.ToUpper() != "LOITER")
                     {
                         Task.Run(() => ProvideDroneError());
                     }
@@ -1374,7 +2144,7 @@ namespace MissionPlanner.GCSViews
             else
                 this.pb_DroneTakeOff.Visible = false;
             //IR
-            if(position_IR == enum_PositionLEDState_IR.On)
+            if (position_IR == enum_PositionLEDState_IR.On)
                 this.pb_InfraLight.Visible = true;
             else
                 this.pb_InfraLight.Visible = false;
@@ -1394,77 +2164,9 @@ namespace MissionPlanner.GCSViews
 
             IsCameraTrackingModeActive = true;
 
-            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.vv_VLC.Size);
+            var success = CameraHandler.Instance.StartTracking(new Point(e.X, e.Y), this.pnl_VideoView.Size);
 
             SetStopButtonVisibility();
-        }
-
-        private void StartVLC()
-        {
-            try
-            {
-                if (_libVlc == null)
-                    _libVlc = new LibVLCSharp.Shared.LibVLC();
-
-                if (_mediaPlayer == null)
-                    _mediaPlayer = new MediaPlayer(_libVlc);
-
-                // media has to be created new, because media.Mrl is read-only otherwise
-                media = new Media(_libVlc, new Uri(SettingManager.Get(Setting.CameraStreamUrl)));
-
-                _mediaPlayer.EnableHardwareDecoding = true;
-                _mediaPlayer.NetworkCaching = 300;
-
-                vv_VLC.MediaPlayer = _mediaPlayer;
-                this.tlp_CVBase.Controls.Add(this.vv_VLC, 0, 0);
-                vv_VLC.Dock = DockStyle.Fill;
-                _mediaPlayer.Fullscreen = true;
-
-                if (panelDoubleClick == null)
-                {
-                    panelDoubleClick = new Panel();// panel for double click
-                    vv_VLC.Controls.Add(panelDoubleClick);
-                    panelDoubleClick.BringToFront();
-                    panelDoubleClick.Dock = DockStyle.Fill;
-                    panelDoubleClick.BackColor = Color.Transparent;
-                }
-                panelDoubleClick.MouseDoubleClick += new MouseEventHandler(vv_VLC_MouseDoubleClick);
-
-                vv_VLC.ThisReallyVisible();
-                vv_VLC.ChildReallyVisible();
-                _mediaPlayer.Play(media);
-
-                log.Info($"VLC started on {media.Mrl}");
-            }
-            catch (Exception ex)
-            {
-                // No messagebox, because reconnectLoop calls this method repeatedly
-                log.Error($"Error at VLC start: {ex.Message}");
-            }
-        }
-
-        public void StartVideoStreamVLC()
-        {
-            if (InvokeRequired)
-                Invoke(new Action(() => StartVLC()));
-            else
-                StartVLC();
-        }
-
-        public void StopVLC()
-        {
-            if (InvokeRequired)
-                Invoke(new Action(() => {
-                    _mediaPlayer.Stop();
-                    panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
-                }));
-            else
-            {
-                _mediaPlayer.Stop();
-                panelDoubleClick.MouseDoubleClick -= new MouseEventHandler(vv_VLC_MouseDoubleClick);
-            }
-
-            log.Info("VLC stopped");
         }
 
         private void SetTripOnOffButton(bool tripState)
@@ -1562,7 +2264,7 @@ namespace MissionPlanner.GCSViews
 
         private void btn_Recording_Click(object sender, EventArgs e)
         {
-            if(_recordingInProgress)
+            if (_recordingInProgress)
             {
                 StopRecording();
 
@@ -1576,6 +2278,25 @@ namespace MissionPlanner.GCSViews
                 this.btn_Recording.Text = "Stop Recording";
                 this.btn_Recording.ForeColor = Color.White;
             }
+        }
+
+        private void pnl_VideoView_VideoClick(object sender, VideoClickEventArgs e)
+        {
+            if (e.X <= 0 || e.Y <= 0 || e.Width <= 0 || e.Height <= 0)
+                return;
+
+            IsCameraTrackingModeActive = true;
+
+            Task.Run(() =>
+            {
+                bool success = CameraHandler.Instance.StartTracking(
+                    new Point(e.X, e.Y),
+                    new Size(e.Width, e.Height));
+
+                Debug.WriteLine(success ? "Track OK" : "Track Failed");
+            });
+
+            SetStopButtonVisibility();
         }
     }
 }
