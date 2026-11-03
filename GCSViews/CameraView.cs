@@ -67,7 +67,6 @@ namespace MissionPlanner.GCSViews
         private const int StreamWidth = 1920;
         private const int StreamHeight = 1080;
 
-        private string _cameraStreamIpAddress = "";
         private const int CameraRtpPort = 11024;
         private const int LocalDisplayRtpPort = 12000;
         private const int LocalRecordingRtpPort = 12002;
@@ -77,20 +76,19 @@ namespace MissionPlanner.GCSViews
         private const int FanOutBacklogDropThresholdBytes = 512 * 1024;
         private const int FanOutMaxDrainPackets = 16;
 
-        private string _ffplayPath = Path.Combine(
+        private readonly string _ffplayPath = Path.Combine(
                                             AppDomain.CurrentDomain.BaseDirectory,
                                             "ffmpeg-8.1.1-full_build",
                                             "bin",
                                             "ffplay.exe");
 
-        private string _ffmpegPath = Path.Combine(
+        private readonly string _ffmpegPath = Path.Combine(
                                             AppDomain.CurrentDomain.BaseDirectory,
                                             "ffmpeg-8.1.1-full_build",
                                             "bin",
                                             "ffmpeg.exe");
 
-        private string _recordingDirectory =
-            @"C:\VideoSegments";
+        private string _recordingDirectory = @"C:\VideoSegments";
 
         private int _recordingSegmentSeconds = 60;
         private string _recordingFilePrefix = "streamRecord";
@@ -427,25 +425,9 @@ namespace MissionPlanner.GCSViews
 
         public void SetNewURL(string url)
         {
-            // Set new URL
             SettingManager.Set(Setting.CameraStreamUrl, url);
             SettingManager.Save();
             log.Info("Stream URL set to: " + url);
-
-            // Restart Stream
-            //CameraView.instance.StopVideoStream();
-            Thread.Sleep(2000);
-            //CameraView.instance.StartVideoStream();
-
-            // Check if URL was set
-            //if (_cameraStreamPlayer.currentUrl == SettingManager.Get(Setting.CameraStreamUrl))
-            //{
-            //    MessageBox.Show("Stream URL a következőre lett állítva: " + url);
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Stream URL beállítás sikertelen");
-            //}
         }
 
         private void StartFeed()
@@ -854,6 +836,13 @@ namespace MissionPlanner.GCSViews
                     return;
                 }
 
+                if (_cameraStreamPlayer == null)
+                {
+                    VideoLog("StartVideoStream delayed: _cameraStreamPlayer is null.");
+                    ScheduleVideoStartupCheck();
+                    return;
+                }
+
                 if (!IsVideoHostReady())
                 {
                     VideoLog("StartVideoStream delayed: video host is not ready.");
@@ -866,29 +855,26 @@ namespace MissionPlanner.GCSViews
                 pnl_VideoView.Visible = true;
                 pnl_VideoView.BringToFront();
 
-                VideoLog(
-                    "Starting video stream. Panel handle=" +
-                    pnl_VideoView.Handle +
-                    ", size=" +
-                    pnl_VideoView.Width +
-                    "x" +
-                    pnl_VideoView.Height
-                );
+                VideoLog("Starting video stream. Panel handle=" +
+                        pnl_VideoView.Handle +
+                        ", size=" +
+                        pnl_VideoView.Width +
+                        "x" +
+                        pnl_VideoView.Height);
 
-                _cameraStreamPlayer
-    .StartAsync(pnl_VideoView.Handle)
-    .ContinueWith(delegate (Task task)
-    {
-        _videoStreamStartInProgress = false;
+                _cameraStreamPlayer.StartAsync(pnl_VideoView.Handle)
+                                   .ContinueWith(delegate (Task task)
+                {
+                    _videoStreamStartInProgress = false;
 
-        if (task.Exception != null)
-        {
-            HandleVideoStreamException(task.Exception.GetBaseException());
-            return;
-        }
+                    if (task.Exception != null)
+                    {
+                        HandleVideoStreamException(task.Exception.GetBaseException());
+                        return;
+                    }
 
-        VideoLog("StartVideoStream completed.");
-    });
+                    VideoLog("StartVideoStream completed.");
+                });
             }
             catch (Exception ex)
             {
@@ -1768,37 +1754,6 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                if (isCameraConnected == false)
-                {
-                    try
-                    {
-                        //if (bool.Parse(SettingManager.Get(Setting.AutoRecordVideoStream)) && _recordingInProgress == false)
-                        //{
-                        //    StartRecording();
-
-                        //    //set recording button
-                        //    if (InvokeRequired)
-                        //        Invoke(new Action(() =>
-                        //        {
-                        //            this.btn_Recording.ForeColor = Color.Red;
-                        //        }));
-                        //    else
-                        //    {
-                        //        this.btn_Recording.ForeColor = Color.Red;
-                        //    }
-
-                        //    if (MainV2.instance.devmode)
-                        //        CustomMessageBox.Show("A videó rögzítés elindult");
-                        //}
-                    }
-                    catch
-                    {
-
-                    }
-
-
-                }
-
                 //can not switch off trip until report in case of tripautoconnect
                 if (InvokeRequired)
                     Invoke(new Action(() => { this.btn_TripSwitchOnOff.Enabled = true; }));
