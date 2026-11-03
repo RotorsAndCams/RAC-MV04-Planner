@@ -84,7 +84,6 @@ namespace MissionPlanner.GCSViews
                     int.Parse(SettingManager.Get(Setting.CameraControlPort)));
                 Thread.Sleep(2000);
                 //CameraView.instance.StopVideoStream();
-                Thread.Sleep(2000);
                 //CameraView.instance.StartVideoStream();
 
                 isReconnecting = false;
